@@ -85,6 +85,15 @@ clients.
 The single new word assigned to a learner for a local calendar date. A missed
 date creates no backlog and does not permit an extra word later.
 
+**Reserved upcoming word**:
+An eligible, undelivered word provisionally held in a learner's bounded `Up
+next` queue. It is not a daily delivery and is not eligible for history or
+practice until the server assigns it to a local calendar date.
+
+**Skipped upcoming word**:
+A reserved upcoming word the learner declines before delivery. WordWell removes
+it from the queue and excludes it from that profile's future selection.
+
 **Familiarity**:
 The learner's self-reported prior knowledge of a delivered word, recorded before
 the lesson is read and used as initial scheduling evidence.
@@ -93,6 +102,34 @@ the lesson is read and used as initial scheduling evidence.
 An editorial estimate of how challenging a word is based on frequency, register,
 usage or meaning complexity, and practical usefulness. It is separate from any
 learner's mastery.
+
+**Adult-interest candidate**:
+A published word lesson eligible for delivery because it may be unfamiliar yet
+useful to a degree-educated adult in reading, writing, conversation, or precise
+thought. Test-prep and advanced school vocabulary are valuable sources of such
+candidates, not automatic inclusions.
+
+**Starting band**:
+The learner's initial adult-interest candidate range. `Build foundations`
+contains approachable but worthwhile words, `Stretch my vocabulary` is the
+default broad range, and `Challenge me` favors rarer, more specialized, or more
+linguistically demanding words. No band includes remedial vocabulary.
+
+**Editorial review signal**:
+Aggregate learner feedback, including skip and replacement patterns, that
+prompts human review of a word lesson or its delivery eligibility. It does not
+automatically change a word's publication or delivery status.
+
+**Editorial feedback review**:
+A human assessment of a word lesson prompted by a configurable aggregate
+feedback threshold or opened manually. It may leave the lesson unchanged,
+adjust future-delivery ranking, suspend future delivery, or escalate withdrawal
+to the content pipeline.
+
+**Delivery suspension**:
+An auditable stop on future delivery of a word lesson. It preserves existing
+lesson pages and history until a separate withdrawal makes the lesson
+unavailable.
 
 **Learner mastery**:
 The explainable, changeable estimate of how readily a learner can recall and use
