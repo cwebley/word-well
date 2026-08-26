@@ -86,13 +86,16 @@ The single new word assigned to a learner for a local calendar date. A missed
 date creates no backlog and does not permit an extra word later.
 
 **Reserved upcoming word**:
-An eligible, undelivered word provisionally held in a learner's bounded `Up
-next` queue. It is not a daily delivery and is not eligible for history or
-practice until the server assigns it to a local calendar date.
+An eligible, undelivered word provisionally held in a learner's server-managed,
+five-deep `Up next` queue. WordWell displays the first three. It is not a daily
+delivery and is not eligible for history or practice until the server assigns
+it to a local calendar date.
 
 **Skipped upcoming word**:
 A reserved upcoming word the learner declines before delivery. WordWell removes
-it from the queue and excludes it from that profile's future selection.
+it from the queue, excludes it from that profile's future selection, and
+appends one eligible replacement when online. A daily delivery cannot be
+skipped.
 
 **Familiarity**:
 The learner's self-reported prior knowledge of a delivered word, recorded before
