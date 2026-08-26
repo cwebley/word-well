@@ -1,0 +1,139 @@
+<!doctype html>
+<!-- PROTOTYPE: Three WordWell visual-language variants. Switch with ?variant=a|b|c. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordWell visual language prototype</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #263a2d;
+        --paper: #fffdf7;
+        --stone: #e7e4d9;
+        --water: #527a82;
+        --moss: #66815f;
+        --wood: #9a6748;
+        --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+        --serif: Iowan Old Style, Palatino Linotype, Book Antiqua, Georgia, serif;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--stone); color: var(--ink); font-family: var(--sans); }
+      button { font: inherit; cursor: pointer; }
+      .prototype-note { margin: 0; padding: .65rem 1rem; background: #24211c; color: #fffdf7; font-size: .8rem; text-align: center; }
+      .app { min-height: calc(100vh - 2.25rem); }
+      .nav-item { color: inherit; text-decoration: none; }
+      .label { display: block; color: var(--moss); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+      .word { margin: .35rem 0 0; font-family: var(--serif); font-size: clamp(4.5rem, 14vw, 9rem); font-weight: 400; letter-spacing: -.075em; line-height: .8; }
+      .pronunciation { color: color-mix(in srgb, var(--ink), transparent 45%); font-size: .9rem; }
+      .definition { font-family: var(--serif); font-size: clamp(1.45rem, 3vw, 2.2rem); line-height: 1.25; }
+      .familiarity { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 2rem; }
+      .familiarity button { border: 1px solid color-mix(in srgb, var(--ink), transparent 75%); border-radius: 99rem; background: transparent; color: var(--ink); padding: .7rem 1rem; }
+      .familiarity button:first-child { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+      .prototype-switcher { position: fixed; z-index: 3; bottom: 1rem; left: 50%; display: flex; align-items: center; gap: .7rem; padding: .45rem; border-radius: 99rem; background: #24211c; box-shadow: 0 1rem 2rem rgb(0 0 0 / 25%); color: white; transform: translateX(-50%); }
+      .prototype-switcher button { width: 2.2rem; height: 2.2rem; border: 0; border-radius: 50%; background: #fffdf7; color: #24211c; font-size: 1.15rem; }
+      .prototype-switcher span { min-width: 12rem; font-size: .8rem; text-align: center; }
+
+      /* A: Stone & Moss. A quiet reading desk with a narrow paper column. */
+      .variant-a { --paper: #fffdf7; --stone: #e7e4d9; --water: #527a82; --moss: #66815f; --wood: #9a6748; background: radial-gradient(circle at 93% 6%, #cddbd2 0 10rem, transparent 10.1rem), var(--stone); }
+      .variant-a .app { max-width: 48rem; margin: auto; padding: 1.5rem; }
+      .variant-a header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4rem; font-size: .9rem; }
+      .variant-a .brand { font-family: var(--serif); font-size: 1.45rem; font-weight: 700; }
+      .variant-a .main-card { padding: clamp(2rem, 8vw, 5rem); border: 1px solid #d7d2c4; border-radius: 1.5rem; background: var(--paper); box-shadow: 0 1.5rem 4rem rgb(47 55 43 / 10%); }
+      .variant-a .up-next { margin-top: 2rem; color: var(--moss); font-size: .9rem; }
+
+      /* B: Waterline. A calm workspace with a blue-green navigation rail. */
+      .variant-b { --ink: #153337; --paper: #f7faf5; --stone: #dce8e3; --water: #286b78; --moss: #5c7660; --wood: #a45b3e; background: var(--stone); }
+      .variant-b .app { display: grid; grid-template-columns: 16rem 1fr; min-height: calc(100vh - 2.25rem); }
+      .variant-b aside { display: flex; flex-direction: column; padding: 2rem; background: var(--water); color: #f8fbf8; }
+      .variant-b .brand { margin-bottom: 4rem; font-family: var(--serif); font-size: 2rem; }
+      .variant-b nav { display: grid; gap: .5rem; }
+      .variant-b nav a { padding: .7rem .8rem; border-radius: .5rem; }
+      .variant-b nav a:first-child { background: rgb(255 255 255 / 18%); }
+      .variant-b .rail-note { margin-top: auto; font-size: .8rem; line-height: 1.45; opacity: .8; }
+      .variant-b main { max-width: 56rem; padding: clamp(2rem, 7vw, 6rem); }
+      .variant-b .main-card { display: grid; grid-template-columns: 1.35fr .65fr; gap: 4rem; padding-bottom: 3rem; border-bottom: 1px solid #a7c0b5; }
+      .variant-b .side-copy { align-self: end; color: var(--water); line-height: 1.55; }
+
+      /* C: Kiln. A high-contrast word poster with warm clay emphasis. */
+      .variant-c { --ink: #382d25; --paper: #fbf5ea; --stone: #d9cbb7; --water: #456d78; --moss: #687358; --wood: #a95537; background: var(--paper); }
+      .variant-c .app { max-width: 72rem; margin: auto; padding: 1.5rem; }
+      .variant-c header { display: flex; justify-content: space-between; padding: 1.1rem 0 5rem; border-bottom: 2px solid var(--ink); }
+      .variant-c .brand { font-size: 1rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+      .variant-c .main-card { display: grid; grid-template-columns: 8rem 1fr; gap: 2rem; padding-top: 2rem; }
+      .variant-c .date { color: var(--wood); font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; writing-mode: vertical-rl; }
+      .variant-c .word { color: var(--wood); font-size: clamp(5.5rem, 17vw, 12rem); }
+      .variant-c .definition { max-width: 35rem; border-left: .3rem solid var(--moss); padding-left: 1.25rem; }
+      .variant-c .familiarity button:first-child { background: var(--wood); border-color: var(--wood); }
+      .variant-c .up-next { margin-top: 3rem; padding: 1rem 0; border-block: 1px solid #bbaa94; font-family: var(--serif); }
+
+      @media (max-width: 42rem) {
+        .variant-b .app { display: block; }
+        .variant-b aside { padding: 1.2rem; }
+        .variant-b .brand { margin-bottom: 1rem; }
+        .variant-b nav { grid-template-columns: repeat(4, 1fr); font-size: .75rem; }
+        .variant-b .rail-note { display: none; }
+        .variant-b .main-card { display: block; }
+        .variant-b .side-copy { margin-top: 2rem; }
+        .variant-c .main-card { grid-template-columns: 1fr; }
+        .variant-c .date { writing-mode: initial; }
+      }
+    </style>
+  </head>
+  <body>
+    <p class="prototype-note">PROTOTYPE ONLY. Pick a direction; this is not application code.</p>
+    <div id="prototype"></div>
+    <div class="prototype-switcher" aria-label="Prototype variants">
+      <button id="previous" type="button" aria-label="Previous variant">&larr;</button>
+      <span id="variant-name"></span>
+      <button id="next" type="button" aria-label="Next variant">&rarr;</button>
+    </div>
+    <script>
+      const variants = {
+        a: { name: "A: Stone & Moss / Reading desk" },
+        b: { name: "B: Waterline / Workspace" },
+        c: { name: "C: Kiln / Word poster" }
+      };
+      let key = new URLSearchParams(location.search).get("variant");
+      if (!variants[key]) key = "a";
+
+      function render() {
+        const sharedLesson = `
+          <span class="label">Today's word</span>
+          <h1 class="word">candid</h1>
+          <p class="pronunciation">/kan-did/ &middot; adjective</p>
+          <p class="definition">Honest and direct, even when the truth may be uncomfortable.</p>
+          <div class="familiarity" aria-label="Familiarity">
+            <button type="button">Seen it, unsure</button>
+            <button type="button">Know the meaning</button>
+            <button type="button">Could use it naturally</button>
+          </div>`;
+        const layouts = {
+          a: `<div class="app"><header><strong class="brand">WordWell</strong><span>Tuesday, August 26</span></header><main class="main-card">${sharedLesson}<p class="up-next">Up next: lucid, tacit, and deft</p></main></div>`,
+          b: `<div class="app"><aside><strong class="brand">WordWell</strong><nav><a class="nav-item" href="#">Today</a><a class="nav-item" href="#">Practice</a><a class="nav-item" href="#">History</a><a class="nav-item" href="#">Profile</a></nav><p class="rail-note">One useful word each day. No streaks. No score.</p></aside><main><section class="main-card"><div>${sharedLesson}</div><p class="side-copy">Use it when you want to describe open, direct communication.<br><br>Do not use it as a reason to be careless with another person.</p></section></main></div>`,
+          c: `<div class="app"><header><strong class="brand">WordWell</strong><span>Today / History</span></header><main class="main-card"><p class="date">August 26<br>Daily delivery</p><section>${sharedLesson}<p class="up-next">Tomorrow's word waits until tomorrow.</p></section></main></div>`
+        };
+        document.body.className = `variant-${key}`;
+        document.querySelector("#prototype").innerHTML = layouts[key];
+        document.querySelector("#variant-name").textContent = variants[key].name;
+        history.replaceState(null, "", `?variant=${key}`);
+      }
+
+      function switchVariant(step) {
+        const keys = Object.keys(variants);
+        key = keys[(keys.indexOf(key) + step + keys.length) % keys.length];
+        render();
+      }
+
+      document.querySelector("#previous").addEventListener("click", () => switchVariant(-1));
+      document.querySelector("#next").addEventListener("click", () => switchVariant(1));
+      document.addEventListener("keydown", (event) => {
+        if (event.target.matches("input, textarea, [contenteditable]")) return;
+        if (event.key === "ArrowLeft") switchVariant(-1);
+        if (event.key === "ArrowRight") switchVariant(1);
+      });
+      render();
+    </script>
+  </body>
+</html>

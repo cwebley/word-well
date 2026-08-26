@@ -1,0 +1,129 @@
+<!doctype html>
+<!-- PROTOTYPE: Literata plus variable sans options. Switch with ?sans=instrument|anek|bricolage. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordWell Waterline type prototype</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,100..800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Literata:opsz,wght@7..72,200..900&display=swap");
+
+      :root {
+        color-scheme: light;
+        /* Waterline palette: water, moss, and wood share lightness/chroma. */
+        --ink: oklch(25% 0.035 205);
+        --paper: oklch(98% 0.012 145);
+        --stone: oklch(91% 0.026 165);
+        --water: oklch(45% 0.075 205);
+        --moss: oklch(45% 0.075 145);
+        --wood: oklch(45% 0.075 45);
+        --water-soft: oklch(from var(--water) calc(l + 10%) c h);
+        --line: oklch(from var(--water) calc(l + 35%) calc(c - 0.03) h);
+        --sans: "Instrument Sans", sans-serif;
+        --serif: Literata, serif;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--stone); color: var(--ink); font-family: var(--sans); }
+      button { font: inherit; cursor: pointer; }
+      .prototype-note { margin: 0; padding: .65rem 1rem; background: oklch(18% 0.02 205); color: var(--paper); font-size: .8rem; text-align: center; }
+      .app { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: calc(100vh - 2.25rem); }
+      aside { display: flex; flex-direction: column; padding: 2rem; background: var(--water); color: var(--paper); }
+      .brand { margin: 0 0 4rem; font-family: var(--serif); font-size: 2rem; font-weight: 620; letter-spacing: -.035em; }
+      nav { display: grid; gap: .45rem; }
+      nav a { padding: .7rem .8rem; border-radius: .5rem; color: inherit; text-decoration: none; }
+      nav a:first-child { background: var(--wood); }
+      .rail-note { margin: auto 0 0; font-size: .85rem; line-height: 1.45; opacity: .88; }
+      main { max-width: 60rem; padding: clamp(2rem, 8vw, 6rem); }
+      .eyebrow { margin: 0; color: var(--moss); font-size: .72rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+      h1 { margin: .4rem 0 0; font-family: var(--serif); font-size: clamp(5rem, 15vw, 10rem); font-variation-settings: "wght" 440, "opsz" 60; font-weight: 440; letter-spacing: -.075em; line-height: .78; }
+      .pronunciation { margin: 1.4rem 0 3.5rem; color: var(--water); font-size: .95rem; font-weight: 580; }
+      .definition { max-width: 38rem; margin: 0; font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 2.15rem); font-variation-settings: "wght" 430, "opsz" 20; font-weight: 430; line-height: 1.3; }
+      .example { max-width: 36rem; color: oklch(from var(--ink) calc(l + 18%) c h); font-family: var(--serif); font-size: 1.15rem; font-style: italic; line-height: 1.45; }
+      .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 42rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+      .detail strong { display: block; margin-bottom: .3rem; color: var(--moss); font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; }
+      .detail p { margin: 0; line-height: 1.45; }
+      .primary-action { margin-top: 2rem; border: 0; border-radius: .45rem; background: var(--wood); color: var(--paper); padding: .8rem 1.1rem; font-weight: 620; }
+      .swatches { display: flex; gap: .5rem; margin-top: 3rem; }
+      .swatch { width: 2.25rem; height: 2.25rem; border: 1px solid oklch(0% 0 0 / 12%); border-radius: 50%; }
+      .swatch:nth-child(1) { background: var(--water); }
+      .swatch:nth-child(2) { background: var(--moss); }
+      .swatch:nth-child(3) { background: var(--wood); }
+      .token-note { margin: .75rem 0 0; color: var(--water); font-family: ui-monospace, monospace; font-size: .72rem; }
+      .prototype-switcher { position: fixed; z-index: 3; bottom: 1rem; left: 50%; display: flex; align-items: center; gap: .7rem; padding: .45rem; border-radius: 99rem; background: oklch(18% 0.02 205); box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%); color: white; transform: translateX(-50%); }
+      .prototype-switcher button { width: 2.2rem; height: 2.2rem; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); font-size: 1.15rem; }
+      .prototype-switcher span { min-width: 15rem; font-size: .8rem; text-align: center; }
+
+      .sans-anek { --sans: "Anek Latin", sans-serif; }
+      .sans-anek .eyebrow, .sans-anek .pronunciation { font-variation-settings: "wght" 620, "wdth" 95; }
+      .sans-bricolage { --sans: "Bricolage Grotesque", sans-serif; }
+      .sans-bricolage .eyebrow, .sans-bricolage .pronunciation { font-variation-settings: "wght" 620, "wdth" 95, "opsz" 14; }
+
+      @media (max-width: 42rem) {
+        .app { display: block; }
+        aside { padding: 1.2rem; }
+        .brand { margin-bottom: 1rem; }
+        nav { grid-template-columns: repeat(4, 1fr); font-size: .75rem; }
+        .rail-note { display: none; }
+        main { padding: 2.25rem 1.5rem 6rem; }
+        .detail { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body class="sans-instrument">
+    <p class="prototype-note">PROTOTYPE ONLY. Variable fonts load from Google Fonts for this comparison.</p>
+    <div class="app">
+      <aside>
+        <p class="brand">WordWell</p>
+        <nav><a href="#">Today</a><a href="#">Practice</a><a href="#">History</a><a href="#">Profile</a></nav>
+        <p class="rail-note">One useful word each day.<br>No streaks. No score.</p>
+      </aside>
+      <main>
+        <p class="eyebrow">Today's word</p>
+        <h1>candid</h1>
+        <p class="pronunciation">/kan-did/ &middot; adjective</p>
+        <p class="definition">Honest and direct, even when the truth may be uncomfortable.</p>
+        <p class="example">"Her candid feedback helped the team improve the proposal."</p>
+        <div class="detail">
+          <div><strong>Use it when</strong><p>You want to describe open, direct communication.</p></div>
+          <div><strong>Do not use it for</strong><p>A rude comment that ignores another person.</p></div>
+        </div>
+        <button class="primary-action" type="button">Continue to lesson</button>
+        <div class="swatches" aria-label="Waterline role colors"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+        <p class="token-note">water / moss / wood: oklch(45% 0.075 hue)</p>
+      </main>
+    </div>
+    <div class="prototype-switcher" aria-label="Typeface variants">
+      <button id="previous" type="button" aria-label="Previous type pairing">&larr;</button>
+      <span id="type-name"></span>
+      <button id="next" type="button" aria-label="Next type pairing">&rarr;</button>
+    </div>
+    <script>
+      const pairs = {
+        instrument: "Literata + Instrument Sans",
+        anek: "Literata + Anek Latin",
+        bricolage: "Literata + Bricolage Grotesque"
+      };
+      let key = new URLSearchParams(location.search).get("sans");
+      if (!pairs[key]) key = "instrument";
+
+      function render() {
+        document.body.className = `sans-${key}`;
+        document.querySelector("#type-name").textContent = pairs[key];
+        history.replaceState(null, "", `?sans=${key}`);
+      }
+      function switchPair(step) {
+        const keys = Object.keys(pairs);
+        key = keys[(keys.indexOf(key) + step + keys.length) % keys.length];
+        render();
+      }
+      document.querySelector("#previous").addEventListener("click", () => switchPair(-1));
+      document.querySelector("#next").addEventListener("click", () => switchPair(1));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") switchPair(-1);
+        if (event.key === "ArrowRight") switchPair(1);
+      });
+      render();
+    </script>
+  </body>
+</html>
