@@ -80,6 +80,8 @@ export type PublishedVocabularyRecord = {
 
 export type QuarantineReason =
   | "invalid-schema"
+  | "invalid-source-snapshot"
+  | "evaluation-failed"
   | "missing-required-field"
   | "unsupported-factual-claim"
   | "prohibited-content"
@@ -95,6 +97,110 @@ export type PipelineInput = {
   readonly draft: VocabularyDraft;
   readonly existingHeadwords?: readonly string[];
   readonly prohibitedTerms?: readonly string[];
+};
+
+export type PinnedSourceSnapshot = {
+  readonly id: string;
+  readonly source: string;
+  readonly release: string;
+  readonly retrievedAt: string;
+  readonly license: string;
+  readonly attribution: string;
+  readonly checksum: string;
+  readonly evidence: readonly SourceEvidence[];
+};
+
+export type SourceAttributionArtifact = {
+  readonly snapshotIds: readonly string[];
+  readonly notices: readonly {
+    readonly source: string;
+    readonly release: string;
+    readonly license: string;
+    readonly attribution: string;
+  }[];
+  readonly evidence: readonly SourceEvidence[];
+};
+
+export type EvaluationMeaningAssertion = {
+  readonly definition: string;
+  readonly partOfSpeech: string;
+  readonly example: string;
+  readonly useItWhen: string;
+  readonly doNotUseItFor: string;
+  readonly synonyms: readonly string[];
+  readonly register: string;
+  readonly practice: VocabularyDraft["meanings"][number]["practice"];
+};
+
+export type EvaluationCase = {
+  readonly id: string;
+  readonly input: PipelineInput;
+  readonly expectedStatus: PipelineResult["status"];
+  readonly expectedReasons?: readonly QuarantineReason[];
+  readonly meanings?: readonly EvaluationMeaningAssertion[];
+};
+
+export type EvaluationSet = {
+  readonly version: string;
+  readonly coverage: readonly string[];
+  readonly cases: readonly EvaluationCase[];
+};
+
+const requiredEvaluationCoverage = [
+  "difficulty",
+  "frequency-and-register",
+  "part-of-speech",
+  "polysemy",
+  "morphology",
+  "regional-variation",
+  "source-confidence",
+  "adversarial-practice"
+] as const;
+
+export type PipelineConfiguration = {
+  readonly modelVersion: string;
+  readonly promptVersion: string;
+  readonly evaluatorVersion: string;
+  readonly rubricVersion: string;
+  readonly deterministicRuleVersion: string;
+};
+
+export type EvaluationResult = {
+  readonly setVersion: string;
+  readonly passed: boolean;
+  readonly cases: readonly { readonly id: string; readonly passed: boolean }[];
+};
+
+export type OperationalPipelineInput = {
+  readonly snapshots: readonly PinnedSourceSnapshot[];
+  readonly candidate: VocabularyCandidate;
+  readonly draft: VocabularyDraft;
+  readonly configuration: PipelineConfiguration;
+  readonly evaluationSet: EvaluationSet;
+  readonly prohibitedTerms?: readonly string[];
+};
+
+export type CurrentVocabularyRecord =
+  | { readonly status: "available"; readonly record: PublishedVocabularyRecord }
+  | { readonly status: "unavailable"; readonly reason: string };
+
+export type PipelineAuditEntry = {
+  readonly operation: "publish" | "refresh" | "withdraw";
+  readonly normalizedHeadword: string;
+  readonly disposition: "published" | "quarantined" | "withdrawn";
+  readonly sourceArtifact?: SourceAttributionArtifact;
+  readonly configuration?: PipelineConfiguration;
+  readonly evaluation?: EvaluationResult;
+  readonly result?: PipelineResult;
+  readonly withdrawalReason?: string;
+};
+
+export type ContentPipeline = {
+  publish(input: OperationalPipelineInput): PipelineResult;
+  refresh(input: OperationalPipelineInput): PipelineResult;
+  withdraw(normalizedHeadword: string, reason: string): boolean;
+  getCurrent(normalizedHeadword: string): CurrentVocabularyRecord | undefined;
+  audit(): readonly PipelineAuditEntry[];
 };
 
 const requiredEvidenceFields: readonly (Exclude<keyof SourceEvidence, "claims">)[] = [
@@ -421,4 +527,174 @@ function isStringArray(value: unknown): value is readonly string[] {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+export function ingestPinnedSourceSnapshots(
+  snapshots: readonly PinnedSourceSnapshot[]
+): SourceAttributionArtifact | undefined {
+  if (
+    snapshots.length === 0 ||
+    new Set(snapshots.map((snapshot) => snapshot.id)).size !== snapshots.length ||
+    snapshots.some(
+      (snapshot) =>
+        !hasText(snapshot.id) ||
+        !hasText(snapshot.source) ||
+        !hasText(snapshot.release) ||
+        !hasText(snapshot.retrievedAt) ||
+        !hasText(snapshot.license) ||
+        !hasText(snapshot.attribution) ||
+        !isChecksum(snapshot.checksum) ||
+        snapshot.evidence.length === 0 ||
+        snapshot.evidence.some(
+          (evidence) =>
+            !isSourceEvidence(evidence) ||
+            evidence.source !== snapshot.source ||
+            evidence.release !== snapshot.release ||
+            evidence.retrievedAt !== snapshot.retrievedAt ||
+            evidence.license !== snapshot.license ||
+            evidence.attribution !== snapshot.attribution
+        )
+    )
+  ) {
+    return undefined;
+  }
+
+  return {
+    snapshotIds: snapshots.map((snapshot) => snapshot.id),
+    notices: snapshots.map(({ source, release, license, attribution }) => ({
+      source,
+      release,
+      license,
+      attribution
+    })),
+    evidence: snapshots.flatMap((snapshot) => snapshot.evidence)
+  };
+}
+
+export function runEvaluationSet(evaluationSet: EvaluationSet): EvaluationResult {
+  const cases = evaluationSet.cases.map((evaluationCase) => {
+    const result = publishVocabularyRecord(evaluationCase.input);
+    const matchesStatus = result.status === evaluationCase.expectedStatus;
+    const matchesReasons =
+      result.status !== "quarantined" ||
+      evaluationCase.expectedReasons === undefined ||
+      sameStrings(result.reasons, evaluationCase.expectedReasons);
+    const matchesMeanings =
+      result.status !== "published" ||
+      evaluationCase.meanings === undefined ||
+      sameMeanings(result.record.meanings, evaluationCase.meanings);
+
+    return { id: evaluationCase.id, passed: matchesStatus && matchesReasons && matchesMeanings };
+  });
+
+  return {
+    setVersion: evaluationSet.version,
+    passed:
+      hasText(evaluationSet.version) &&
+      requiredEvaluationCoverage.every((coverage) => evaluationSet.coverage.includes(coverage)) &&
+      cases.length > 0 &&
+      cases.every((item) => item.passed),
+    cases
+  };
+}
+
+export function createContentPipeline(): ContentPipeline {
+  const currentRecords = new Map<string, CurrentVocabularyRecord>();
+  const auditEntries: PipelineAuditEntry[] = [];
+
+  function run(
+    operation: "publish" | "refresh",
+    input: OperationalPipelineInput
+  ): PipelineResult {
+    const sourceArtifact = ingestPinnedSourceSnapshots(input.snapshots);
+    const evaluation = runEvaluationSet(input.evaluationSet);
+    const existingHeadwords = [...currentRecords.entries()]
+      .filter(([headword]) => headword !== input.candidate.normalizedHeadword)
+      .flatMap(([, current]) => (current.status === "available" ? [current.record.headword] : []));
+    const result: PipelineResult = sourceArtifact
+      ? !evaluation.passed
+        ? { status: "quarantined", reasons: ["evaluation-failed"] as const }
+        : publishVocabularyRecord({
+            candidate: input.candidate,
+            evidence: sourceArtifact.evidence,
+            draft: input.draft,
+            existingHeadwords,
+            prohibitedTerms: input.prohibitedTerms
+          })
+      : { status: "quarantined", reasons: ["invalid-source-snapshot"] as const };
+
+    if (result.status === "published") {
+      currentRecords.set(result.record.normalizedHeadword, {
+        status: "available",
+        record: result.record
+      });
+    }
+
+    auditEntries.push({
+      operation,
+      normalizedHeadword: input.candidate.normalizedHeadword,
+      disposition: result.status,
+      ...(sourceArtifact ? { sourceArtifact } : {}),
+      configuration: input.configuration,
+      evaluation,
+      result
+    });
+    return result;
+  }
+
+  return {
+    publish: (input) => run("publish", input),
+    refresh: (input) => run("refresh", input),
+    withdraw: (normalizedHeadword, reason) => {
+      const key = normalizeHeadword(normalizedHeadword);
+      if (!hasText(key) || !hasText(reason) || !currentRecords.has(key)) {
+        return false;
+      }
+
+      currentRecords.set(key, { status: "unavailable", reason });
+      auditEntries.push({
+        operation: "withdraw",
+        normalizedHeadword: key,
+        disposition: "withdrawn",
+        withdrawalReason: reason
+      });
+      return true;
+    },
+    getCurrent: (normalizedHeadword) => currentRecords.get(normalizeHeadword(normalizedHeadword)),
+    audit: () => auditEntries
+  };
+}
+
+function sameMeanings(
+  meanings: readonly PublishedMeaning[],
+  assertions: readonly EvaluationMeaningAssertion[]
+): boolean {
+  return (
+    meanings.length === assertions.length &&
+    meanings.every((meaning, index) => {
+      const assertion = assertions[index];
+      return (
+        assertion !== undefined &&
+        meaning.definition === assertion.definition &&
+        meaning.partOfSpeech === assertion.partOfSpeech &&
+        meaning.example === assertion.example &&
+        meaning.useItWhen === assertion.useItWhen &&
+        meaning.doNotUseItFor === assertion.doNotUseItFor &&
+        sameStrings(meaning.synonyms, assertion.synonyms) &&
+        meaning.register === assertion.register &&
+        meaning.practice.prompt === assertion.practice.prompt &&
+        meaning.practice.correctSentence === assertion.practice.correctSentence &&
+        meaning.practice.incorrectSentence === assertion.practice.incorrectSentence &&
+        meaning.practice.explanation === assertion.practice.explanation
+      );
+    })
+  );
+}
+
+function sameStrings(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function isChecksum(value: string): boolean {
+  return /^sha256:[a-f0-9]{64}$/i.test(value);
 }
