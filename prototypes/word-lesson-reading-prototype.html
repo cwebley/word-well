@@ -55,6 +55,19 @@
       .lesson .example { border-block-start: 1px solid var(--line); display: grid; gap: .8rem; padding-block: 1.7rem; }
       .lesson .example:last-child { border-block-end: 1px solid var(--line); }
       .lesson .example p:last-child { font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 2rem); font-style: italic; line-height: 1.28; }
+      .lesson .usage-studies { display: grid; gap: 1.25rem; margin-block-end: clamp(3rem, 8vw, 7rem); }
+      .lesson .usage-studies > .eyebrow { margin-block-end: .25rem; }
+      .lesson .usage-study { border: 1px solid var(--line); display: grid; gap: 1.25rem; padding: clamp(1.25rem, 3vw, 2.2rem); }
+      .lesson .usage-study-name { color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+      .lesson .usage-pair { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lesson .usage-choice { display: grid; gap: .65rem; min-height: 100%; padding: 1rem; }
+      .lesson .usage-choice p:last-child { font-family: var(--serif); font-size: clamp(1.25rem, 2vw, 1.7rem); letter-spacing: -.025em; line-height: 1.18; }
+      .lesson .use { --cue: var(--moss); }
+      .lesson .avoid { --cue: oklch(53% 0.13 25); }
+      .lesson .barred .usage-choice { border-block-start: .4rem solid var(--cue); }
+      .lesson .washed .usage-choice { background: color-mix(in oklab, var(--cue) 12%, var(--paper)); border-inline-start: .4rem solid var(--cue); }
+      .lesson .marked .usage-choice { border: 1px solid var(--cue); position: relative; }
+      .lesson .marked .usage-choice::before { background: var(--cue); color: var(--paper); content: attr(data-mark); font-size: .8rem; font-weight: 800; height: 1.5rem; left: -0.7rem; line-height: 1.5rem; position: absolute; text-align: center; top: -.75rem; width: 1.5rem; }
       .lesson .etymology { background: color-mix(in oklab, var(--wood-light) 18%, var(--paper)); border-inline-start: .35rem solid var(--wood-light); display: grid; gap: .75rem; padding: clamp(1.5rem, 4vw, 2.5rem); }
 
       /* B: a practical guide. Meaning is central; use and misuse are visible at once. */
@@ -94,6 +107,7 @@
         .field-guide .example { border-block-end: 1px solid var(--line); border-inline-end: 0; }
         .field-guide .example:last-child { border-block-end: 0; }
         .reference .facts { border-block-end: 1px solid var(--line); border-inline-end: 0; }
+        .lesson .usage-pair { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -109,6 +123,7 @@
           <div class="body">
             <section class="definition"><p class="eyebrow">In brief</p><h2 class="reading-heading">Honest and direct, even when the truth may be uncomfortable.</h2><p class="body-copy">Candid is usually approving: it names openness that is useful, clear, and proportionate, not bluntness for its own sake.</p></section>
             <section class="examples" aria-labelledby="lesson-examples"><p class="eyebrow" id="lesson-examples">In a sentence</p><div class="example"><p class="usage-label">At work</p><p>“Her candid feedback helped the team improve the proposal.”</p></div><div class="example"><p class="usage-label">With a friend</p><p>“He was candid about why the plan had not worked.”</p></div><div class="example"><p class="usage-label">In an interview</p><p>“The memoir is candid about the cost of ambition.”</p></div></section>
+            <section class="usage-studies" aria-labelledby="usage-studies"><p class="eyebrow" id="usage-studies">Use guidance studies</p><div class="usage-study barred"><p class="usage-study-name">A. Rule bars</p><div class="usage-pair"><div class="usage-choice use"><p class="usage-label">Use it when</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid"><p class="usage-label">Do not use it for</p><p>A rude comment that ignores the other person.</p></div></div></div><div class="usage-study washed"><p class="usage-study-name">B. Quiet fields</p><div class="usage-pair"><div class="usage-choice use"><p class="usage-label">A good fit</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid"><p class="usage-label">Not a fit</p><p>A rude comment that ignores the other person.</p></div></div></div><div class="usage-study marked"><p class="usage-study-name">C. Direction markers</p><div class="usage-pair"><div class="usage-choice use" data-mark="+"><p class="usage-label">Use it when</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid" data-mark="-"><p class="usage-label">Avoid it when</p><p>A rude comment that ignores the other person.</p></div></div></div></section>
             <aside class="etymology"><p class="eyebrow">Where it comes from</p><p class="body-copy">Candid comes from Latin <i>candidus</i>, “white, bright, shining.” Roman candidates wore white togas as a public sign of openness, which helped the word acquire its modern sense of frankness.</p></aside>
           </div>
         </article>
