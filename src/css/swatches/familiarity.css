@@ -14,7 +14,7 @@
 
 .familiarity-word {
   font-family: var(--font-reading);
-  font-size: clamp(4.5rem, 15vw, 10rem);
+  font-size: var(--step-10);
   font-weight: 440;
   letter-spacing: -0.075em;
   line-height: 0.8;

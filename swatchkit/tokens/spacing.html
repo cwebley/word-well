@@ -16,7 +16,7 @@
         </td>
         <td><strong>space-xs</strong></td>
         <td><code>var(--space-xs)</code></td>
-        <td><code>clamp(calc(7 / var(--root-base) * 1rem), calc((7 - var(--vw-min) * (8 - 7) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (8 - 7) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(8 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-xs-min) / var(--root-base) * 1rem), calc((var(--fluid-space-xs-min) - var(--vw-min) * (var(--fluid-space-xs-max) - var(--fluid-space-xs-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-xs-max) - var(--fluid-space-xs-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-xs-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -24,7 +24,7 @@
         </td>
         <td><strong>space-s</strong></td>
         <td><code>var(--space-s)</code></td>
-        <td><code>clamp(calc(14 / var(--root-base) * 1rem), calc((14 - var(--vw-min) * (16 - 14) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (16 - 14) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(16 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-s-min) / var(--root-base) * 1rem), calc((var(--fluid-space-s-min) - var(--vw-min) * (var(--fluid-space-s-max) - var(--fluid-space-s-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-s-max) - var(--fluid-space-s-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-s-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -32,7 +32,7 @@
         </td>
         <td><strong>space-m</strong></td>
         <td><code>var(--space-m)</code></td>
-        <td><code>clamp(calc(21 / var(--root-base) * 1rem), calc((21 - var(--vw-min) * (24 - 21) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (24 - 21) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(24 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-m-min) / var(--root-base) * 1rem), calc((var(--fluid-space-m-min) - var(--vw-min) * (var(--fluid-space-m-max) - var(--fluid-space-m-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-m-max) - var(--fluid-space-m-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-m-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -40,7 +40,7 @@
         </td>
         <td><strong>space-l</strong></td>
         <td><code>var(--space-l)</code></td>
-        <td><code>clamp(calc(35 / var(--root-base) * 1rem), calc((35 - var(--vw-min) * (40 - 35) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (40 - 35) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(40 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-l-min) / var(--root-base) * 1rem), calc((var(--fluid-space-l-min) - var(--vw-min) * (var(--fluid-space-l-max) - var(--fluid-space-l-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-l-max) - var(--fluid-space-l-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-l-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -48,7 +48,7 @@
         </td>
         <td><strong>space-xl</strong></td>
         <td><code>var(--space-xl)</code></td>
-        <td><code>clamp(calc(49 / var(--root-base) * 1rem), calc((49 - var(--vw-min) * (56 - 49) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (56 - 49) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(56 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-xl-min) / var(--root-base) * 1rem), calc((var(--fluid-space-xl-min) - var(--vw-min) * (var(--fluid-space-xl-max) - var(--fluid-space-xl-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-xl-max) - var(--fluid-space-xl-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-xl-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -56,7 +56,7 @@
         </td>
         <td><strong>space-2xl</strong></td>
         <td><code>var(--space-2xl)</code></td>
-        <td><code>clamp(calc(56 / var(--root-base) * 1rem), calc((56 - var(--vw-min) * (64 - 56) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (64 - 56) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(64 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-2xl-min) / var(--root-base) * 1rem), calc((var(--fluid-space-2xl-min) - var(--vw-min) * (var(--fluid-space-2xl-max) - var(--fluid-space-2xl-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-2xl-max) - var(--fluid-space-2xl-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-2xl-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -64,7 +64,7 @@
         </td>
         <td><strong>space-3xl</strong></td>
         <td><code>var(--space-3xl)</code></td>
-        <td><code>clamp(calc(70 / var(--root-base) * 1rem), calc((70 - var(--vw-min) * (80 - 70) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (80 - 70) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(80 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-3xl-min) / var(--root-base) * 1rem), calc((var(--fluid-space-3xl-min) - var(--vw-min) * (var(--fluid-space-3xl-max) - var(--fluid-space-3xl-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-3xl-max) - var(--fluid-space-3xl-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-3xl-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -72,7 +72,7 @@
         </td>
         <td><strong>space-4xl</strong></td>
         <td><code>var(--space-4xl)</code></td>
-        <td><code>clamp(calc(105 / var(--root-base) * 1rem), calc((105 - var(--vw-min) * (120 - 105) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (120 - 105) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(120 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-4xl-min) / var(--root-base) * 1rem), calc((var(--fluid-space-4xl-min) - var(--vw-min) * (var(--fluid-space-4xl-max) - var(--fluid-space-4xl-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-4xl-max) - var(--fluid-space-4xl-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-4xl-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -80,7 +80,7 @@
         </td>
         <td><strong>space-s-l</strong></td>
         <td><code>var(--space-s-l)</code></td>
-        <td><code>clamp(calc(14 / var(--root-base) * 1rem), calc((14 - var(--vw-min) * (40 - 14) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (40 - 14) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(40 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-s-l-min) / var(--root-base) * 1rem), calc((var(--fluid-space-s-l-min) - var(--vw-min) * (var(--fluid-space-s-l-max) - var(--fluid-space-s-l-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-s-l-max) - var(--fluid-space-s-l-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-s-l-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -88,7 +88,7 @@
         </td>
         <td><strong>space-xs-l</strong></td>
         <td><code>var(--space-xs-l)</code></td>
-        <td><code>clamp(calc(7 / var(--root-base) * 1rem), calc((7 - var(--vw-min) * (40 - 7) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (40 - 7) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(40 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-xs-l-min) / var(--root-base) * 1rem), calc((var(--fluid-space-xs-l-min) - var(--vw-min) * (var(--fluid-space-xs-l-max) - var(--fluid-space-xs-l-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-xs-l-max) - var(--fluid-space-xs-l-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-xs-l-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -96,7 +96,7 @@
         </td>
         <td><strong>space-m-l</strong></td>
         <td><code>var(--space-m-l)</code></td>
-        <td><code>clamp(calc(21 / var(--root-base) * 1rem), calc((21 - var(--vw-min) * (40 - 21) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (40 - 21) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(40 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-m-l-min) / var(--root-base) * 1rem), calc((var(--fluid-space-m-l-min) - var(--vw-min) * (var(--fluid-space-m-l-max) - var(--fluid-space-m-l-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-m-l-max) - var(--fluid-space-m-l-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-m-l-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -104,7 +104,7 @@
         </td>
         <td><strong>space-s-m</strong></td>
         <td><code>var(--space-s-m)</code></td>
-        <td><code>clamp(calc(14 / var(--root-base) * 1rem), calc((14 - var(--vw-min) * (24 - 14) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (24 - 14) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(24 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-s-m-min) / var(--root-base) * 1rem), calc((var(--fluid-space-s-m-min) - var(--vw-min) * (var(--fluid-space-s-m-max) - var(--fluid-space-s-m-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-s-m-max) - var(--fluid-space-s-m-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-s-m-max) / var(--root-base) * 1rem))</code></td>
       </tr>
       <tr>
         <td>
@@ -112,7 +112,7 @@
         </td>
         <td><strong>space-2xl-4xl</strong></td>
         <td><code>var(--space-2xl-4xl)</code></td>
-        <td><code>clamp(calc(56 / var(--root-base) * 1rem), calc((56 - var(--vw-min) * (120 - 56) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (120 - 56) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(120 / var(--root-base) * 1rem))</code></td>
+        <td><code>clamp(calc(var(--fluid-space-2xl-4xl-min) / var(--root-base) * 1rem), calc((var(--fluid-space-2xl-4xl-min) - var(--vw-min) * (var(--fluid-space-2xl-4xl-max) - var(--fluid-space-2xl-4xl-min)) / (var(--vw-max) - var(--vw-min))) / var(--root-base) * 1rem + (var(--fluid-space-2xl-4xl-max) - var(--fluid-space-2xl-4xl-min)) / (var(--vw-max) - var(--vw-min)) * 100vw), calc(var(--fluid-space-2xl-4xl-max) / var(--root-base) * 1rem))</code></td>
       </tr>
   </tbody>
 </table>

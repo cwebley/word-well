@@ -25,7 +25,7 @@
     "jsdom": "^29.1.1",
     "npm-run-all": "^4.1.5",
     "onchange": "^7.1.0",
-    "swatchkit": "^6.3.0",
+    "swatchkit": "^6.4.0",
     "typescript": "latest",
     "vitest": "latest"
   }

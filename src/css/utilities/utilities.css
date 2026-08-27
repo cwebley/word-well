@@ -56,6 +56,7 @@
 .font-size\:step-4 { font-size: var(--step-4); }
 .font-size\:step-5 { font-size: var(--step-5); }
 .font-size\:step-6 { font-size: var(--step-6); }
+.font-size\:step-10 { font-size: var(--step-10); }
 .margin-block\:space-xs { margin-block: var(--space-xs); }
 .margin-block-start\:space-xs { margin-block-start: var(--space-xs); }
 .margin-block-end\:space-xs { margin-block-end: var(--space-xs); }
