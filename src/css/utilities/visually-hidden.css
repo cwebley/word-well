@@ -1,0 +1,18 @@
+/* 
+  Visually Hidden Utility
+
+  Hides content visually while keeping it accessible to assistive technologies
+  (like screen readers). Use this instead of `display: none` when you want
+  content to be available to users who rely on non-visual browsing.
+*/
+.visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
+}

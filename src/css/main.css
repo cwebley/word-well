@@ -1,0 +1,87 @@
+/**
+ * SwatchKit Main Stylesheet
+ *
+ * This is your app's CSS entry point. It declares the cascade-layer order,
+ * then imports each group of styles into its layer.
+ * Edit freely — this file is yours.
+ *
+ * Cascade layers make the cascade predictable: a later layer always wins over
+ * an earlier one, regardless of selector specificity. The order below is, from
+ * weakest to strongest:
+ *
+ *   reset        → browser reset
+ *   tokens       → design tokens + variables (custom properties)
+ *   elements     → bare element defaults (global/elements.css)
+ *   compositions → layout primitives (flow, cluster, sidebar, …)
+ *   swatches     → your component styles
+ *   app          → app/page-specific CSS (overrides components)
+ *   utilities    → explicit per-instance utility classes (the final word)
+ *
+ * Utilities are last on purpose: if you add a utility class in your markup,
+ * it should take effect. (Unlayered CSS still beats every layer — that's your
+ * emergency escape hatch.)
+ *
+ * Note: @import rules must come before any regular style rules. Keep the
+ * @layer declaration and all @import lines at the top; put app CSS in the
+ * @layer app { } block at the bottom.
+ *
+ * swatchkit init --force will overwrite blueprint files (with .bak backups).
+ * The only auto-generated file is css/utilities/utilities.css — do not edit it
+ * manually. Your design tokens live in css/global/tokens.css and are yours.
+ */
+
+@layer reset, tokens, elements, compositions, swatches, app, utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Literata:opsz,wght@7..72,200..900&display=swap");
+
+/* Browser reset */
+@import "global/reset.css" layer(reset);
+
+/* Design tokens + variables (yours — edit global/tokens.css directly) */
+@import "global/tokens.css" layer(tokens);
+@import "global/variables.css" layer(tokens);
+
+/* Global element defaults */
+@import "global/elements.css" layer(elements);
+
+/* Layout compositions */
+@import "compositions/index.css" layer(compositions);
+
+/* Component swatches */
+@import "swatches/index.css" layer(swatches);
+
+/* Utility classes (generated from your @swatchkit token blocks) */
+@import "utilities/index.css" layer(utilities);
+
+/* === Your App Styles === */
+/* Page/app CSS goes here. It overrides component styles but not utilities. */
+@layer app {
+  body {
+    background: var(--color-stone);
+  }
+  .app-shell {
+    container: app-shell / inline-size;
+    display: grid;
+    grid-template-areas:
+      "main"
+      "navigation";
+    grid-template-rows: minmax(0, 1fr) auto;
+    min-block-size: 100dvh;
+  }
+
+  .navigation-rail {
+    grid-area: navigation;
+  }
+
+  .app-main {
+    grid-area: main;
+  }
+
+  @media (min-width: 50rem) {
+    .app-shell {
+      grid-template-areas: "navigation main";
+      grid-template-columns: 16rem minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr);
+    }
+  }
+}

@@ -1,0 +1,20 @@
+/*
+  CLUSTER
+  Distributes items with consistent spacing, regardless of their size.
+
+  Credit: Adapted from Every Layout (The Cluster)
+  Docs:   https://every-layout.dev/layouts/cluster/
+
+  CUSTOM PROPERTIES:
+  --gutter: Space between items (default: --space-m)
+  --cluster-horizontal-alignment: Horizontal alignment (default: flex-start)
+  --cluster-vertical-alignment: Vertical alignment (default: center)
+*/
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter, var(--space-m));
+  justify-content: var(--cluster-horizontal-alignment, flex-start);
+  align-items: var(--cluster-vertical-alignment, center);
+}

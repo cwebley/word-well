@@ -1,0 +1,74 @@
+<!-- @swatchkit generated-token-doc -->
+<div class="viewport-list">
+  <div class="viewport-item">
+    <div class="viewport-bar" style="width: 330px">
+      <span class="viewport-meta">
+        <strong>viewport-min</strong>
+        <code>var(--viewport-min)</code>
+        <span class="viewport-value">330px</span>
+      </span>
+    </div>
+  </div>
+  <div class="viewport-item">
+    <div class="viewport-bar" style="width: 760px">
+      <span class="viewport-meta">
+        <strong>viewport-mid</strong>
+        <code>var(--viewport-mid)</code>
+        <span class="viewport-value">760px</span>
+      </span>
+    </div>
+  </div>
+  <div class="viewport-item">
+    <div class="viewport-bar" style="width: 940px">
+      <span class="viewport-meta">
+        <strong>viewport-large</strong>
+        <code>var(--viewport-large)</code>
+        <span class="viewport-value">940px</span>
+      </span>
+    </div>
+  </div>
+  <div class="viewport-item">
+    <div class="viewport-bar" style="width: 1350px">
+      <span class="viewport-meta">
+        <strong>viewport-max</strong>
+        <code>var(--viewport-max)</code>
+        <span class="viewport-value">1350px</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .viewport-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: monospace;
+  }
+  .viewport-item {
+    display: flex;
+  }
+  .viewport-bar {
+    background: var(--color-primary, #666);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    min-width: max-content;
+    flex-shrink: 0;
+  }
+  .viewport-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-light, #fff);
+    white-space: nowrap;
+  }
+  .viewport-meta code {
+    opacity: 0.75;
+  }
+  .viewport-value {
+    font-weight: bold;
+    margin-left: auto;
+    padding-left: 2rem;
+  }
+</style>

@@ -4,24 +4,28 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "build": "npm run clean && npm run build:site && npm run build:swatchkit && npm run build:assets",
     "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "vite": "latest"
+    "test:watch": "vitest",
+    "typecheck": "tsc -b",
+    "clean": "node scripts/clean.js",
+    "build:site": "node scripts/build-site.js",
+    "build:swatchkit": "swatchkit",
+    "build:assets": "node scripts/build-assets.js",
+    "build:prod": "npm run clean && npm run build:site && npm run build:swatchkit && node scripts/build-assets.js --prod",
+    "watch:site": "onchange 'src/pages/**/*' 'src/components/**/*' -- npm run build:site",
+    "watch:assets": "onchange 'src/css/**/*' 'src/js/**/*' 'src/components/**/*' -e 'src/css/utilities/utilities.css' -- npm run build:assets",
+    "swatchkit:watch": "swatchkit --watch",
+    "serve": "http-server dist -c-1 -p 0 -o",
+    "dev": "npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
+    "esbuild": "^0.28.0",
+    "http-server": "^14.1.1",
     "jsdom": "^29.1.1",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
+    "swatchkit": "^6.3.0",
     "typescript": "latest",
     "vitest": "latest"
   }

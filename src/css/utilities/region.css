@@ -1,0 +1,12 @@
+/* 
+A container that provides consistent vertical spacing for
+chunks/sections/regions of content. Also a relative position container.
+*/
+
+.region {
+  padding-block: var(--region-space, var(--space-m));
+  position: relative;
+}
+
+.region[data-disable-space-top] {
+}

@@ -1,0 +1,87 @@
+.navigation-rail {
+  display: flex;
+  /* height: fit-content; */
+  flex-direction: column;
+  /* padding-block: var(--space-l); */
+  background: var(--color-water);
+  color: var(--color-on-water);
+}
+
+.navigation-wordmark {
+  display: block;
+  line-height: 2;
+  color: inherit;
+  font-family: var(--font-reading);
+  font-size: var(--step-4);
+  text-fit: grow;
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  margin-inline: var(--space-l);
+}
+
+.navigation {
+  display: grid;
+  gap: var(--space-xs);
+  margin-block: var(--space-2xl) auto;
+}
+
+.navigation-link {
+  position: relative;
+  border-radius: 0;
+  color: inherit;
+  padding: var(--space-xs) var(--space-s);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.navigation-link:not([aria-current="page"]):hover {
+  background: color-mix(in oklab, var(--color-water-soft) 25%, transparent);
+}
+
+.navigation-link[aria-current="page"] {
+  background: color-mix(in oklab, var(--color-water-soft) 45%, transparent);
+}
+
+.navigation-link[aria-current="page"]:hover {
+  background: color-mix(in oklab, var(--color-water-soft) 70%, transparent);
+}
+
+.navigation-link[aria-current="page"]::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 0.5rem;
+  background: var(--color-wood-light);
+  view-transition-name: navigation-active-edge;
+  content: "";
+}
+
+@container app-shell (width < 50rem) {
+  .navigation-wordmark {
+    display: none;
+  }
+
+  .navigation {
+    display: flex;
+    gap: 0;
+    margin-block: 0;
+  }
+  .navigation-link {
+    flex: 1;
+  }
+  .navigation-link[aria-current="page"]::before {
+    height: 0.3rem;
+    width: unset;
+    inset-block-start: unset;
+    inset-block-end: 0;
+    inset-inline: 0;
+  }
+}
+
+::view-transition-group(navigation-active-edge) {
+  animation-duration: 220ms;
+  animation-timing-function: var(--transition-bounce);
+}

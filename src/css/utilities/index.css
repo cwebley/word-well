@@ -1,0 +1,12 @@
+/* === CSS Utilities === */
+
+/* Single-purpose helper classes. main.css imports this file into the
+   `utilities` cascade layer (declared last), so these win over component and
+   app styles without needing !important. */
+
+/* Auto-generated utility classes from your @swatchkit token blocks.
+   Do not edit utilities.css directly — it is regenerated on every build. */
+@import "utilities.css";
+
+@import "visually-hidden.css";
+@import "region.css";

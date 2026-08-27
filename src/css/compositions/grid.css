@@ -1,0 +1,36 @@
+/**
+ * Auto Grid Swatch
+ *
+ * A flexible layout that creates an auto-filling grid with configurable item sizes.
+ * Implements the "RAM" (Repeat, Auto, Minmax) pattern to adapt without media queries.
+ *
+ * Related: https://every-layout.dev/layouts/grid/
+ *
+ * Usage: <div class="grid">...</div>
+ */
+
+.grid {
+  /*
+   * --gutter: Space between items
+   * --grid-min-item-size: Minimum width of an item before wrapping
+   * --grid-placement: auto-fill (default) or auto-fit
+   */
+  display: grid;
+  grid-template-columns: repeat(
+    var(--grid-placement, auto-fill),
+    minmax(var(--grid-min-item-size, 16rem), 1fr)
+  );
+  gap: var(--gutter, var(--space-l));
+}
+
+/* A split 50/50 layout */
+.grid[data-layout="50-50"] {
+  --grid-placement: auto-fit;
+  --grid-min-item-size: clamp(16rem, 50vw, 33rem);
+}
+
+/* Three column grid layout */
+.grid[data-layout="thirds"] {
+  --grid-placement: auto-fit;
+  --grid-min-item-size: clamp(16rem, 33%, 20rem);
+}
