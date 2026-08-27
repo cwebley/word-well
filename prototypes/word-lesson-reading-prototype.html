@@ -1,0 +1,143 @@
+<!doctype html>
+<!-- PROTOTYPE ONLY: Three Word lesson reading hierarchies, switchable with ?variant=. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordWell Word lesson prototype</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Literata:opsz,wght@7..72,200..900&display=swap");
+
+      :root {
+        --ink: oklch(25% 0.035 205);
+        --muted: oklch(45% 0.035 205);
+        --paper: oklch(98% 0.012 165);
+        --stone: oklch(91% 0.015 200);
+        --water: oklch(45% 0.075 205);
+        --moss: oklch(45% 0.075 145);
+        --wood: oklch(45% 0.075 45);
+        --wood-light: oklch(62% 0.09 45);
+        --line: color-mix(in oklab, var(--water), transparent 55%);
+        --sans: "Instrument Sans", sans-serif;
+        --serif: Literata, Iowan Old Style, Georgia, serif;
+      }
+
+      * { box-sizing: border-box; }
+      body { background: var(--stone); color: var(--ink); font-family: var(--sans); margin: 0; }
+      h1, h2, p, figure { margin: 0; }
+      .app { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-block-size: 100dvh; }
+      .rail { background: var(--water); color: var(--paper); padding: 2rem; }
+      .rail h2 { font-family: var(--serif); font-size: 2rem; font-weight: 520; letter-spacing: -.04em; margin: 0 0 4rem; }
+      .rail nav { display: grid; gap: .45rem; }
+      .rail a { color: inherit; padding: .7rem .8rem; text-decoration: none; }
+      .rail a:first-child { background: color-mix(in oklab, var(--water) 65%, var(--paper)); border-inline-start: .3rem solid var(--wood-light); }
+      .variant { display: none; }
+      body[data-variant="lesson"] .lesson, body[data-variant="field-guide"] .field-guide, body[data-variant="reference"] .reference { display: block; }
+      .eyebrow { color: var(--moss); font-size: .78rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+      .word { color: var(--water); font-family: var(--serif); font-size: clamp(5.5rem, 16vw, 12rem); font-weight: 440; letter-spacing: -.08em; line-height: .78; }
+      .metadata { color: var(--water); font-size: clamp(1.05rem, 2vw, 1.5rem); font-weight: 600; }
+      .reading-heading { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.55rem); font-weight: 470; letter-spacing: -.045em; line-height: 1.04; }
+      .body-copy { font-size: clamp(1.05rem, 1.7vw, 1.35rem); line-height: 1.55; }
+      .rule { border: 0; border-block-start: 1px solid var(--line); margin: 0; }
+      .usage-label { color: var(--moss); font-size: .76rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+      .switcher { align-items: center; background: oklch(18% 0.02 205); border-radius: 99rem; bottom: 1rem; box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%); color: white; display: flex; gap: .75rem; left: 50%; padding: .45rem; position: fixed; transform: translateX(-50%); z-index: 2; }
+      .switcher button { background: var(--paper); border: 0; border-radius: 50%; color: var(--ink); cursor: pointer; font: inherit; font-size: 1.2rem; height: 2.2rem; width: 2.2rem; }
+      .switcher output { font-size: .8rem; min-width: 13rem; text-align: center; }
+
+      /* A: a paced, editorial lesson. The word panel directly echoes Familiarity. */
+      .lesson { min-height: 100dvh; }
+      .lesson .hero { align-content: center; background: var(--paper); border-block-end: 1px solid var(--line); display: grid; min-block-size: min(34rem, 52dvh); padding: clamp(2.5rem, 7vw, 7rem); }
+      .lesson .hero .eyebrow { margin-block-end: clamp(2rem, 7vw, 5rem); }
+      .lesson .word { margin-block-end: 1.25rem; }
+      .lesson .body { margin-inline: auto; max-width: 60rem; padding: clamp(3rem, 8vw, 8rem) clamp(2rem, 7vw, 7rem) 7rem; }
+      .lesson .definition { display: grid; gap: 1.4rem; max-width: 50rem; }
+      .lesson .examples { display: grid; gap: 0; margin-block: clamp(3rem, 8vw, 7rem); }
+      .lesson .example { border-block-start: 1px solid var(--line); display: grid; gap: .8rem; padding-block: 1.7rem; }
+      .lesson .example:last-child { border-block-end: 1px solid var(--line); }
+      .lesson .example p:last-child { font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 2rem); font-style: italic; line-height: 1.28; }
+      .lesson .etymology { background: color-mix(in oklab, var(--wood-light) 18%, var(--paper)); border-inline-start: .35rem solid var(--wood-light); display: grid; gap: .75rem; padding: clamp(1.5rem, 4vw, 2.5rem); }
+
+      /* B: a practical guide. Meaning is central; use and misuse are visible at once. */
+      .field-guide { padding: clamp(2rem, 5vw, 5rem); }
+      .field-guide .hero { border-block-end: 2px solid var(--water); padding-block: clamp(1rem, 3vw, 2.5rem) clamp(2.5rem, 8vw, 6rem); }
+      .field-guide .hero .eyebrow { margin-block-end: 2rem; }
+      .field-guide .word { margin-block-end: 1rem; }
+      .field-guide .definition { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.04em; line-height: 1.08; max-width: 58rem; }
+      .field-guide .guide-grid { display: grid; gap: clamp(2rem, 6vw, 6rem); grid-template-columns: repeat(2, minmax(0, 1fr)); padding-block: clamp(2.5rem, 6vw, 5rem); }
+      .field-guide .guide-grid section { display: grid; gap: 1rem; }
+      .field-guide .guide-grid .body-copy { max-width: 30rem; }
+      .field-guide .examples { border-block: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .field-guide .example { border-inline-end: 1px solid var(--line); display: grid; gap: 1rem; padding: clamp(1.4rem, 3vw, 2.7rem); }
+      .field-guide .example:last-child { border-inline-end: 0; }
+      .field-guide .example p:last-child { font-family: var(--serif); font-size: clamp(1.2rem, 2vw, 1.75rem); line-height: 1.32; }
+      .field-guide .origin { display: grid; gap: .8rem; max-width: 48rem; padding-block: clamp(2.5rem, 6vw, 5rem); }
+
+      /* C: reference notes. A narrow reading column sits against a stable fact rail. */
+      .reference { background: var(--paper); min-height: 100dvh; }
+      .reference .hero { border-block-end: 1px solid var(--line); padding: clamp(2.5rem, 7vw, 7rem); }
+      .reference .hero .eyebrow { margin-block-end: clamp(2rem, 7vw, 5rem); }
+      .reference .word { margin-block-end: 1.25rem; }
+      .reference .content { display: grid; grid-template-columns: minmax(12rem, .55fr) minmax(22rem, 1.45fr); margin-inline: auto; max-width: 90rem; }
+      .reference .facts { background: var(--stone); border-inline-end: 1px solid var(--line); display: grid; align-content: start; gap: 1.7rem; padding: clamp(2rem, 4vw, 4rem); }
+      .reference .facts div { display: grid; gap: .35rem; }
+      .reference .facts p:last-child { font-family: var(--serif); font-size: 1.25rem; line-height: 1.3; }
+      .reference .article { display: grid; gap: clamp(2.5rem, 6vw, 5rem); max-width: 52rem; padding: clamp(2.5rem, 6vw, 6rem); }
+      .reference .article section { display: grid; gap: 1.2rem; }
+      .reference .article h2 { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.35rem); font-weight: 500; letter-spacing: -.03em; }
+      .reference .example-list { display: grid; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+      .reference .example-list li { border-inline-start: .25rem solid var(--wood-light); font-family: var(--serif); font-size: clamp(1.2rem, 2vw, 1.65rem); line-height: 1.32; padding-inline-start: 1rem; }
+
+      @media (max-width: 50rem) {
+        .app { grid-template-columns: 1fr; }
+        .rail { display: none; }
+        .field-guide .guide-grid, .field-guide .examples, .reference .content { grid-template-columns: 1fr; }
+        .field-guide .example { border-block-end: 1px solid var(--line); border-inline-end: 0; }
+        .field-guide .example:last-child { border-block-end: 0; }
+        .reference .facts { border-block-end: 1px solid var(--line); border-inline-end: 0; }
+      }
+    </style>
+  </head>
+  <body data-variant="lesson">
+    <div class="app">
+      <aside class="rail">
+        <h2>WordWell</h2>
+        <nav aria-label="Primary navigation"><a href="#">Today</a><a href="#">Practice</a><a href="#">History</a><a href="#">Profile</a></nav>
+      </aside>
+      <main>
+        <article class="variant lesson">
+          <header class="hero"><p class="eyebrow">Today's word</p><h1 class="word">candid</h1><p class="metadata">/ˈkændɪd/ &middot; adjective</p></header>
+          <div class="body">
+            <section class="definition"><p class="eyebrow">In brief</p><h2 class="reading-heading">Honest and direct, even when the truth may be uncomfortable.</h2><p class="body-copy">Candid is usually approving: it names openness that is useful, clear, and proportionate, not bluntness for its own sake.</p></section>
+            <section class="examples" aria-labelledby="lesson-examples"><p class="eyebrow" id="lesson-examples">In a sentence</p><div class="example"><p class="usage-label">At work</p><p>“Her candid feedback helped the team improve the proposal.”</p></div><div class="example"><p class="usage-label">With a friend</p><p>“He was candid about why the plan had not worked.”</p></div><div class="example"><p class="usage-label">In an interview</p><p>“The memoir is candid about the cost of ambition.”</p></div></section>
+            <aside class="etymology"><p class="eyebrow">Where it comes from</p><p class="body-copy">Candid comes from Latin <i>candidus</i>, “white, bright, shining.” Roman candidates wore white togas as a public sign of openness, which helped the word acquire its modern sense of frankness.</p></aside>
+          </div>
+        </article>
+
+        <article class="variant field-guide">
+          <header class="hero"><p class="eyebrow">Today's word</p><h1 class="word">candid</h1><p class="metadata">/ˈkændɪd/ &middot; adjective</p></header>
+          <section class="definition"><p>Honest and direct, even when the truth may be uncomfortable.</p></section>
+          <div class="guide-grid"><section><p class="usage-label">Use it when</p><p class="reading-heading">You mean open, direct communication.</p><p class="body-copy">A candid response says what matters without pretending the difficult part is not there.</p></section><section><p class="usage-label">Do not use it for</p><p class="reading-heading">A rude comment that ignores the other person.</p><p class="body-copy">Candid does not excuse cruelty. The word suggests honesty with a purpose.</p></section></div>
+          <section class="examples" aria-label="Three examples"><div class="example"><p class="usage-label">1</p><p>“She gave a candid account of the project’s setbacks.”</p></div><div class="example"><p class="usage-label">2</p><p>“We had a candid conversation about the budget.”</p></div><div class="example"><p class="usage-label">3</p><p>“His candid answer made the decision easier.”</p></div></section>
+          <section class="origin"><p class="eyebrow">A word with a visible past</p><p class="body-copy">From Latin <i>candidus</i>, “white” or “bright.” White clothing came to suggest public openness, and later candid came to describe speech that feels unguarded and sincere.</p></section>
+        </article>
+
+        <article class="variant reference">
+          <header class="hero"><p class="eyebrow">Today's word</p><h1 class="word">candid</h1><p class="metadata">/ˈkændɪd/ &middot; adjective</p></header>
+          <div class="content"><aside class="facts"><div><p class="eyebrow">Also</p><p>frank, open</p></div><div><p class="eyebrow">Register</p><p>Neutral</p></div><div><p class="eyebrow">Core idea</p><p>Honesty with care</p></div></aside><div class="article"><section><p class="eyebrow">Meaning</p><h2>Honest and direct, even when the truth may be uncomfortable.</h2><p class="body-copy">Use candid when the openness is constructive: clear-eyed feedback, an unvarnished account, or a difficult but worthwhile conversation.</p></section><section><p class="eyebrow">Examples</p><ul class="example-list"><li>“The report is candid about the risks.”</li><li>“She was candid about needing more time.”</li><li>“A candid review can improve the next draft.”</li></ul></section><section><p class="eyebrow">Etymology</p><p class="body-copy">Latin <i>candidus</i> meant “white, bright, shining.” The association with public openness eventually gave English its modern word for frank speech.</p></section></div></div>
+        </article>
+      </main>
+    </div>
+    <div class="switcher" aria-label="Prototype variant switcher"><button type="button" id="previous" aria-label="Previous variant">&larr;</button><output id="variant-label"></output><button type="button" id="next" aria-label="Next variant">&rarr;</button></div>
+    <script>
+      const variants = [["lesson", "A: Pacing the lesson"], ["field-guide", "B: Practical field guide"], ["reference", "C: Reading reference"]];
+      const params = new URLSearchParams(location.search);
+      let index = Math.max(0, variants.findIndex(([key]) => key === params.get("variant")));
+      function render() { const [key, label] = variants[index]; document.body.dataset.variant = key; document.querySelector("#variant-label").textContent = label; const url = new URL(location.href); url.searchParams.set("variant", key); history.replaceState(null, "", url); }
+      function switchVariant(step) { index = (index + step + variants.length) % variants.length; render(); }
+      document.querySelector("#previous").addEventListener("click", () => switchVariant(-1));
+      document.querySelector("#next").addEventListener("click", () => switchVariant(1));
+      document.addEventListener("keydown", (event) => { if (event.target.matches("button, input, textarea, [contenteditable]")) return; if (event.key === "ArrowLeft") switchVariant(-1); if (event.key === "ArrowRight") switchVariant(1); });
+      render();
+    </script>
+  </body>
+</html>
