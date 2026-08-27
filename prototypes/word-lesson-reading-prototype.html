@@ -17,6 +17,10 @@
         --moss: oklch(45% 0.075 145);
         --wood: oklch(45% 0.075 45);
         --wood-light: oklch(62% 0.09 45);
+        --clay-kiln: oklch(51% 0.13 29);
+        --clay-terracotta: oklch(54% 0.12 38);
+        --clay-ochre: oklch(57% 0.11 52);
+        --color-avoid: var(--clay-kiln);
         --line: color-mix(in oklab, var(--water), transparent 55%);
         --sans: "Instrument Sans", sans-serif;
         --serif: Literata, Iowan Old Style, Georgia, serif;
@@ -43,6 +47,13 @@
       .switcher { align-items: center; background: oklch(18% 0.02 205); border-radius: 99rem; bottom: 1rem; box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%); color: white; display: flex; gap: .75rem; left: 50%; padding: .45rem; position: fixed; transform: translateX(-50%); z-index: 2; }
       .switcher button { background: var(--paper); border: 0; border-radius: 50%; color: var(--ink); cursor: pointer; font: inherit; font-size: 1.2rem; height: 2.2rem; width: 2.2rem; }
       .switcher output { font-size: .8rem; min-width: 13rem; text-align: center; }
+      .tone-switcher { align-items: center; background: var(--paper); border: 1px solid var(--line); bottom: 4.8rem; display: flex; gap: .45rem; left: 50%; padding: .45rem .6rem; position: fixed; transform: translateX(-50%); z-index: 2; }
+      .tone-switcher span { color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      .tone-switcher button { background: var(--swatch); border: 2px solid transparent; cursor: pointer; height: 1.45rem; width: 1.45rem; }
+      .tone-switcher button[aria-pressed="true"] { border-color: var(--ink); outline: 2px solid var(--paper); outline-offset: -4px; }
+      body[data-tone="kiln"] { --color-avoid: var(--clay-kiln); }
+      body[data-tone="terracotta"] { --color-avoid: var(--clay-terracotta); }
+      body[data-tone="ochre"] { --color-avoid: var(--clay-ochre); }
 
       /* A: a paced, editorial lesson. The word panel directly echoes Familiarity. */
       .lesson { min-height: 100dvh; }
@@ -63,7 +74,7 @@
       .lesson .usage-choice { display: grid; gap: .65rem; min-height: 100%; padding: 1rem; }
       .lesson .usage-choice p:last-child { font-family: var(--serif); font-size: clamp(1.25rem, 2vw, 1.7rem); letter-spacing: -.025em; line-height: 1.18; }
       .lesson .use { --cue: var(--moss); }
-      .lesson .avoid { --cue: oklch(53% 0.13 25); }
+      .lesson .avoid { --cue: var(--color-avoid); }
       .lesson .barred .usage-choice { border-block-start: .4rem solid var(--cue); }
       .lesson .washed .usage-choice { background: color-mix(in oklab, var(--cue) 12%, var(--paper)); border-inline-start: .4rem solid var(--cue); }
       .lesson .marked .usage-choice { border: 1px solid var(--cue); position: relative; }
@@ -123,7 +134,7 @@
           <div class="body">
             <section class="definition"><p class="eyebrow">In brief</p><h2 class="reading-heading">Honest and direct, even when the truth may be uncomfortable.</h2><p class="body-copy">Candid is usually approving: it names openness that is useful, clear, and proportionate, not bluntness for its own sake.</p></section>
             <section class="examples" aria-labelledby="lesson-examples"><p class="eyebrow" id="lesson-examples">In a sentence</p><div class="example"><p class="usage-label">At work</p><p>“Her candid feedback helped the team improve the proposal.”</p></div><div class="example"><p class="usage-label">With a friend</p><p>“He was candid about why the plan had not worked.”</p></div><div class="example"><p class="usage-label">In an interview</p><p>“The memoir is candid about the cost of ambition.”</p></div></section>
-            <section class="usage-studies" aria-labelledby="usage-studies"><p class="eyebrow" id="usage-studies">Use guidance studies</p><div class="usage-study barred"><p class="usage-study-name">A. Rule bars</p><div class="usage-pair"><div class="usage-choice use"><p class="usage-label">Use it when</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid"><p class="usage-label">Do not use it for</p><p>A rude comment that ignores the other person.</p></div></div></div><div class="usage-study washed"><p class="usage-study-name">B. Quiet fields</p><div class="usage-pair"><div class="usage-choice use"><p class="usage-label">A good fit</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid"><p class="usage-label">Not a fit</p><p>A rude comment that ignores the other person.</p></div></div></div><div class="usage-study marked"><p class="usage-study-name">C. Direction markers</p><div class="usage-pair"><div class="usage-choice use" data-mark="+"><p class="usage-label">Use it when</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid" data-mark="-"><p class="usage-label">Avoid it when</p><p>A rude comment that ignores the other person.</p></div></div></div></section>
+            <section class="usage-studies" aria-labelledby="usage-studies"><p class="eyebrow" id="usage-studies">Use guidance</p><div class="usage-study barred"><div class="usage-pair"><div class="usage-choice use"><p class="usage-label">Use it when</p><p>You mean open, direct communication.</p></div><div class="usage-choice avoid"><p class="usage-label">Do not use it for</p><p>A rude comment that ignores the other person.</p></div></div></div></section>
             <aside class="etymology"><p class="eyebrow">Where it comes from</p><p class="body-copy">Candid comes from Latin <i>candidus</i>, “white, bright, shining.” Roman candidates wore white togas as a public sign of openness, which helped the word acquire its modern sense of frankness.</p></aside>
           </div>
         </article>
@@ -143,6 +154,7 @@
       </main>
     </div>
     <div class="switcher" aria-label="Prototype variant switcher"><button type="button" id="previous" aria-label="Previous variant">&larr;</button><output id="variant-label"></output><button type="button" id="next" aria-label="Next variant">&rarr;</button></div>
+    <div class="tone-switcher" aria-label="Clay token study"><span>Clay cue</span><button type="button" data-tone="kiln" style="--swatch: var(--clay-kiln)" aria-label="Kiln clay" title="Kiln clay" aria-pressed="true"></button><button type="button" data-tone="terracotta" style="--swatch: var(--clay-terracotta)" aria-label="Terracotta" title="Terracotta" aria-pressed="false"></button><button type="button" data-tone="ochre" style="--swatch: var(--clay-ochre)" aria-label="Ocher" title="Ocher" aria-pressed="false"></button></div>
     <script>
       const variants = [["lesson", "A: Pacing the lesson"], ["field-guide", "B: Practical field guide"], ["reference", "C: Reading reference"]];
       const params = new URLSearchParams(location.search);
@@ -151,6 +163,7 @@
       function switchVariant(step) { index = (index + step + variants.length) % variants.length; render(); }
       document.querySelector("#previous").addEventListener("click", () => switchVariant(-1));
       document.querySelector("#next").addEventListener("click", () => switchVariant(1));
+      document.querySelectorAll(".tone-switcher button").forEach((button) => button.addEventListener("click", () => { document.body.dataset.tone = button.dataset.tone; document.querySelectorAll(".tone-switcher button").forEach((candidate) => candidate.setAttribute("aria-pressed", candidate === button)); }));
       document.addEventListener("keydown", (event) => { if (event.target.matches("button, input, textarea, [contenteditable]")) return; if (event.key === "ArrowLeft") switchVariant(-1); if (event.key === "ArrowRight") switchVariant(1); });
       render();
     </script>
