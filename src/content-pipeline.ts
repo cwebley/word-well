@@ -321,7 +321,7 @@ function validateRequiredContent(draft: VocabularyDraft): QuarantineReason[] {
       (meaning) =>
         !hasText(meaning.definition) ||
         !hasText(meaning.partOfSpeech) ||
-        meaning.examples.length < 3 ||
+        meaning.examples.length !== 3 ||
         meaning.examples.some((example) => !hasText(example)) ||
         !hasText(meaning.useItWhen) ||
         !hasText(meaning.doNotUseItFor) ||

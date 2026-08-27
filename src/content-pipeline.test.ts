@@ -179,6 +179,17 @@ describe("content pipeline", () => {
       publishVocabularyRecord({
         candidate,
         evidence,
+        draft: {
+          ...draft,
+          meanings: [{ ...draft.meanings[0], examples: [...draft.meanings[0].examples, "A fourth example."] }]
+        }
+      })
+    ).toEqual({ status: "quarantined", reasons: ["missing-required-field"] });
+
+    expect(
+      publishVocabularyRecord({
+        candidate,
+        evidence,
         draft: { ...draft, pronunciationEvidenceId: "missing-evidence" }
       })
     ).toEqual({
