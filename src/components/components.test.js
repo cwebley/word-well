@@ -20,12 +20,15 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain("candid");
     expect(lesson).toContain('class="lesson flow"');
     expect(lesson).not.toContain('class="card flow"');
-    const familiarity = renderFamiliarityGate({ headword: "candid" });
+    const familiarity = renderFamiliarityGate({ headword: "candid", pronunciation: "/kan-did/", partOfSpeech: "adjective" });
     expect(familiarity).toContain("How familiar is this word?");
+    expect(familiarity).toContain("adjective &middot; /kan-did/");
     expect(familiarity).toContain('class="familiarity-word">candid');
     expect(familiarity).toContain("Familiar, but I don&#39;t use it");
     expect(familiarity).toContain('class="familiarity-actions"');
-    expect(familiarity).toContain('class="familiarity-gate flow"');
+    expect(familiarity).toContain('class="familiarity-gate"');
+    expect(familiarity).toContain('class="familiarity-word-panel"');
+    expect(familiarity).toContain('class="familiarity-prompt flow"');
     expect(familiarity).toContain('class="button"');
     expect(familiarity).not.toContain('class="button choice"');
     expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice })).toContain("Which sentence uses candid naturally?");

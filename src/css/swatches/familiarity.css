@@ -1,7 +1,37 @@
 .familiarity-gate {
+  display: grid;
+  grid-template-rows: minmax(16rem, 34dvh) minmax(0, 1fr);
+  margin-inline: calc(var(--gutter) * -1);
+  min-block-size: 100%;
+}
+
+.familiarity-word-panel {
+  align-content: center;
+  background: var(--color-surface);
+  border-block-end: var(--stroke-solid);
+  display: grid;
+  padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
+}
+
+.familiarity-metadata {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.familiarity-word {
+  color: var(--color-link);
+  font-family: var(--font-reading);
+  font-size: min(var(--step-10), 28cqi);
+  font-weight: 440;
+  letter-spacing: -0.075em;
+  line-height: 0.8;
+}
+
+.familiarity-prompt {
   --flow-space: var(--space-m);
-  max-inline-size: 42rem;
-  padding-block: var(--space-2xl);
+  align-content: center;
+  display: grid;
+  padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
 }
 
 .familiarity-title {
@@ -10,14 +40,6 @@
   font-weight: 440;
   letter-spacing: -0.04em;
   line-height: var(--leading-flat);
-}
-
-.familiarity-word {
-  font-family: var(--font-reading);
-  font-size: var(--step-10);
-  font-weight: 440;
-  letter-spacing: -0.075em;
-  line-height: 0.8;
 }
 
 .familiarity-copy {

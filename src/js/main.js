@@ -20,7 +20,7 @@ function render() {
   } else if (route === "profile") {
     main.innerHTML = `<section class="card flow"><p class="lesson-label">Your WordWell</p><h1 class="card-title">Keep your learning private and portable.</h1><p>Starting band: Stretch my vocabulary.</p></section>`;
   } else if (!familiarity || revising) {
-    main.innerHTML = renderFamiliarityGate({ headword: lesson.headword, revision: revising });
+    main.innerHTML = renderFamiliarityGate({ headword: lesson.headword, pronunciation: lesson.pronunciation, partOfSpeech: lesson.meanings[0].partOfSpeech, revision: revising });
   } else {
     main.innerHTML = renderLessonCard({ lesson });
   }
