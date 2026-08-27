@@ -22,7 +22,7 @@ export function renderCard({ title, body, ctaLabel, ctaHref } = {}) {
 
 export function renderLessonCard({ lesson }) {
   const meaning = lesson.meanings[0];
-  return `<article class="card flow" aria-labelledby="lesson-word">
+  return `<article class="lesson flow" aria-labelledby="lesson-word">
     <p class="lesson-label">Today's word</p>
     <h1 id="lesson-word" class="lesson-word">${escapeHtml(lesson.headword)}</h1>
     <p class="lesson-pronunciation">${escapeHtml(lesson.pronunciation)} · ${escapeHtml(meaning.partOfSpeech)}</p>

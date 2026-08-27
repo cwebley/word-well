@@ -24,6 +24,7 @@
   --flow-space: var(--space-m);
 }
 
+.lesson { --flow-space: var(--space-m); max-width: 42rem; padding-block: var(--space-2xl); }
 .lesson-word { font-family: var(--font-reading); font-size: clamp(4.5rem, 15vw, 10rem); font-weight: 440; letter-spacing: -0.075em; line-height: 0.8; }
 .lesson-label, .status-label { color: var(--color-support); font-size: var(--step--1); font-weight: var(--weight-bold); letter-spacing: 0.13em; text-transform: uppercase; }
 .lesson-pronunciation { color: var(--color-link); font-weight: var(--weight-medium); }

@@ -16,8 +16,18 @@ describe("SwatchKit shared WordWell components", () => {
   });
 
   it("renders the learner components shared by the application and library", () => {
-    expect(renderLessonCard({ lesson: seededVocabularyRecord })).toContain("candid");
-    expect(renderFamiliarityGate()).toContain("How familiar is this word?");
+    const lesson = renderLessonCard({ lesson: seededVocabularyRecord });
+    expect(lesson).toContain("candid");
+    expect(lesson).toContain('class="lesson flow"');
+    expect(lesson).not.toContain('class="card flow"');
+    const familiarity = renderFamiliarityGate({ headword: "candid" });
+    expect(familiarity).toContain("How familiar is this word?");
+    expect(familiarity).toContain('class="familiarity-word">candid');
+    expect(familiarity).toContain("Familiar, but I don&#39;t use it");
+    expect(familiarity).toContain('class="familiarity-actions"');
+    expect(familiarity).toContain('class="familiarity-gate flow"');
+    expect(familiarity).toContain('class="button"');
+    expect(familiarity).not.toContain('class="button choice"');
     expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice })).toContain("Which sentence uses candid naturally?");
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
   });

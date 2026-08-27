@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- PROTOTYPE: Literata plus variable sans options. Switch with ?sans=instrument|anek|bricolage. -->
+<!-- PROTOTYPE: Type and navigation-color options. Switch with ?sans=instrument|anek|bricolage&nav=wood|light-wood|marker|moss. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -18,6 +18,8 @@
         --moss: oklch(45% 0.075 145);
         --wood: oklch(45% 0.075 45);
         --water-soft: oklch(from var(--water) calc(l + 10%) c h);
+        --wood-nav: oklch(62% 0.09 45);
+        --moss-nav: oklch(70% 0.05 145);
         --line: oklch(from var(--water) calc(l + 35%) calc(c - 0.03) h);
         --sans: "Instrument Sans", sans-serif;
         --serif: Literata, serif;
@@ -31,8 +33,25 @@
       aside { display: flex; flex-direction: column; padding: 2rem; background: var(--water); color: var(--paper); }
       .brand { margin: 0 0 4rem; font-family: var(--serif); font-size: 2rem; font-weight: 620; letter-spacing: -.035em; }
       nav { display: grid; gap: .45rem; }
-      nav a { padding: .7rem .8rem; border-radius: .5rem; color: inherit; text-decoration: none; }
-      nav a:first-child { background: var(--wood); }
+      nav a { padding: .7rem .8rem; color: inherit; text-decoration: none; }
+      nav a { transition: background .15s ease, border-color .15s ease, color .15s ease; }
+      .nav-wood nav a:first-child { background: var(--wood); }
+      .nav-light-wood nav a:first-child {
+        background: var(--wood-nav);
+        color: var(--ink);
+      }
+      .nav-marker nav a:first-child {
+        border-inline-start: .3rem solid var(--wood-nav);
+        padding-inline-start: .5rem;
+        background: color-mix(in oklab, var(--water-soft) 45%, transparent);
+      }
+      .nav-marker nav a:hover {
+        background: color-mix(in oklab, var(--water-soft) 30%, transparent);
+      }
+      .nav-moss nav a:first-child {
+        background: var(--moss-nav);
+        color: var(--wood);
+      }
       .rail-note { margin: auto 0 0; font-size: .85rem; line-height: 1.45; opacity: .88; }
       main { max-width: 60rem; padding: clamp(2rem, 8vw, 6rem); }
       .eyebrow { margin: 0; color: var(--moss); font-size: .72rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
@@ -51,6 +70,7 @@
       .swatch:nth-child(3) { background: var(--wood); }
       .token-note { margin: .75rem 0 0; color: var(--water); font-family: ui-monospace, monospace; font-size: .72rem; }
       .prototype-switcher { position: fixed; z-index: 3; bottom: 1rem; left: 50%; display: flex; align-items: center; gap: .7rem; padding: .45rem; border-radius: 99rem; background: oklch(18% 0.02 205); box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%); color: white; transform: translateX(-50%); }
+      .type-switcher { bottom: 4.5rem; }
       .prototype-switcher button { width: 2.2rem; height: 2.2rem; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); font-size: 1.15rem; }
       .prototype-switcher span { min-width: 15rem; font-size: .8rem; text-align: center; }
 
@@ -93,10 +113,15 @@
         <p class="token-note">water / moss / wood: oklch(45% 0.075 hue)</p>
       </main>
     </div>
-    <div class="prototype-switcher" aria-label="Typeface variants">
+    <div class="prototype-switcher type-switcher" aria-label="Typeface variants">
       <button id="previous" type="button" aria-label="Previous type pairing">&larr;</button>
       <span id="type-name"></span>
       <button id="next" type="button" aria-label="Next type pairing">&rarr;</button>
+    </div>
+    <div class="prototype-switcher" aria-label="Navigation color variants">
+      <button id="nav-previous" type="button" aria-label="Previous navigation color">&larr;</button>
+      <span id="nav-name"></span>
+      <button id="nav-next" type="button" aria-label="Next navigation color">&rarr;</button>
     </div>
     <script>
       const pairs = {
@@ -104,22 +129,42 @@
         anek: "Literata + Anek Latin",
         bricolage: "Literata + Bricolage Grotesque"
       };
+      const navTreatments = {
+        wood: "Nav: wood-filled active",
+        "light-wood": "Nav: lighter wood active",
+        marker: "Nav: water tint + wood edge",
+        moss: "Nav: light moss + wood text"
+      };
       let key = new URLSearchParams(location.search).get("sans");
       if (!pairs[key]) key = "instrument";
+      let navKey = new URLSearchParams(location.search).get("nav");
+      if (!navTreatments[navKey]) navKey = "wood";
 
       function render() {
-        document.body.className = `sans-${key}`;
+        document.body.className = `sans-${key} nav-${navKey}`;
         document.querySelector("#type-name").textContent = pairs[key];
-        history.replaceState(null, "", `?sans=${key}`);
+        document.querySelector("#nav-name").textContent = navTreatments[navKey];
+        const url = new URL(location.href);
+        url.searchParams.set("sans", key);
+        url.searchParams.set("nav", navKey);
+        history.replaceState(null, "", url);
       }
       function switchPair(step) {
         const keys = Object.keys(pairs);
         key = keys[(keys.indexOf(key) + step + keys.length) % keys.length];
         render();
       }
+      function switchNav(step) {
+        const keys = Object.keys(navTreatments);
+        navKey = keys[(keys.indexOf(navKey) + step + keys.length) % keys.length];
+        render();
+      }
       document.querySelector("#previous").addEventListener("click", () => switchPair(-1));
       document.querySelector("#next").addEventListener("click", () => switchPair(1));
+      document.querySelector("#nav-previous").addEventListener("click", () => switchNav(-1));
+      document.querySelector("#nav-next").addEventListener("click", () => switchNav(1));
       document.addEventListener("keydown", (event) => {
+        if (event.target.matches("input, textarea, [contenteditable]")) return;
         if (event.key === "ArrowLeft") switchPair(-1);
         if (event.key === "ArrowRight") switchPair(1);
       });

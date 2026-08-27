@@ -4,6 +4,6 @@ const html = String.raw;
 
 export default html`
   <h2>Familiarity gate</h2>
-  <p>The learner chooses a starting point before lesson content is revealed.</p>
-  ${renderFamiliarityGate()}
+  <p>A direct, text-only familiarity ladder. Each choice advances the learner into today's lesson.</p>
+  ${renderFamiliarityGate({ headword: "candid" })}
 `;

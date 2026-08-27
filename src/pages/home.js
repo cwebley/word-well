@@ -1,5 +1,6 @@
 import { renderFamiliarityGate } from "../components/familiarity.js";
 import { renderNavigation } from "../components/navigation.js";
+import { seededVocabularyRecord } from "../fixtures/published-word-lesson.js";
 
 const html = String.raw;
 
@@ -17,7 +18,7 @@ export function home() {
         <div class="app-shell">
           ${renderNavigation()}
           <main class="app-main region wrapper" id="app-main" tabindex="-1">
-            ${renderFamiliarityGate()}
+            ${renderFamiliarityGate({ headword: seededVocabularyRecord.headword })}
           </main>
         </div>
 
