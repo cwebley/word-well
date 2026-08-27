@@ -17,6 +17,7 @@
   --color-moss: oklch(45% 0.075 145);
   --color-wood: oklch(45% 0.075 45);
   --color-wood-light: oklch(62% 0.09 45);
+  --color-clay: oklch(51% 0.13 29);
   --color-stone: oklch(91% 0.015 200);
   /* @swatchkit end */
 
@@ -29,6 +30,7 @@
   --color-action: var(--color-wood);
   --color-link: var(--color-water);
   --color-support: var(--color-moss);
+  --color-avoid: var(--color-clay);
   --color-on-action: var(--color-surface);
   --color-on-water: var(--color-surface);
   /* @swatchkit end */

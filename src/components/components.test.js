@@ -18,8 +18,14 @@ describe("SwatchKit shared WordWell components", () => {
   it("renders the learner components shared by the application and library", () => {
     const lesson = renderLessonCard({ lesson: seededVocabularyRecord });
     expect(lesson).toContain("candid");
-    expect(lesson).toContain('class="lesson flow"');
+    expect(lesson).toContain('class="word-lesson"');
+    expect(lesson).toContain('class="word-lesson-hero"');
     expect(lesson).not.toContain('class="card flow"');
+    expect(lesson).toContain("In a sentence");
+    expect(lesson).toContain("He was candid about why the plan had not worked.");
+    expect(lesson).toContain("Use it when");
+    expect(lesson).toContain("Do not use it for");
+    expect(lesson).toContain("Where it comes from");
     const familiarity = renderFamiliarityGate({ headword: "candid", pronunciation: "/kan-did/", partOfSpeech: "adjective" });
     expect(familiarity).toContain("How familiar is this word?");
     expect(familiarity).toContain("adjective &middot; /kan-did/");

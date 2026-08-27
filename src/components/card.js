@@ -22,14 +22,19 @@ export function renderCard({ title, body, ctaLabel, ctaHref } = {}) {
 
 export function renderLessonCard({ lesson }) {
   const meaning = lesson.meanings[0];
-  return `<article class="lesson flow" aria-labelledby="lesson-word">
-    <p class="lesson-label">Today's word</p>
-    <h1 id="lesson-word" class="lesson-word">${escapeHtml(lesson.headword)}</h1>
-    <p class="lesson-pronunciation">${escapeHtml(lesson.pronunciation)} · ${escapeHtml(meaning.partOfSpeech)}</p>
-    <p class="lesson-definition">${escapeHtml(meaning.definition)}.</p>
-    <p class="lesson-example">“${escapeHtml(meaning.example)}”</p>
-    <dl class="lesson-guidance"><div><dt>Use it when</dt><dd>${escapeHtml(meaning.useItWhen)}.</dd></div><div><dt>Don't use it for</dt><dd>${escapeHtml(meaning.doNotUseItFor)}.</dd></div></dl>
-    <p>Also: ${meaning.synonyms.map(escapeHtml).join(", ")}</p>
-    ${renderButton({ label: "Update familiarity", action: "revise-familiarity", variant: "outline", size: "small" })}
+  const examples = meaning.examples.map((example) => `<li>“${escapeHtml(example)}”</li>`).join("");
+  const etymology = lesson.etymology
+    ? `<section class="word-lesson-etymology"><p class="lesson-label">Where it comes from</p><p>${escapeHtml(lesson.etymology)}</p></section>`
+    : "";
+
+  return `<article class="word-lesson" aria-labelledby="lesson-word">
+    <header class="word-lesson-hero"><p class="lesson-label">Today's word</p><h1 id="lesson-word" class="lesson-word">${escapeHtml(lesson.headword)}</h1><p class="lesson-pronunciation">${escapeHtml(lesson.pronunciation)} · ${escapeHtml(meaning.partOfSpeech)}</p></header>
+    <div class="word-lesson-body">
+      <section class="word-lesson-definition"><p class="lesson-label">In brief</p><p>${escapeHtml(meaning.definition)}.</p></section>
+      <section class="word-lesson-examples" aria-labelledby="lesson-examples"><p id="lesson-examples" class="lesson-label">In a sentence</p><ol role="list">${examples}</ol></section>
+      <dl class="lesson-guidance"><div class="lesson-guidance-use"><dt>Use it when</dt><dd>${escapeHtml(meaning.useItWhen)}.</dd></div><div class="lesson-guidance-avoid"><dt>Do not use it for</dt><dd>${escapeHtml(meaning.doNotUseItFor)}.</dd></div></dl>
+      ${etymology}
+      <footer class="word-lesson-footer"><p>Also: ${meaning.synonyms.map(escapeHtml).join(", ")}</p>${renderButton({ label: "Update familiarity", action: "revise-familiarity", variant: "outline", size: "small" })}</footer>
+    </div>
   </article>`;
 }

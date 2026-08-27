@@ -39,7 +39,11 @@ const draft = {
       definitionEvidenceId: "oewn-candid-adjective",
       partOfSpeech: "adjective",
       partOfSpeechEvidenceId: "oewn-candid-adjective",
-      example: "Her candid feedback helped the team improve the proposal.",
+      examples: [
+        "Her candid feedback helped the team improve the proposal.",
+        "He was candid about why the plan had not worked.",
+        "The memoir is candid about the cost of ambition."
+      ],
       useItWhen: "you want to describe open, direct communication",
       doNotUseItFor: "a rude comment that ignores the other person",
       synonyms: ["frank", "open"],
@@ -57,7 +61,11 @@ const draft = {
       definitionEvidenceId: "oewn-candid-adjective",
       partOfSpeech: "adjective",
       partOfSpeechEvidenceId: "oewn-candid-adjective",
-      example: "The newspaper printed a candid photo from the event.",
+      examples: [
+        "The newspaper printed a candid photo from the event.",
+        "The reporter captured a candid moment backstage.",
+        "The exhibition includes candid photographs of the city."
+      ],
       useItWhen: "you mean an unposed or informal photograph",
       doNotUseItFor: "a carefully staged portrait",
       synonyms: ["unposed", "informal"],
@@ -91,10 +99,10 @@ export const launchEvaluationSet: EvaluationSet = {
       input: { candidate, evidence, draft },
       expectedStatus: "published",
       meanings: draft.meanings.map(
-        ({ definition, partOfSpeech, example, useItWhen, doNotUseItFor, synonyms, register, practice }) => ({
+        ({ definition, partOfSpeech, examples, useItWhen, doNotUseItFor, synonyms, register, practice }) => ({
           definition,
           partOfSpeech,
-          example,
+          examples,
           useItWhen,
           doNotUseItFor,
           synonyms,

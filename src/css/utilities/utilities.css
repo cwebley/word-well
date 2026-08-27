@@ -13,6 +13,8 @@
 .background-color\:color-wood { background-color: var(--color-wood); }
 .color\:color-wood-light { color: var(--color-wood-light); }
 .background-color\:color-wood-light { background-color: var(--color-wood-light); }
+.color\:color-clay { color: var(--color-clay); }
+.background-color\:color-clay { background-color: var(--color-clay); }
 .color\:color-stone { color: var(--color-stone); }
 .background-color\:color-stone { background-color: var(--color-stone); }
 .color\:color-text { color: var(--color-text); }
@@ -31,6 +33,8 @@
 .background-color\:color-link { background-color: var(--color-link); }
 .color\:color-support { color: var(--color-support); }
 .background-color\:color-support { background-color: var(--color-support); }
+.color\:color-avoid { color: var(--color-avoid); }
+.background-color\:color-avoid { background-color: var(--color-avoid); }
 .color\:color-on-action { color: var(--color-on-action); }
 .background-color\:color-on-action { background-color: var(--color-on-action); }
 .color\:color-on-water { color: var(--color-on-water); }

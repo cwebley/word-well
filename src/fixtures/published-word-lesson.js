@@ -3,10 +3,15 @@ export const seededVocabularyRecord = {
   normalizedHeadword: "candid",
   version: "2026-08-26.1",
   pronunciation: "/ˈkændɪd/",
+  etymology: "Candid comes from Latin candidus, meaning white, bright, or shining. Public figures seeking office wore white togas, which helped the word acquire its modern sense of openness.",
   meanings: [
     {
       definition: "honest and direct, even when the truth may be uncomfortable",
-      example: "Her candid feedback helped the team improve the proposal.",
+      examples: [
+        "Her candid feedback helped the team improve the proposal.",
+        "He was candid about why the plan had not worked.",
+        "The memoir is candid about the cost of ambition."
+      ],
       useItWhen: "you want to describe open, direct communication",
       doNotUseItFor: "a rude comment that ignores the other person",
       synonyms: ["frank", "open"],

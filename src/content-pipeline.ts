@@ -29,7 +29,7 @@ export type VocabularyDraft = {
     readonly definitionEvidenceId: string;
     readonly partOfSpeech: string;
     readonly partOfSpeechEvidenceId: string;
-    readonly example: string;
+    readonly examples: readonly string[];
     readonly useItWhen: string;
     readonly doNotUseItFor: string;
     readonly synonyms: readonly string[];
@@ -52,7 +52,7 @@ type PublishedMeaning = Omit<
     readonly definition: SourceEvidence;
     readonly partOfSpeech: SourceEvidence;
     readonly register: SourceEvidence;
-    readonly example: GeneratedFieldProvenance;
+    readonly examples: GeneratedFieldProvenance;
     readonly useItWhen: GeneratedFieldProvenance;
     readonly doNotUseItFor: GeneratedFieldProvenance;
     readonly synonyms: GeneratedFieldProvenance;
@@ -124,7 +124,7 @@ export type SourceAttributionArtifact = {
 export type EvaluationMeaningAssertion = {
   readonly definition: string;
   readonly partOfSpeech: string;
-  readonly example: string;
+  readonly examples: readonly string[];
   readonly useItWhen: string;
   readonly doNotUseItFor: string;
   readonly synonyms: readonly string[];
@@ -251,7 +251,7 @@ export function publishVocabularyRecord(input: unknown): PipelineResult {
         return {
           definition: meaning.definition,
           partOfSpeech: meaning.partOfSpeech,
-          example: meaning.example,
+          examples: meaning.examples,
           useItWhen: meaning.useItWhen,
           doNotUseItFor: meaning.doNotUseItFor,
           synonyms: meaning.synonyms,
@@ -261,7 +261,7 @@ export function publishVocabularyRecord(input: unknown): PipelineResult {
             definition,
             partOfSpeech,
             register,
-            example: { sourceContext },
+            examples: { sourceContext },
             useItWhen: { sourceContext },
             doNotUseItFor: { sourceContext },
             synonyms: { sourceContext },
@@ -321,7 +321,8 @@ function validateRequiredContent(draft: VocabularyDraft): QuarantineReason[] {
       (meaning) =>
         !hasText(meaning.definition) ||
         !hasText(meaning.partOfSpeech) ||
-        !hasText(meaning.example) ||
+        meaning.examples.length < 3 ||
+        meaning.examples.some((example) => !hasText(example)) ||
         !hasText(meaning.useItWhen) ||
         !hasText(meaning.doNotUseItFor) ||
         meaning.synonyms.length === 0 ||
@@ -415,7 +416,7 @@ function validateProhibitedContent(
     draft.etymology,
     ...draft.meanings.flatMap((meaning) => [
       meaning.definition,
-      meaning.example,
+      ...meaning.examples,
       meaning.useItWhen,
       meaning.doNotUseItFor,
       meaning.register,
@@ -501,7 +502,7 @@ function isDraftMeaning(value: unknown): value is VocabularyDraft["meanings"][nu
     typeof value.definitionEvidenceId === "string" &&
     typeof value.partOfSpeech === "string" &&
     typeof value.partOfSpeechEvidenceId === "string" &&
-    typeof value.example === "string" &&
+    isStringArray(value.examples) &&
     typeof value.useItWhen === "string" &&
     typeof value.doNotUseItFor === "string" &&
     isStringArray(value.synonyms) &&
@@ -677,7 +678,7 @@ function sameMeanings(
         assertion !== undefined &&
         meaning.definition === assertion.definition &&
         meaning.partOfSpeech === assertion.partOfSpeech &&
-        meaning.example === assertion.example &&
+        sameStrings(meaning.examples, assertion.examples) &&
         meaning.useItWhen === assertion.useItWhen &&
         meaning.doNotUseItFor === assertion.doNotUseItFor &&
         sameStrings(meaning.synonyms, assertion.synonyms) &&
