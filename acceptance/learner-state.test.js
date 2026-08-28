@@ -55,7 +55,7 @@ suite("learner-state browser acceptance", () => {
   });
 
   beforeEach(async () => {
-    await pool.query("TRUNCATE reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_lessons");
+    await pool.query("TRUNCATE recovery_tokens, passkey_challenges, passkeys, profile_access_events, reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_lessons");
     await seedPublishedLesson();
   });
 
@@ -148,7 +148,124 @@ suite("learner-state browser acceptance", () => {
     expect(await acceptedOperationCount()).toBe(0);
     await context.close();
   }, 30_000);
+
+  it("clears the browser cache and shows the tombstone page after the server deletes the profile", async () => {
+    const context = await newLearnerContext();
+    const page = await openLearner(context);
+
+    await page.getByRole("button", { name: "Completely new to me" }).click();
+    await visible(page.getByRole("heading", { name: "candid" }));
+    await waitForAcceptedOperations(1);
+    const grant = await extractGrant(page);
+    await authenticateSession(grant);
+
+    const response = await fetch(`${apiUrl}/profile/delete`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${grant}` },
+    });
+    expect(response.status).toBe(200);
+
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await visible(page.getByRole("heading", { name: "Your WordWell profile is scheduled for permanent deletion." }));
+
+    const stillCached = await page.evaluate(async () => {
+      return new Promise((resolve) => {
+        const request = indexedDB.open("wordwell", 1);
+        request.onsuccess = () => {
+          const transaction = request.result.transaction("learner-state", "readonly");
+          const operation = transaction.objectStore("learner-state").getAll();
+          operation.onsuccess = () => resolve(operation.result);
+        };
+        request.onerror = () => resolve(null);
+      });
+    });
+    expect(stillCached).toEqual([]);
+
+    await context.close();
+  }, 30_000);
+
+  it("rejects later sync attempts with a deleted envelope after the server tombstones the profile", async () => {
+    const context = await newLearnerContext();
+    const page = await openLearner(context);
+
+    await page.getByRole("button", { name: "Completely new to me" }).click();
+    await visible(page.getByRole("heading", { name: "candid" }));
+    await waitForAcceptedOperations(1);
+    const grant = await extractGrant(page);
+    await authenticateSession(grant);
+
+    await fetch(`${apiUrl}/profile/delete`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${grant}` },
+    });
+
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await visible(page.getByRole("heading", { name: "Your WordWell profile is scheduled for permanent deletion." }));
+
+    const lateResponse = await fetch(`${apiUrl}/learning-state/sync`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${grant}`, "content-type": "application/json" },
+      body: JSON.stringify({ operations: [] }),
+    });
+    expect(lateResponse.status).toBe(410);
+    expect(await lateResponse.json()).toEqual({ status: "deleted" });
+
+    await context.close();
+  }, 30_000);
+
+  it("drains the unsent outbox after the session is renewed while the server was offline", async () => {
+    const context = await newLearnerContext();
+    const page = await openLearner(context);
+
+    await page.getByRole("button", { name: "Completely new to me" }).click();
+    await visible(page.getByRole("heading", { name: "candid" }));
+    await waitForAcceptedOperations(1);
+
+    await context.setOffline(true);
+    await page.getByRole("button", { name: "Useful to me", exact: true }).click();
+    await visible(page.getByRole("button", { name: "Retry" }));
+
+    const grant = await extractGrant(page);
+    if (!grant) throw new Error("grant was not found in sessionStorage");
+    const renewed = await fetch(`${apiUrl}/session/renew`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${grant}` },
+    });
+    const renewedBody = await renewed.json();
+    await page.evaluate((nextSession) => {
+      const clientId = sessionStorage.getItem("wordwell:client-context");
+      sessionStorage.setItem(`wordwell:session:${clientId}`, JSON.stringify(nextSession));
+    }, renewedBody.session);
+
+    await context.setOffline(false);
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await page.getByRole("button", { name: "Retry" }).waitFor({ state: "hidden" });
+    await waitForAcceptedOperations(2);
+
+    await context.close();
+  }, 30_000);
 });
+
+async function extractGrant(page) {
+  return page.evaluate(() => {
+    for (let index = 0; index < sessionStorage.length; index += 1) {
+      const key = sessionStorage.key(index);
+      if (key && key.startsWith("wordwell:session:")) {
+        const value = sessionStorage.getItem(key);
+        return value ? JSON.parse(value).grant : null;
+      }
+    }
+    return null;
+  });
+}
+
+async function authenticateSession(grant) {
+  const { createHash } = await import("node:crypto");
+  await pool.query(
+    "UPDATE sessions SET recently_authenticated_at = $1 WHERE grant_digest = $2",
+    [new Date(), createHash("sha256").update(grant).digest("hex")]
+  );
+}
 
 async function newLearnerContext() {
   const context = await browser.newContext();

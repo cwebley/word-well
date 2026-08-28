@@ -1,11 +1,19 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { Pool, PoolClient, QueryResult } from "pg";
 import {
+  challengeLifetimeMs,
   maxSyncOperations,
   permittedKinds,
+  recoveryTokenLifetimeMs,
+  recentAuthenticationLifetimeMs,
   sessionLifetimeMs,
   type LearnerState,
+  type PasskeyChallenge,
+  type PasskeyCredential,
+  type Profile,
+  type ProfileResponse,
   type RepositoryResponse,
+  type RetentionSchedule,
   type Session,
   type SyncOperation
 } from "./types.js";
@@ -21,6 +29,93 @@ export class ApiError extends Error {
     super(message);
     this.status = status;
   }
+}
+
+type InternalRetentionSchedule = {
+  liveDataPurgeAt: Date;
+  profileAnalyticsPurgeAt: Date;
+  backupExpiryAt: Date;
+  securityRecordExpiryAt: Date;
+  requestIpLogExpiryAt: Date;
+};
+
+async function canProtect(client: Queryable, profileId: string): Promise<boolean> {
+  const deliveries = await client.query<{ count: string }>(
+    "SELECT count(DISTINCT local_date)::text AS count FROM deliveries WHERE profile_id = $1",
+    [profileId]
+  );
+  if (Number(deliveries.rows[0]?.count ?? 0) >= 3) return true;
+  const history = await client.query("SELECT 1 FROM profile_access_events WHERE profile_id = $1 AND event = 'history-accessed'", [profileId]);
+  return Boolean(history.rowCount);
+}
+
+async function readProfileRow(client: Queryable, profileId: string): Promise<Profile> {
+  const profile = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [profileId]);
+  const state = profile.rows[0]?.state === "protected" ? "protected" : "anonymous";
+  const passkeys = await client.query<{ credential_id: string; label: string }>(
+    "SELECT credential_id, label FROM passkeys WHERE profile_id = $1 ORDER BY registered_at",
+    [profileId]
+  );
+  const recovery = await client.query<{ recovery_email: string | null }>(
+    "SELECT recovery_email FROM profiles WHERE id = $1",
+    [profileId]
+  );
+  const eligible = state === "anonymous" ? await canProtect(client, profileId) : true;
+  return {
+    state,
+    canProtect: eligible,
+    passkeys: passkeys.rows.map((row) => ({ id: row.credential_id, label: row.label })),
+    recoveryEmail: recovery.rows[0]?.recovery_email ?? null,
+  };
+}
+
+async function sessionIdForGrant(client: Queryable, grant: string): Promise<string | null> {
+  const result = await client.query<{ id: string }>("SELECT id FROM sessions WHERE grant_digest = $1", [digest(grant)]);
+  return result.rows[0]?.id ?? null;
+}
+
+async function recentAuthentication(client: Queryable, grant: string, now: Date): Promise<boolean> {
+  const result = await client.query<{ recently_authenticated_at: Date | null }>(
+    `SELECT recently_authenticated_at FROM sessions WHERE grant_digest = $1 AND revoked_at IS NULL`,
+    [digest(grant)]
+  );
+  const last = result.rows[0]?.recently_authenticated_at;
+  if (!last) return false;
+  return now.getTime() - last.getTime() <= recentAuthenticationLifetimeMs;
+}
+
+async function consumeChallenge(client: Queryable, profileId: string, challenge: string, purpose: "register" | "authenticate", now: Date): Promise<boolean> {
+  const result = await client.query<{ id: string }>(
+    `SELECT id FROM passkey_challenges
+      WHERE profile_id = $1 AND challenge = $2 AND purpose = $3
+        AND consumed_at IS NULL AND expires_at > $4
+      FOR UPDATE`,
+    [profileId, challenge, purpose, now]
+  );
+  const row = result.rows[0];
+  if (!row) return false;
+  await client.query("UPDATE passkey_challenges SET consumed_at = $2 WHERE id = $1", [row.id, now]);
+  return true;
+}
+
+function makeRetentionSchedule(now: Date): InternalRetentionSchedule {
+  return {
+    liveDataPurgeAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+    profileAnalyticsPurgeAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+    backupExpiryAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+    securityRecordExpiryAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+    requestIpLogExpiryAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+  };
+}
+
+function publicRetention(retention: InternalRetentionSchedule): RetentionSchedule {
+  return {
+    liveDataPurgeAt: retention.liveDataPurgeAt.toISOString(),
+    profileAnalyticsPurgeAt: retention.profileAnalyticsPurgeAt.toISOString(),
+    backupExpiryAt: retention.backupExpiryAt.toISOString(),
+    securityRecordExpiryAt: retention.securityRecordExpiryAt.toISOString(),
+    requestIpLogExpiryAt: retention.requestIpLogExpiryAt.toISOString(),
+  };
 }
 
 export class LearnerDatabase {
@@ -125,6 +220,453 @@ export class LearnerDatabase {
     }
   }
 
+  async createPasskeyChallenge(grant: string, purpose: "register" | "authenticate", credentialId?: string): Promise<{ status: "active"; challenge: PasskeyChallenge } | { status: "deleted" } | { status: "session-expired" } | { status: "rejected"; reason: string }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), false);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const now = this.#now();
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      const state = profileState.rows[0]?.state;
+      if (purpose === "register") {
+        if (state === "anonymous") {
+          const eligible = await canProtect(client, authorization.profileId);
+          if (!eligible) {
+            await client.query("ROLLBACK");
+            return { status: "rejected", reason: "Protection is not available yet." };
+          }
+        } else if (state !== "protected") {
+          await client.query("ROLLBACK");
+          return { status: "rejected", reason: "Profile cannot register a passkey in its current state." };
+        }
+      } else {
+        if (state !== "protected") {
+          await client.query("ROLLBACK");
+          return { status: "rejected", reason: "Profile protection is required." };
+        }
+        if (!credentialId) {
+          await client.query("ROLLBACK");
+          return { status: "rejected", reason: "A credential is required to authenticate." };
+        }
+        const owned = await client.query("SELECT 1 FROM passkeys WHERE credential_id = $1 AND profile_id = $2", [credentialId, authorization.profileId]);
+        if (!owned.rowCount) {
+          await client.query("ROLLBACK");
+          return { status: "rejected", reason: "Passkey was not found." };
+        }
+      }
+      const challenge = randomBytes(32).toString("base64url");
+      const expiresAt = new Date(now.getTime() + challengeLifetimeMs);
+      const sessionId = await sessionIdForGrant(client, grant);
+      await client.query(
+        `INSERT INTO passkey_challenges (id, profile_id, session_id, purpose, challenge, created_at, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [randomUUID(), authorization.profileId, sessionId, purpose, challenge, now, expiresAt]
+      );
+      await client.query("COMMIT");
+      return { status: "active", challenge: { challenge, expiresAt: expiresAt.toISOString() } };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async protectProfile(grant: string, credential: PasskeyCredential): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const now = this.#now();
+      const profileRow = await client.query<{ state: string; protected_at: Date | null }>("SELECT state, protected_at FROM profiles WHERE id = $1", [authorization.profileId]);
+      const state = profileRow.rows[0]?.state;
+      if (state !== "anonymous") {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Profile is already protected.");
+      }
+      const eligible = await canProtect(client, authorization.profileId);
+      if (!eligible) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Protection is not available yet.");
+      }
+      const consumed = await consumeChallenge(client, authorization.profileId, credential.challenge, "register", now);
+      if (!consumed) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "The register challenge was not valid.");
+      }
+      const profile = await this.#insertPasskeyAndPromote(client, authorization.profileId, grant, credential, now);
+      await client.query("COMMIT");
+      return { status: "protected", profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async readProfile(grant: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async recordHistoryAccess(grant: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      await client.query(
+        `INSERT INTO profile_access_events (profile_id, event, recorded_at) VALUES ($1, 'history-accessed', $2)
+         ON CONFLICT (profile_id, event) DO NOTHING`,
+        [authorization.profileId, this.#now()]
+      );
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async authenticate(grant: string, credential: { id: string; challenge: string }): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const now = this.#now();
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      if (profileState.rows[0]?.state !== "protected") {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
+      }
+      const owned = await client.query("SELECT 1 FROM passkeys WHERE credential_id = $1 AND profile_id = $2", [credential.id, authorization.profileId]);
+      if (!owned.rowCount) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Passkey was not registered.");
+      }
+      const consumed = await consumeChallenge(client, authorization.profileId, credential.challenge, "authenticate", now);
+      if (!consumed) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "The authenticate challenge was not valid.");
+      }
+      await client.query(
+        `UPDATE sessions SET recently_authenticated_at = $2 WHERE grant_digest = $1`,
+        [digest(grant), now]
+      );
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async addPasskey(grant: string, credential: PasskeyCredential): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const recent = await recentAuthentication(client, grant, this.#now());
+      if (!recent) {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
+      }
+      const consumed = await consumeChallenge(client, authorization.profileId, credential.challenge, "register", this.#now());
+      if (!consumed) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "The register challenge was not valid.");
+      }
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      if (profileState.rows[0]?.state !== "protected") {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Profile protection is required.");
+      }
+      this.#assertValidPublicKey(credential.publicKey);
+      await client.query(
+        `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [randomUUID(), authorization.profileId, credential.id, credential.label, credential.publicKey, this.#now()]
+      );
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async requestRecoveryEmail(grant: string, email: string): Promise<ProfileResponse & { token?: string; expiresAt?: string } | { status: "authentication-required" }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const recent = await recentAuthentication(client, grant, this.#now());
+      if (!recent) {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
+      }
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      if (profileState.rows[0]?.state !== "protected") {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Profile protection is required.");
+      }
+      const now = this.#now();
+      const token = randomBytes(32).toString("base64url");
+      const expiresAt = new Date(now.getTime() + recoveryTokenLifetimeMs);
+      await client.query(
+        `INSERT INTO recovery_tokens (id, profile_id, purpose, token_digest, email, created_at, expires_at)
+         VALUES ($1, $2, 'verify-email', $3, $4, $5, $6)
+         ON CONFLICT (profile_id, purpose) DO UPDATE SET token_digest = EXCLUDED.token_digest, email = EXCLUDED.email, created_at = EXCLUDED.created_at, expires_at = EXCLUDED.expires_at, consumed_at = NULL`,
+        [randomUUID(), authorization.profileId, digest(token), email, now, expiresAt]
+      );
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile, token, expiresAt: expiresAt.toISOString() };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async revokePasskey(grant: string, credentialId: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const recent = await recentAuthentication(client, grant, this.#now());
+      if (!recent) {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
+      }
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      if (profileState.rows[0]?.state !== "protected") {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Profile protection is required.");
+      }
+      const count = await client.query<{ count: string }>(
+        "SELECT count(*)::text AS count FROM passkeys WHERE profile_id = $1",
+        [authorization.profileId]
+      );
+      if (Number(count.rows[0]?.count ?? 0) <= 1) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "Register another passkey before removing the last one.");
+      }
+      const removed = await client.query(
+        "DELETE FROM passkeys WHERE profile_id = $1 AND credential_id = $2",
+        [authorization.profileId, credentialId]
+      );
+      if (!removed.rowCount) {
+        await client.query("ROLLBACK");
+        throw new ApiError(404, "Passkey was not found.");
+      }
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async startRecovery(email: string): Promise<{ status: "active"; token: string; expiresAt: string } | { status: "not-found" } | { status: "deleted" } | { status: "session-expired" }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await client.query<{ id: string; state: string }>(
+        `SELECT id, state FROM profiles WHERE recovery_email = $1`,
+        [email]
+      );
+      const profile = result.rows[0];
+      if (!profile || profile.state === "tombstoned") {
+        await client.query("ROLLBACK");
+        return { status: "not-found" };
+      }
+      const now = this.#now();
+      const token = randomBytes(32).toString("base64url");
+      const expiresAt = new Date(now.getTime() + recoveryTokenLifetimeMs);
+      await client.query(
+        `INSERT INTO recovery_tokens (id, profile_id, purpose, token_digest, email, created_at, expires_at)
+         VALUES ($1, $2, 'recover', $3, $4, $5, $6)
+         ON CONFLICT (profile_id, purpose) DO UPDATE SET token_digest = EXCLUDED.token_digest, email = EXCLUDED.email, created_at = EXCLUDED.created_at, expires_at = EXCLUDED.expires_at, consumed_at = NULL`,
+        [randomUUID(), profile.id, digest(token), email, now, expiresAt]
+      );
+      await client.query("COMMIT");
+      return { status: "active", token, expiresAt: expiresAt.toISOString() };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async completeRecovery(token: string, credential: { id: string; label: string; publicKey: string }): Promise<{ status: "active"; profile: Profile; session: Session } | { status: "deleted" } | { status: "session-expired" }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const now = this.#now();
+      const result = await client.query<{ id: string; profile_id: string; expires_at: Date; consumed_at: Date | null }>(
+        `SELECT id, profile_id, expires_at, consumed_at FROM recovery_tokens
+          WHERE token_digest = $1 AND purpose = 'recover'
+          FOR UPDATE`,
+        [digest(token)]
+      );
+      const row = result.rows[0];
+      if (!row || row.consumed_at || row.expires_at <= now) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "The recovery link is invalid or expired.");
+      }
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [row.profile_id]);
+      if (profileState.rows[0]?.state === "tombstoned") {
+        await client.query("ROLLBACK");
+        return { status: "deleted" };
+      }
+      await client.query("UPDATE recovery_tokens SET consumed_at = $2 WHERE id = $1", [row.id, now]);
+      this.#assertValidPublicKey(credential.publicKey);
+      await client.query(
+        `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [randomUUID(), row.profile_id, credential.id, credential.label, credential.publicKey, now]
+      );
+      await client.query(
+        `UPDATE sessions SET revoked_at = $2 WHERE profile_id = $1 AND revoked_at IS NULL`,
+        [row.profile_id, now]
+      );
+      const session = makeSession(now);
+      await insertSession(client, row.profile_id, session, now);
+      const profile = await readProfileRow(client, row.profile_id);
+      await client.query("COMMIT");
+      return { status: "active", profile, session: publicSession(session) };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async verifyRecoveryEmail(token: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const now = this.#now();
+      const result = await client.query<{ id: string; profile_id: string; expires_at: Date; consumed_at: Date | null }>(
+        `SELECT id, profile_id, expires_at, consumed_at FROM recovery_tokens
+          WHERE token_digest = $1 AND purpose = 'verify-email'
+          FOR UPDATE`,
+        [digest(token)]
+      );
+      const row = result.rows[0];
+      if (!row || row.consumed_at || row.expires_at <= now) {
+        await client.query("ROLLBACK");
+        throw new ApiError(400, "The recovery-email verification link is invalid or expired.");
+      }
+      await client.query("UPDATE recovery_tokens SET consumed_at = $2 WHERE id = $1", [row.id, now]);
+      await client.query("UPDATE profiles SET recovery_email = (SELECT email FROM recovery_tokens WHERE id = $1) WHERE id = $2", [row.id, row.profile_id]);
+      const profile = await readProfileRow(client, row.profile_id);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async deleteProfile(grant: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), false);
+      if (authorization.status !== "active") {
+        await client.query("ROLLBACK");
+        return authorization;
+      }
+      const recent = await recentAuthentication(client, grant, this.#now());
+      if (!recent) {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
+      }
+      const deletedAt = this.#now();
+      const retention = makeRetentionSchedule(deletedAt);
+      await client.query(
+        `UPDATE profiles SET state = 'tombstoned', tombstoned_at = $2, purge_schedule = $3 WHERE id = $1`,
+        [authorization.profileId, deletedAt, retention]
+      );
+      await client.query(
+        `UPDATE sessions SET revoked_at = $2 WHERE profile_id = $1`,
+        [authorization.profileId, deletedAt]
+      );
+      await client.query("DELETE FROM passkeys WHERE profile_id = $1", [authorization.profileId]);
+      await client.query("DELETE FROM passkey_challenges WHERE profile_id = $1", [authorization.profileId]);
+      await client.query("DELETE FROM recovery_tokens WHERE profile_id = $1", [authorization.profileId]);
+      await client.query("COMMIT");
+      return { status: "tombstoned", deletedAt: deletedAt.toISOString(), retention: publicRetention(retention) };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async skipUpcoming(grant: string, upcomingId: string, timeZone?: string): Promise<RepositoryResponse> {
     if (timeZone) validateTimeZone(timeZone);
     return this.#withAuthorizedSession(grant, timeZone, async (client, authorization) => {
@@ -163,6 +705,33 @@ export class LearnerDatabase {
 
   async close(): Promise<void> {
     await this.#pool.end();
+  }
+
+  #assertValidPublicKey(publicKey: string): void {
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(publicKey)) {
+      throw new ApiError(400, "Credential publicKey is not valid base64.");
+    }
+    if (Buffer.from(publicKey, "base64").length !== 32) {
+      throw new ApiError(400, "Credential publicKey must decode to 32 bytes.");
+    }
+  }
+
+  async #insertPasskeyAndPromote(client: PoolClient, profileId: string, grant: string, credential: PasskeyCredential, now: Date): Promise<Profile> {
+    this.#assertValidPublicKey(credential.publicKey);
+    await client.query(
+      `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [randomUUID(), profileId, credential.id, credential.label, credential.publicKey, now]
+    );
+    await client.query(
+      `UPDATE profiles SET state = 'protected', protected_at = $2 WHERE id = $1`,
+      [profileId, now]
+    );
+    await client.query(
+      `UPDATE sessions SET recently_authenticated_at = $2 WHERE grant_digest = $1`,
+      [digest(grant), now]
+    );
+    return readProfileRow(client, profileId);
   }
 
   async #withAuthorizedSession<T>(grant: string, timeZone: string | undefined, action: (client: PoolClient, authorization: ActiveAuthorization) => Promise<T>): Promise<T | RepositoryResponse> {

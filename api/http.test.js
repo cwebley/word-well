@@ -26,6 +26,10 @@ suite("learner HTTP seam", () => {
 
   beforeEach(async () => {
     now = new Date("2026-08-27T12:00:00Z");
+    await pool.query("DELETE FROM recovery_tokens");
+    await pool.query("DELETE FROM passkey_challenges");
+    await pool.query("DELETE FROM passkeys");
+    await pool.query("DELETE FROM profile_access_events");
     await pool.query("DELETE FROM reserved_upcoming_words");
     await pool.query("DELETE FROM skipped_upcoming_words");
     await pool.query("DELETE FROM learner_evidence");
@@ -184,6 +188,242 @@ suite("learner HTTP seam", () => {
     expect(deleted.body).toEqual({ status: "deleted" });
   });
 
+  it("refuses protection when the profile has no eligibility, then accepts it after meaningful history", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    const grant = created.body.session.grant;
+    const profileId = await profileForGrant(grant);
+
+    const rejected = await request("POST", "/profile/protect", grant, {
+      credential: { id: "cred-1", label: "Laptop", publicKey: fakePublicKey("1"), challenge: "stale" },
+    });
+    expect(rejected.response.status).toBe(400);
+
+    await seedDeliveries(profileId, ["2026-08-25", "2026-08-26", "2026-08-27"]);
+    const challenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+    expect(challenge.response.status).toBe(200);
+    expect(challenge.body.challenge).toEqual(expect.any(String));
+
+    const credential = {
+      id: "cred-1",
+      label: "Laptop",
+      publicKey: fakePublicKey("cred-1"),
+      challenge: challenge.body.challenge,
+    };
+    const protection = await request("POST", "/profile/protect", grant, { credential });
+    expect(protection.response.status).toBe(200);
+    expect(protection.body).toMatchObject({
+      status: "protected",
+      profile: {
+        state: "protected",
+        canProtect: true,
+        passkeys: [{ id: "cred-1", label: "Laptop" }],
+        recoveryEmail: null,
+      },
+    });
+  });
+
+  it("requires recent authentication before allowing passkey changes", async () => {
+    const { grant } = await protectProfile();
+    now = new Date("2026-08-27T12:06:00Z");
+
+    const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+    expect(addChallenge.response.status).toBe(200);
+    const denied = await request("POST", "/profile/passkeys", grant, {
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
+    });
+    expect(denied.response.status).toBe(200);
+    expect(denied.body).toEqual({ status: "authentication-required" });
+  });
+
+  it("supports adding and revoking multiple passkeys within the recent-auth window", async () => {
+    const { grant } = await protectProfile();
+
+    const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+    const added = await request("POST", "/profile/passkeys", grant, {
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
+    });
+    expect(added.response.status).toBe(200);
+    expect(added.body.profile.passkeys.map(({ label }) => label)).toEqual(["Laptop", "Phone"]);
+
+    const revoked = await request("DELETE", "/profile/passkeys/cred-2", grant);
+    expect(revoked.response.status).toBe(200);
+    expect(revoked.body.profile.passkeys.map(({ label }) => label)).toEqual(["Laptop"]);
+  });
+
+  it("refuses to remove the last remaining passkey", async () => {
+    const { grant } = await protectProfile();
+
+    const removed = await request("DELETE", "/profile/passkeys/cred-1", grant);
+    expect(removed.response.status).toBe(400);
+    expect(removed.body.error).toMatch(/last/i);
+  });
+
+  it("refreshes the recent-authentication marker on a valid passkey assertion", async () => {
+    const { grant } = await protectProfile();
+    now = new Date("2026-08-27T12:06:00Z");
+
+    const authChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "authenticate", credentialId: "cred-1" });
+    expect(authChallenge.response.status).toBe(200);
+    const auth = await request("POST", "/profile/authenticate", grant, {
+      credential: { id: "cred-1", challenge: authChallenge.body.challenge },
+    });
+    expect(auth.response.status).toBe(200);
+    expect(auth.body.status).toBe("protected");
+
+    const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+    const added = await request("POST", "/profile/passkeys", grant, {
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
+    });
+    expect(added.response.status).toBe(200);
+  });
+
+  it("issues, supersedes, and expires recovery-email verification tokens", async () => {
+    const { grant } = await protectProfile();
+
+    const requested = await request("POST", "/profile/recovery-email/request", grant, { email: "learner@example.com" });
+    expect(requested.response.status).toBe(200);
+    expect(requested.body.email).toBe("learner@example.com");
+    expect(requested.body.token).toEqual(expect.any(String));
+
+    const verified = await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+    expect(verified.response.status).toBe(200);
+    expect(verified.body.profile.recoveryEmail).toBe("learner@example.com");
+
+    const reused = await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+    expect(reused.response.status).toBe(400);
+
+    const newer = await request("POST", "/profile/recovery-email/request", grant, { email: "another@example.com" });
+    expect(newer.body.token).not.toBe(requested.body.token);
+
+    const stale = await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+    expect(stale.response.status).toBe(400);
+  });
+
+  it("rejects recovery-email verification tokens past their expiry", async () => {
+    const { grant } = await protectProfile();
+
+    const requested = await request("POST", "/profile/recovery-email/request", grant, { email: "learner@example.com" });
+    now = new Date("2026-08-27T12:16:00Z");
+
+    const verified = await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+    expect(verified.response.status).toBe(400);
+  });
+
+  it("recovers into the same profile with a fresh session and revokes prior sessions", async () => {
+    const { grant, profileId } = await protectProfile();
+    const requested = await request("POST", "/profile/recovery-email/request", grant, { email: "learner@example.com" });
+    await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+
+    const started = await request("POST", "/profile/recover/start", undefined, { email: "learner@example.com" });
+    expect(started.response.status).toBe(200);
+    expect(started.body.token).toEqual(expect.any(String));
+
+    const completed = await request("POST", "/profile/recover/complete", undefined, {
+      token: started.body.token,
+      credential: { id: "cred-recovered", label: "Replacement", publicKey: fakePublicKey("recovered") },
+    });
+    expect(completed.response.status).toBe(200);
+    expect(completed.body.session.grant).not.toBe(grant);
+
+    const recovered = await pool.query("SELECT id FROM profiles");
+    expect(recovered.rows[0].id).toBe(profileId);
+
+    const oldSession = await request("GET", "/learning-state", grant);
+    expect(oldSession.response.status).toBe(401);
+    expect(oldSession.body).toEqual({ status: "session-expired" });
+
+    const reused = await request("POST", "/profile/recover/complete", undefined, {
+      token: started.body.token,
+      credential: { id: "cred-recovered-2", label: "Another", publicKey: fakePublicKey("2") },
+    });
+    expect(reused.response.status).toBe(400);
+  });
+
+  it("rejects recovery tokens past their expiry", async () => {
+    const { grant } = await protectProfile();
+    const requested = await request("POST", "/profile/recovery-email/request", grant, { email: "learner@example.com" });
+    await request("POST", "/profile/recovery-email/verify", undefined, { token: requested.body.token });
+
+    const started = await request("POST", "/profile/recover/start", undefined, { email: "learner@example.com" });
+    now = new Date("2026-08-27T12:16:00Z");
+
+    const completed = await request("POST", "/profile/recover/complete", undefined, {
+      token: started.body.token,
+      credential: { id: "cred-recovered", label: "Replacement", publicKey: fakePublicKey("recovered") },
+    });
+    expect(completed.response.status).toBe(400);
+  });
+
+  it("rejects passkey registrations whose public key is not a 32-byte base64 string", async () => {
+    const { grant } = await protectProfile();
+    const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+
+    const rejected = await request("POST", "/profile/passkeys", grant, {
+      credential: { id: "cred-bad", label: "Bad key", publicKey: "not-a-real-key", challenge: addChallenge.body.challenge },
+    });
+    expect(rejected.response.status).toBe(400);
+    expect(rejected.body.error).toMatch(/publicKey/i);
+  });
+
+  it("refuses deletion from a session that has not recently authenticated", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    const grant = created.body.session.grant;
+
+    const denied = await request("POST", "/profile/delete", grant);
+    expect(denied.response.status).toBe(200);
+    expect(denied.body).toEqual({ status: "authentication-required" });
+  });
+
+  it("tombstones the profile on delete, blocks every endpoint with a deleted envelope, and persists the purge schedule", async () => {
+    const { grant } = await protectProfile();
+
+    const deleted = await request("POST", "/profile/delete", grant);
+    expect(deleted.response.status).toBe(200);
+    expect(deleted.body).toEqual({
+      status: "tombstoned",
+      deletedAt: now.toISOString(),
+      retention: {
+        liveDataPurgeAt: "2026-08-28T12:00:00.000Z",
+        profileAnalyticsPurgeAt: "2026-08-28T12:00:00.000Z",
+        backupExpiryAt: "2026-09-26T12:00:00.000Z",
+        securityRecordExpiryAt: "2026-09-26T12:00:00.000Z",
+        requestIpLogExpiryAt: "2026-09-03T12:00:00.000Z",
+      },
+    });
+
+    const state = await request("GET", "/learning-state", grant);
+    expect(state.response.status).toBe(410);
+    expect(state.body).toEqual({ status: "deleted" });
+
+    const sync = await request("POST", "/learning-state/sync", grant, { operations: [] });
+    expect(sync.response.status).toBe(410);
+    expect(sync.body).toEqual({ status: "deleted" });
+
+    const renew = await request("POST", "/session/renew", grant);
+    expect(renew.response.status).toBe(410);
+    expect(renew.body).toEqual({ status: "deleted" });
+
+    const profileState = await pool.query("SELECT state, purge_schedule FROM profiles");
+    expect(profileState.rows[0].state).toBe("tombstoned");
+    expect(profileState.rows[0].purge_schedule).toMatchObject({
+      liveDataPurgeAt: expect.any(String),
+      backupExpiryAt: expect.any(String),
+    });
+  });
+
+  async function protectProfile() {
+    const created = await request("POST", "/profiles/anonymous");
+    const grant = created.body.session.grant;
+    const profileId = await profileForGrant(grant);
+    await seedDeliveries(profileId, ["2026-08-25", "2026-08-26", "2026-08-27"]);
+    const challenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+    const response = await request("POST", "/profile/protect", grant, {
+      credential: { id: "cred-1", label: "Laptop", publicKey: fakePublicKey("1"), challenge: challenge.body.challenge },
+    });
+    expect(response.response.status).toBe(200);
+    return { grant, profileId };
+  }
+
   async function seedLessonAndDelivery(profileId) {
     await pool.query(
       "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
@@ -193,6 +433,19 @@ suite("learner HTTP seam", () => {
       "INSERT INTO deliveries (id, profile_id, local_date, lesson_id, normalized_headword) VALUES ($1, $2, $3, $4, $5)",
       ["delivery-1", profileId, "2026-08-27", "lesson-candid", "candid"]
     );
+  }
+
+  async function seedDeliveries(profileId, dates) {
+    for (const date of dates) {
+      await pool.query(
+        "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
+        [`lesson-${date}`, `headword-${date}`, { headword: `headword-${date}`, normalizedHeadword: `headword-${date}`, meanings: [{ definition: "test", examples: ["example"] }] }]
+      );
+      await pool.query(
+        "INSERT INTO deliveries (id, profile_id, local_date, lesson_id, normalized_headword) VALUES ($1, $2, $3, $4, $5)",
+        [`delivery-${date}`, profileId, date, `lesson-${date}`, `headword-${date}`]
+      );
+    }
   }
 
   async function seedPublishedLessons() {
@@ -243,4 +496,13 @@ async function request(method, path, grant, body, timeZone) {
 
 function digest(grant) {
   return createHash("sha256").update(grant).digest("hex");
+}
+
+function fakePublicKey(seed) {
+  const bytes = Buffer.alloc(32);
+  const view = bytes.toString("hex");
+  for (let index = 0; index < seed.length; index += 1) {
+    bytes[index] = (seed.charCodeAt(index) * 31 + index * 17) & 0xff;
+  }
+  return bytes.toString("base64");
 }

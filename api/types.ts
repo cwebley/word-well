@@ -1,5 +1,8 @@
 export const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 export const maxSyncOperations = 100;
+export const recentAuthenticationLifetimeMs = 5 * 60 * 1000;
+export const recoveryTokenLifetimeMs = 15 * 60 * 1000;
+export const challengeLifetimeMs = 5 * 60 * 1000;
 
 export const permittedKinds = [
   "familiarity",
@@ -45,3 +48,45 @@ export type RepositoryResponse =
   | ActiveResponse
   | { readonly status: "deleted" }
   | { readonly status: "session-expired" };
+
+export type Passkey = {
+  readonly id: string;
+  readonly label: string;
+};
+
+export type PasskeyCredential = {
+  readonly id: string;
+  readonly label: string;
+  readonly publicKey: string;
+  readonly challenge: string;
+};
+
+export type ProfileState = "anonymous" | "protected";
+
+export type Profile = {
+  readonly state: ProfileState;
+  readonly canProtect: boolean;
+  readonly passkeys: readonly Passkey[];
+  readonly recoveryEmail: string | null;
+};
+
+export type RetentionSchedule = {
+  readonly liveDataPurgeAt: string;
+  readonly profileAnalyticsPurgeAt: string;
+  readonly backupExpiryAt: string;
+  readonly securityRecordExpiryAt: string;
+  readonly requestIpLogExpiryAt: string;
+};
+
+export type ProfileResponse =
+  | { readonly status: "anonymous"; readonly profile: Profile }
+  | { readonly status: "protected"; readonly profile: Profile }
+  | { readonly status: "authentication-required" }
+  | { readonly status: "tombstoned"; readonly deletedAt: string; readonly retention: RetentionSchedule }
+  | { readonly status: "deleted" }
+  | { readonly status: "session-expired" };
+
+export type PasskeyChallenge = {
+  readonly challenge: string;
+  readonly expiresAt: string;
+};
