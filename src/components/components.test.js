@@ -4,6 +4,7 @@ import { renderLessonCard } from "./card.js";
 import { renderFamiliarityGate } from "./familiarity.js";
 import { renderPractice } from "./practice.js";
 import { renderStatus } from "./status.js";
+import { renderLearningSyncStatus } from "./learning-sync-status.js";
 import { bindNavigation, renderNavigation } from "./navigation.js";
 import { renderProfile } from "./profile.js";
 import {
@@ -56,6 +57,8 @@ describe("SwatchKit shared WordWell components", () => {
     expect(practice).not.toContain("lesson-label");
     expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice, result: false })).not.toContain("Practice again");
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
+    expect(renderLearningSyncStatus("offline")).toContain('data-action="retry-learning"');
+    expect(renderLearningSyncStatus("session-expired")).toContain("Session expired");
   });
 
   it("renders every meaning in a multi-meaning lesson", () => {
@@ -131,5 +134,6 @@ describe("SwatchKit shared WordWell components", () => {
     expect(swatch.default).toContain('src="../../../../js/navigation-preview.js"');
     expect(swatch.default).toContain("Desktop rail");
     expect(swatch.default).toContain("Compact bottom navigation");
+    expect(swatch.default).toContain("Preview sync state");
   });
 });

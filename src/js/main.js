@@ -10,6 +10,7 @@ import { WebAuthnSimulator } from "../webauthn-simulator.js";
 import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
 import { createInstallation } from "../install.js";
 import { createProductSignals } from "../product-signals.js";
+import { renderLearningSyncStatus } from "../components/learning-sync-status.js";
 
 const html = String.raw;
 const sessionExpiredDetail = "Your session has expired. Your unsent learning changes are still on this device.";
@@ -47,7 +48,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 function render() {
-  syncStatusOutlet.innerHTML = learningSyncNotice();
+  syncStatusOutlet.innerHTML = renderLearningSyncStatus(syncStatus);
   if (deleted) {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
@@ -284,14 +285,6 @@ function learningStatus() {
         : "Your saved lessons are unavailable right now. Retry when you are connected."
       : "Your next lesson will appear here after it is delivered.";
   return html`<section class="card flow"><p class="lesson-label">Today</p><h1 class="card-title">No lesson ready</h1><p>${detail}</p><button class="button" data-action="retry-learning" type="button">Retry</button></section>`;
-}
-
-function learningSyncNotice() {
-  if (syncStatus === "offline") {
-    return html`<aside class="sync-status" role="status"><p><strong>Offline</strong><span class="sync-status-detail"> Your changes will sync when you reconnect.</span></p><button class="button small" data-action="retry-learning" type="button">Retry</button></aside>`;
-  }
-  if (syncStatus !== "session-expired") return "";
-  return html`<aside class="sync-status" role="status"><p><strong>Session expired</strong> Unsent changes remain on this device.</p></aside>`;
 }
 
 function renderHistory() {

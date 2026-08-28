@@ -1,4 +1,5 @@
 import { renderNavigation } from "../../../src/components/navigation.js";
+import { renderButton } from "../../../src/components/button.js";
 
 const html = String.raw;
 
@@ -11,24 +12,26 @@ export default html`
 
   <h3>Desktop rail</h3>
   <div class="navigation-preview-stage">
-    <div class="app-shell navigation-preview navigation-preview--desktop">
+    <div class="app-shell navigation-preview navigation-preview--desktop" data-sync-preview>
       ${renderNavigation()}
       <div class="navigation-preview-main flow">
         <p class="lesson-label">Today's word</p>
         <p>Desktop learner content fills the space beside the navigation rail.</p>
       </div>
     </div>
+    ${renderSyncControls()}
   </div>
 
   <h3>Compact bottom navigation</h3>
   <div class="navigation-preview-stage">
-    <div class="app-shell navigation-preview navigation-preview--compact">
+    <div class="app-shell navigation-preview navigation-preview--compact" data-sync-preview>
       ${renderNavigation()}
       <div class="navigation-preview-main flow">
         <p class="lesson-label">Today's word</p>
         <p>Compact learner content leaves room for bottom navigation.</p>
       </div>
     </div>
+    ${renderSyncControls()}
   </div>
 
   <style>
@@ -71,6 +74,21 @@ export default html`
     .navigation-preview .navigation-link[aria-current="page"]::before {
       view-transition-name: none;
     }
+
+    .navigation-sync-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-block-start: var(--space-s);
+    }
   </style>
   <script type="module" src="../../../../js/navigation-preview.js"></script>
 `;
+
+function renderSyncControls() {
+  return html`<div class="navigation-sync-controls" role="group" aria-label="Preview sync state">
+    ${renderButton({ label: "Online", action: "preview-sync-status", value: "online", variant: "outline", size: "small" })}
+    ${renderButton({ label: "Offline", action: "preview-sync-status", value: "offline", variant: "outline", size: "small" })}
+    ${renderButton({ label: "Session expired", action: "preview-sync-status", value: "session-expired", variant: "outline", size: "small" })}
+  </div>`;
+}
