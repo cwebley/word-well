@@ -78,15 +78,9 @@ export type RetentionSchedule = {
   readonly requestIpLogExpiryAt: string;
 };
 
-export type RecoveryVerification = {
-  readonly token: string;
-  readonly email: string;
-  readonly expiresAt: string;
-};
-
 export type ProfileResponse =
   | { readonly status: "anonymous"; readonly profile: Profile }
-  | { readonly status: "protected"; readonly profile: Profile; readonly recoveryVerification?: RecoveryVerification }
+  | { readonly status: "protected"; readonly profile: Profile }
   | { readonly status: "authentication-required" }
   | { readonly status: "tombstoned"; readonly deletedAt: string; readonly retention: RetentionSchedule }
   | { readonly status: "deleted" }
@@ -94,10 +88,5 @@ export type ProfileResponse =
 
 export type PasskeyChallenge = {
   readonly challenge: string;
-  readonly expiresAt: string;
-};
-
-export type RecoveryToken = {
-  readonly token: string;
   readonly expiresAt: string;
 };

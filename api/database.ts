@@ -12,7 +12,6 @@ import {
   type PasskeyCredential,
   type Profile,
   type ProfileResponse,
-  type RecoveryToken,
   type RepositoryResponse,
   type RetentionSchedule,
   type Session,
@@ -75,12 +74,12 @@ async function sessionIdForGrant(client: Queryable, grant: string): Promise<stri
   return result.rows[0]?.id ?? null;
 }
 
-async function recentAuthentication(client: Queryable, profileId: string, now: Date): Promise<boolean> {
-  const result = await client.query<{ max_auth: Date | null }>(
-    `SELECT max(recently_authenticated_at) AS max_auth FROM sessions WHERE profile_id = $1 AND revoked_at IS NULL`,
-    [profileId]
+async function recentAuthentication(client: Queryable, grant: string, now: Date): Promise<boolean> {
+  const result = await client.query<{ recently_authenticated_at: Date | null }>(
+    `SELECT recently_authenticated_at FROM sessions WHERE grant_digest = $1 AND revoked_at IS NULL`,
+    [digest(grant)]
   );
-  const last = result.rows[0]?.max_auth;
+  const last = result.rows[0]?.recently_authenticated_at;
   if (!last) return false;
   return now.getTime() - last.getTime() <= recentAuthenticationLifetimeMs;
 }
@@ -408,7 +407,7 @@ export class LearnerDatabase {
         await client.query("ROLLBACK");
         return authorization;
       }
-      const recent = await recentAuthentication(client, authorization.profileId, this.#now());
+      const recent = await recentAuthentication(client, grant, this.#now());
       if (!recent) {
         await client.query("ROLLBACK");
         return { status: "authentication-required" };
@@ -423,6 +422,7 @@ export class LearnerDatabase {
         await client.query("ROLLBACK");
         throw new ApiError(400, "Profile protection is required.");
       }
+      this.#assertValidPublicKey(credential.publicKey);
       await client.query(
         `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -448,7 +448,7 @@ export class LearnerDatabase {
         await client.query("ROLLBACK");
         return authorization;
       }
-      const recent = await recentAuthentication(client, authorization.profileId, this.#now());
+      const recent = await recentAuthentication(client, grant, this.#now());
       if (!recent) {
         await client.query("ROLLBACK");
         return { status: "authentication-required" };
@@ -487,7 +487,7 @@ export class LearnerDatabase {
         await client.query("ROLLBACK");
         return authorization;
       }
-      const recent = await recentAuthentication(client, authorization.profileId, this.#now());
+      const recent = await recentAuthentication(client, grant, this.#now());
       if (!recent) {
         await client.query("ROLLBACK");
         return { status: "authentication-required" };
@@ -578,6 +578,7 @@ export class LearnerDatabase {
         return { status: "deleted" };
       }
       await client.query("UPDATE recovery_tokens SET consumed_at = $2 WHERE id = $1", [row.id, now]);
+      this.#assertValidPublicKey(credential.publicKey);
       await client.query(
         `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -637,6 +638,11 @@ export class LearnerDatabase {
       if (authorization.status !== "active") {
         await client.query("ROLLBACK");
         return authorization;
+      }
+      const recent = await recentAuthentication(client, grant, this.#now());
+      if (!recent) {
+        await client.query("ROLLBACK");
+        return { status: "authentication-required" };
       }
       const deletedAt = this.#now();
       const retention = makeRetentionSchedule(deletedAt);
@@ -701,7 +707,17 @@ export class LearnerDatabase {
     await this.#pool.end();
   }
 
+  #assertValidPublicKey(publicKey: string): void {
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(publicKey)) {
+      throw new ApiError(400, "Credential publicKey is not valid base64.");
+    }
+    if (Buffer.from(publicKey, "base64").length !== 32) {
+      throw new ApiError(400, "Credential publicKey must decode to 32 bytes.");
+    }
+  }
+
   async #insertPasskeyAndPromote(client: PoolClient, profileId: string, grant: string, credential: PasskeyCredential, now: Date): Promise<Profile> {
+    this.#assertValidPublicKey(credential.publicKey);
     await client.query(
       `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, registered_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,

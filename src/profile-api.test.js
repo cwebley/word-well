@@ -115,6 +115,24 @@ describe("HttpProfileAdapter seam", () => {
     expect(result.status).toBe("deleted");
     expect(session.load("client-test")).toBeUndefined();
   });
+
+  it("stores the fresh session returned by a recovery completion", async () => {
+    const session = memorySession();
+    const recoveredSession = { grant: "grant-recovered", expiresAt: "2026-09-26T12:00:00.000Z" };
+    const fetch_ = async (url, init) => {
+      expect(url).toBe("http://api.local/profile/recover/complete");
+      expect(init.method).toBe("POST");
+      return jsonResponse(200, {
+        status: "active",
+        profile: { state: "protected", canProtect: true, passkeys: [{ id: "cred-2", label: "Recovered" }], recoveryEmail: "learner@example.com" },
+        session: recoveredSession,
+      });
+    };
+
+    const result = await new HttpProfileAdapter({ fetch: fetch_, baseUrl: "http://api.local", session, clientContextId: "client-test", timeZone: "UTC" }).completeRecovery("recovery-token", { id: "cred-2", label: "Recovered", publicKey: "pk-2" });
+    expect(result.status).toBe("active");
+    expect(session.load("client-test")).toEqual(recoveredSession);
+  });
 });
 
 class ProfileClientForTest {

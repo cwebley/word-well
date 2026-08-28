@@ -3,7 +3,7 @@ import { renderFamiliarityGate } from "../components/familiarity.js";
 import { renderPractice } from "../components/practice.js";
 import { renderStatus } from "../components/status.js";
 import { bindNavigation } from "../components/navigation.js";
-import { renderProfile } from "../components/profile.js";
+import { renderProfile, renderRecoveryCompletion } from "../components/profile.js";
 import { escapeHtml, renderButton } from "../components/button.js";
 import { WebAuthnSimulator } from "../webauthn-simulator.js";
 import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
@@ -27,7 +27,9 @@ let syncStatus;
 let syncBusy = false;
 let deletionConfirmation = false;
 let recoveryVerification;
+let recoveryStart;
 let deleted = false;
+let recoveryToken = new URL(window.location.href).searchParams.get("recover-token");
 let analyticsConsent = localStorage.getItem("wordwell:analytics-consent") === "granted";
 let installation;
 const webauthn = new WebAuthnSimulator();
@@ -58,11 +60,16 @@ function render() {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
   }
+  if (recoveryToken) {
+    main.innerHTML = renderRecoveryCompletion();
+    return;
+  }
   if (route === "profile") {
     main.innerHTML = renderProfile({
       profile: profileClient.cache(),
       deletionConfirmation,
       recoveryVerification,
+      recoveryStart,
       installation: installation.show(),
       analyticsConsent,
     });
@@ -183,6 +190,18 @@ document.addEventListener("click", async (event) => {
     } catch (error) {
       console.error("verifyRecoveryEmail failed", error);
     }
+  } else if (target.dataset.action === "complete-profile-recovery") {
+    try {
+      const result = await profileClient.completeRecovery(recoveryToken, "Recovered passkey");
+      if (result.status === "active") {
+        recoveryToken = undefined;
+        window.history.replaceState({}, "", window.location.pathname);
+        await profileClient.load();
+        await reconcileLearning();
+      }
+    } catch (error) {
+      console.error("completeRecovery failed", error);
+    }
   } else if (target.dataset.action === "start-profile-deletion") {
     deletionConfirmation = true;
   } else if (target.dataset.action === "cancel-profile-deletion") {
@@ -218,6 +237,25 @@ document.addEventListener("submit", async (event) => {
     recoveryVerification = { email, token: result.token, expiresAt: result.expiresAt };
   } catch (error) {
     console.error("requestRecoveryEmail failed", error);
+  }
+  render();
+});
+
+document.addEventListener("submit", async (event) => {
+  const form = event.target.closest('[data-action="start-profile-recovery"]');
+  if (!form) return;
+  event.preventDefault();
+  try {
+    const email = String(new FormData(form).get("recovery-start-email"));
+    const result = await profileClient.startRecovery(email);
+    if (result.status === "active") {
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.searchParams.set("recover-token", result.token);
+      recoveryStart = { url: url.toString() };
+    }
+  } catch (error) {
+    console.error("startRecovery failed", error);
   }
   render();
 });

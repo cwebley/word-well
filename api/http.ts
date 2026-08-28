@@ -154,21 +154,37 @@ function productSignal(value: unknown): {
   return { event: event as "install_cta_shown" | "install_cta_started" | "install_confirmed", capability: capability as "chromium_prompt" | "ios_home_screen", day: String(day) };
 }
 
+function credentialFields<K extends string>(value: unknown, fields: readonly K[]): Record<K, string> {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
+  const { credential } = value as Record<string, unknown>;
+  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
+  const source = credential as Record<string, unknown>;
+  const result: Partial<Record<K, string>> = {};
+  for (const field of fields) {
+    const candidate = source[field];
+    if (typeof candidate !== "string" || !candidate) {
+      throw new ApiError(400, `Credential ${field} is required.`);
+    }
+    result[field] = candidate;
+  }
+  return result as Record<K, string>;
+}
+
 function passkeyCredential(value: unknown): {
   id: string;
   label: string;
   publicKey: string;
   challenge: string;
 } {
-  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
-  const { credential } = value as Record<string, unknown>;
-  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
-  const { id, label, publicKey, challenge } = credential as Record<string, unknown>;
-  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
-  if (typeof label !== "string" || !label) throw new ApiError(400, "Credential label is required.");
-  if (typeof publicKey !== "string" || !publicKey) throw new ApiError(400, "Credential publicKey is required.");
-  if (typeof challenge !== "string" || !challenge) throw new ApiError(400, "Credential challenge is required.");
-  return { id, label, publicKey, challenge };
+  return credentialFields(value, ["id", "label", "publicKey", "challenge"]);
+}
+
+function authenticateCredential(value: unknown): { id: string; challenge: string } {
+  return credentialFields(value, ["id", "challenge"]);
+}
+
+function recoverCredential(value: unknown): { id: string; label: string; publicKey: string } {
+  return credentialFields(value, ["id", "label", "publicKey"]);
 }
 
 function passkeyChallengePurpose(value: unknown): "register" | "authenticate" {
@@ -184,16 +200,6 @@ function passkeyCredentialId(value: unknown): string | undefined {
   return typeof credentialId === "string" && credentialId ? credentialId : undefined;
 }
 
-function authenticateCredential(value: unknown): { id: string; challenge: string } {
-  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
-  const { credential } = value as Record<string, unknown>;
-  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
-  const { id, challenge } = credential as Record<string, unknown>;
-  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
-  if (typeof challenge !== "string" || !challenge) throw new ApiError(400, "Credential challenge is required.");
-  return { id, challenge };
-}
-
 function recoveryTokenFromBody(value: unknown): string {
   if (!value || typeof value !== "object") throw new ApiError(400, "A recovery token is required.");
   const token = (value as Record<string, unknown>).token;
@@ -206,17 +212,6 @@ function recoveryEmailFromBody(value: unknown): string {
   const email = (value as Record<string, unknown>).email;
   if (typeof email !== "string" || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ApiError(400, "A recovery email is required.");
   return email;
-}
-
-function recoverCredential(value: unknown): { id: string; label: string; publicKey: string } {
-  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
-  const { credential } = value as Record<string, unknown>;
-  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
-  const { id, label, publicKey } = credential as Record<string, unknown>;
-  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
-  if (typeof label !== "string" || !label) throw new ApiError(400, "Credential label is required.");
-  if (typeof publicKey !== "string" || !publicKey) throw new ApiError(400, "Credential publicKey is required.");
-  return { id, label, publicKey };
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {

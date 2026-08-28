@@ -194,7 +194,7 @@ suite("learner HTTP seam", () => {
     const profileId = await profileForGrant(grant);
 
     const rejected = await request("POST", "/profile/protect", grant, {
-      credential: { id: "cred-1", label: "Laptop", publicKey: "pk-1", challenge: "stale" },
+      credential: { id: "cred-1", label: "Laptop", publicKey: fakePublicKey("1"), challenge: "stale" },
     });
     expect(rejected.response.status).toBe(400);
 
@@ -206,7 +206,7 @@ suite("learner HTTP seam", () => {
     const credential = {
       id: "cred-1",
       label: "Laptop",
-      publicKey: "ssh-pubkey-1",
+      publicKey: fakePublicKey("cred-1"),
       challenge: challenge.body.challenge,
     };
     const protection = await request("POST", "/profile/protect", grant, { credential });
@@ -229,7 +229,7 @@ suite("learner HTTP seam", () => {
     const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
     expect(addChallenge.response.status).toBe(200);
     const denied = await request("POST", "/profile/passkeys", grant, {
-      credential: { id: "cred-2", label: "Phone", publicKey: "pk-2", challenge: addChallenge.body.challenge },
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
     });
     expect(denied.response.status).toBe(200);
     expect(denied.body).toEqual({ status: "authentication-required" });
@@ -240,7 +240,7 @@ suite("learner HTTP seam", () => {
 
     const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
     const added = await request("POST", "/profile/passkeys", grant, {
-      credential: { id: "cred-2", label: "Phone", publicKey: "pk-2", challenge: addChallenge.body.challenge },
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
     });
     expect(added.response.status).toBe(200);
     expect(added.body.profile.passkeys.map(({ label }) => label)).toEqual(["Laptop", "Phone"]);
@@ -272,7 +272,7 @@ suite("learner HTTP seam", () => {
 
     const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
     const added = await request("POST", "/profile/passkeys", grant, {
-      credential: { id: "cred-2", label: "Phone", publicKey: "pk-2", challenge: addChallenge.body.challenge },
+      credential: { id: "cred-2", label: "Phone", publicKey: fakePublicKey("2"), challenge: addChallenge.body.challenge },
     });
     expect(added.response.status).toBe(200);
   });
@@ -320,7 +320,7 @@ suite("learner HTTP seam", () => {
 
     const completed = await request("POST", "/profile/recover/complete", undefined, {
       token: started.body.token,
-      credential: { id: "cred-recovered", label: "Replacement", publicKey: "pk-recovered" },
+      credential: { id: "cred-recovered", label: "Replacement", publicKey: fakePublicKey("recovered") },
     });
     expect(completed.response.status).toBe(200);
     expect(completed.body.session.grant).not.toBe(grant);
@@ -334,7 +334,7 @@ suite("learner HTTP seam", () => {
 
     const reused = await request("POST", "/profile/recover/complete", undefined, {
       token: started.body.token,
-      credential: { id: "cred-recovered-2", label: "Another", publicKey: "pk-2" },
+      credential: { id: "cred-recovered-2", label: "Another", publicKey: fakePublicKey("2") },
     });
     expect(reused.response.status).toBe(400);
   });
@@ -349,14 +349,33 @@ suite("learner HTTP seam", () => {
 
     const completed = await request("POST", "/profile/recover/complete", undefined, {
       token: started.body.token,
-      credential: { id: "cred-recovered", label: "Replacement", publicKey: "pk-recovered" },
+      credential: { id: "cred-recovered", label: "Replacement", publicKey: fakePublicKey("recovered") },
     });
     expect(completed.response.status).toBe(400);
   });
 
-  it("tombstones the profile on delete, blocks every endpoint with a deleted envelope, and persists the purge schedule", async () => {
+  it("rejects passkey registrations whose public key is not a 32-byte base64 string", async () => {
+    const { grant } = await protectProfile();
+    const addChallenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
+
+    const rejected = await request("POST", "/profile/passkeys", grant, {
+      credential: { id: "cred-bad", label: "Bad key", publicKey: "not-a-real-key", challenge: addChallenge.body.challenge },
+    });
+    expect(rejected.response.status).toBe(400);
+    expect(rejected.body.error).toMatch(/publicKey/i);
+  });
+
+  it("refuses deletion from a session that has not recently authenticated", async () => {
     const created = await request("POST", "/profiles/anonymous");
     const grant = created.body.session.grant;
+
+    const denied = await request("POST", "/profile/delete", grant);
+    expect(denied.response.status).toBe(200);
+    expect(denied.body).toEqual({ status: "authentication-required" });
+  });
+
+  it("tombstones the profile on delete, blocks every endpoint with a deleted envelope, and persists the purge schedule", async () => {
+    const { grant } = await protectProfile();
 
     const deleted = await request("POST", "/profile/delete", grant);
     expect(deleted.response.status).toBe(200);
@@ -399,7 +418,7 @@ suite("learner HTTP seam", () => {
     await seedDeliveries(profileId, ["2026-08-25", "2026-08-26", "2026-08-27"]);
     const challenge = await request("POST", "/profile/passkey-challenge", grant, { purpose: "register" });
     const response = await request("POST", "/profile/protect", grant, {
-      credential: { id: "cred-1", label: "Laptop", publicKey: "pk-1", challenge: challenge.body.challenge },
+      credential: { id: "cred-1", label: "Laptop", publicKey: fakePublicKey("1"), challenge: challenge.body.challenge },
     });
     expect(response.response.status).toBe(200);
     return { grant, profileId };
@@ -477,4 +496,13 @@ async function request(method, path, grant, body, timeZone) {
 
 function digest(grant) {
   return createHash("sha256").update(grant).digest("hex");
+}
+
+function fakePublicKey(seed) {
+  const bytes = Buffer.alloc(32);
+  const view = bytes.toString("hex");
+  for (let index = 0; index < seed.length; index += 1) {
+    bytes[index] = (seed.charCodeAt(index) * 31 + index * 17) & 0xff;
+  }
+  return bytes.toString("base64");
 }

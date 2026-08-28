@@ -78,7 +78,11 @@ export class HttpProfileAdapter {
   }
 
   async completeRecovery(token, credential) {
-    return this.#anonymousRequest("POST", "/profile/recover/complete", { token, credential });
+    const response = await this.#anonymousRequest("POST", "/profile/recover/complete", { token, credential });
+    if (response.status === "active" && response.session) {
+      this.#session.save(this.#clientContextId, response.session);
+    }
+    return response;
   }
 
   async deleteProfile() {

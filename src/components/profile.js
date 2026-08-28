@@ -2,7 +2,7 @@ import { escapeHtml, renderButton } from "./button.js";
 
 const html = String.raw;
 
-export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification, installation, analyticsConsent = false } = {}) {
+export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification, recoveryStart, installation, analyticsConsent = false } = {}) {
   if (profile.state === "tombstoned") {
     return html`<section class="region wrapper profile flow" aria-labelledby="profile-title">
       <p class="lesson-label">Profile deleted</p>
@@ -15,7 +15,7 @@ export function renderProfile({ profile, deletionConfirmation = false, recoveryV
 
   const protection = profile.state === "anonymous"
     ? renderAnonymousProfile(profile)
-    : renderProtectedProfile(profile, recoveryVerification);
+    : renderProtectedProfile(profile, recoveryVerification, recoveryStart);
 
   return html`<section class="region wrapper profile flow" aria-labelledby="profile-title">
     <p class="lesson-label">Your WordWell</p>
@@ -53,13 +53,19 @@ function renderAnonymousProfile(profile) {
   </section>`;
 }
 
-function renderProtectedProfile(profile, recoveryVerification) {
+function renderProtectedProfile(profile, recoveryVerification, recoveryStart) {
   const passkeys = profile.passkeys.map((passkey) => html`<li class="profile-item"><span>${escapeHtml(passkey.label)}</span>${renderButton({ label: "Remove", action: "revoke-passkey", value: passkey.id, variant: "outline", size: "small" })}</li>`).join("");
   const recovery = profile.recoveryEmail
     ? html`<p><strong>${escapeHtml(profile.recoveryEmail)}</strong> can be used only to regain access when your passkeys are unavailable.</p>`
     : html`<form data-action="add-recovery-email"><label for="recovery-email">Recovery email</label><input id="recovery-email" name="recovery-email" type="email" autocomplete="email" required /><button class="button" type="submit">Send verification link</button></form>`;
   const verification = recoveryVerification
     ? html`<p class="profile-notice" role="status">Verification link prepared for ${escapeHtml(recoveryVerification.email)}. ${renderButton({ label: "Verify recovery email", action: "verify-recovery-email", value: recoveryVerification.token, variant: "outline", size: "small" })}</p>`
+    : "";
+  const recoveryStartNotice = recoveryStart
+    ? html`<p class="profile-notice" role="status">Recovery link prepared. <a href="${escapeHtml(recoveryStart.url)}">Recover this profile</a></p>`
+    : "";
+  const recoveryStartForm = profile.recoveryEmail
+    ? html`<form data-action="start-profile-recovery"><label for="recovery-start-email">Recovery email</label><input id="recovery-start-email" name="recovery-start-email" type="email" autocomplete="email" value="${escapeHtml(profile.recoveryEmail)}" required /><button class="button" type="submit">Prepare recovery link</button></form>`
     : "";
 
   return html`<div class="profile-sections flow">
@@ -73,6 +79,8 @@ function renderProtectedProfile(profile, recoveryVerification) {
       <h2>Recovery email</h2>
       ${recovery}
       ${verification}
+      ${recoveryStartForm}
+      ${recoveryStartNotice}
     </section>
     <section class="profile-section profile-danger flow">
       <h2>Delete profile</h2>
@@ -80,6 +88,15 @@ function renderProtectedProfile(profile, recoveryVerification) {
       ${renderButton({ label: "Delete profile", action: "start-profile-deletion", variant: "outline" })}
     </section>
   </div>`;
+}
+
+export function renderRecoveryCompletion() {
+  return html`<section class="region wrapper profile flow" aria-labelledby="recovery-title">
+    <p class="lesson-label">Profile recovery</p>
+    <h1 id="recovery-title">Restore your WordWell profile</h1>
+    <p>Register a new passkey to restore this profile and revoke its prior sessions.</p>
+    ${renderButton({ label: "Restore with a new passkey", action: "complete-profile-recovery" })}
+  </section>`;
 }
 
 function renderDeletionConfirmation() {

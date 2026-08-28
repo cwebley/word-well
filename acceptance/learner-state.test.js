@@ -157,6 +157,7 @@ suite("learner-state browser acceptance", () => {
     await visible(page.getByRole("heading", { name: "candid" }));
     await waitForAcceptedOperations(1);
     const grant = await extractGrant(page);
+    await authenticateSession(grant);
 
     const response = await fetch(`${apiUrl}/profile/delete`, {
       method: "POST",
@@ -191,6 +192,7 @@ suite("learner-state browser acceptance", () => {
     await visible(page.getByRole("heading", { name: "candid" }));
     await waitForAcceptedOperations(1);
     const grant = await extractGrant(page);
+    await authenticateSession(grant);
 
     await fetch(`${apiUrl}/profile/delete`, {
       method: "POST",
@@ -255,6 +257,14 @@ async function extractGrant(page) {
     }
     return null;
   });
+}
+
+async function authenticateSession(grant) {
+  const { createHash } = await import("node:crypto");
+  await pool.query(
+    "UPDATE sessions SET recently_authenticated_at = $1 WHERE grant_digest = $2",
+    [new Date(), createHash("sha256").update(grant).digest("hex")]
+  );
 }
 
 async function newLearnerContext() {

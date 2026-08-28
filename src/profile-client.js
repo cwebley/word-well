@@ -75,10 +75,13 @@ export class ProfileClient {
 
   async completeRecovery(token, label) {
     const credential = this.#createCredential(label, "");
-    return this.#adapter.completeRecovery(token, credential);
+    const response = await this.#adapter.completeRecovery(token, credential);
+    this.#update(response);
+    return response;
   }
 
   async deleteProfile() {
+    await this.#assertRecentAuthentication();
     const response = await this.#adapter.deleteProfile();
     if (response.status === "tombstoned") this.#cache = undefined;
     return response;
