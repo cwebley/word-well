@@ -48,6 +48,13 @@ export class LearningStateServer {
     return { status: "active", state: this.state(profileId) };
   }
 
+  readState(profileId) {
+    const profile = this.#profile(profileId);
+    if (profile.state === "tombstoned") return { status: "deleted" };
+    if (profile.session === "expired") return { status: "session-expired" };
+    return { status: "active", state: this.state(profileId) };
+  }
+
   state(profileId) {
     const profile = this.#profile(profileId);
     const evidence = [...profile.evidence].sort(byOrder);
@@ -125,7 +132,22 @@ export class LearningStateClient {
 
   synchronize() {
     this.#outbox = this.#outbox.filter((operation) => this.#now() - new Date(operation.createdAt) <= outboxLifetime);
-    const response = this.#server.synchronize(this.#profile, this.#outbox);
+    const sent = [...this.#outbox];
+    const response = this.#server.synchronize(this.#profile, sent);
+    return response instanceof Promise ? response.then((value) => this.#accept(value, sent)) : this.#accept(response, sent);
+  }
+
+  hydrate() {
+    const response = this.#server.readState(this.#profile);
+    return response instanceof Promise ? response.then((value) => this.#accept(value, [])) : this.#accept(response, []);
+  }
+
+  renewSession() {
+    const response = this.#server.renewSession(this.#profile);
+    return response instanceof Promise ? response.then((value) => this.#accept(value, [])) : this.#accept(response, []);
+  }
+
+  #accept(response, sent) {
     if (response.status === "deleted") {
       this.#outbox = [];
       this.#sent.clear();
@@ -138,9 +160,10 @@ export class LearningStateClient {
       return { status: "session-expired" };
     }
 
-    for (const operation of this.#outbox) this.#sent.set(operation.id, operation);
-    this.#outbox = [];
-    this.#cache = cache(response.state);
+    const sentIds = new Set(sent.map(({ id }) => id));
+    for (const operation of sent) this.#sent.set(operation.id, operation);
+    this.#outbox = this.#outbox.filter(({ id }) => !sentIds.has(id));
+    if (response.state) this.#cache = cache(response.state);
     this.#save();
     return { status: "active" };
   }
@@ -165,6 +188,69 @@ export class LearningStateClient {
       clientId: this.#clientId,
       nextOperation: this.#nextOperation
     });
+  }
+}
+
+export class HttpLearningStateAdapter {
+  #fetch;
+  #baseUrl;
+  #session;
+  #clientContextId;
+
+  constructor({ fetch = globalThis.fetch, baseUrl = "", session = browserSession(), clientContextId = clientContextId() } = {}) {
+    this.#fetch = fetch;
+    this.#baseUrl = baseUrl.replace(/\/$/, "");
+    this.#session = session;
+    this.#clientContextId = clientContextId;
+  }
+
+  get cacheKey() {
+    return `client:${this.#clientContextId}`;
+  }
+
+  async readState() {
+    return this.#request("GET", "/learning-state");
+  }
+
+  async synchronize(_profile, operations) {
+    return this.#request("POST", "/learning-state/sync", { operations });
+  }
+
+  async renewSession() {
+    const response = await this.#request("POST", "/session/renew");
+    if (response.status === "active") this.#session.save(this.#clientContextId, response.session);
+    return response;
+  }
+
+  async #request(method, path, body) {
+    const grant = await this.#grant();
+    const response = await this.#fetch(`${this.#baseUrl}${path}`, {
+      method,
+      headers: {
+        authorization: `Bearer ${grant}`,
+        ...(body ? { "content-type": "application/json" } : {})
+      },
+      ...(body ? { body: JSON.stringify(body) } : {})
+    });
+    const value = await response.json();
+    if (!response.ok && value.status !== "deleted" && value.status !== "session-expired") {
+      throw new Error(value.error ?? "Learning state request failed.");
+    }
+    if (value.status === "deleted") this.#session.clear(this.#clientContextId);
+    return value;
+  }
+
+  async #grant() {
+    const session = this.#session.load(this.#clientContextId);
+    if (session?.grant) return session.grant;
+    const response = await this.#fetch(`${this.#baseUrl}/profiles/anonymous`, {
+      method: "POST",
+      headers: { "x-client-context": this.#clientContextId }
+    });
+    const value = await response.json();
+    if (!response.ok || !value.session?.grant) throw new Error(value.error ?? "Could not create an anonymous profile.");
+    this.#session.save(this.#clientContextId, value.session);
+    return value.session.grant;
   }
 }
 
@@ -239,6 +325,23 @@ function browserStorage() {
         const storageKey = storage.key(index);
         if (storageKey?.startsWith(prefix)) storage.removeItem(storageKey);
       }
+    }
+  };
+}
+
+function browserSession() {
+  const storage = globalThis.sessionStorage;
+  const key = (clientId) => `wordwell:session:${clientId}`;
+  return {
+    load(clientId) {
+      const value = storage?.getItem(key(clientId));
+      return value ? JSON.parse(value) : undefined;
+    },
+    save(clientId, session) {
+      storage?.setItem(key(clientId), JSON.stringify(session));
+    },
+    clear(clientId) {
+      storage?.removeItem(key(clientId));
     }
   };
 }

@@ -25,12 +25,23 @@ const profiles = new Profiles({ webauthn });
 const profileSession = profiles.createAnonymousProfile().session;
 let practiceVisit;
 const profileId = "local-preview-profile";
-const lessons = new DailyLessons([{ id: "seeded-candid", startingBand: "Stretch my vocabulary", record: seededVocabularyRecord }]);
+const lessons = new DailyLessons([
+  {
+    id: "seeded-candid",
+    startingBand: "Stretch my vocabulary",
+    record: seededVocabularyRecord,
+  },
+]);
 const delivery = lessons.deliver(profileId, "UTC");
-const learningServer = new LearningStateServer({ lessons: [{ id: "seeded-candid", record: seededVocabularyRecord }] });
+const learningServer = new LearningStateServer({
+  lessons: [{ id: "seeded-candid", record: seededVocabularyRecord }],
+});
 const learningProfile = learningServer.createProfile();
 learningServer.recordDelivery(learningProfile, delivery);
-const learning = new LearningStateClient({ server: learningServer, profile: learningProfile });
+const learning = new LearningStateClient({
+  server: learningServer,
+  profile: learningProfile,
+});
 if (navigator.onLine) learning.synchronize();
 hydrateCachedLearning();
 window.addEventListener("online", () => learning.synchronize());
@@ -42,20 +53,50 @@ function render() {
   }
   const lesson = seededVocabularyRecord;
   if (route === "practice") {
-    practiceVisit = practiceResult === undefined && familiarity ? lessons.practice(profileId) : practiceVisit;
+    practiceVisit =
+      practiceResult === undefined && familiarity
+        ? lessons.practice(profileId)
+        : practiceVisit;
     main.innerHTML = familiarity
       ? practiceResult !== undefined
-        ? renderPractice({ practice: practiceVisit.practice, result: practiceResult })
+        ? renderPractice({
+            practice: practiceVisit.practice,
+            result: practiceResult,
+          })
         : practiceVisit
           ? renderPractice({ practice: practiceVisit.practice })
-          : renderStatus({ label: "Practice", detail: "Nothing is due for recall right now." })
-      : renderStatus({ label: "Practice", detail: "Record your familiarity before beginning practice." });
+          : renderStatus({
+              label: "Practice",
+              detail: "Nothing is due for recall right now.",
+            })
+      : renderStatus({
+          label: "Practice",
+          detail: "Record your familiarity before beginning practice.",
+        });
   } else if (route === "history") {
-    main.innerHTML = familiarity ? html`<section class="card flow"><p class="lesson-label">History</p><h1 class="card-title">Words you've met</h1><p><strong>${lesson.headword}</strong> · ${familiarity}</p></section>` : renderStatus({ label: "History", detail: "Your word history will gather here after today's lesson." });
+    main.innerHTML = familiarity
+      ? html`<section class="card flow">
+          <p class="lesson-label">History</p>
+          <h1 class="card-title">Words you've met</h1>
+          <p><strong>${lesson.headword}</strong> · ${familiarity}</p>
+        </section>`
+      : renderStatus({
+          label: "History",
+          detail: "Your word history will gather here after today's lesson.",
+        });
   } else if (route === "profile") {
-    main.innerHTML = renderProfile({ profile: profiles.profile(profileSession.id), deletionConfirmation, recoveryVerification });
+    main.innerHTML = renderProfile({
+      profile: profiles.profile(profileSession.id),
+      deletionConfirmation,
+      recoveryVerification,
+    });
   } else if (!familiarity || revising) {
-    main.innerHTML = renderFamiliarityGate({ headword: lesson.headword, pronunciation: lesson.pronunciation, partOfSpeech: lesson.meanings[0].partOfSpeech, revision: revising });
+    main.innerHTML = renderFamiliarityGate({
+      headword: lesson.headword,
+      pronunciation: lesson.pronunciation,
+      partOfSpeech: lesson.meanings[0].partOfSpeech,
+      revision: revising,
+    });
   } else {
     main.innerHTML = renderLessonCard({ lesson });
   }
@@ -78,21 +119,35 @@ document.addEventListener("click", (event) => {
   event.preventDefault();
   if (target.dataset.action === "familiarity") {
     familiarity = target.dataset.value;
-    if (revising) lessons.reviseFamiliarity(profileId, delivery.id, familiarity);
+    if (revising)
+      lessons.reviseFamiliarity(profileId, delivery.id, familiarity);
     else lessons.recordFamiliarity(profileId, delivery.id, familiarity);
     recordLearning("familiarity", { deliveryId: delivery.id, familiarity });
     revising = false;
   } else if (target.dataset.action === "revise-familiarity") {
     revising = true;
   } else if (target.dataset.action === "practice-answer") {
-    practiceResult = lessons.answerPractice(profileId, practiceVisit.delivery.id, target.dataset.value).correct;
-    recordLearning("practice", { deliveryId: practiceVisit.delivery.id, correct: practiceResult });
+    practiceResult = lessons.answerPractice(
+      profileId,
+      practiceVisit.delivery.id,
+      target.dataset.value,
+    ).correct;
+    recordLearning("practice", {
+      deliveryId: practiceVisit.delivery.id,
+      correct: practiceResult,
+    });
   } else if (target.dataset.action === "active-use") {
     lessons.recordActiveUse(profileId, delivery.id, target.dataset.value);
-    recordLearning("active-use", { deliveryId: delivery.id, activeUse: target.dataset.value });
+    recordLearning("active-use", {
+      deliveryId: delivery.id,
+      activeUse: target.dataset.value,
+    });
   } else if (target.dataset.action === "utility") {
     lessons.recordUtility(profileId, delivery.id, target.dataset.value);
-    recordLearning("utility", { deliveryId: delivery.id, utility: target.dataset.value });
+    recordLearning("utility", {
+      deliveryId: delivery.id,
+      utility: target.dataset.value,
+    });
   } else if (target.dataset.action === "content-quality") {
     lessons.reportContentQuality(profileId, delivery.id);
     recordLearning("content-quality", { deliveryId: delivery.id });
@@ -100,7 +155,10 @@ document.addEventListener("click", (event) => {
     profiles.protect(profileSession.id, webauthn.createPasskey("This device"));
   } else if (target.dataset.action === "add-passkey") {
     authenticateProfile();
-    profiles.addPasskey(profileSession.id, webauthn.createPasskey("New passkey"));
+    profiles.addPasskey(
+      profileSession.id,
+      webauthn.createPasskey("New passkey"),
+    );
   } else if (target.dataset.action === "revoke-passkey") {
     authenticateProfile();
     profiles.revokePasskey(profileSession.id, target.dataset.value);
@@ -128,7 +186,10 @@ document.addEventListener("submit", (event) => {
   event.preventDefault();
   const email = new FormData(form).get("recovery-email");
   authenticateProfile();
-  recoveryVerification = { email, ...profiles.requestRecoveryEmail(profileSession.id, email) };
+  recoveryVerification = {
+    email,
+    ...profiles.requestRecoveryEmail(profileSession.id, email),
+  };
   render();
 });
 
@@ -146,5 +207,7 @@ function hydrateCachedLearning() {
   const cached = learning.cache();
   if (!cached.history.length) return;
   lessons.restore(profileId, cached);
-  familiarity = cached.history.find(({ id }) => id === delivery.id)?.familiarity;
+  familiarity = cached.history.find(
+    ({ id }) => id === delivery.id,
+  )?.familiarity;
 }
