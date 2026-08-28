@@ -8,6 +8,7 @@ import { seededVocabularyRecord } from "../fixtures/published-word-lesson.js";
 import { Profiles } from "../profiles.js";
 import { WebAuthnSimulator } from "../webauthn-simulator.js";
 import { DailyLessons } from "../daily-lessons.js";
+import { LearningStateClient, LearningStateServer } from "../learning-sync.js";
 
 const html = String.raw;
 
@@ -26,6 +27,12 @@ let practiceVisit;
 const profileId = "local-preview-profile";
 const lessons = new DailyLessons([{ id: "seeded-candid", startingBand: "Stretch my vocabulary", record: seededVocabularyRecord }]);
 const delivery = lessons.deliver(profileId, "UTC");
+const learningServer = new LearningStateServer({ lessons: [{ id: "seeded-candid", record: seededVocabularyRecord }] });
+const learningProfile = learningServer.createProfile();
+learningServer.recordDelivery(learningProfile, delivery);
+const learning = new LearningStateClient({ server: learningServer, profile: learningProfile });
+if (navigator.onLine) learning.synchronize();
+window.addEventListener("online", () => learning.synchronize());
 
 function render() {
   if (deleted) {
@@ -72,17 +79,22 @@ document.addEventListener("click", (event) => {
     familiarity = target.dataset.value;
     if (revising) lessons.reviseFamiliarity(profileId, delivery.id, familiarity);
     else lessons.recordFamiliarity(profileId, delivery.id, familiarity);
+    recordLearning("familiarity", { deliveryId: delivery.id, familiarity });
     revising = false;
   } else if (target.dataset.action === "revise-familiarity") {
     revising = true;
   } else if (target.dataset.action === "practice-answer") {
     practiceResult = lessons.answerPractice(profileId, practiceVisit.delivery.id, target.dataset.value).correct;
+    recordLearning("practice", { deliveryId: practiceVisit.delivery.id, correct: practiceResult });
   } else if (target.dataset.action === "active-use") {
     lessons.recordActiveUse(profileId, delivery.id, target.dataset.value);
+    recordLearning("active-use", { deliveryId: delivery.id, activeUse: target.dataset.value });
   } else if (target.dataset.action === "utility") {
     lessons.recordUtility(profileId, delivery.id, target.dataset.value);
+    recordLearning("utility", { deliveryId: delivery.id, utility: target.dataset.value });
   } else if (target.dataset.action === "content-quality") {
     lessons.reportContentQuality(profileId, delivery.id);
+    recordLearning("content-quality", { deliveryId: delivery.id });
   } else if (target.dataset.action === "protect-profile") {
     profiles.protect(profileSession.id, webauthn.createPasskey("This device"));
   } else if (target.dataset.action === "add-passkey") {
@@ -101,6 +113,8 @@ document.addEventListener("click", (event) => {
   } else if (target.dataset.action === "confirm-profile-deletion") {
     authenticateProfile();
     profiles.deleteProfile(profileSession.id);
+    learningServer.deleteProfile(learningProfile);
+    learning.synchronize();
     deletionConfirmation = false;
     deleted = true;
   }
@@ -120,4 +134,9 @@ document.addEventListener("submit", (event) => {
 function authenticateProfile() {
   const [passkey] = profiles.profile(profileSession.id).passkeys;
   profiles.authenticate(profileSession.id, webauthn.getPasskey(passkey.id));
+}
+
+function recordLearning(kind, details) {
+  learning.record(kind, details);
+  if (navigator.onLine) learning.synchronize();
 }

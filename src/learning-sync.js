@@ -3,7 +3,7 @@ const maxOutboxOperations = 100;
 const outboxLifetime = 30 * 24 * 60 * 60 * 1000;
 const permittedKinds = new Set(["familiarity", "practice", "active-use", "utility", "content-quality"]);
 const appendOnlyKinds = new Set(["practice", "utility", "content-quality"]);
-let nextClient = 1;
+const recallStages = ["new", "1 day", "3 days", "7 days", "14 days", "30 days"];
 
 export class LearningStateServer {
   #profiles = new Map();
@@ -84,29 +84,43 @@ export class LearningStateClient {
   #server;
   #profile;
   #now;
+  #storage;
   #outbox = [];
   #sent = new Map();
   #nextOperation = 1;
-  #clientId = `client-${nextClient++}`;
+  #clientId;
   #cache = { appShell: true, lessons: [], history: [], practice: [] };
 
-  constructor({ server, profile, now = () => new Date() }) {
+  constructor({ server, profile, now = () => new Date(), storage = browserStorage(), clientId = clientContextId() }) {
     this.#server = server;
     this.#profile = profile;
     this.#now = now;
+    this.#storage = storage;
+    const saved = storage.load(profile, clientId);
+    if (saved) {
+      this.#outbox = saved.outbox;
+      this.#cache = saved.cache;
+      this.#clientId = saved.clientId;
+      this.#nextOperation = saved.nextOperation;
+    } else {
+      this.#clientId = clientId;
+    }
   }
 
   record(kind, details) {
     if (!permittedKinds.has(kind)) throw new Error(`${kind} cannot be queued while offline.`);
     const operation = { id: `${this.#clientId}:operation-${this.#nextOperation++}`, kind, ...details, createdAt: this.#now().toISOString() };
-    this.#outbox.push(operation);
-    if (this.#outbox.length > maxOutboxOperations) this.#outbox.shift();
+    this.#queue(operation);
+    this.#save();
     return operation;
   }
 
   retry(operationId) {
     const operation = this.#sent.get(operationId);
-    if (operation) this.#outbox.push(operation);
+    if (operation) {
+      this.#queue(operation);
+      this.#save();
+    }
   }
 
   synchronize() {
@@ -116,13 +130,18 @@ export class LearningStateClient {
       this.#outbox = [];
       this.#sent.clear();
       this.#cache = { appShell: true, lessons: [], history: [], practice: [] };
+      this.#storage.clear(this.#profile, this.#clientId);
       return { status: "deleted" };
     }
-    if (response.status === "session-expired") return { status: "session-expired" };
+    if (response.status === "session-expired") {
+      this.#save();
+      return { status: "session-expired" };
+    }
 
     for (const operation of this.#outbox) this.#sent.set(operation.id, operation);
     this.#outbox = [];
     this.#cache = cache(response.state);
+    this.#save();
     return { status: "active" };
   }
 
@@ -133,6 +152,20 @@ export class LearningStateClient {
   outbox() {
     return structuredClone(this.#outbox);
   }
+
+  #queue(operation) {
+    this.#outbox.push(operation);
+    if (this.#outbox.length > maxOutboxOperations) this.#outbox.shift();
+  }
+
+  #save() {
+    this.#storage.save(this.#profile, this.#clientId, {
+      cache: this.#cache,
+      outbox: this.#outbox,
+      clientId: this.#clientId,
+      nextOperation: this.#nextOperation
+    });
+  }
 }
 
 function cache(state) {
@@ -140,8 +173,8 @@ function cache(state) {
   const lessonIds = new Set(history.filter(({ status }) => status === "current").map(({ lessonId }) => lessonId));
   return {
     appShell: true,
-    lessons: state.lessons.filter(({ id }) => lessonIds.has(id)),
-    history,
+    lessons: state.lessons.filter(({ id }) => lessonIds.has(id)).map(learnerSafe),
+    history: history.map(learnerSafe),
     practice: history.filter(({ recall }) => recall)
   };
 }
@@ -168,15 +201,47 @@ function rebuildRecall(familiarity, activeUse, evidence) {
 }
 
 function nextStage(stage) {
-  const stages = ["new", "1 day", "3 days", "7 days", "14 days", "30 days"];
-  return stages[Math.min(stages.indexOf(stage) + 1, stages.length - 1)];
+  return recallStages[Math.min(recallStages.indexOf(stage) + 1, recallStages.length - 1)];
 }
 
 function previousStage(stage) {
-  const stages = ["new", "1 day", "3 days", "7 days", "14 days", "30 days"];
-  return stages[Math.max(stages.indexOf(stage) - 1, 0)];
+  return recallStages[Math.max(recallStages.indexOf(stage) - 1, 0)];
 }
 
 function byOrder(left, right) {
   return left.order - right.order;
+}
+
+function learnerSafe(value) {
+  if (Array.isArray(value)) return value.map(learnerSafe);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value)
+    .filter(([key]) => !/session|passkey|credential|recovery|analytics|pipeline.*evidence/i.test(key))
+    .map(([key, item]) => [key, learnerSafe(item)]));
+}
+
+function browserStorage() {
+  const storage = globalThis.localStorage;
+  const key = (profile, clientId) => `wordwell:learning-state:${profile}:${clientId}`;
+  return {
+    load(profile, clientId) {
+      const value = storage?.getItem(key(profile, clientId));
+      return value ? JSON.parse(value) : undefined;
+    },
+    save(profile, clientId, value) {
+      storage?.setItem(key(profile, clientId), JSON.stringify(value));
+    },
+    clear(profile, clientId) {
+      storage?.removeItem(key(profile, clientId));
+    }
+  };
+}
+
+function clientContextId() {
+  const key = "wordwell:client-context";
+  const stored = globalThis.sessionStorage?.getItem(key);
+  if (stored) return stored;
+  const clientId = `client-${crypto.randomUUID()}`;
+  globalThis.sessionStorage?.setItem(key, clientId);
+  return clientId;
 }

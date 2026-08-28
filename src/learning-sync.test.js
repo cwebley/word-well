@@ -9,6 +9,7 @@ function lesson(id, headword, version = "1") {
 
 function setup() {
   let time = new Date("2026-08-27T12:00:00Z");
+  let clientContext = 1;
   const server = new LearningStateServer({
     lessons: [lesson("candid", "candid"), lesson("lucid", "lucid")],
     now: () => time
@@ -17,8 +18,17 @@ function setup() {
   return {
     server,
     profile,
-    client: () => new LearningStateClient({ server, profile, now: () => time }),
+    client: () => new LearningStateClient({ server, profile, now: () => time, clientId: `test-client-${clientContext++}` }),
     setTime: (next) => { time = new Date(next); }
+  };
+}
+
+function storage() {
+  const values = new Map();
+  return {
+    load: (profile, clientId) => structuredClone(values.get(`${profile}:${clientId}`)),
+    save: (profile, clientId, value) => values.set(`${profile}:${clientId}`, structuredClone(value)),
+    clear: (profile, clientId) => values.delete(`${profile}:${clientId}`)
   };
 }
 
@@ -99,5 +109,18 @@ describe("learner synchronization seam", () => {
 
     expect(offline.synchronize()).toEqual({ status: "session-expired" });
     expect(offline.outbox()).toHaveLength(1);
+  });
+
+  it("restores a sanitized cache and queued changes after a client reload", () => {
+    const { server, profile, client } = setup();
+    const persisted = storage();
+    server.recordDelivery(profile, { id: "delivery-1", lessonId: "candid", localDate: "2026-08-27", recoveryEmail: "private@example.com" });
+    const first = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser-tab" });
+    first.synchronize();
+    first.record("utility", { deliveryId: "delivery-1", utility: "useful" });
+
+    const reloaded = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser-tab" });
+    expect(reloaded.cache().history[0]).not.toHaveProperty("recoveryEmail");
+    expect(reloaded.outbox()).toHaveLength(1);
   });
 });
