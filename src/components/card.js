@@ -28,6 +28,7 @@ export function renderLessonCard({ lesson }) {
     : "";
 
   return `<article class="word-lesson" aria-labelledby="lesson-word">
+    <div class="word-lesson-pinned" aria-hidden="true"><span class="word-lesson-pinned-word">${escapeHtml(lesson.headword)}</span><span class="word-lesson-pinned-meta">${escapeHtml(lesson.pronunciation)} · ${escapeHtml(meaning.partOfSpeech)}</span></div>
     <header class="word-lesson-hero"><p class="lesson-label">Today's word</p><h1 id="lesson-word" class="lesson-word">${escapeHtml(lesson.headword)}</h1><p class="lesson-pronunciation">${escapeHtml(lesson.pronunciation)} · ${escapeHtml(meaning.partOfSpeech)}</p></header>
     <div class="word-lesson-body">
       <section class="word-lesson-definition"><p class="lesson-label">In brief</p><p>${escapeHtml(meaning.definition)}.</p></section>

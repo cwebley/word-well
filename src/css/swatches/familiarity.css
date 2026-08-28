@@ -1,14 +1,12 @@
 .familiarity-gate {
   display: grid;
   grid-template-rows: minmax(16rem, 34dvh) minmax(0, 1fr);
-  margin-inline: calc(var(--gutter) * -1);
   min-block-size: 100%;
 }
 
 .familiarity-word-panel {
   align-content: center;
   background: var(--color-surface);
-  border-block-end: var(--stroke-solid);
   display: grid;
   padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
 }

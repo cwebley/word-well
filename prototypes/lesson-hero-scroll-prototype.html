@@ -1,0 +1,610 @@
+<!doctype html>
+<!-- PROTOTYPE ONLY: Word lesson hero collapsing into a pinned header on scroll,
+     as a scroll-scrubbed View Transition (the Bramus technique, 2026 form).
+
+     One transition is started at the top of the page and held open with
+     ViewTransition.waitUntil(). Its pseudo-element animations then have their
+     timeline swapped for a ScrollTimeline, so scroll position scrubs the morph
+     instead of a clock. The browser tweens the real boxes, which is why the
+     headword lands on the pinned word exactly: no hand-computed scale factor,
+     so differing line-height, em letter-spacing and Literata's optical-size
+     axis all stop mattering.
+
+     `:root { view-transition-name: none }` is load-bearing. Without it the UA
+     captures the whole page as one snapshot and the page would appear frozen
+     for as long as the transition is held open. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordWell lesson hero scroll prototype</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Literata:opsz,wght@7..72,200..900&display=swap");
+
+      :root {
+        --ink: oklch(25% 0.035 205);
+        --muted: oklch(45% 0.035 205);
+        --paper: oklch(98% 0.012 165);
+        --stone: oklch(91% 0.015 200);
+        --water: oklch(45% 0.075 205);
+        --moss: oklch(45% 0.075 145);
+        --wood-light: oklch(62% 0.09 45);
+        --line: color-mix(in oklab, var(--water), transparent 55%);
+        --sans: "Instrument Sans", sans-serif;
+        --serif: Literata, Iowan Old Style, Georgia, serif;
+
+        --bar-height: 4.5rem;
+        --hero-inset: clamp(1.5rem, 7vw, 7rem);
+        --collapse-range: 20rem; /* measured; see measure() */
+
+        scroll-padding-top: var(--bar-height);
+
+        /* The page must not be captured as one snapshot, or holding the
+           transition open would freeze the whole document. */
+        view-transition-name: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--stone);
+        color: var(--ink);
+        font-family: var(--sans);
+        margin: 0;
+      }
+      h1,
+      h2,
+      p,
+      figure,
+      ol {
+        margin: 0;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 16rem minmax(0, 1fr);
+        min-block-size: 100dvh;
+      }
+      .rail {
+        background: var(--water);
+        color: var(--paper);
+        padding: 2rem;
+      }
+      .rail h2 {
+        font-family: var(--serif);
+        font-size: 2rem;
+        font-weight: 520;
+        letter-spacing: -0.04em;
+        margin: 0 0 4rem;
+      }
+      .rail nav {
+        display: grid;
+        gap: 0.45rem;
+      }
+      .rail a {
+        color: inherit;
+        padding: 0.7rem 0.8rem;
+        text-decoration: none;
+      }
+      .rail a:first-child {
+        background: color-mix(in oklab, var(--water) 65%, var(--paper));
+        border-inline-start: 0.3rem solid var(--wood-light);
+      }
+
+      /* A stretched grid item has zero sticky travel inside its grid area. */
+      .main {
+        align-self: start;
+      }
+
+      .pinned {
+        block-size: var(--bar-height);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        padding-inline: var(--hero-inset);
+      }
+      /* Inner row so the two labels sit on a shared baseline while the row as a
+         whole stays vertically centred in the bar. */
+      .pinned-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+      }
+      .visually-hidden {
+        clip-path: inset(50%);
+        block-size: 1px;
+        inline-size: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+      }
+      .pinned::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--paper);
+        z-index: -1;
+      }
+
+      .hero {
+        align-content: center;
+        background: var(--paper);
+        display: grid;
+        margin-block-start: calc(var(--bar-height) * -1);
+        min-block-size: min(30rem, 48dvh);
+        padding: var(--hero-inset);
+        padding-block-start: var(--bar-height);
+      }
+      .eyebrow {
+        color: var(--moss);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        margin-block-end: 2rem;
+      }
+
+      /* ---- The two states of the headword and its metadata. Exactly one of
+             each pair is rendered at a time, and each pair shares a
+             view-transition-name so the UA morphs one into the other. ---- */
+      .hero-word {
+        color: var(--water);
+        font-family: var(--serif);
+        font-size: clamp(5.5rem, 16vw, 12rem);
+        font-weight: 440;
+        letter-spacing: -0.08em;
+        line-height: 0.78;
+        width: fit-content;
+      }
+      .hero-meta {
+        color: var(--water);
+        font-size: clamp(1.05rem, 2vw, 1.5rem);
+        font-weight: 600;
+        margin-block-start: 1.25rem;
+        width: fit-content;
+      }
+      .pinned-word {
+        color: var(--water);
+        font-family: var(--serif);
+        font-size: 1.6rem;
+        font-weight: 440;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+      .pinned-meta {
+        color: var(--muted);
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .eyebrow {
+        view-transition-name: lesson-eyebrow;
+      }
+      .hero-word,
+      .pinned-word {
+        view-transition-name: lesson-word;
+      }
+      .hero-meta,
+      .pinned-meta {
+        view-transition-name: lesson-meta;
+      }
+
+      /* The eyebrow has no pinned counterpart, so the UA gives it a pure exit
+         animation. Leaving it in the DOM would make it morph to a new position
+         instead of fading away. */
+      body[data-state="pinned"] .eyebrow,
+      body[data-state="pinned"] .hero-word,
+      body[data-state="pinned"] .hero-meta {
+        display: none;
+      }
+      body[data-state="expanded"] .pinned-word,
+      body[data-state="expanded"] .pinned-meta {
+        display: none;
+      }
+
+      /* Linear, so scroll progress maps straight onto the morph. The duration
+         is nominal: once the timeline is a ScrollTimeline, scroll drives it. */
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*) {
+        animation-duration: 1s;
+        animation-timing-function: linear;
+      }
+      /* Captured elements are hit-test-skipped by the UA anyway; this lets
+         clicks through to the live page underneath the overlay. */
+      ::view-transition {
+        pointer-events: none;
+      }
+
+      /* ---- Scroll-driven opacity fade-in for the pinned label row. ----
+         The transition has already finished by the time the hero uncovers the
+         label, so an opacity transition starting at that point is invisible.
+         A ScrollTimeline fades the row in across the last few centimetres of
+         hero travel, so the word emerges from beneath the hero rather than
+         popping into place. */
+      @supports (animation-timeline: scroll()) {
+        @media (prefers-reduced-motion: no-preference) {
+          .pinned-row {
+            animation-name: label-in;
+            animation-duration: 1ms;
+            animation-fill-mode: both;
+            animation-timing-function: linear;
+            animation-timeline: scroll(root block);
+          }
+          body[data-state]:not([data-motion="off"]) .pinned-row {
+            animation-range: calc(var(--collapse-range))
+              calc(var(--collapse-range) + 8rem);
+          }
+          body:not([data-state]) .pinned-row {
+            animation-range: calc(var(--collapse-range) - 8rem)
+              var(--collapse-range);
+          }
+        }
+      }
+      @keyframes label-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* ---- Fallback: clock-driven fade. Used when scroll-driven animations
+             are unsupported. ---- */
+      @media (prefers-reduced-motion: no-preference) {
+        body:not([data-state])[data-fallback-header] .pinned-row {
+          opacity: 0;
+          transition: opacity 180ms ease-out;
+        }
+        body:not([data-state])[data-fallback-header="visible"] .pinned-row {
+          opacity: 1;
+        }
+      }
+
+       /* ---- Fallback: no view transitions, no assignable timeline, or the
+             switcher off. The paper surface is revealed naturally from below;
+             the pinned label is faded in either by a ScrollTimeline (when
+             supported) or by a clock-driven transition. ---- */
+       body:not([data-state]) .pinned {
+         z-index: 0;
+       }
+        body:not([data-state]) .hero {
+          position: relative;
+          z-index: 1;
+        }
+
+        /* ---- Fallback: no view transitions, no assignable timeline, or the
+              switcher off. The paper surface is revealed naturally from below;
+              the pinned label is faded in either by a ScrollTimeline (when
+              supported) or by a clock-driven transition. ---- */
+      .body {
+        display: grid;
+        gap: 3rem;
+        padding: 3.5rem var(--hero-inset) 8rem;
+        max-inline-size: 46rem;
+      }
+      .definition {
+        border-block-start: 0.2rem solid var(--water);
+        padding-block-start: 0.75rem;
+        display: grid;
+        gap: 0.6rem;
+      }
+      .definition p:last-child {
+        font-family: var(--serif);
+        font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+        font-weight: 460;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+      }
+      .examples ol {
+        border-block: 1px solid var(--line);
+        list-style: none;
+        padding: 0;
+      }
+      .examples li {
+        border-block-end: 1px solid var(--line);
+        font-family: var(--serif);
+        font-size: 1.3rem;
+        font-style: italic;
+        line-height: 1.35;
+        padding-block: 1rem;
+      }
+      .examples li:last-child {
+        border-block-end: 0;
+      }
+      .label {
+        color: var(--moss);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .etymology {
+        background: color-mix(in oklab, var(--wood-light) 18%, var(--paper));
+        border-inline-start: 0.35rem solid var(--wood-light);
+        display: grid;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+      .switcher {
+        align-items: center;
+        background: oklch(18% 0.02 205);
+        border-radius: 99rem;
+        bottom: 1rem;
+        box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%);
+        color: white;
+        display: flex;
+        gap: 0.75rem;
+        left: 50%;
+        padding: 0.45rem 0.9rem;
+        position: fixed;
+        transform: translateX(-50%);
+        z-index: 5;
+      }
+      .switcher button {
+        background: var(--paper);
+        border: 0;
+        border-radius: 99rem;
+        color: var(--ink);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .switcher output {
+        font-size: 0.75rem;
+        min-width: 17rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="rail">
+        <h2>WordWell</h2>
+        <nav>
+          <a href="#today">Today</a>
+          <a href="#practice">Practice</a>
+          <a href="#history">History</a>
+          <a href="#profile">Profile</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="pinned">
+          <div class="pinned-row" aria-hidden="true">
+            <span class="pinned-word">candid</span>
+            <span class="pinned-meta">/ˈkændɪd/ · adjective</span>
+          </div>
+        </div>
+
+        <header class="hero">
+          <!-- The accessible copy belongs to neither visual state, so the
+               heading survives every swap the transition makes. -->
+          <div class="visually-hidden">
+            <p>Today's word</p>
+            <h1>candid</h1>
+            <p>/ˈkændɪd/ · adjective</p>
+          </div>
+          <p class="eyebrow" aria-hidden="true">Today's word</p>
+          <p class="hero-word" aria-hidden="true">candid</p>
+          <p class="hero-meta" aria-hidden="true">/ˈkændɪd/ · adjective</p>
+        </header>
+
+        <div class="body">
+          <section class="definition">
+            <p class="label">In brief</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+            <p>honest and direct, even when the truth may be uncomfortable.</p>
+          </section>
+          <section class="examples">
+            <p class="label">In a sentence</p>
+            <ol>
+              <li>
+                “Her candid feedback helped the team improve the proposal.”
+              </li>
+              <li>“He was candid about why the plan had not worked.”</li>
+              <li>“The memoir is candid about the cost of ambition.”</li>
+            </ol>
+          </section>
+          <section class="etymology">
+            <p class="label">Where it comes from</p>
+            <p>
+              Candid comes from Latin candidus, meaning white, bright, or
+              shining. Public figures seeking office wore white togas, which
+              helped the word acquire its modern sense of openness.
+            </p>
+          </section>
+          <section class="examples">
+            <p class="label">Also</p>
+            <p>frank, open</p>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="switcher">
+      <button type="button" data-toggle>Disable scrub</button>
+      <output id="readout"></output>
+    </div>
+
+    <script type="module">
+       const root = document.documentElement;
+       const hero = document.querySelector(".hero");
+       const pinnedRow = document.querySelector(".pinned-row");
+       const readout = document.querySelector("#readout");
+
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+      /* The transition captures the old state at whatever geometry is on screen
+         when it starts, so it must start at the top of the page. */
+      function measure() {
+        const range = Math.max(
+          1,
+          Math.round(hero.getBoundingClientRect().height),
+        );
+        root.style.setProperty("--collapse-range", `${range}px`);
+        return range;
+      }
+
+      /* Chromium-only: Firefox and Safari expose Animation.timeline as a getter,
+         so the scrub cannot be driven there and we fall back to the static bar. */
+      function timelineIsAssignable() {
+        if (typeof ScrollTimeline !== "function") return false;
+        const probe = document.createElement("div");
+        document.body.append(probe);
+        try {
+          const animation = probe.animate(
+            [{ opacity: 1 }, { opacity: 0 }],
+            1000,
+          );
+          const timeline = new ScrollTimeline({
+            source: document.scrollingElement,
+            axis: "block",
+          });
+          animation.timeline = timeline;
+          const ok = animation.timeline === timeline;
+          animation.cancel();
+          return ok;
+        } catch {
+          return false;
+        } finally {
+          probe.remove();
+        }
+      }
+
+       const supported =
+         typeof document.startViewTransition === "function" &&
+         typeof ViewTransition !== "undefined" &&
+         "waitUntil" in ViewTransition.prototype &&
+         timelineIsAssignable() &&
+         !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+       const timelineAvailable =
+         typeof ScrollTimeline === "function" &&
+         matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+       let transition = null;
+       let releaseHold = null;
+
+       /* Used only when the row is faded by a clock-driven transition rather
+          than by a scroll-driven animation. */
+       function syncFallbackHeader() {
+         if (document.body.dataset.state || timelineAvailable) return;
+         const heroBottom = hero.getBoundingClientRect().bottom;
+         document.body.dataset.fallbackHeader =
+           heroBottom <= pinnedRow.getBoundingClientRect().bottom
+             ? "visible"
+             : "hidden";
+       }
+
+       function teardown() {
+        releaseHold?.();
+        releaseHold = null;
+        if (transition) {
+          transition.skipTransition();
+          transition = null;
+        }
+        delete document.body.dataset.state;
+      }
+
+      async function begin() {
+        if (!supported || document.body.dataset.motion === "off") return;
+        teardown();
+        window.scrollTo(0, 0);
+        const range = measure();
+        document.body.dataset.state = "expanded";
+
+        const current = document.startViewTransition(() => {
+          document.body.dataset.state = "pinned";
+        });
+        transition = current;
+
+        try {
+          await current.ready;
+        } catch {
+          if (transition === current) transition = null;
+          return;
+        }
+        if (transition !== current) return;
+
+        /* Hold the transition open indefinitely. Without this the pseudo-tree
+           is destroyed the moment scroll progress reaches 1, irreversibly. */
+        current.waitUntil(
+          new Promise((resolve) => {
+            releaseHold = resolve;
+          }),
+        );
+
+        const timeline = new ScrollTimeline({
+          source: document.scrollingElement,
+          axis: "block",
+        });
+        let scrubbed = 0;
+        for (const animation of document.getAnimations()) {
+          const effect = animation.effect;
+          if (effect?.target !== root) continue;
+          if (!effect.pseudoElement?.startsWith("::view-transition")) continue;
+          animation.timeline = timeline;
+          animation.rangeStart = "0px";
+          animation.rangeEnd = `${range}px`;
+          scrubbed++;
+        }
+
+        readout.textContent = `${scrubbed} pseudo animations · ${range}px scrub`;
+      }
+
+       if (supported) {
+         begin();
+         document.fonts?.ready.then(begin);
+       } else {
+         readout.textContent = matchMedia("(prefers-reduced-motion: reduce)")
+           .matches
+           ? "reduced motion — hero reveals the bar"
+           : "no scrub support — hero reveals the bar, then fades in its label";
+         syncFallbackHeader();
+         addEventListener("scroll", syncFallbackHeader, { passive: true });
+       }
+
+      /* A resize changes the snapshot containing block, which the spec lists as
+         a skip condition, so the transition has to be rebuilt. */
+      let resizeTimer;
+      addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (supported && document.body.dataset.motion !== "off") begin();
+          else syncFallbackHeader();
+        }, 150);
+      });
+
+      document
+        .querySelector("[data-toggle]")
+        .addEventListener("click", (event) => {
+          const off = document.body.dataset.motion === "off";
+          document.body.dataset.motion = off ? "on" : "off";
+          event.target.textContent = off ? "Disable scrub" : "Enable scrub";
+           if (off) begin();
+           else {
+             teardown();
+             syncFallbackHeader();
+             readout.textContent =
+               "scrub disabled — hero reveals the bar, then fades in its label";
+           }
+        });
+    </script>
+  </body>
+</html>

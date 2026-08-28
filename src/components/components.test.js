@@ -20,6 +20,9 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain("candid");
     expect(lesson).toContain('class="word-lesson"');
     expect(lesson).toContain('class="word-lesson-hero"');
+    expect(lesson).toContain('class="word-lesson-pinned"');
+    expect(lesson).toContain('class="word-lesson-pinned-word"');
+    expect(lesson).toContain('class="word-lesson-pinned-meta"');
     expect(lesson).not.toContain('class="card flow"');
     expect(lesson).toContain("In a sentence");
     expect(lesson).toContain("He was candid about why the plan had not worked.");

@@ -17,8 +17,12 @@ export function home() {
       <body>
         <div class="app-shell">
           ${renderNavigation()}
-          <main class="app-main region wrapper" id="app-main" tabindex="-1">
-            ${renderFamiliarityGate({ headword: seededVocabularyRecord.headword, pronunciation: seededVocabularyRecord.pronunciation, partOfSpeech: seededVocabularyRecord.meanings[0].partOfSpeech })}
+          <main class="app-main region" id="app-main" tabindex="-1">
+            ${renderFamiliarityGate({
+              headword: seededVocabularyRecord.headword,
+              pronunciation: seededVocabularyRecord.pronunciation,
+              partOfSpeech: seededVocabularyRecord.meanings[0].partOfSpeech,
+            })}
           </main>
         </div>
 
