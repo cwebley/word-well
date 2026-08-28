@@ -63,13 +63,23 @@
   display: none;
 }
 
+.learning-sync-status:not(:empty) {
+  position: fixed;
+  z-index: 10;
+  inset-inline-start: max(var(--space-m), env(safe-area-inset-left));
+  inset-block-end: max(var(--space-m), env(safe-area-inset-bottom));
+  max-inline-size: min(22rem, calc(100vw - var(--space-l)));
+}
+
 .sync-status {
   display: grid;
   gap: var(--space-xs);
-  margin: var(--space-s);
   padding: var(--space-s);
   border-inline-start: 0.3rem solid var(--color-wood-light);
-  background: color-mix(in oklab, var(--color-water-soft) 35%, transparent);
+  border-radius: var(--radius-m);
+  background: var(--color-surface-raised);
+  box-shadow: 0 0.75rem 2rem color-mix(in oklab, var(--color-text), transparent 75%);
+  color: var(--color-text);
   font-size: var(--step--1);
 }
 
@@ -104,13 +114,6 @@
     inset-inline: 0;
   }
 
-  .learning-sync-status {
-    align-self: center;
-  }
-
-  .sync-status {
-    margin: var(--space-xs) var(--space-s);
-  }
 }
 
 ::view-transition-group(navigation-active-edge) {
