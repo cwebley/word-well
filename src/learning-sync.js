@@ -221,6 +221,18 @@ export class LearningStateClient {
       : this.#accept(response, []);
   }
 
+  skipUpcoming(upcomingId) {
+    if (this.#ready)
+      return this.#ready.then(() => {
+        this.#ready = undefined;
+        return this.skipUpcoming(upcomingId);
+      });
+    const response = this.#server.skipUpcoming(upcomingId);
+    return response instanceof Promise
+      ? response.then((value) => this.#accept(value, []))
+      : this.#accept(response, []);
+  }
+
   #accept(response, sent) {
     if (response.status === "deleted") {
       this.#outbox = [];
@@ -283,17 +295,20 @@ export class HttpLearningStateAdapter {
   #baseUrl;
   #session;
   #clientContextId;
+  #timeZone;
 
   constructor({
     fetch = globalThis.fetch,
     baseUrl = "",
     session = browserSession(),
     clientContextId = browserClientContextId(),
+    timeZone = browserTimeZone(),
   } = {}) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/$/, "");
     this.#session = session;
     this.#clientContextId = clientContextId;
+    this.#timeZone = timeZone;
   }
 
   get cacheKey() {
@@ -315,12 +330,17 @@ export class HttpLearningStateAdapter {
     return response;
   }
 
+  async skipUpcoming(upcomingId) {
+    return this.#request("POST", `/upcoming/${encodeURIComponent(upcomingId)}/skip`);
+  }
+
   async #request(method, path, body) {
     const grant = await this.#grant();
     const response = await this.#fetch(`${this.#baseUrl}${path}`, {
       method,
       headers: {
         authorization: `Bearer ${grant}`,
+        "x-time-zone": this.#timeZone,
         ...(body ? { "content-type": "application/json" } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
@@ -342,7 +362,7 @@ export class HttpLearningStateAdapter {
     if (session?.grant) return session.grant;
     const response = await this.#fetch(`${this.#baseUrl}/profiles/anonymous`, {
       method: "POST",
-      headers: { "x-client-context": this.#clientContextId },
+      headers: { "x-client-context": this.#clientContextId, "x-time-zone": this.#timeZone },
     });
     const value = await response.json();
     if (!response.ok || !value.session?.grant)
@@ -368,6 +388,8 @@ function cache(state) {
     practice: history.filter(({ recall }) => recall).map(learnerSafe),
     evidence: state.evidence.map(learnerSafe),
     mutable: state.mutable.map(learnerSafe),
+    ...(state.delivery ? { delivery: learnerSafe(state.delivery) } : {}),
+    ...(state.upcoming ? { upcoming: state.upcoming.map(learnerSafe) } : {}),
   };
 }
 
@@ -420,7 +442,7 @@ function learnerSafe(value) {
     Object.entries(value)
       .filter(
         ([key]) =>
-          !/session|passkey|credential|recovery|analytics|pipeline.*evidence/i.test(
+          !/session|passkey|credential|recovery|analytics|pipeline|provenance/i.test(
             key,
           ),
       )
@@ -511,4 +533,8 @@ function browserClientContextId() {
   const clientId = `client-${crypto.randomUUID()}`;
   globalThis.sessionStorage?.setItem(key, clientId);
   return clientId;
+}
+
+function browserTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }

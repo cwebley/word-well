@@ -5,23 +5,29 @@ import type { LearnerDatabase } from "./database.js";
 export function createApi(database: LearnerDatabase) {
   return async function handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
     try {
+      setCorsHeaders(request, response);
+      if (request.method === "OPTIONS") return send(response, 204, null);
       const path = new URL(request.url ?? "/", "http://wordwell.local").pathname;
       if (request.method === "POST" && path === "/profiles/anonymous") {
         const clientContextId = request.headers["x-client-context"];
-        return send(response, 201, await database.createAnonymousProfile(typeof clientContextId === "string" ? clientContextId : undefined));
+        return send(response, 201, await database.createAnonymousProfile(typeof clientContextId === "string" ? clientContextId : undefined, clientTimeZone(request) ?? "UTC"));
       }
 
       const grant = bearerGrant(request);
       if (request.method === "GET" && path === "/learning-state") {
-        return sendRepository(response, await database.readState(grant));
+        return sendRepository(response, await database.readState(grant, clientTimeZone(request)));
       }
       if (request.method === "POST" && path === "/learning-state/sync") {
         const body = await readJson(request);
         const operations = validateOperations(body && typeof body === "object" ? (body as Record<string, unknown>).operations : undefined);
-        return sendRepository(response, await database.synchronize(grant, operations));
+        return sendRepository(response, await database.synchronize(grant, operations, clientTimeZone(request)));
       }
       if (request.method === "POST" && path === "/session/renew") {
         return sendRepository(response, await database.renewSession(grant));
+      }
+      const skip = path.match(/^\/upcoming\/([^/]+)\/skip$/);
+      if (request.method === "POST" && skip) {
+        return sendRepository(response, await database.skipUpcoming(grant, decodeURIComponent(skip[1]!), clientTimeZone(request)));
       }
       send(response, 404, { error: "Not found." });
     } catch (error) {
@@ -30,6 +36,16 @@ export function createApi(database: LearnerDatabase) {
       send(response, status, { error: status === 500 ? "Unexpected server error." : error instanceof Error ? error.message : "Request was rejected." });
     }
   };
+}
+
+function setCorsHeaders(request: IncomingMessage, response: ServerResponse): void {
+  const origin = request.headers.origin;
+  if (origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    response.setHeader("access-control-allow-origin", origin);
+    response.setHeader("vary", "Origin");
+  }
+  response.setHeader("access-control-allow-methods", "GET, POST, OPTIONS");
+  response.setHeader("access-control-allow-headers", "authorization, content-type, x-client-context, x-time-zone");
 }
 
 function sendRepository(response: ServerResponse, value: { status: string; [key: string]: unknown }): void {
@@ -46,6 +62,11 @@ function bearerGrant(request: IncomingMessage): string {
   const header = request.headers.authorization;
   if (!header?.startsWith("Bearer ") || header.length <= "Bearer ".length) throw new ApiError(401, "A session grant is required.");
   return header.slice("Bearer ".length);
+}
+
+function clientTimeZone(request: IncomingMessage): string | undefined {
+  const value = request.headers["x-time-zone"];
+  return typeof value === "string" && value ? value : undefined;
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {

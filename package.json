@@ -20,7 +20,7 @@
     "watch:assets": "onchange 'src/css/**/*' 'src/js/**/*' 'src/components/**/*' -e 'src/css/utilities/utilities.css' -- npm run build:assets",
     "swatchkit:watch": "swatchkit --watch",
     "serve": "http-server dist -c-1 -p 0 -o",
-    "dev": "npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve"
+    "dev": "export API_BASE_URL=http://localhost:3000 && npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve"
   },
   "devDependencies": {
     "@types/node": "^26.4.0",

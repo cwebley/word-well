@@ -1,5 +1,5 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import type { Pool, PoolClient } from "pg";
+import type { Pool, PoolClient, QueryResult } from "pg";
 import {
   maxSyncOperations,
   permittedKinds,
@@ -12,6 +12,7 @@ import {
 
 type Queryable = Pick<PoolClient, "query">;
 type Clock = () => Date;
+type ActiveAuthorization = { status: "active"; profileId: string; clientContextId: string; timeZone: string };
 
 export class ApiError extends Error {
   readonly status: number;
@@ -31,7 +32,8 @@ export class LearnerDatabase {
     this.#now = now;
   }
 
-  async createAnonymousProfile(clientContextId?: string): Promise<{ profile: { state: "anonymous" }; session: Session }> {
+  async createAnonymousProfile(clientContextId?: string, timeZone = "UTC"): Promise<{ profile: { state: "anonymous" }; session: Session }> {
+    validateTimeZone(timeZone);
     const client = await this.#pool.connect();
     try {
       await client.query("BEGIN");
@@ -42,7 +44,7 @@ export class LearnerDatabase {
         "INSERT INTO profiles (id, state, created_at) VALUES ($1, 'anonymous', $2)",
         [profileId, now]
       );
-      await insertSession(client, profileId, session, now, clientContextId);
+      await insertSession(client, profileId, session, now, clientContextId, timeZone);
       await client.query("COMMIT");
       return { profile: { state: "anonymous" }, session: publicSession(session) };
     } catch (error) {
@@ -53,13 +55,17 @@ export class LearnerDatabase {
     }
   }
 
-  async readState(grant: string): Promise<RepositoryResponse> {
-    return this.#withAuthorizedSession(grant, async (client, profileId) => {
-      return { status: "active", state: await learnerState(client, profileId) };
+  async readState(grant: string, timeZone?: string): Promise<RepositoryResponse> {
+    if (timeZone) validateTimeZone(timeZone);
+    return this.#withAuthorizedSession(grant, timeZone, async (client, authorization) => {
+      const now = this.#now();
+      await ensureDailyDelivery(client, authorization.profileId, authorization.timeZone, now);
+      return { status: "active", state: await learnerState(client, authorization.profileId, dateInTimeZone(now, authorization.timeZone)) };
     });
   }
 
-  async synchronize(grant: string, operations: readonly SyncOperation[]): Promise<RepositoryResponse> {
+  async synchronize(grant: string, operations: readonly SyncOperation[], timeZone?: string): Promise<RepositoryResponse> {
+    if (timeZone) validateTimeZone(timeZone);
     if (operations.length > maxSyncOperations) {
       throw new ApiError(400, `A sync batch cannot contain more than ${maxSyncOperations} operations.`);
     }
@@ -67,17 +73,19 @@ export class LearnerDatabase {
     const client = await this.#pool.connect();
     try {
       await client.query("BEGIN");
-      const authorization = await authorize(client, grant, this.#now());
+      const authorization = await authorize(client, grant, this.#now(), true, timeZone);
       if (authorization.status !== "active") {
         await client.query("ROLLBACK");
         return authorization;
       }
 
+      const now = this.#now();
+      await ensureDailyDelivery(client, authorization.profileId, authorization.timeZone, now);
       for (const operation of operations) {
         await acceptOperation(client, authorization.profileId, authorization.clientContextId, operation, this.#now());
       }
 
-      const state = await learnerState(client, authorization.profileId);
+      const state = await learnerState(client, authorization.profileId, dateInTimeZone(now, authorization.timeZone));
       await client.query("COMMIT");
       return { status: "active", state };
     } catch (error) {
@@ -99,7 +107,7 @@ export class LearnerDatabase {
       }
       await client.query("UPDATE sessions SET revoked_at = $2 WHERE grant_digest = $1", [digest(grant), this.#now()]);
       const session = makeSession(this.#now());
-      await insertSession(client, authorization.profileId, session, this.#now(), authorization.clientContextId);
+      await insertSession(client, authorization.profileId, session, this.#now(), authorization.clientContextId, authorization.timeZone);
       await client.query("COMMIT");
       return { status: "active", session: publicSession(session) };
     } catch (error) {
@@ -110,20 +118,57 @@ export class LearnerDatabase {
     }
   }
 
+  async skipUpcoming(grant: string, upcomingId: string, timeZone?: string): Promise<RepositoryResponse> {
+    if (timeZone) validateTimeZone(timeZone);
+    return this.#withAuthorizedSession(grant, timeZone, async (client, authorization) => {
+      const now = this.#now();
+      await ensureDailyDelivery(client, authorization.profileId, authorization.timeZone, now);
+      const upcoming = await client.query<{ normalized_headword: string }>(
+        "SELECT normalized_headword FROM reserved_upcoming_words WHERE id = $1 AND profile_id = $2",
+        [upcomingId, authorization.profileId]
+      );
+      if (!upcoming.rowCount) {
+        const alreadySkipped = await client.query(
+          "SELECT 1 FROM skipped_upcoming_words WHERE profile_id = $1 AND upcoming_id = $2",
+          [authorization.profileId, upcomingId]
+        );
+        if (alreadySkipped.rowCount) {
+          return {
+            status: "active",
+            state: await learnerState(client, authorization.profileId, dateInTimeZone(now, authorization.timeZone))
+          };
+        }
+        throw new ApiError(404, "The upcoming word was not found.");
+      }
+      await client.query(
+        `INSERT INTO skipped_upcoming_words (profile_id, normalized_headword, upcoming_id, skipped_at)
+         VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
+        [authorization.profileId, upcoming.rows[0]!.normalized_headword, upcomingId, now]
+      );
+      await client.query("DELETE FROM reserved_upcoming_words WHERE id = $1", [upcomingId]);
+      await fillUpcoming(client, authorization.profileId, now);
+      return {
+        status: "active",
+        state: await learnerState(client, authorization.profileId, dateInTimeZone(now, authorization.timeZone))
+      };
+    });
+  }
+
   async close(): Promise<void> {
     await this.#pool.end();
   }
 
-  async #withAuthorizedSession<T>(grant: string, action: (client: PoolClient, profileId: string) => Promise<T>): Promise<T | RepositoryResponse> {
+  async #withAuthorizedSession<T>(grant: string, timeZone: string | undefined, action: (client: PoolClient, authorization: ActiveAuthorization) => Promise<T>): Promise<T | RepositoryResponse> {
     const client = await this.#pool.connect();
     try {
       await client.query("BEGIN");
-      const authorization = await authorize(client, grant, this.#now());
+      if (timeZone) validateTimeZone(timeZone);
+      const authorization = await authorize(client, grant, this.#now(), true, timeZone);
       if (authorization.status !== "active") {
         await client.query("ROLLBACK");
         return authorization;
       }
-      const result = await action(client, authorization.profileId);
+      const result = await action(client, authorization);
       await client.query("COMMIT");
       return result;
     } catch (error) {
@@ -135,15 +180,16 @@ export class LearnerDatabase {
   }
 }
 
-async function authorize(client: Queryable, grant: string, now: Date, renewContact = true): Promise<{ status: "active"; profileId: string; clientContextId: string } | { status: "deleted" } | { status: "session-expired" }> {
+async function authorize(client: Queryable, grant: string, now: Date, renewContact = true, requestedTimeZone?: string): Promise<ActiveAuthorization | { status: "deleted" } | { status: "session-expired" }> {
   const result = await client.query<{
     profile_id: string;
     client_context_id: string;
     profile_state: string;
+    time_zone: string;
     expires_at: Date;
     revoked_at: Date | null;
   }>(
-    `SELECT s.profile_id, s.client_context_id, s.expires_at, s.revoked_at, p.state AS profile_state
+    `SELECT s.profile_id, s.client_context_id, s.time_zone, s.expires_at, s.revoked_at, p.state AS profile_state
       FROM sessions s
        JOIN profiles p ON p.id = s.profile_id
       WHERE s.grant_digest = $1
@@ -154,13 +200,14 @@ async function authorize(client: Queryable, grant: string, now: Date, renewConta
   if (!session) return { status: "session-expired" };
   if (session.profile_state === "tombstoned") return { status: "deleted" };
   if (session.revoked_at || session.expires_at <= now) return { status: "session-expired" };
+  const timeZone = requestedTimeZone ?? session.time_zone;
   if (renewContact) {
     await client.query(
-      "UPDATE sessions SET last_contact_at = $2, expires_at = $3 WHERE grant_digest = $1",
-      [digest(grant), now, new Date(now.getTime() + sessionLifetimeMs)]
+      "UPDATE sessions SET last_contact_at = $2, expires_at = $3, time_zone = $4 WHERE grant_digest = $1",
+      [digest(grant), now, new Date(now.getTime() + sessionLifetimeMs), timeZone]
     );
   }
-  return { status: "active", profileId: session.profile_id, clientContextId: session.client_context_id };
+  return { status: "active", profileId: session.profile_id, clientContextId: session.client_context_id, timeZone };
 }
 
 async function acceptOperation(client: Queryable, profileId: string, clientContextId: string, operation: SyncOperation, now: Date): Promise<void> {
@@ -210,15 +257,150 @@ async function acceptOperation(client: Queryable, profileId: string, clientConte
   }
 }
 
-async function learnerState(client: Queryable, profileId: string): Promise<LearnerState> {
-  const [lessons, deliveries, evidence, mutable] = await Promise.all([
-    client.query<{ id: string; record: Record<string, unknown> }>(
-      `SELECT id, record FROM published_lessons
-        WHERE available AND id IN (SELECT lesson_id FROM deliveries WHERE profile_id = $1)
-        ORDER BY id`,
+async function ensureDailyDelivery(client: Queryable, profileId: string, timeZone: string, now: Date): Promise<void> {
+  const localDate = dateInTimeZone(now, timeZone);
+  await discardIneligibleUpcoming(client, profileId);
+  const existing = await client.query("SELECT 1 FROM deliveries WHERE profile_id = $1 AND local_date = $2", [profileId, localDate]);
+  if (existing.rowCount) {
+    await fillUpcoming(client, profileId, now);
+    return;
+  }
+
+  const reserved = await nextReserved(client, profileId);
+  const selected = reserved.rows[0] ?? (await nextLesson(client, profileId)).rows[0];
+  if (selected) {
+    await client.query(
+      `INSERT INTO deliveries (id, profile_id, local_date, lesson_id, normalized_headword)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [`${profileId}:${localDate}`, profileId, localDate, selected.lesson_id, selected.normalized_headword]
+    );
+    if (reserved.rows[0]) await client.query("DELETE FROM reserved_upcoming_words WHERE id = $1", [reserved.rows[0].id]);
+  }
+  await fillUpcoming(client, profileId, now);
+}
+
+type ReservedSelection = {
+  id: string;
+  lesson_id: string;
+  normalized_headword: string;
+};
+
+async function nextReserved(client: Queryable, profileId: string): Promise<QueryResult<ReservedSelection>> {
+  return client.query<ReservedSelection>(
+    `SELECT r.id, r.lesson_id, r.normalized_headword
+       FROM reserved_upcoming_words r
+      WHERE r.profile_id = $1
+      ORDER BY r.queue_position
+      LIMIT 1`,
+    [profileId]
+  );
+}
+
+async function discardIneligibleUpcoming(client: Queryable, profileId: string): Promise<void> {
+  const invalid = await client.query<{ id: string }>(
+    `SELECT r.id
+       FROM reserved_upcoming_words r
+       JOIN published_lessons l ON l.id = r.lesson_id
+       JOIN profiles p ON p.id = r.profile_id
+      WHERE r.profile_id = $1
+        AND (
+          NOT l.available
+          OR COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) <> p.starting_band
+          OR EXISTS (SELECT 1 FROM deliveries d WHERE d.profile_id = $1 AND d.normalized_headword = r.normalized_headword)
+          OR EXISTS (SELECT 1 FROM skipped_upcoming_words s WHERE s.profile_id = $1 AND s.normalized_headword = r.normalized_headword)
+        )`,
+    [profileId]
+  );
+  for (const row of invalid.rows) await client.query("DELETE FROM reserved_upcoming_words WHERE id = $1", [row.id]);
+}
+
+async function nextLesson(client: Queryable, profileId: string): Promise<QueryResult<{ id: string; lesson_id: string; normalized_headword: string }>> {
+  return client.query<{ id: string; lesson_id: string; normalized_headword: string }>(
+    `SELECT NULL::uuid AS id, l.id AS lesson_id, l.normalized_headword
+       FROM published_lessons l
+       JOIN profiles p ON p.id = $1
+      WHERE l.available
+        AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
+        AND NOT EXISTS (
+          SELECT 1 FROM deliveries d
+           WHERE d.profile_id = $1 AND d.normalized_headword = l.normalized_headword
+        )
+        AND NOT EXISTS (
+          SELECT 1 FROM skipped_upcoming_words s
+           WHERE s.profile_id = $1 AND s.normalized_headword = l.normalized_headword
+        )
+      ORDER BY l.id
+      LIMIT 1`,
+    [profileId]
+  );
+}
+
+async function fillUpcoming(client: Queryable, profileId: string, now: Date): Promise<void> {
+  const count = await client.query<{ count: string }>("SELECT count(*)::text AS count FROM reserved_upcoming_words WHERE profile_id = $1", [profileId]);
+  const vacancies = Math.max(0, 5 - Number(count.rows[0]?.count ?? 0));
+  for (let index = 0; index < vacancies; index += 1) {
+    const candidate = await client.query<{ id: string; normalized_headword: string }>(
+      `SELECT l.id, l.normalized_headword
+         FROM published_lessons l
+         JOIN profiles p ON p.id = $1
+        WHERE l.available
+          AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
+          AND NOT EXISTS (
+            SELECT 1 FROM deliveries d
+             WHERE d.profile_id = $1 AND d.normalized_headword = l.normalized_headword
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM skipped_upcoming_words s
+             WHERE s.profile_id = $1 AND s.normalized_headword = l.normalized_headword
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM reserved_upcoming_words r
+             WHERE r.profile_id = $1 AND r.normalized_headword = l.normalized_headword
+          )
+        ORDER BY l.id
+        LIMIT 1`,
       [profileId]
-    ),
-    client.query<{
+    );
+    if (!candidate.rowCount) return;
+    const position = await client.query<{ position: number }>(
+      "SELECT COALESCE(max(queue_position), 0) + 1 AS position FROM reserved_upcoming_words WHERE profile_id = $1",
+      [profileId]
+    );
+    await client.query(
+      `INSERT INTO reserved_upcoming_words (id, profile_id, lesson_id, normalized_headword, queue_position, reserved_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [randomUUID(), profileId, candidate.rows[0]!.id, candidate.rows[0]!.normalized_headword, position.rows[0]!.position, now]
+    );
+  }
+}
+
+function validateTimeZone(timeZone: string): void {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format();
+  } catch {
+    throw new ApiError(400, "The time zone must be a valid IANA time zone.");
+  }
+}
+
+function dateInTimeZone(now: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+async function learnerState(client: Queryable, profileId: string, localDate?: string): Promise<LearnerState> {
+  const lessons = await client.query<{ id: string; record: Record<string, unknown> }>(
+    `SELECT id, record FROM published_lessons
+      WHERE available AND id IN (SELECT lesson_id FROM deliveries WHERE profile_id = $1)
+      ORDER BY id`,
+    [profileId]
+  );
+  const deliveries = await client.query<{
       id: string;
       lesson_id: string;
       local_date: string;
@@ -229,34 +411,33 @@ async function learnerState(client: Queryable, profileId: string): Promise<Learn
       familiarity_at: Date | null;
       active_use_at: Date | null;
     }>(
-      `SELECT d.id, d.lesson_id, d.local_date::text, d.normalized_headword, l.available,
-              familiarity.details->>'familiarity' AS familiarity,
-              active_use.details->>'activeUse' AS active_use,
-              familiarity.accepted_at AS familiarity_at,
-              active_use.accepted_at AS active_use_at
-         FROM deliveries d
-         JOIN published_lessons l ON l.id = d.lesson_id
-         LEFT JOIN learner_choices familiarity
-           ON familiarity.profile_id = d.profile_id AND familiarity.delivery_id = d.id AND familiarity.kind = 'familiarity'
-         LEFT JOIN learner_choices active_use
-           ON active_use.profile_id = d.profile_id AND active_use.delivery_id = d.id AND active_use.kind = 'active-use'
-        WHERE d.profile_id = $1
-        ORDER BY d.local_date DESC`,
-      [profileId]
-    ),
-    client.query<Record<string, unknown>>(
-      `SELECT operation_id AS id, kind, delivery_id AS "deliveryId", details,
-              accepted_at::text AS "acceptedAt", accepted_order AS "order"
-         FROM learner_evidence WHERE profile_id = $1 ORDER BY accepted_order`,
-      [profileId]
-    ),
-    client.query<Record<string, unknown>>(
-      `SELECT operation_id AS id, kind, delivery_id AS "deliveryId", details,
-              accepted_at::text AS "acceptedAt", accepted_order AS "order"
-         FROM learner_choices WHERE profile_id = $1 ORDER BY accepted_order`,
-      [profileId]
-    )
-  ]);
+    `SELECT d.id, d.lesson_id, d.local_date::text, d.normalized_headword, l.available,
+            familiarity.details->>'familiarity' AS familiarity,
+            active_use.details->>'activeUse' AS active_use,
+            familiarity.accepted_at AS familiarity_at,
+            active_use.accepted_at AS active_use_at
+       FROM deliveries d
+       JOIN published_lessons l ON l.id = d.lesson_id
+       LEFT JOIN learner_choices familiarity
+         ON familiarity.profile_id = d.profile_id AND familiarity.delivery_id = d.id AND familiarity.kind = 'familiarity'
+       LEFT JOIN learner_choices active_use
+         ON active_use.profile_id = d.profile_id AND active_use.delivery_id = d.id AND active_use.kind = 'active-use'
+      WHERE d.profile_id = $1
+      ORDER BY d.local_date DESC`,
+    [profileId]
+  );
+  const evidence = await client.query<Record<string, unknown>>(
+    `SELECT operation_id AS id, kind, delivery_id AS "deliveryId", details,
+            accepted_at::text AS "acceptedAt", accepted_order AS "order"
+       FROM learner_evidence WHERE profile_id = $1 ORDER BY accepted_order`,
+    [profileId]
+  );
+  const mutable = await client.query<Record<string, unknown>>(
+    `SELECT operation_id AS id, kind, delivery_id AS "deliveryId", details,
+            accepted_at::text AS "acceptedAt", accepted_order AS "order"
+       FROM learner_choices WHERE profile_id = $1 ORDER BY accepted_order`,
+    [profileId]
+  );
 
   const safeLessons = lessons.rows.map((row) => ({ id: row.id, record: learnerSafe(row.record) }));
   const evidenceRows = evidence.rows.map(flattenStoredOperation);
@@ -276,7 +457,24 @@ async function learnerState(client: Queryable, profileId: string): Promise<Learn
     };
   });
 
-  return { lessons: safeLessons, history, evidence: evidenceRows, mutable: mutableRows };
+  const state: LearnerState = { lessons: safeLessons, history, evidence: evidenceRows, mutable: mutableRows };
+  const activeDelivery = localDate ? history.find((delivery) => delivery.localDate === localDate) : undefined;
+
+  const upcoming = await client.query<Record<string, unknown>>(
+    `SELECT r.id, r.lesson_id AS "lessonId", r.normalized_headword AS "normalizedHeadword",
+            l.record->>'headword' AS headword,
+            COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) AS "startingBand"
+       FROM reserved_upcoming_words r
+       JOIN published_lessons l ON l.id = r.lesson_id
+      WHERE r.profile_id = $1
+      ORDER BY r.queue_position`,
+    [profileId]
+  );
+  return {
+    ...state,
+    ...(activeDelivery ? { delivery: activeDelivery } : {}),
+    ...(upcoming.rows.length ? { upcoming: upcoming.rows.map(learnerSafe) } : {})
+  };
 }
 
 function rebuildRecall(familiarity: string | undefined, activeUse: string | undefined, evidence: readonly Record<string, unknown>[], familiarityAt: Date, activeUseAt: Date | null): Record<string, unknown> | undefined {
@@ -365,11 +563,11 @@ function publicSession(session: { grant: string; expiresAt: Date }): Session {
   return { grant: session.grant, expiresAt: session.expiresAt.toISOString() };
 }
 
-async function insertSession(client: Queryable, profileId: string, session: { id: string; grant: string; expiresAt: Date }, now: Date, clientContextId: string | undefined = randomUUID()): Promise<void> {
+async function insertSession(client: Queryable, profileId: string, session: { id: string; grant: string; expiresAt: Date }, now: Date, clientContextId: string | undefined = randomUUID(), timeZone = "UTC"): Promise<void> {
   await client.query(
-    `INSERT INTO sessions (id, profile_id, client_context_id, grant_digest, created_at, last_contact_at, expires_at)
-     VALUES ($1, $2, $3, $4, $5, $5, $6)`,
-    [session.id, profileId, clientContextId, digest(session.grant), now, new Date(now.getTime() + sessionLifetimeMs)]
+    `INSERT INTO sessions (id, profile_id, client_context_id, grant_digest, created_at, last_contact_at, expires_at, time_zone)
+     VALUES ($1, $2, $3, $4, $5, $5, $6, $7)`,
+    [session.id, profileId, clientContextId, digest(session.grant), now, new Date(now.getTime() + sessionLifetimeMs), timeZone]
   );
 }
 

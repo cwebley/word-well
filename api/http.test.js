@@ -25,6 +25,9 @@ suite("learner HTTP seam", () => {
   });
 
   beforeEach(async () => {
+    now = new Date("2026-08-27T12:00:00Z");
+    await pool.query("DELETE FROM reserved_upcoming_words");
+    await pool.query("DELETE FROM skipped_upcoming_words");
     await pool.query("DELETE FROM learner_evidence");
     await pool.query("DELETE FROM learner_choices");
     await pool.query("DELETE FROM accepted_operations");
@@ -49,6 +52,61 @@ suite("learner HTTP seam", () => {
     const state = await request("GET", "/learning-state", created.body.session.grant);
     expect(state.response.status).toBe(200);
     expect(state.body).toEqual({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } });
+  });
+
+  it("delivers one lesson per local date, promotes the reserved queue, and does not catch up missed dates", async () => {
+    now = new Date("2026-08-27T00:30:00Z");
+    const created = await request("POST", "/profiles/anonymous", undefined, undefined, "America/Los_Angeles");
+    const profileId = await profileForGrant(created.body.session.grant);
+    await seedPublishedLessons();
+
+    const first = await request("GET", "/learning-state", created.body.session.grant, undefined, "America/Los_Angeles");
+    expect(first.body.state.delivery).toMatchObject({ localDate: "2026-08-26", normalizedHeadword: "candid" });
+    expect(first.body.state.history).toHaveLength(1);
+    expect(first.body.state.upcoming).toHaveLength(2);
+
+    const retry = await request("GET", "/learning-state", created.body.session.grant);
+    expect(retry.body.state.history).toHaveLength(1);
+    expect(retry.body.state.delivery.id).toBe(first.body.state.delivery.id);
+
+    now = new Date("2026-08-29T00:30:00Z");
+    const nextDate = await request("GET", "/learning-state", created.body.session.grant, undefined, "America/Los_Angeles");
+    expect(nextDate.body.state.delivery.localDate).toBe("2026-08-28");
+    expect(nextDate.body.state.history).toHaveLength(2);
+    expect(nextDate.body.state.history.map(({ normalizedHeadword }) => normalizedHeadword)).toEqual(["lucid", "candid"]);
+  });
+
+  it("skips only reserved words and fills the vacancy without repeating the headword", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    const profileId = await profileForGrant(created.body.session.grant);
+    await seedPublishedLessons();
+    const first = await request("GET", "/learning-state", created.body.session.grant);
+    const skippedId = first.body.state.upcoming[0].id;
+
+    const skipped = await request("POST", `/upcoming/${skippedId}/skip`, created.body.session.grant);
+
+    expect(skipped.response.status).toBe(200);
+    expect(skipped.body.state.upcoming.map(({ normalizedHeadword }) => normalizedHeadword)).toEqual(["plain"]);
+    expect(skipped.body.state.history.map(({ normalizedHeadword }) => normalizedHeadword)).toEqual(["candid"]);
+
+    const retry = await request("POST", `/upcoming/${skippedId}/skip`, created.body.session.grant);
+    expect(retry.response.status).toBe(200);
+    expect(retry.body.state.upcoming.map(({ normalizedHeadword }) => normalizedHeadword)).toEqual(["plain"]);
+  });
+
+  it("discards withdrawn upcoming content before promoting a later candidate", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    const profileId = await profileForGrant(created.body.session.grant);
+    await seedPublishedLessons();
+    const first = await request("GET", "/learning-state", created.body.session.grant);
+    await pool.query("UPDATE published_lessons SET available = false WHERE id = 'lesson-lucid'");
+
+    now = new Date("2026-08-28T12:00:00Z");
+    const nextDate = await request("GET", "/learning-state", created.body.session.grant);
+
+    expect(nextDate.body.state.delivery.normalizedHeadword).toBe("plain");
+    expect((nextDate.body.state.upcoming ?? []).map(({ normalizedHeadword }) => normalizedHeadword)).not.toContain("lucid");
+    expect(first.body.state.upcoming.map(({ normalizedHeadword }) => normalizedHeadword)).toContain("lucid");
   });
 
   it("rotates session grants and rejects them after thirty days without contact", async () => {
@@ -137,17 +195,27 @@ suite("learner HTTP seam", () => {
     );
   }
 
+  async function seedPublishedLessons() {
+    for (const [id, headword] of [["lesson-candid", "candid"], ["lesson-lucid", "lucid"], ["lesson-plain", "plain"]]) {
+      await pool.query(
+        "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
+        [id, headword, { headword, normalizedHeadword: headword, startingBand: "Stretch my vocabulary" }]
+      );
+    }
+  }
+
   async function profileForGrant(grant) {
     const result = await pool.query("SELECT profile_id FROM sessions WHERE grant_digest = $1", [digest(grant)]);
     return result.rows[0].profile_id;
   }
 });
 
-async function request(method, path, grant, body) {
+async function request(method, path, grant, body, timeZone) {
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       ...(grant ? { authorization: `Bearer ${grant}` } : {}),
+      ...(timeZone ? { "x-time-zone": timeZone } : {}),
       ...(body ? { "content-type": "application/json" } : {})
     },
     ...(body ? { body: JSON.stringify(body) } : {})

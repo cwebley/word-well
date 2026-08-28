@@ -27,6 +27,8 @@ export type LearnerState = {
   readonly history: readonly Record<string, unknown>[];
   readonly evidence: readonly Record<string, unknown>[];
   readonly mutable: readonly Record<string, unknown>[];
+  readonly delivery?: Record<string, unknown>;
+  readonly upcoming?: readonly Record<string, unknown>[];
 };
 
 export type ActiveResponse = {

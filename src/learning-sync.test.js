@@ -130,6 +130,36 @@ describe("learner synchronization seam", () => {
     expect(reloaded.outbox()).toHaveLength(1);
   });
 
+  it("hydrates the server-issued delivery before offline rendering and queues changes for that delivery", async () => {
+    const persisted = storage();
+    const canonical = {
+      lessons: [lesson("candid", "candid")],
+      history: [{ id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" }],
+      delivery: { id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" },
+      evidence: [],
+      mutable: [],
+    };
+    await persisted.save("server-profile", "browser-tab", {
+      cache: { appShell: true, lessons: canonical.lessons, history: canonical.history, delivery: canonical.delivery, practice: [], evidence: [], mutable: [] },
+      outbox: [],
+      clientId: "browser-tab",
+      nextOperation: 1,
+    });
+    const client = new LearningStateClient({
+      server: {
+        synchronize: (_profile, operations) => ({ status: "active", state: { ...canonical, evidence: operations, mutable: [] } }),
+      },
+      profile: "server-profile",
+      storage: persisted,
+      clientId: "browser-tab",
+    });
+    await client.ready();
+
+    expect(client.cache().delivery.id).toBe("delivery-server-1");
+    client.record("utility", { deliveryId: client.cache().delivery.id, utility: "useful" });
+    expect(client.outbox()[0].deliveryId).toBe("delivery-server-1");
+  });
+
   it("persists learner cache and outbox records in IndexedDB without using local storage", async () => {
     const storage = indexedDbStorage({ indexedDB: fakeIndexedDb() });
     const value = {
