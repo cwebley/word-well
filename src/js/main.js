@@ -12,6 +12,7 @@ import { createInstallation } from "../install.js";
 import { createProductSignals } from "../product-signals.js";
 
 const html = String.raw;
+const sessionExpiredDetail = "Your session has expired. Your unsent learning changes are still on this device.";
 
 const main = document.querySelector("#app-main");
 let route = "today";
@@ -59,8 +60,9 @@ function render() {
     });
     return;
   }
+  const syncNotice = learningSyncNotice();
   if (route === "history") {
-    main.innerHTML = renderHistory();
+    main.innerHTML = syncNotice + renderHistory();
     return;
   }
   const cachedDelivery = currentDelivery();
@@ -75,7 +77,7 @@ function render() {
       practiceResult === undefined && familiarity
         ? practiceFor(delivery, lesson)
         : practiceVisit;
-    main.innerHTML = familiarity
+    main.innerHTML = syncNotice + (familiarity
       ? practiceResult !== undefined
         ? renderPractice({
             practice: practiceVisit.practice,
@@ -90,16 +92,16 @@ function render() {
       : renderStatus({
           label: "Practice",
           detail: "Record your familiarity before beginning practice.",
-        });
+        }));
   } else if (!familiarity || revising) {
-    main.innerHTML = renderFamiliarityGate({
+    main.innerHTML = syncNotice + renderFamiliarityGate({
       headword: lesson.headword,
       pronunciation: lesson.pronunciation,
       partOfSpeech: lesson.meanings[0].partOfSpeech,
       revision: revising,
     }) + renderUpcoming();
   } else {
-    main.innerHTML = renderLessonCard({ lesson }) + renderUpcoming();
+    main.innerHTML = syncNotice + renderLessonCard({ lesson }) + renderUpcoming();
   }
 }
 
@@ -204,6 +206,7 @@ function authenticateProfile() {
 function recordLearning(kind, details) {
   learning.record(kind, details);
   if (navigator.onLine) void reconcileLearning();
+  else syncStatus = "offline";
 }
 
 async function startLearning() {
@@ -273,13 +276,24 @@ function practiceFor(delivery, lesson) {
 
 function learningStatus() {
   const detail = syncStatus === "session-expired"
-    ? "Your session has expired. Your unsent learning changes are still on this device."
+    ? sessionExpiredDetail
     : syncStatus === "offline"
       ? currentDelivery() && !isToday(currentDelivery())
         ? "Your next daily delivery needs a connection. Cached history and practice remain available."
         : "Your saved lessons are unavailable right now. Retry when you are connected."
       : "Your next lesson will appear here after it is delivered.";
   return html`<section class="card flow"><p class="lesson-label">Today</p><h1 class="card-title">No lesson ready</h1><p>${detail}</p><button class="button" data-action="retry-learning" type="button">Retry</button></section>`;
+}
+
+function learningSyncNotice() {
+  if (syncStatus === "offline") {
+    return html`<section class="card flow"><p class="lesson-label">Learning status</p><p>Your changes will sync when you reconnect.</p><button class="button" data-action="retry-learning" type="button">Retry</button></section>`;
+  }
+  if (syncStatus !== "session-expired") return "";
+  return renderStatus({
+    label: "Session expired",
+    detail: sessionExpiredDetail,
+  });
 }
 
 function renderHistory() {
