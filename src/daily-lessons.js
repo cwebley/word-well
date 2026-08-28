@@ -140,6 +140,15 @@ export class DailyLessons {
     return profile.deliveries;
   }
 
+  restore(profileId, { history = [], evidence = [], mutable = [] }) {
+    const profile = this.#profile(profileId);
+    profile.deliveries = history.map(({ status, familiarity, recall, ...delivery }) => delivery);
+    profile.deliveredHeadwords = new Set(profile.deliveries.map(({ normalizedHeadword }) => normalizedHeadword));
+    profile.evidence = [...evidence, ...mutable].map(({ acceptedAt, order, id, createdAt, ...event }) => ({ ...event, recordedAt: acceptedAt }));
+    profile.deliveries.forEach((delivery) => this.#rebuildDelivery(profileId, delivery.id));
+    return profile.deliveries;
+  }
+
   #profile(profileId) {
     let profile = this.#profiles.get(profileId);
     if (!profile) {

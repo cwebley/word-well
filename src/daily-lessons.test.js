@@ -120,4 +120,15 @@ describe("daily lessons", () => {
 
     expect(lessons.history("profile")[0].delivery.recall).toEqual(beforeReset);
   });
+
+  it("restores cached learner evidence for offline history and practice", () => {
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    lessons.restore("profile", {
+      history: [{ id: "profile:2026-08-26", profileId: "profile", localDate: "2026-08-26", lessonId: "candid", normalizedHeadword: "candid", status: "current" }],
+      mutable: [{ kind: "familiarity", deliveryId: "profile:2026-08-26", familiarity: "Completely new to me", acceptedAt: "2026-08-26T12:00:00.000Z" }],
+      evidence: [{ kind: "practice", deliveryId: "profile:2026-08-26", correct: true, acceptedAt: "2026-08-26T12:00:00.000Z" }]
+    });
+
+    expect(lessons.history("profile")[0].delivery.recall).toEqual({ stage: "1 day", dueAt: "2026-08-27T12:00:00.000Z", mastery: 1 });
+  });
 });

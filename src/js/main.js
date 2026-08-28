@@ -32,6 +32,7 @@ const learningProfile = learningServer.createProfile();
 learningServer.recordDelivery(learningProfile, delivery);
 const learning = new LearningStateClient({ server: learningServer, profile: learningProfile });
 if (navigator.onLine) learning.synchronize();
+hydrateCachedLearning();
 window.addEventListener("online", () => learning.synchronize());
 
 function render() {
@@ -139,4 +140,11 @@ function authenticateProfile() {
 function recordLearning(kind, details) {
   learning.record(kind, details);
   if (navigator.onLine) learning.synchronize();
+}
+
+function hydrateCachedLearning() {
+  const cached = learning.cache();
+  if (!cached.history.length) return;
+  lessons.restore(profileId, cached);
+  familiarity = cached.history.find(({ id }) => id === delivery.id)?.familiarity;
 }

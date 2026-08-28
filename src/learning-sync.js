@@ -62,7 +62,7 @@ export class LearningStateServer {
         return { ...delivery, status: lesson ? "current" : "unavailable", familiarity, recall: rebuildRecall(familiarity, activeUse, deliveryEvidence) };
       })
       .sort((left, right) => right.localDate.localeCompare(left.localDate));
-    return { evidence, history, lessons: [...this.#lessons.values()] };
+    return { evidence, mutable, history, lessons: [...this.#lessons.values()] };
   }
 
   #accept(profile, operation) {
@@ -175,7 +175,9 @@ function cache(state) {
     appShell: true,
     lessons: state.lessons.filter(({ id }) => lessonIds.has(id)).map(learnerSafe),
     history: history.map(learnerSafe),
-    practice: history.filter(({ recall }) => recall).map(learnerSafe)
+    practice: history.filter(({ recall }) => recall).map(learnerSafe),
+    evidence: state.evidence.map(learnerSafe),
+    mutable: state.mutable.map(learnerSafe)
   };
 }
 
