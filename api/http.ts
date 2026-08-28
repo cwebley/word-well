@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { ApiError, validateOperations } from "./database.js";
 import type { LearnerDatabase } from "./database.js";
+import type { ProfileResponse } from "./types.js";
 
 export function createApi(database: LearnerDatabase) {
   return async function handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -17,6 +18,22 @@ export function createApi(database: LearnerDatabase) {
         await database.recordProductSignal(signal);
         return send(response, 204, null);
       }
+      if (request.method === "POST" && path === "/profile/recovery-email/verify") {
+        const body = await readJson(request);
+        const token = recoveryTokenFromBody(body);
+        return sendProfile(response, await database.verifyRecoveryEmail(token));
+      }
+      if (request.method === "POST" && path === "/profile/recover/start") {
+        const body = await readJson(request);
+        const result = await database.startRecovery(recoveryEmailFromBody(body));
+        if (result.status === "active") return send(response, 200, { token: result.token, expiresAt: result.expiresAt });
+        if (result.status === "not-found") return send(response, 404, { error: "No protected profile uses that recovery email." });
+        return sendProfile(response, result);
+      }
+      if (request.method === "POST" && path === "/profile/recover/complete") {
+        const body = await readJson(request);
+        return send(response, 200, await database.completeRecovery(recoveryTokenFromBody(body), recoverCredential(body)));
+      }
 
       const grant = bearerGrant(request);
       if (request.method === "GET" && path === "/learning-state") {
@@ -29,6 +46,45 @@ export function createApi(database: LearnerDatabase) {
       }
       if (request.method === "POST" && path === "/session/renew") {
         return sendRepository(response, await database.renewSession(grant));
+      }
+      if (request.method === "GET" && path === "/profile") {
+        return sendProfile(response, await database.readProfile(grant));
+      }
+      if (request.method === "POST" && path === "/profile/history-accessed") {
+        return sendProfile(response, await database.recordHistoryAccess(grant));
+      }
+      if (request.method === "POST" && path === "/profile/passkey-challenge") {
+        const body = await readJson(request);
+        const result = await database.createPasskeyChallenge(grant, passkeyChallengePurpose(body), passkeyCredentialId(body));
+        if (result.status === "active") return send(response, 200, result.challenge);
+        if (result.status === "rejected") return send(response, 400, { error: result.reason });
+        return sendProfile(response, result);
+      }
+      if (request.method === "POST" && path === "/profile/protect") {
+        const body = await readJson(request);
+        return sendProfile(response, await database.protectProfile(grant, passkeyCredential(body)));
+      }
+      if (request.method === "POST" && path === "/profile/passkeys") {
+        const body = await readJson(request);
+        return sendProfile(response, await database.addPasskey(grant, passkeyCredential(body)));
+      }
+      const revoke = path.match(/^\/profile\/passkeys\/([^/]+)$/);
+      if (request.method === "DELETE" && revoke) {
+        return sendProfile(response, await database.revokePasskey(grant, decodeURIComponent(revoke[1]!)));
+      }
+      if (request.method === "POST" && path === "/profile/authenticate") {
+        const body = await readJson(request);
+        return sendProfile(response, await database.authenticate(grant, authenticateCredential(body)));
+      }
+      if (request.method === "POST" && path === "/profile/recovery-email/request") {
+        const body = await readJson(request);
+        const email = recoveryEmailFromBody(body);
+        const result = await database.requestRecoveryEmail(grant, email);
+        if ("token" in result && result.token) return send(response, 200, { email, token: result.token, expiresAt: result.expiresAt });
+        return sendProfile(response, result);
+      }
+      if (request.method === "POST" && path === "/profile/delete") {
+        return sendProfile(response, await database.deleteProfile(grant));
       }
       const skip = path.match(/^\/upcoming\/([^/]+)\/skip$/);
       if (request.method === "POST" && skip) {
@@ -55,6 +111,13 @@ function setCorsHeaders(request: IncomingMessage, response: ServerResponse): voi
 
 function sendRepository(response: ServerResponse, value: { status: string; [key: string]: unknown }): void {
   const statusCode = value.status === "deleted" ? 410 : value.status === "session-expired" ? 401 : 200;
+  send(response, statusCode, value);
+}
+
+function sendProfile(response: ServerResponse, value: ProfileResponse): void {
+  let statusCode = 200;
+  if (value.status === "deleted") statusCode = 410;
+  else if (value.status === "session-expired") statusCode = 401;
   send(response, statusCode, value);
 }
 
@@ -89,6 +152,71 @@ function productSignal(value: unknown): {
     throw new ApiError(400, "Product signal was not valid.");
   }
   return { event: event as "install_cta_shown" | "install_cta_started" | "install_confirmed", capability: capability as "chromium_prompt" | "ios_home_screen", day: String(day) };
+}
+
+function passkeyCredential(value: unknown): {
+  id: string;
+  label: string;
+  publicKey: string;
+  challenge: string;
+} {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
+  const { credential } = value as Record<string, unknown>;
+  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
+  const { id, label, publicKey, challenge } = credential as Record<string, unknown>;
+  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
+  if (typeof label !== "string" || !label) throw new ApiError(400, "Credential label is required.");
+  if (typeof publicKey !== "string" || !publicKey) throw new ApiError(400, "Credential publicKey is required.");
+  if (typeof challenge !== "string" || !challenge) throw new ApiError(400, "Credential challenge is required.");
+  return { id, label, publicKey, challenge };
+}
+
+function passkeyChallengePurpose(value: unknown): "register" | "authenticate" {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A passkey challenge purpose is required.");
+  const purpose = (value as Record<string, unknown>).purpose;
+  if (purpose !== "register" && purpose !== "authenticate") throw new ApiError(400, "Passkey challenge purpose must be register or authenticate.");
+  return purpose;
+}
+
+function passkeyCredentialId(value: unknown): string | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const credentialId = (value as Record<string, unknown>).credentialId;
+  return typeof credentialId === "string" && credentialId ? credentialId : undefined;
+}
+
+function authenticateCredential(value: unknown): { id: string; challenge: string } {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
+  const { credential } = value as Record<string, unknown>;
+  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
+  const { id, challenge } = credential as Record<string, unknown>;
+  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
+  if (typeof challenge !== "string" || !challenge) throw new ApiError(400, "Credential challenge is required.");
+  return { id, challenge };
+}
+
+function recoveryTokenFromBody(value: unknown): string {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A recovery token is required.");
+  const token = (value as Record<string, unknown>).token;
+  if (typeof token !== "string" || !token) throw new ApiError(400, "A recovery token is required.");
+  return token;
+}
+
+function recoveryEmailFromBody(value: unknown): string {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A recovery email is required.");
+  const email = (value as Record<string, unknown>).email;
+  if (typeof email !== "string" || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ApiError(400, "A recovery email is required.");
+  return email;
+}
+
+function recoverCredential(value: unknown): { id: string; label: string; publicKey: string } {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A credential is required.");
+  const { credential } = value as Record<string, unknown>;
+  if (!credential || typeof credential !== "object") throw new ApiError(400, "A credential is required.");
+  const { id, label, publicKey } = credential as Record<string, unknown>;
+  if (typeof id !== "string" || !id) throw new ApiError(400, "Credential id is required.");
+  if (typeof label !== "string" || !label) throw new ApiError(400, "Credential label is required.");
+  if (typeof publicKey !== "string" || !publicKey) throw new ApiError(400, "Credential publicKey is required.");
+  return { id, label, publicKey };
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {

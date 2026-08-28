@@ -5,9 +5,10 @@ import { renderStatus } from "../components/status.js";
 import { bindNavigation } from "../components/navigation.js";
 import { renderProfile } from "../components/profile.js";
 import { escapeHtml, renderButton } from "../components/button.js";
-import { Profiles } from "../profiles.js";
 import { WebAuthnSimulator } from "../webauthn-simulator.js";
 import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
+import { HttpProfileAdapter } from "../profile-api.js";
+import { ProfileClient } from "../profile-client.js";
 import { createInstallation } from "../install.js";
 import { createProductSignals } from "../product-signals.js";
 import { renderLearningSyncStatus } from "../components/learning-sync-status.js";
@@ -30,15 +31,17 @@ let deleted = false;
 let analyticsConsent = localStorage.getItem("wordwell:analytics-consent") === "granted";
 let installation;
 const webauthn = new WebAuthnSimulator();
-const profiles = new Profiles({ webauthn });
-const profileSession = profiles.createAnonymousProfile().session;
+const profileAdapter = new HttpProfileAdapter({
+  baseUrl: document.documentElement.dataset.apiBaseUrl ?? "",
+});
+const profileClient = new ProfileClient({ adapter: profileAdapter, webauthn });
 let practiceVisit;
-const adapter = new HttpLearningStateAdapter({
+const learningAdapter = new HttpLearningStateAdapter({
   baseUrl: document.documentElement.dataset.apiBaseUrl ?? "",
 });
 const learning = new LearningStateClient({
-  server: adapter,
-  profile: adapter.cacheKey,
+  server: learningAdapter,
+  profile: learningAdapter.cacheKey,
 });
 const signals = createProductSignals(() => analyticsConsent);
 installation = createInstallation({ window, navigator, signals, onChange: () => render() });
@@ -57,7 +60,7 @@ function render() {
   }
   if (route === "profile") {
     main.innerHTML = renderProfile({
-      profile: profiles.profile(profileSession.id),
+      profile: profileClient.cache(),
       deletionConfirmation,
       recoveryVerification,
       installation: installation.show(),
@@ -112,7 +115,8 @@ function render() {
 bindNavigation(document.querySelector(".navigation"), {
   onNavigate(nextRoute) {
     route = nextRoute;
-    if (route === "history") profiles.accessHistory(profileSession.id);
+    if (route === "history") void profileClient.recordHistoryAccess();
+    if (route === "profile") void profileClient.load();
     practiceResult = undefined;
     practiceVisit = undefined;
     render();
@@ -120,7 +124,7 @@ bindNavigation(document.querySelector(".navigation"), {
   },
 });
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   const target = event.target.closest("[data-action]");
   if (!target) return;
   event.preventDefault();
@@ -155,27 +159,42 @@ document.addEventListener("click", (event) => {
   } else if (target.dataset.action === "install-app") {
     void installation.prompt();
   } else if (target.dataset.action === "protect-profile") {
-    profiles.protect(profileSession.id, webauthn.createPasskey("This device"));
+    try {
+      await profileClient.protect("This device");
+    } catch (error) {
+      console.error("protect failed", error);
+    }
   } else if (target.dataset.action === "add-passkey") {
-    authenticateProfile();
-    profiles.addPasskey(
-      profileSession.id,
-      webauthn.createPasskey("New passkey"),
-    );
+    try {
+      await profileClient.addPasskey("New passkey");
+    } catch (error) {
+      console.error("addPasskey failed", error);
+    }
   } else if (target.dataset.action === "revoke-passkey") {
-    authenticateProfile();
-    profiles.revokePasskey(profileSession.id, target.dataset.value);
+    try {
+      await profileClient.revokePasskey(target.dataset.value);
+    } catch (error) {
+      console.error("revokePasskey failed", error);
+    }
   } else if (target.dataset.action === "verify-recovery-email") {
-    profiles.verifyRecoveryEmail(target.dataset.value);
-    recoveryVerification = undefined;
+    try {
+      await profileClient.verifyRecoveryEmail(target.dataset.value);
+      recoveryVerification = undefined;
+    } catch (error) {
+      console.error("verifyRecoveryEmail failed", error);
+    }
   } else if (target.dataset.action === "start-profile-deletion") {
     deletionConfirmation = true;
   } else if (target.dataset.action === "cancel-profile-deletion") {
     deletionConfirmation = false;
   } else if (target.dataset.action === "confirm-profile-deletion") {
-    authenticateProfile();
-    profiles.deleteProfile(profileSession.id);
-    void reconcileLearning();
+    try {
+      await profileClient.deleteProfile();
+      deleted = true;
+      void reconcileLearning();
+    } catch (error) {
+      console.error("deleteProfile failed", error);
+    }
     deletionConfirmation = false;
   }
   render();
@@ -189,23 +208,19 @@ document.addEventListener("change", (event) => {
   render();
 });
 
-document.addEventListener("submit", (event) => {
+document.addEventListener("submit", async (event) => {
   const form = event.target.closest('[data-action="add-recovery-email"]');
   if (!form) return;
   event.preventDefault();
   const email = new FormData(form).get("recovery-email");
-  authenticateProfile();
-  recoveryVerification = {
-    email,
-    ...profiles.requestRecoveryEmail(profileSession.id, email),
-  };
+  try {
+    const result = await profileClient.requestRecoveryEmail(String(email));
+    recoveryVerification = { email, token: result.token, expiresAt: result.expiresAt };
+  } catch (error) {
+    console.error("requestRecoveryEmail failed", error);
+  }
   render();
 });
-
-function authenticateProfile() {
-  const [passkey] = profiles.profile(profileSession.id).passkeys;
-  profiles.authenticate(profileSession.id, webauthn.getPasskey(passkey.id));
-}
 
 function recordLearning(kind, details) {
   learning.record(kind, details);
@@ -215,6 +230,7 @@ function recordLearning(kind, details) {
 
 async function startLearning() {
   await learning.ready();
+  await profileClient.load().catch((error) => console.error("profile load failed", error));
   const cached = learning.cache();
   familiarity = currentDelivery(cached)?.familiarity;
   if (!navigator.onLine) syncStatus = "offline";
