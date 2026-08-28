@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HttpLearningStateAdapter, LearningStateClient, LearningStateServer } from "./learning-sync.js";
+import { HttpLearningStateAdapter, indexedDbStorage, LearningStateClient, LearningStateServer } from "./learning-sync.js";
 
 const day = 24 * 60 * 60 * 1000;
 
@@ -126,6 +126,29 @@ describe("learner synchronization seam", () => {
     expect(reloaded.outbox()).toHaveLength(1);
   });
 
+  it("persists learner cache and outbox records in IndexedDB without using local storage", async () => {
+    const storage = indexedDbStorage({ indexedDB: fakeIndexedDb() });
+    const value = {
+      cache: { appShell: true, lessons: [], history: [], practice: [] },
+      outbox: [{ id: "browser:operation-1" }],
+      clientId: "browser",
+      nextOperation: 2
+    };
+
+    await storage.save("client:browser", "browser", value);
+    expect(await storage.load("client:browser", "browser")).toEqual(value);
+    const reloaded = new LearningStateClient({
+      server: { synchronize: () => ({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }) },
+      profile: "client:browser",
+      clientId: "browser",
+      storage
+    });
+    await reloaded.ready();
+    expect(reloaded.outbox()).toEqual(value.outbox);
+    await storage.clearProfile("client:browser");
+    expect(await storage.load("client:browser", "browser")).toBeUndefined();
+  });
+
   it("uses a separate client-context session for HTTP state reads, syncs, renewals, and deletions", async () => {
     const sessions = new Map();
     const persisted = storage();
@@ -176,4 +199,43 @@ describe("learner synchronization seam", () => {
 
 function response(status, body) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+}
+
+function fakeIndexedDb() {
+  const records = new Map();
+  const database = {
+    createObjectStore() {},
+    transaction() {
+      return {
+        objectStore() {
+          return {
+            get: (id) => operation(() => records.get(id)),
+            put: (record) => operation(() => records.set(record.id, structuredClone(record))),
+            getAll: () => operation(() => [...records.values()].map((record) => structuredClone(record))),
+            delete: (id) => operation(() => records.delete(id))
+          };
+        }
+      };
+    }
+  };
+  return {
+    open() {
+      const request = {};
+      queueMicrotask(() => {
+        request.result = database;
+        request.onupgradeneeded?.();
+        request.onsuccess?.();
+      });
+      return request;
+    }
+  };
+
+  function operation(action) {
+    const request = {};
+    queueMicrotask(() => {
+      request.result = action();
+      request.onsuccess?.();
+    });
+    return request;
+  }
 }

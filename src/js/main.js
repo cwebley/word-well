@@ -4,11 +4,9 @@ import { renderPractice } from "../components/practice.js";
 import { renderStatus } from "../components/status.js";
 import { bindNavigation } from "../components/navigation.js";
 import { renderProfile } from "../components/profile.js";
-import { seededVocabularyRecord } from "../fixtures/published-word-lesson.js";
 import { Profiles } from "../profiles.js";
 import { WebAuthnSimulator } from "../webauthn-simulator.js";
-import { DailyLessons } from "../daily-lessons.js";
-import { LearningStateClient, LearningStateServer } from "../learning-sync.js";
+import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
 
 const html = String.raw;
 
@@ -17,6 +15,7 @@ let route = "today";
 let familiarity;
 let revising = false;
 let practiceResult;
+let syncStatus;
 let deletionConfirmation = false;
 let recoveryVerification;
 let deleted = false;
@@ -24,38 +23,43 @@ const webauthn = new WebAuthnSimulator();
 const profiles = new Profiles({ webauthn });
 const profileSession = profiles.createAnonymousProfile().session;
 let practiceVisit;
-const profileId = "local-preview-profile";
-const lessons = new DailyLessons([
-  {
-    id: "seeded-candid",
-    startingBand: "Stretch my vocabulary",
-    record: seededVocabularyRecord,
-  },
-]);
-const delivery = lessons.deliver(profileId, "UTC");
-const learningServer = new LearningStateServer({
-  lessons: [{ id: "seeded-candid", record: seededVocabularyRecord }],
+const adapter = new HttpLearningStateAdapter({
+  baseUrl: document.documentElement.dataset.apiBaseUrl ?? "",
 });
-const learningProfile = learningServer.createProfile();
-learningServer.recordDelivery(learningProfile, delivery);
 const learning = new LearningStateClient({
-  server: learningServer,
-  profile: learningProfile,
+  server: adapter,
+  profile: adapter.cacheKey,
 });
-if (navigator.onLine) learning.synchronize();
-hydrateCachedLearning();
-window.addEventListener("online", () => learning.synchronize());
+
+void startLearning();
+window.addEventListener("online", reconcileLearning);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") void reconcileLearning();
+});
 
 function render() {
   if (deleted) {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
   }
-  const lesson = seededVocabularyRecord;
+  if (route === "profile") {
+    main.innerHTML = renderProfile({
+      profile: profiles.profile(profileSession.id),
+      deletionConfirmation,
+      recoveryVerification,
+    });
+    return;
+  }
+  const delivery = currentDelivery();
+  const lesson = currentLesson(delivery);
+  if (!delivery || !lesson) {
+    main.innerHTML = learningStatus();
+    return;
+  }
   if (route === "practice") {
     practiceVisit =
       practiceResult === undefined && familiarity
-        ? lessons.practice(profileId)
+        ? practiceFor(delivery, lesson)
         : practiceVisit;
     main.innerHTML = familiarity
       ? practiceResult !== undefined
@@ -84,12 +88,6 @@ function render() {
           label: "History",
           detail: "Your word history will gather here after today's lesson.",
         });
-  } else if (route === "profile") {
-    main.innerHTML = renderProfile({
-      profile: profiles.profile(profileSession.id),
-      deletionConfirmation,
-      recoveryVerification,
-    });
   } else if (!familiarity || revising) {
     main.innerHTML = renderFamiliarityGate({
       headword: lesson.headword,
@@ -119,38 +117,30 @@ document.addEventListener("click", (event) => {
   event.preventDefault();
   if (target.dataset.action === "familiarity") {
     familiarity = target.dataset.value;
-    if (revising)
-      lessons.reviseFamiliarity(profileId, delivery.id, familiarity);
-    else lessons.recordFamiliarity(profileId, delivery.id, familiarity);
-    recordLearning("familiarity", { deliveryId: delivery.id, familiarity });
+    recordLearning("familiarity", { deliveryId: currentDelivery().id, familiarity });
     revising = false;
   } else if (target.dataset.action === "revise-familiarity") {
     revising = true;
   } else if (target.dataset.action === "practice-answer") {
-    practiceResult = lessons.answerPractice(
-      profileId,
-      practiceVisit.delivery.id,
-      target.dataset.value,
-    ).correct;
+    practiceResult = target.dataset.value === "correct";
     recordLearning("practice", {
       deliveryId: practiceVisit.delivery.id,
       correct: practiceResult,
     });
   } else if (target.dataset.action === "active-use") {
-    lessons.recordActiveUse(profileId, delivery.id, target.dataset.value);
     recordLearning("active-use", {
-      deliveryId: delivery.id,
+      deliveryId: currentDelivery().id,
       activeUse: target.dataset.value,
     });
   } else if (target.dataset.action === "utility") {
-    lessons.recordUtility(profileId, delivery.id, target.dataset.value);
     recordLearning("utility", {
-      deliveryId: delivery.id,
+      deliveryId: currentDelivery().id,
       utility: target.dataset.value,
     });
   } else if (target.dataset.action === "content-quality") {
-    lessons.reportContentQuality(profileId, delivery.id);
-    recordLearning("content-quality", { deliveryId: delivery.id });
+    recordLearning("content-quality", { deliveryId: currentDelivery().id });
+  } else if (target.dataset.action === "retry-learning") {
+    void reconcileLearning();
   } else if (target.dataset.action === "protect-profile") {
     profiles.protect(profileSession.id, webauthn.createPasskey("This device"));
   } else if (target.dataset.action === "add-passkey") {
@@ -172,10 +162,8 @@ document.addEventListener("click", (event) => {
   } else if (target.dataset.action === "confirm-profile-deletion") {
     authenticateProfile();
     profiles.deleteProfile(profileSession.id);
-    learningServer.deleteProfile(learningProfile);
-    learning.synchronize();
+    void reconcileLearning();
     deletionConfirmation = false;
-    deleted = true;
   }
   render();
 });
@@ -200,14 +188,51 @@ function authenticateProfile() {
 
 function recordLearning(kind, details) {
   learning.record(kind, details);
-  if (navigator.onLine) learning.synchronize();
+  if (navigator.onLine) void reconcileLearning();
 }
 
-function hydrateCachedLearning() {
+async function startLearning() {
+  await learning.ready();
   const cached = learning.cache();
-  if (!cached.history.length) return;
-  lessons.restore(profileId, cached);
-  familiarity = cached.history.find(
-    ({ id }) => id === delivery.id,
-  )?.familiarity;
+  familiarity = currentDelivery(cached)?.familiarity;
+  render();
+  if (navigator.onLine) await reconcileLearning();
+}
+
+async function reconcileLearning() {
+  try {
+    const result = await learning.synchronize();
+    syncStatus = result.status;
+    if (result.status === "deleted") deleted = true;
+    if (result.status === "active") {
+      familiarity = currentDelivery()?.familiarity;
+      practiceVisit = undefined;
+    }
+  } catch {
+    syncStatus = "offline";
+  }
+  render();
+}
+
+function currentDelivery(cached = learning.cache()) {
+  return cached.history.find(({ status }) => status === "current");
+}
+
+function currentLesson(delivery, cached = learning.cache()) {
+  return delivery && cached.lessons.find(({ id }) => id === delivery.lessonId)?.record;
+}
+
+function practiceFor(delivery, lesson) {
+  if (!delivery.recall?.dueAt || delivery.recall.dueAt > new Date().toISOString()) return undefined;
+  const attempts = learning.cache().evidence.filter(({ deliveryId, kind }) => deliveryId === delivery.id && kind === "practice");
+  return { delivery, practice: lesson.meanings[attempts.length % lesson.meanings.length].practice };
+}
+
+function learningStatus() {
+  const detail = syncStatus === "session-expired"
+    ? "Your session has expired. Your unsent learning changes are still on this device."
+    : syncStatus === "offline"
+      ? "Your saved lessons are unavailable right now. Retry when you are connected."
+      : "Your next lesson will appear here after it is delivered.";
+  return html`<section class="card flow"><p class="lesson-label">Today</p><h1 class="card-title">No lesson ready</h1><p>${detail}</p><button class="button" data-action="retry-learning" type="button">Retry</button></section>`;
 }
