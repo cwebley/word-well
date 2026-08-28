@@ -14,6 +14,7 @@ import { renderLearningSyncStatus } from "../components/learning-sync-status.js"
 
 const html = String.raw;
 const sessionExpiredDetail = "Your session has expired. Your unsent learning changes are still on this device.";
+const retryMinBusyMs = 600;
 
 const main = document.querySelector("#app-main");
 const syncStatusOutlet = document.querySelector("#learning-sync-status");
@@ -223,11 +224,27 @@ async function startLearning() {
 }
 
 async function reconcileLearning({ source = "auto" } = {}) {
-  if (source === "retry") {
-    syncBusy = true;
-    syncError = undefined;
+  if (source !== "retry") {
+    await runReconcile(source);
+    return;
+  }
+  syncError = undefined;
+  syncBusy = true;
+  render();
+  let outcome;
+  try {
+    outcome = await runReconcile(source, { keepBusy: true });
+  } finally {
+    const elapsed = outcome?.elapsed ?? 0;
+    const remaining = Math.max(0, retryMinBusyMs - elapsed);
+    if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+    syncBusy = false;
     render();
   }
+}
+
+async function runReconcile(source = "auto", { keepBusy = false } = {}) {
+  const start = Date.now();
   try {
     const result = await learning.synchronize();
     syncStatus = result.status;
@@ -241,9 +258,9 @@ async function reconcileLearning({ source = "auto" } = {}) {
     syncStatus = "offline";
     if (source === "retry") syncError = "Retry failed. Try again in a moment.";
   } finally {
-    syncBusy = false;
+    if (!keepBusy) render();
   }
-  render();
+  return { elapsed: Date.now() - start };
 }
 
 async function skipUpcoming(upcomingId) {
