@@ -28,7 +28,9 @@ function storage() {
   return {
     load: (profile, clientId) => structuredClone(values.get(`${profile}:${clientId}`)),
     save: (profile, clientId, value) => values.set(`${profile}:${clientId}`, structuredClone(value)),
-    clear: (profile, clientId) => values.delete(`${profile}:${clientId}`)
+    clearProfile: (profile) => {
+      for (const key of values.keys()) if (key.startsWith(`${profile}:`)) values.delete(key);
+    }
   };
 }
 

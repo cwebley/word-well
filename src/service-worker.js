@@ -1,4 +1,4 @@
-const cacheName = "wordwell-shell-v1";
+const cacheName = `wordwell-shell-${__WORDWELL_BUILD__}`;
 const shell = ["./", "./index.html", "./css/main.css", "./js/main.js"];
 
 self.addEventListener("install", (event) => {

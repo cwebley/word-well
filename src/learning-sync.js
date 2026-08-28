@@ -130,7 +130,7 @@ export class LearningStateClient {
       this.#outbox = [];
       this.#sent.clear();
       this.#cache = { appShell: true, lessons: [], history: [], practice: [] };
-      this.#storage.clear(this.#profile, this.#clientId);
+      this.#storage.clearProfile(this.#profile);
       return { status: "deleted" };
     }
     if (response.status === "session-expired") {
@@ -175,7 +175,7 @@ function cache(state) {
     appShell: true,
     lessons: state.lessons.filter(({ id }) => lessonIds.has(id)).map(learnerSafe),
     history: history.map(learnerSafe),
-    practice: history.filter(({ recall }) => recall)
+    practice: history.filter(({ recall }) => recall).map(learnerSafe)
   };
 }
 
@@ -231,8 +231,12 @@ function browserStorage() {
     save(profile, clientId, value) {
       storage?.setItem(key(profile, clientId), JSON.stringify(value));
     },
-    clear(profile, clientId) {
-      storage?.removeItem(key(profile, clientId));
+    clearProfile(profile) {
+      const prefix = `wordwell:learning-state:${profile}:`;
+      for (let index = storage.length - 1; index >= 0; index -= 1) {
+        const storageKey = storage.key(index);
+        if (storageKey?.startsWith(prefix)) storage.removeItem(storageKey);
+      }
     }
   };
 }

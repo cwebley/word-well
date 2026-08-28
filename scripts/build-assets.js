@@ -17,6 +17,9 @@ await esbuild.build({
   minify: isProduction,
   sourcemap: !isProduction,
   format: "esm",
+  define: {
+    __WORDWELL_BUILD__: JSON.stringify(process.env.GITHUB_SHA ?? Date.now().toString())
+  },
   // Emit referenced assets (fonts/images via url()) next to the output
   // instead of failing, in case a dependency ships them.
   loader: {
