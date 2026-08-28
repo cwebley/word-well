@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: wordwell_test
+      POSTGRES_USER: wordwell
+      POSTGRES_PASSWORD: wordwell
+    ports:
+      - "127.0.0.1:54329:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wordwell -d wordwell_test"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
