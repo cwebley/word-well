@@ -59,22 +59,35 @@
   body {
     background: var(--color-stone);
   }
+  /* The shell must fill the viewport so a single child can become the scroll
+     container. Without `block-size: 100dvh` here, the document grows to fit
+     `.app-main` and scrolls at the html level. */
+  body {
+    block-size: 100dvh;
+    overflow: hidden;
+  }
   .app-shell {
+    block-size: 100dvh;
     container: app-shell / inline-size;
     display: grid;
     grid-template-areas:
       "main"
       "navigation";
     grid-template-rows: minmax(0, 1fr) auto;
-    min-block-size: 100dvh;
   }
 
   .navigation-rail {
     grid-area: navigation;
   }
 
+  /* The main column is the only scroll surface. `min-block-size: 0` releases
+     the grid item from its content-sized default so it can actually shrink
+     under its scroll content. */
   .app-main {
     grid-area: main;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
   }
 
   @media (min-width: 50rem) {
