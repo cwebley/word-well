@@ -59,9 +59,10 @@
   body {
     background: var(--color-stone);
   }
-  /* Page-level scroll lock. Only when the shell is mounted: pages that don't
-     use it (e.g. the SwatchKit library) keep normal document scrolling. */
-  body:has(.app-shell) {
+  /* Page-level scroll lock. Only the real application page should be locked
+     to the viewport; SwatchKit previews wrap a smaller `.app-shell` and need
+     the document to scroll so rail overflow can be inspected. */
+  body.app-page {
     block-size: 100dvh;
     overflow: hidden;
   }

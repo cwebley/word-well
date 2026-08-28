@@ -15,7 +15,7 @@ export function home({ apiBaseUrl = process.env.API_BASE_URL ?? "" } = {}) {
         <title>WordWell</title>
         <link rel="stylesheet" href="./css/main.css" />
       </head>
-      <body>
+      <body class="app-page">
         <div class="app-shell">
           ${renderNavigation()}
           <main class="app-main" id="app-main" tabindex="-1">
