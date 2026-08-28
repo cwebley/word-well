@@ -288,7 +288,7 @@ function learningStatus() {
 
 function learningSyncNotice() {
   if (syncStatus === "offline") {
-    return html`<aside class="sync-status" role="status"><p><strong>Offline</strong> Your changes will sync when you reconnect.</p><button class="button small" data-action="retry-learning" type="button">Retry</button></aside>`;
+    return html`<aside class="sync-status" role="status"><p><strong>Offline</strong><span class="sync-status-detail"> Your changes will sync when you reconnect.</span></p><button class="button small" data-action="retry-learning" type="button">Retry</button></aside>`;
   }
   if (syncStatus !== "session-expired") return "";
   return html`<aside class="sync-status" role="status"><p><strong>Session expired</strong> Unsent changes remain on this device.</p></aside>`;

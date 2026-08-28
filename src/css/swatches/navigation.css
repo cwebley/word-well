@@ -1,4 +1,5 @@
 .navigation-rail {
+  position: relative;
   display: flex;
   /* height: fit-content; */
   flex-direction: column;
@@ -64,11 +65,7 @@
 }
 
 .learning-sync-status:not(:empty) {
-  position: fixed;
-  z-index: 10;
-  inset-inline-start: max(var(--space-m), env(safe-area-inset-left));
-  inset-block-end: max(var(--space-m), env(safe-area-inset-bottom));
-  max-inline-size: min(22rem, calc(100vw - var(--space-l)));
+  margin: var(--space-s);
 }
 
 .sync-status {
@@ -78,7 +75,6 @@
   border-inline-start: 0.3rem solid var(--color-wood-light);
   border-radius: var(--radius-m);
   background: var(--color-surface-raised);
-  box-shadow: 0 0.75rem 2rem color-mix(in oklab, var(--color-text), transparent 75%);
   color: var(--color-text);
   font-size: var(--step--1);
 }
@@ -112,6 +108,27 @@
     inset-block-start: unset;
     inset-block-end: 0;
     inset-inline: 0;
+  }
+
+  .learning-sync-status:not(:empty) {
+    position: absolute;
+    z-index: 1;
+    inset-inline-start: var(--space-s);
+    inset-block-end: 100%;
+    margin: 0;
+  }
+
+  .sync-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-xs) var(--space-s);
+    border-radius: var(--radius-m) var(--radius-m) 0 0;
+    box-shadow: 0 -0.4rem 1rem color-mix(in oklab, var(--color-text), transparent 85%);
+  }
+
+  .sync-status-detail {
+    display: none;
   }
 
 }
