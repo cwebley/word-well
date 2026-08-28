@@ -60,7 +60,6 @@ describe("SwatchKit shared WordWell components", () => {
     expect(renderLearningSyncStatus("offline")).toContain('data-action="retry-learning"');
     expect(renderLearningSyncStatus("session-expired")).toContain("Session expired");
     expect(renderLearningSyncStatus("offline", { busy: true })).toContain('disabled aria-busy="true"');
-    expect(renderLearningSyncStatus("offline", { error: "Retry failed. Try again in a moment." })).toContain("sync-status-error");
   });
 
   it("renders every meaning in a multi-meaning lesson", () => {

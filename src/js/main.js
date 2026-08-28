@@ -24,7 +24,6 @@ let revising = false;
 let practiceResult;
 let syncStatus;
 let syncBusy = false;
-let syncError;
 let deletionConfirmation = false;
 let recoveryVerification;
 let deleted = false;
@@ -51,7 +50,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 function render() {
-  syncStatusOutlet.innerHTML = renderLearningSyncStatus(syncStatus, { busy: syncBusy, error: syncError });
+  syncStatusOutlet.innerHTML = renderLearningSyncStatus(syncStatus, { busy: syncBusy });
   if (deleted) {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
@@ -225,15 +224,14 @@ async function startLearning() {
 
 async function reconcileLearning({ source = "auto" } = {}) {
   if (source !== "retry") {
-    await runReconcile(source);
+    await runReconcile();
     return;
   }
-  syncError = undefined;
   syncBusy = true;
   render();
   let outcome;
   try {
-    outcome = await runReconcile(source, { keepBusy: true });
+    outcome = await runReconcile({ keepBusy: true });
   } finally {
     const elapsed = outcome?.elapsed ?? 0;
     const remaining = Math.max(0, retryMinBusyMs - elapsed);
@@ -243,7 +241,7 @@ async function reconcileLearning({ source = "auto" } = {}) {
   }
 }
 
-async function runReconcile(source = "auto", { keepBusy = false } = {}) {
+async function runReconcile({ keepBusy = false } = {}) {
   const start = Date.now();
   try {
     const result = await learning.synchronize();
@@ -252,11 +250,9 @@ async function runReconcile(source = "auto", { keepBusy = false } = {}) {
     if (result.status === "active") {
       familiarity = currentDelivery()?.familiarity;
       practiceVisit = undefined;
-      syncError = undefined;
     }
   } catch (error) {
     syncStatus = "offline";
-    if (source === "retry") syncError = "Retry failed. Try again in a moment.";
   } finally {
     if (!keepBusy) render();
   }
