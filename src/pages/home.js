@@ -17,7 +17,7 @@ export function home() {
       <body>
         <div class="app-shell">
           ${renderNavigation()}
-          <main class="app-main region" id="app-main" tabindex="-1">
+          <main class="app-main" id="app-main" tabindex="-1">
             ${renderFamiliarityGate({
               headword: seededVocabularyRecord.headword,
               pronunciation: seededVocabularyRecord.pronunciation,
