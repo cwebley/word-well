@@ -3,18 +3,12 @@
    internal pinned bar and header are always in that order so the hero can
    scroll over the bar. */
 
-.word-hero-header {
+.word-hero {
   align-content: center;
   background: var(--color-surface);
-  border-block-end: var(--stroke-solid);
   display: grid;
-  margin-block-start: calc(var(--word-hero-pinned-height, 4.5rem) * -1);
   position: relative;
   z-index: 1;
-}
-
-.word-hero-header .lesson-label {
-  margin-block-end: var(--space-2xl);
 }
 
 .word-hero-word {

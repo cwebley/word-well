@@ -27,7 +27,7 @@ export function renderFamiliarityGate({
       pinned: false,
       eyebrow: "Today's word",
     })}
-    <div class="region wrapper familiarity-prompt flow">
+    <div class="region wrapper flow familiarity-prompt region-space:space-xl">
       <h1 id="familiarity-heading" class="familiarity-title">
         ${revision
           ? "How familiar does this word feel now?"

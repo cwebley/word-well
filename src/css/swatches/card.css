@@ -47,12 +47,6 @@
   margin-inline: auto;
   max-inline-size: 72rem;
 }
-.word-lesson-definition {
-  border-block-start: 0.2rem solid var(--color-link);
-  display: grid;
-  gap: var(--space-m);
-  padding-block-start: var(--space-m);
-}
 .word-lesson-definition > p:last-child {
   font-family: var(--font-reading);
   font-size: var(--step-5);

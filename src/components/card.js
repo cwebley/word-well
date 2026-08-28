@@ -43,9 +43,8 @@ export function renderLessonCard({ lesson }) {
       pronunciation: lesson.pronunciation,
       partOfSpeech: meaning.partOfSpeech,
     })}
-    <div class="wrapper word-lesson-body">
-      <section class="word-lesson-definition">
-        <p class="lesson-label">In brief</p>
+    <div class="region wrapper word-lesson-body region-space:space-xl">
+      <section class="flow word-lesson-definition">
         <p>${escapeHtml(meaning.definition)}.</p>
       </section>
       <section class="word-lesson-examples" aria-labelledby="lesson-examples">
