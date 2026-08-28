@@ -123,9 +123,9 @@ suite("learner-state browser acceptance", () => {
     await clearIndexedDb(context, page);
     await context.setOffline(true);
     await page.reload();
-    await visible(page.getByRole("button", { name: "Retry" }));
+    await visible(page.locator("#app-main").getByRole("button", { name: "Retry" }));
     await context.setOffline(false);
-    await page.getByRole("button", { name: "Retry" }).click();
+    await page.locator("#app-main").getByRole("button", { name: "Retry" }).click();
     await visible(page.getByRole("heading", { name: "candid" }));
 
     await context.close();
@@ -141,10 +141,10 @@ suite("learner-state browser acceptance", () => {
     await context.setOffline(false);
     await page.evaluate(() => window.dispatchEvent(new Event("online")));
 
-    await visible(page.getByText("Your session has expired. Your unsent learning changes are still on this device."));
+    await visible(page.getByText("Unsent changes remain on this device."));
     await visible(page.getByRole("heading", { name: "candid" }));
     await page.reload();
-    await visible(page.getByText("Your session has expired. Your unsent learning changes are still on this device."));
+    await visible(page.getByText("Unsent changes remain on this device."));
     expect(await acceptedOperationCount()).toBe(0);
     await context.close();
   }, 30_000);

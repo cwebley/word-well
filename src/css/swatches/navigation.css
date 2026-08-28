@@ -59,6 +59,28 @@
   content: "";
 }
 
+.learning-sync-status:empty {
+  display: none;
+}
+
+.sync-status {
+  display: grid;
+  gap: var(--space-xs);
+  margin: var(--space-s);
+  padding: var(--space-s);
+  border-inline-start: 0.3rem solid var(--color-wood-light);
+  background: color-mix(in oklab, var(--color-water-soft) 35%, transparent);
+  font-size: var(--step--1);
+}
+
+.sync-status p {
+  margin: 0;
+}
+
+.sync-status .button {
+  justify-self: start;
+}
+
 @container app-shell (width < 50rem) {
   .navigation-wordmark {
     display: none;
@@ -80,6 +102,14 @@
     inset-block-start: unset;
     inset-block-end: 0;
     inset-inline: 0;
+  }
+
+  .learning-sync-status {
+    align-self: center;
+  }
+
+  .sync-status {
+    margin: var(--space-xs) var(--space-s);
   }
 }
 

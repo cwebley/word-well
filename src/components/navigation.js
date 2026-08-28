@@ -43,7 +43,8 @@ export function renderNavigation({
         <a class="navigation-wordmark" href="#today">${escapeHtml(brand)}</a>
       </h2>
       <nav class="navigation" aria-label="Primary navigation">${links}</nav>
-  </aside>`;
+      <div class="learning-sync-status" id="learning-sync-status"></div>
+   </aside>`;
 }
 
 /**

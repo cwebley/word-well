@@ -15,6 +15,7 @@ const html = String.raw;
 const sessionExpiredDetail = "Your session has expired. Your unsent learning changes are still on this device.";
 
 const main = document.querySelector("#app-main");
+const syncStatusOutlet = document.querySelector("#learning-sync-status");
 let route = "today";
 let familiarity;
 let revising = false;
@@ -46,6 +47,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 function render() {
+  syncStatusOutlet.innerHTML = learningSyncNotice();
   if (deleted) {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
@@ -60,9 +62,8 @@ function render() {
     });
     return;
   }
-  const syncNotice = learningSyncNotice();
   if (route === "history") {
-    main.innerHTML = syncNotice + renderHistory();
+    main.innerHTML = renderHistory();
     return;
   }
   const cachedDelivery = currentDelivery();
@@ -77,7 +78,7 @@ function render() {
       practiceResult === undefined && familiarity
         ? practiceFor(delivery, lesson)
         : practiceVisit;
-    main.innerHTML = syncNotice + (familiarity
+    main.innerHTML = familiarity
       ? practiceResult !== undefined
         ? renderPractice({
             practice: practiceVisit.practice,
@@ -92,16 +93,16 @@ function render() {
       : renderStatus({
           label: "Practice",
           detail: "Record your familiarity before beginning practice.",
-        }));
+        });
   } else if (!familiarity || revising) {
-    main.innerHTML = syncNotice + renderFamiliarityGate({
+    main.innerHTML = renderFamiliarityGate({
       headword: lesson.headword,
       pronunciation: lesson.pronunciation,
       partOfSpeech: lesson.meanings[0].partOfSpeech,
       revision: revising,
     }) + renderUpcoming();
   } else {
-    main.innerHTML = syncNotice + renderLessonCard({ lesson }) + renderUpcoming();
+    main.innerHTML = renderLessonCard({ lesson }) + renderUpcoming();
   }
 }
 
@@ -287,13 +288,10 @@ function learningStatus() {
 
 function learningSyncNotice() {
   if (syncStatus === "offline") {
-    return html`<section class="card flow"><p class="lesson-label">Learning status</p><p>Your changes will sync when you reconnect.</p><button class="button" data-action="retry-learning" type="button">Retry</button></section>`;
+    return html`<aside class="sync-status" role="status"><p><strong>Offline</strong> Your changes will sync when you reconnect.</p><button class="button outline small" data-action="retry-learning" type="button">Retry</button></aside>`;
   }
   if (syncStatus !== "session-expired") return "";
-  return renderStatus({
-    label: "Session expired",
-    detail: sessionExpiredDetail,
-  });
+  return html`<aside class="sync-status" role="status"><p><strong>Session expired</strong> Unsent changes remain on this device.</p></aside>`;
 }
 
 function renderHistory() {
