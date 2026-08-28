@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { HttpLearningStateAdapter, indexedDbStorage, LearningStateClient, LearningStateServer } from "./learning-sync.js";
 
 const day = 24 * 60 * 60 * 1000;
@@ -37,6 +37,23 @@ function storage() {
 describe("learner synchronization seam", () => {
   it("constructs an HTTP adapter with its default browser client context", () => {
     expect(() => new HttpLearningStateAdapter({ fetch: () => {} })).not.toThrow();
+  });
+
+  it("calls the browser fetch function with its required global receiver", async () => {
+    const originalFetch = globalThis.fetch;
+    const fetch = vi.fn(function () {
+      if (this !== globalThis) throw new TypeError("Illegal invocation");
+      return response(200, { status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } });
+    });
+    globalThis.fetch = fetch;
+    const adapter = new HttpLearningStateAdapter({
+      clientContextId: "browser-tab",
+      session: { load: () => ({ grant: "grant" }), save() {}, clear() {} },
+    });
+
+    await expect(adapter.readState()).resolves.toMatchObject({ status: "active" });
+    expect(fetch).toHaveBeenCalledOnce();
+    globalThis.fetch = originalFetch;
   });
 
   it("keeps the app shell, fifty most recent lessons, history, and practice offline without sensitive profile data", async () => {

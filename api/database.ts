@@ -305,6 +305,8 @@ async function discardIneligibleUpcoming(client: Queryable, profileId: string): 
       WHERE r.profile_id = $1
         AND (
           NOT l.available
+          OR jsonb_typeof(l.record->'meanings') <> 'array'
+          OR jsonb_array_length(l.record->'meanings') = 0
           OR COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) <> p.starting_band
           OR EXISTS (SELECT 1 FROM deliveries d WHERE d.profile_id = $1 AND d.normalized_headword = r.normalized_headword)
           OR EXISTS (SELECT 1 FROM skipped_upcoming_words s WHERE s.profile_id = $1 AND s.normalized_headword = r.normalized_headword)
@@ -319,7 +321,9 @@ async function nextLesson(client: Queryable, profileId: string): Promise<QueryRe
     `SELECT NULL::uuid AS id, l.id AS lesson_id, l.normalized_headword
        FROM published_lessons l
        JOIN profiles p ON p.id = $1
-      WHERE l.available
+        WHERE l.available
+        AND jsonb_typeof(l.record->'meanings') = 'array'
+        AND jsonb_array_length(l.record->'meanings') > 0
         AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
         AND NOT EXISTS (
           SELECT 1 FROM deliveries d
@@ -344,6 +348,8 @@ async function fillUpcoming(client: Queryable, profileId: string, now: Date): Pr
          FROM published_lessons l
          JOIN profiles p ON p.id = $1
         WHERE l.available
+          AND jsonb_typeof(l.record->'meanings') = 'array'
+          AND jsonb_array_length(l.record->'meanings') > 0
           AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
           AND NOT EXISTS (
             SELECT 1 FROM deliveries d

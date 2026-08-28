@@ -199,7 +199,25 @@ suite("learner HTTP seam", () => {
     for (const [id, headword] of [["lesson-candid", "candid"], ["lesson-lucid", "lucid"], ["lesson-plain", "plain"]]) {
       await pool.query(
         "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
-        [id, headword, { headword, normalizedHeadword: headword, startingBand: "Stretch my vocabulary" }]
+        [id, headword, {
+          headword,
+          normalizedHeadword: headword,
+          startingBand: "Stretch my vocabulary",
+          meanings: [{
+            definition: "A test meaning.",
+            examples: ["A first example.", "A second example.", "A third example."],
+            useItWhen: "testing delivery",
+            doNotUseItFor: "anything else",
+            synonyms: ["test"],
+            partOfSpeech: "noun",
+            practice: {
+              prompt: "Which example is correct?",
+              correctSentence: "A first example.",
+              incorrectSentence: "A second example.",
+              explanation: "This is test content."
+            }
+          }]
+        }]
       );
     }
   }

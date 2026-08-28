@@ -58,7 +58,7 @@ function render() {
   const cachedDelivery = currentDelivery();
   const delivery = route === "practice" ? cachedDelivery : todayDelivery();
   const lesson = currentLesson(delivery);
-  if (!delivery || !lesson || (route !== "practice" && !isToday(delivery))) {
+  if (!delivery || !lesson || !Array.isArray(lesson.meanings) || !lesson.meanings.length || (route !== "practice" && !isToday(delivery))) {
     main.innerHTML = learningStatus();
     return;
   }
@@ -194,7 +194,7 @@ async function startLearning() {
   familiarity = currentDelivery(cached)?.familiarity;
   if (!navigator.onLine) syncStatus = "offline";
   render();
-  if (navigator.onLine) await reconcileLearning();
+  await reconcileLearning();
 }
 
 async function reconcileLearning() {

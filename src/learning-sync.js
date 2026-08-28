@@ -298,7 +298,7 @@ export class HttpLearningStateAdapter {
   #timeZone;
 
   constructor({
-    fetch = globalThis.fetch,
+    fetch = (...arguments_) => globalThis.fetch(...arguments_),
     baseUrl = "",
     session = browserSession(),
     clientContextId = browserClientContextId(),
