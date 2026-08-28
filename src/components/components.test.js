@@ -5,6 +5,7 @@ import { renderFamiliarityGate } from "./familiarity.js";
 import { renderPractice } from "./practice.js";
 import { renderStatus } from "./status.js";
 import { bindNavigation, renderNavigation } from "./navigation.js";
+import { renderProfile } from "./profile.js";
 import {
   multiMeaningVocabularyRecord,
   seededVocabularyRecord,
@@ -77,6 +78,15 @@ describe("SwatchKit shared WordWell components", () => {
     expect(html).toContain('href="#practice"');
     expect(html).toContain('data-route="practice" aria-current="page"');
     expect(html).not.toContain('data-route="today" aria-current="page"');
+  });
+
+  it("renders anonymous protection, credential management, and deletion confirmation", () => {
+    expect(renderProfile({ profile: { state: "anonymous", canProtect: false } })).toContain("Anonymous for now");
+    expect(renderProfile({ profile: { state: "anonymous", canProtect: true } })).toContain('data-action="protect-profile"');
+    const protectedProfile = renderProfile({ profile: { state: "protected", passkeys: [{ id: "passkey-1", label: "Laptop" }] } });
+    expect(protectedProfile).toContain("Recovery email");
+    expect(protectedProfile).toContain('data-action="revoke-passkey"');
+    expect(renderProfile({ profile: { state: "protected", passkeys: [] }, deletionConfirmation: true })).toContain("Permanently delete profile");
   });
 
   it("moves aria-current inside a view transition when a navigation link is clicked", () => {

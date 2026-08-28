@@ -1,0 +1,42 @@
+.profile {
+  --flow-space: var(--space-l);
+  margin-inline: auto;
+  max-inline-size: 48rem;
+  padding-block: var(--space-xl);
+}
+.profile > h1,
+.profile-section > h2 {
+  font-family: var(--font-reading);
+  font-weight: var(--weight-regular);
+}
+.profile-sections {
+  --flow-space: var(--space-l);
+}
+.profile-section {
+  --flow-space: var(--space-s);
+  border-block-start: var(--stroke-solid);
+  padding-block-start: var(--space-m);
+}
+.profile-list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+}
+.profile-item {
+  align-items: center;
+  display: flex;
+  gap: var(--space-s);
+  justify-content: space-between;
+}
+.profile-danger {
+  border-block-start-color: var(--color-avoid);
+}
+.profile-danger .button.outline {
+  border-color: var(--color-avoid);
+  color: var(--color-avoid);
+}
+.profile-notice {
+  background: color-mix(in oklab, var(--color-support) 12%, var(--color-surface-raised));
+  padding: var(--space-s);
+}
