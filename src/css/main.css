@@ -83,6 +83,7 @@
      the grid item from its content-sized default so it can actually shrink
      under its scroll content. */
   .app-main {
+    container-type: inline-size;
     grid-area: main;
     overflow-y: auto;
     overscroll-behavior-y: contain;
