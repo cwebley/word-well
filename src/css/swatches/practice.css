@@ -1,0 +1,23 @@
+.practice {
+  margin-inline: auto;
+}
+
+.practice-choices {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.practice-choices .button {
+  line-height: var(--leading-standard);
+  min-block-size: 5rem;
+}
+
+.practice-feedback {
+  border-inline-start: 0.35rem solid var(--color-support);
+  margin-inline: auto;
+}
+
+.practice-next {
+  color: var(--color-support);
+  font-size: var(--step--1);
+}

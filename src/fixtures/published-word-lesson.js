@@ -21,7 +21,7 @@ export const seededVocabularyRecord = {
         prompt: "Which sentence uses candid naturally?",
         correctSentence: "Her candid feedback helped the team improve.",
         incorrectSentence: "The candid spreadsheet calculated the totals.",
-        explanation: "Feedback can be candid because it can be open and direct."
+        explanation: "Feedback can be candid because it can be open and direct; a spreadsheet cannot be candid because it does not communicate honestly."
       }
     }
   ]
@@ -47,7 +47,7 @@ export const multiMeaningVocabularyRecord = {
         prompt: "Which sentence uses candid naturally?",
         correctSentence: "The reporter captured a candid moment backstage.",
         incorrectSentence: "The candid engine needed more oil.",
-        explanation: "A photograph or moment can be candid when it is unposed."
+        explanation: "A photograph or moment can be candid when it is unposed; an engine cannot be candid because it is not a photograph or person."
       }
     }
   ]

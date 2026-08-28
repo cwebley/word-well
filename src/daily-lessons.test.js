@@ -10,7 +10,14 @@ function lesson(id, headword, startingBand) {
       normalizedHeadword: headword.toLowerCase(),
       version: "1",
       pronunciation: `/${headword}/`,
-      meanings: []
+      meanings: [{
+        practice: {
+          prompt: `Which sentence uses ${headword} naturally?`,
+          correctSentence: `The ${headword} answer fits.`,
+          incorrectSentence: `The ${headword} calculator fits.`,
+          explanation: "The answer fits the word's meaning; the calculator does not."
+        }
+      }]
     }
   };
 }
@@ -68,5 +75,49 @@ describe("daily lessons", () => {
 
     expect(revised.familiarity).toBe("Could use it naturally");
     expect(lessons.history("profile")).toHaveLength(1);
+  });
+
+  it("presents delivered words for due recall, advances explicit stages, and makes incorrect answers due sooner", () => {
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
+    const started = new Date("2026-08-26T12:00:00Z");
+    lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", started);
+
+    expect(lessons.practice("profile", started)).toMatchObject({ delivery: { id: delivery.id } });
+    const correct = lessons.answerPractice("profile", delivery.id, "correct", started);
+
+    expect(correct).toMatchObject({ correct: true, delivery: { recall: { stage: "1 day", dueAt: "2026-08-27T12:00:00.000Z", mastery: 1 } } });
+    expect(lessons.dueRecall("profile", new Date("2026-08-26T12:00:01Z"))).toEqual([]);
+    const incorrect = lessons.answerPractice("profile", delivery.id, "incorrect", new Date("2026-08-27T12:00:00Z"));
+
+    expect(incorrect.delivery.recall).toMatchObject({ stage: "new", dueAt: "2026-08-28T12:00:00.000Z", mastery: 0 });
+  });
+
+  it("keeps utility and content quality as editorial evidence while active use modestly strengthens recall", () => {
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
+    lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", new Date("2026-08-26T12:00:00Z"));
+    lessons.answerPractice("profile", delivery.id, "correct", new Date("2026-08-26T12:00:00Z"));
+
+    const utility = lessons.recordUtility("profile", delivery.id, "not_useful", new Date("2026-08-26T13:00:00Z"));
+    const quality = lessons.reportContentQuality("profile", delivery.id, new Date("2026-08-26T13:01:00Z"));
+    const using = lessons.recordActiveUse("profile", delivery.id, "using", new Date("2026-08-26T14:00:00Z"));
+
+    expect(utility).toMatchObject({ kind: "utility", utility: "not_useful" });
+    expect(quality).toMatchObject({ kind: "content-quality" });
+    expect(using.recall).toEqual({ stage: "3 days", dueAt: "2026-08-29T14:00:00.000Z", mastery: 2 });
+  });
+
+  it("rebuilds derived recall from retained familiarity, practice, and active-use evidence", () => {
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
+    lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", new Date("2026-08-26T12:00:00Z"));
+    lessons.answerPractice("profile", delivery.id, "correct", new Date("2026-08-26T12:00:00Z"));
+    lessons.recordActiveUse("profile", delivery.id, "using", new Date("2026-08-26T14:00:00Z"));
+    const beforeReset = lessons.history("profile")[0].delivery.recall;
+
+    lessons.resetRecall("profile");
+
+    expect(lessons.history("profile")[0].delivery.recall).toEqual(beforeReset);
   });
 });

@@ -25,9 +25,7 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain('class="region word-lesson"');
     expect(lesson).toContain('class="region wrapper word-hero"');
     expect(lesson).toContain('class="word-hero-word"');
-    expect(lesson).toContain('class="word-hero-pinned"');
-    expect(lesson).toContain('class="word-hero-pinned-word"');
-    expect(lesson).toContain('class="word-hero-pinned-meta"');
+    expect(lesson).not.toContain('class="word-hero-pinned"');
     expect(lesson).not.toContain('class="card flow"');
 
     const familiarity = renderFamiliarityGate({ headword: "candid", pronunciation: "/kan-did/", partOfSpeech: "adjective" });
@@ -46,7 +44,14 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain("Use it when");
     expect(lesson).toContain("Do not use it for");
     expect(lesson).toContain("Where it comes from");
-    expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice })).toContain("Which sentence uses candid naturally?");
+    expect(lesson).toContain("Useful to me");
+    expect(lesson).toContain("I&#39;m using this");
+    expect(lesson).toContain("This seems wrong");
+    const practice = renderPractice({ practice: seededVocabularyRecord.meanings[0].practice });
+    expect(practice).toContain("Which sentence uses candid naturally?");
+    expect(practice).toContain('class="button choice large"');
+    expect(practice).not.toContain("lesson-label");
+    expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice, result: false })).not.toContain("Practice again");
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
   });
 
