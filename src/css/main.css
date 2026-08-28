@@ -59,10 +59,9 @@
   body {
     background: var(--color-stone);
   }
-  /* The shell must fill the viewport so a single child can become the scroll
-     container. Without `block-size: 100dvh` here, the document grows to fit
-     `.app-main` and scrolls at the html level. */
-  body {
+  /* Page-level scroll lock. Only when the shell is mounted: pages that don't
+     use it (e.g. the SwatchKit library) keep normal document scrolling. */
+  body:has(.app-shell) {
     block-size: 100dvh;
     overflow: hidden;
   }
