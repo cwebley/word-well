@@ -1,5 +1,7 @@
 import { escapeHtml, renderButton } from "./button.js";
 
+const html = String.raw;
+
 const choices = [
   "Completely new to me",
   "I think I've heard of it",
@@ -10,7 +12,7 @@ const choices = [
 export function renderFamiliarityGate({ headword, partOfSpeech, pronunciation, revision = false } = {}) {
   const metadata = [partOfSpeech, pronunciation].filter(Boolean).map(escapeHtml).join(" &middot; ");
 
-  return `<section class="familiarity-gate" aria-labelledby="familiarity-heading">
+  return html`<section class="familiarity-gate" aria-labelledby="familiarity-heading">
     <div class="familiarity-word-panel">
       <p class="lesson-label familiarity-metadata">${metadata}</p>
       <p class="familiarity-word">${escapeHtml(headword)}</p>

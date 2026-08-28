@@ -34,7 +34,7 @@ export function renderNavigation({
         .filter(Boolean)
         .join(" ");
 
-      return `<a ${attributes}>${escapeHtml(label)}</a>`;
+      return html`<a ${attributes}>${escapeHtml(label)}</a>`;
     })
     .join("");
 
