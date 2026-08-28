@@ -40,6 +40,7 @@ export function renderWordHero({
         ${escapeHtml(headword)}
       </h1>
       ${metadata ? html`<p class="word-hero-meta">${metadata}</p>` : ""}
+      ${pinnedRow}
     </header>
   `;
 }
