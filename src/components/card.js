@@ -37,7 +37,7 @@ export function renderLessonCard({ lesson }) {
       </section>`
     : "";
 
-  return html`<article class="word-lesson" aria-labelledby="lesson-word">
+  return html`<article class="region word-lesson" aria-labelledby="lesson-word">
     ${renderWordHero({
       headword: lesson.headword,
       pronunciation: lesson.pronunciation,

@@ -84,7 +84,6 @@
      under its scroll content. */
   .app-main {
     grid-area: main;
-    min-block-size: 0;
     overflow-y: auto;
     overscroll-behavior-y: contain;
   }

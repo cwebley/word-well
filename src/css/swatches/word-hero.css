@@ -9,7 +9,6 @@
   border-block-end: var(--stroke-solid);
   display: grid;
   margin-block-start: calc(var(--word-hero-pinned-height, 4.5rem) * -1);
-  padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
   position: relative;
   z-index: 1;
 }

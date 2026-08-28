@@ -34,13 +34,12 @@ export function renderWordHero({
       </div>`
     : "";
 
-  return html`<div class="word-hero">
-    ${pinnedRow}
-    <header class="word-hero-header">
+  return html`
+    <header class="region wrapper word-hero">
       <h1 id="${escapeHtml(headingId)}" class="word-hero-word">
         ${escapeHtml(headword)}
       </h1>
       ${metadata ? html`<p class="word-hero-meta">${metadata}</p>` : ""}
     </header>
-  </div>`;
+  `;
 }

@@ -1,14 +1,6 @@
-.familiarity-gate {
-  display: grid;
-  grid-template-rows: minmax(16rem, 34dvh) minmax(0, 1fr);
-  min-block-size: 100%;
-}
-
 .familiarity-prompt {
   --flow-space: var(--space-m);
   align-content: center;
-  display: grid;
-  padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
 }
 
 .familiarity-title {
@@ -54,7 +46,11 @@
 }
 
 .familiarity-actions .button:hover {
-  background: color-mix(in oklab, var(--color-link) 8%, var(--color-surface-raised));
+  background: color-mix(
+    in oklab,
+    var(--color-link) 8%,
+    var(--color-surface-raised)
+  );
   border-color: var(--color-link);
   transform: translateY(-1px);
 }
