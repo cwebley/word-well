@@ -79,9 +79,17 @@ strong feedback can nominate an item for content regeneration/review.
   idioms, or specialized terms.
 - Optimize for General American English and mention regional variation only
   where it materially affects use.
-- Candidate words come from corpus frequency, register, and usefulness signals.
-  A SAT-style list may be one input, but is not the product boundary.
-- Reject archaic, test-prep-only, performative, and impractical vocabulary.
+- Candidate words come from editorial nomination sources plus corpus frequency,
+  register, and usefulness signals. Word-of-the-day and test-preparation lists
+  are first-class nomination sources. A nomination is a reason to consider a
+  word, never a reason to publish it, and no list is the product boundary.
+- Reject archaic and impractical vocabulary outright. Judge a word on its most
+  useful meaning rather than on its headword, so a rare word with a live
+  figurative meaning stays eligible.
+- Treat performative vocabulary as band-relative rather than a blanket reject.
+  `Build foundations` excludes it, `Stretch my vocabulary` admits little of it,
+  and `Challenge me` admits Latinate and literary words the other bands would
+  not.
 - Use qualitative, curated frequency/register guidance such as `uncommon in
   casual conversation; common in professional writing`, not misleading numeric
   precision.

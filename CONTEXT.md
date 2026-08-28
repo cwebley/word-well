@@ -17,11 +17,26 @@ A recorded, meaningfully distinct use of a word that can be explained and
 demonstrated in context.
 _Avoid_: Sense, definition (when referring to the concept rather than its learner-facing wording)
 
+**Source meaning**:
+One unit of meaning as a pinned source records it, with its own source
+identifier, definition text, and part of speech, before WordWell's scope
+review. Sources divide meaning more finely than a learner needs, so several
+source meanings may merge into one published meaning and others may be
+excluded.
+_Avoid_: Sense, source sense, synset
+
 **Published meaning**:
 A source-backed meaning included in a learner-facing WordWell lesson after
 scope review. Excluded source meanings remain pipeline evidence and are not
 shown to learners.
 _Avoid_: Learner sense, accepted sense
+
+**Practice item**:
+A published, versioned contextual-use question belonging to one published
+meaning and to the lesson content version it was written against. Practice
+items are generated, evaluated, published, and withdrawn independently of the
+lesson body, so a bank can be replenished without redrafting the lesson.
+_Avoid_: Practice question, flashcard, practice card
 
 **Unavailable lesson**:
 A delivered word that remains in learner history after its current content is
@@ -33,6 +48,22 @@ _Avoid_: Deleted lesson, hidden lesson
 An offline process that turns candidate words and pinned source evidence into
 published WordWell vocabulary records or quarantined records.
 _Avoid_: Live tutor, runtime generation
+
+**Nomination**:
+A record that an external editorial source proposed a headword for
+consideration, such as a word-of-the-day list or a test-preparation list.
+Nomination provenance records which source proposed a word and when. It is
+never learner-facing content and is distinct from the source evidence that
+backs a published claim.
+_Avoid_: Candidate source, suggestion, referral
+
+**Config fingerprint**:
+The identifier for one reproducible pipeline configuration, derived from the
+pinned source releases, the extraction version, and the model, prompt,
+evaluator, rubric, and deterministic rule versions. It keys idempotent job
+runs, records what produced a record, defines when a published record is
+stale, and gates which configurations may publish.
+_Avoid_: Run id, pipeline version, build hash
 
 **Evaluation set**:
 A versioned, hand-curated collection of complete word lessons, including
@@ -110,7 +141,9 @@ learner's mastery.
 A published word lesson eligible for delivery because it may be unfamiliar yet
 useful to a degree-educated adult in reading, writing, conversation, or precise
 thought. Test-prep and advanced school vocabulary are valuable sources of such
-candidates, not automatic inclusions.
+candidates, not automatic inclusions. Eligibility is judged on a word's most
+useful meaning rather than on its headword alone, so a rare word with a live
+figurative meaning can qualify.
 
 **Starting band**:
 The learner's initial adult-interest candidate range. `Build foundations`
@@ -145,9 +178,10 @@ for optional practice. It advances or retreats from practice evidence rather
 than representing permanent knowledge.
 
 **Practice attempt**:
-A submitted answer to one contextual-use question for a delivered word. The
-learner receives immediate explanation; the attempt becomes evidence even though
-WordWell does not expose a score.
+A submitted answer to one served practice item for a delivered word. The attempt
+retains the identity of the item served. The learner receives immediate
+explanation; the attempt becomes evidence even though WordWell does not expose a
+score.
 
 **Offline cache**:
 A bounded local copy of published WordWell content and downloaded learner state
