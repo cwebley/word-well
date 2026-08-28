@@ -26,3 +26,29 @@ export const seededVocabularyRecord = {
     }
   ]
 };
+
+export const multiMeaningVocabularyRecord = {
+  ...seededVocabularyRecord,
+  meanings: [
+    ...seededVocabularyRecord.meanings,
+    {
+      definition: "shown plainly in a photograph without posing or concealment",
+      examples: [
+        "The newspaper printed a candid photo from the event.",
+        "The reporter captured a candid moment backstage.",
+        "The exhibition includes candid photographs of the city."
+      ],
+      useItWhen: "you mean an unposed or informal photograph",
+      doNotUseItFor: "a carefully staged portrait",
+      synonyms: ["unposed", "informal"],
+      partOfSpeech: "adjective",
+      register: "neutral",
+      practice: {
+        prompt: "Which sentence uses candid naturally?",
+        correctSentence: "The reporter captured a candid moment backstage.",
+        incorrectSentence: "The candid engine needed more oil.",
+        explanation: "A photograph or moment can be candid when it is unposed."
+      }
+    }
+  ]
+};

@@ -47,6 +47,11 @@
   margin-inline: auto;
   max-inline-size: 72rem;
 }
+.word-lesson-meanings,
+.word-lesson-meaning {
+  display: grid;
+  gap: var(--space-2xl-4xl);
+}
 .word-lesson-definition > p:last-child {
   font-family: var(--font-reading);
   font-size: var(--step-5);

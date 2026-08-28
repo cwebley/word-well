@@ -36,6 +36,7 @@ export function renderWordHero({
 
   return html`
     <header class="region wrapper word-hero">
+      ${pinnedRow}
       <h1 id="${escapeHtml(headingId)}" class="word-hero-word">
         ${escapeHtml(headword)}
       </h1>

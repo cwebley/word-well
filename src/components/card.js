@@ -26,9 +26,37 @@ export function renderCard({ title, body, ctaLabel, ctaHref } = {}) {
 }
 
 export function renderLessonCard({ lesson }) {
-  const meaning = lesson.meanings[0];
-  const examples = meaning.examples
-    .map((example) => html`<li>“${escapeHtml(example)}”</li>`)
+  const partsOfSpeech = [...new Set(lesson.meanings.map((meaning) => meaning.partOfSpeech))].join(", ");
+  const meanings = lesson.meanings
+    .map((meaning, index) => {
+      const examples = meaning.examples
+        .map((example) => html`<li>“${escapeHtml(example)}”</li>`)
+        .join("");
+      const examplesId = `lesson-examples-${index}`;
+
+      return html`<section class="word-lesson-meaning" aria-labelledby="lesson-meaning-${index}">
+        <h2 id="lesson-meaning-${index}" class="visually-hidden">Meaning ${index + 1}</h2>
+        <section class="flow word-lesson-definition">
+          <p>${escapeHtml(meaning.definition)}.</p>
+        </section>
+        <section class="word-lesson-examples" aria-labelledby="${examplesId}">
+          <p id="${examplesId}" class="lesson-label">In a sentence</p>
+          <ol role="list">
+            ${examples}
+          </ol>
+        </section>
+        <dl class="lesson-guidance">
+          <div class="lesson-guidance-use">
+            <dt>Use it when</dt>
+            <dd>${escapeHtml(meaning.useItWhen)}.</dd>
+          </div>
+          <div class="lesson-guidance-avoid">
+            <dt>Do not use it for</dt>
+            <dd>${escapeHtml(meaning.doNotUseItFor)}.</dd>
+          </div>
+        </dl>
+      </section>`;
+    })
     .join("");
   const etymology = lesson.etymology
     ? html`<section class="word-lesson-etymology">
@@ -41,31 +69,17 @@ export function renderLessonCard({ lesson }) {
     ${renderWordHero({
       headword: lesson.headword,
       pronunciation: lesson.pronunciation,
-      partOfSpeech: meaning.partOfSpeech,
+      partOfSpeech: partsOfSpeech,
     })}
     <div class="region wrapper word-lesson-body region-space:space-xl">
-      <section class="flow word-lesson-definition">
-        <p>${escapeHtml(meaning.definition)}.</p>
-      </section>
-      <section class="word-lesson-examples" aria-labelledby="lesson-examples">
-        <p id="lesson-examples" class="lesson-label">In a sentence</p>
-        <ol role="list">
-          ${examples}
-        </ol>
-      </section>
-      <dl class="lesson-guidance">
-        <div class="lesson-guidance-use">
-          <dt>Use it when</dt>
-          <dd>${escapeHtml(meaning.useItWhen)}.</dd>
-        </div>
-        <div class="lesson-guidance-avoid">
-          <dt>Do not use it for</dt>
-          <dd>${escapeHtml(meaning.doNotUseItFor)}.</dd>
-        </div>
-      </dl>
+      <div class="word-lesson-meanings">
+        ${meanings}
+      </div>
       ${etymology}
       <footer class="word-lesson-footer">
-        <p>Also: ${meaning.synonyms.map(escapeHtml).join(", ")}</p>
+        <p>Also: ${[...new Set(lesson.meanings.flatMap((meaning) => meaning.synonyms))]
+          .map(escapeHtml)
+          .join(", ")}</p>
         ${renderButton({
           label: "Update familiarity",
           action: "revise-familiarity",
