@@ -92,6 +92,22 @@ describe("SwatchKit shared WordWell components", () => {
     expect(renderProfile({ profile: { state: "protected", passkeys: [] }, deletionConfirmation: true })).toContain("Permanently delete profile");
   });
 
+  it("renders platform-appropriate installation help and explicit signal consent", () => {
+    const ios = renderProfile({
+      profile: { state: "anonymous", canProtect: false },
+      installation: { capability: "ios_home_screen", canPrompt: false },
+    });
+    const chromium = renderProfile({
+      profile: { state: "anonymous", canProtect: false },
+      installation: { capability: "chromium_prompt", canPrompt: true },
+      analyticsConsent: true,
+    });
+
+    expect(ios).toContain("Add to Home Screen");
+    expect(chromium).toContain('data-action="install-app"');
+    expect(chromium).toContain('data-action="analytics-consent" type="checkbox" checked');
+  });
+
   it("moves aria-current inside a view transition when a navigation link is clicked", () => {
     document.body.innerHTML = renderNavigation();
     const navigation = document.querySelector(".navigation");

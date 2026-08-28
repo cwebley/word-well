@@ -1,7 +1,7 @@
 export function createProductSignals(hasConsent, send = sendToFirstParty) {
   return {
     record(event, capability) {
-      if (!hasConsent()) {
+      if (!hasConsent() || !events.has(event) || !capabilities.has(capability)) {
         return;
       }
 
@@ -14,8 +14,16 @@ export function createProductSignals(hasConsent, send = sendToFirstParty) {
   };
 }
 
+const events = new Set([
+  "install_cta_shown",
+  "install_cta_started",
+  "install_confirmed",
+]);
+const capabilities = new Set(["chromium_prompt", "ios_home_screen"]);
+
 function sendToFirstParty(signal) {
-  void fetch("/api/analytics", {
+  const baseUrl = document.documentElement.dataset.apiBaseUrl ?? "";
+  void fetch(`${baseUrl}/product-signals`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(signal),

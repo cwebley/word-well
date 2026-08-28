@@ -45,6 +45,13 @@ for (const file of STANDALONE_CSS) {
   }
 }
 
+for (const file of ["manifest.webmanifest", "assets/icon.svg"]) {
+  const source = path.join("src", file);
+  const destination = path.join("dist", file);
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.copyFileSync(source, destination);
+}
+
 console.log(
   `[assets] Built CSS and JS with esbuild${isProduction ? " (production)" : ""}`,
 );

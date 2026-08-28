@@ -2,7 +2,7 @@ import { escapeHtml, renderButton } from "./button.js";
 
 const html = String.raw;
 
-export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification } = {}) {
+export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification, installation, analyticsConsent = false } = {}) {
   if (profile.state === "tombstoned") {
     return html`<section class="region wrapper profile flow" aria-labelledby="profile-title">
       <p class="lesson-label">Profile deleted</p>
@@ -22,6 +22,20 @@ export function renderProfile({ profile, deletionConfirmation = false, recoveryV
     <h1 id="profile-title">Keep your learning private and portable.</h1>
     <p>Starting band: Stretch my vocabulary.</p>
     ${protection}
+    ${renderInstallation(installation, analyticsConsent)}
+  </section>`;
+}
+
+function renderInstallation(installation, analyticsConsent) {
+  if (!installation || installation.capability === "unavailable" || (installation.capability === "chromium_prompt" && !installation.canPrompt)) return "";
+  const install = installation.capability === "ios_home_screen"
+    ? "In Safari, choose Share, then Add to Home Screen."
+    : renderButton({ label: "Install WordWell", action: "install-app" });
+  return html`<section class="profile-section flow">
+    <h2>Install WordWell</h2>
+    <p>${install}</p>
+    <label><input data-action="analytics-consent" type="checkbox" ${analyticsConsent ? "checked" : ""} /> Share anonymous installation signals</label>
+    <p>Only install prompt and confirmation events are sent. No device identifier or learning history is collected.</p>
   </section>`;
 }
 

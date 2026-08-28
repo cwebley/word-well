@@ -10,7 +10,8 @@ beforeAll(async () => {
     createAnonymousProfile: async () => ({ profile: { state: "anonymous" }, session: { grant: "grant", expiresAt: "2026-09-26T12:00:00.000Z" } }),
     readState: async () => ({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }),
     synchronize: async (_grant, operations) => ({ status: "active", state: { lessons: [], history: [], evidence: operations, mutable: [] } }),
-    renewSession: async () => ({ status: "session-expired" })
+    renewSession: async () => ({ status: "session-expired" }),
+    recordProductSignal: async (signal) => recorded.push(signal)
   };
   server = createServer(createApi(database));
   await new Promise((resolve) => server.listen(0, resolve));
@@ -46,7 +47,26 @@ describe("HTTP learner sync contract", () => {
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ status: "session-expired" });
   });
+
+  it("accepts only the fixed anonymous product signal payload", async () => {
+    const accepted = await request("POST", "/product-signals", {
+      event: "install_confirmed",
+      capability: "ios_home_screen",
+      day: "2026-08-28"
+    });
+    const rejected = await request("POST", "/product-signals", {
+      event: "lesson_read",
+      capability: "device-123",
+      day: "today"
+    });
+
+    expect(accepted.response.status).toBe(204);
+    expect(recorded).toContainEqual({ event: "install_confirmed", capability: "ios_home_screen", day: "2026-08-28" });
+    expect(rejected.response.status).toBe(400);
+  });
 });
+
+const recorded = [];
 
 async function request(method, path, body) {
   const response = await fetch(`${baseUrl}${path}`, {
@@ -54,5 +74,5 @@ async function request(method, path, body) {
     headers: { authorization: "Bearer grant", ...(body ? { "content-type": "application/json" } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {})
   });
-  return { response, body: await response.json() };
+  return { response, body: response.status === 204 ? undefined : await response.json() };
 }

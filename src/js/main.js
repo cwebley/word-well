@@ -8,6 +8,8 @@ import { escapeHtml, renderButton } from "../components/button.js";
 import { Profiles } from "../profiles.js";
 import { WebAuthnSimulator } from "../webauthn-simulator.js";
 import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
+import { createInstallation } from "../install.js";
+import { createProductSignals } from "../product-signals.js";
 
 const html = String.raw;
 
@@ -20,6 +22,8 @@ let syncStatus;
 let deletionConfirmation = false;
 let recoveryVerification;
 let deleted = false;
+let analyticsConsent = localStorage.getItem("wordwell:analytics-consent") === "granted";
+let installation;
 const webauthn = new WebAuthnSimulator();
 const profiles = new Profiles({ webauthn });
 const profileSession = profiles.createAnonymousProfile().session;
@@ -31,6 +35,8 @@ const learning = new LearningStateClient({
   server: adapter,
   profile: adapter.cacheKey,
 });
+const signals = createProductSignals(() => analyticsConsent);
+installation = createInstallation({ window, navigator, signals, onChange: () => render() });
 
 void startLearning();
 window.addEventListener("online", reconcileLearning);
@@ -48,6 +54,8 @@ function render() {
       profile: profiles.profile(profileSession.id),
       deletionConfirmation,
       recoveryVerification,
+      installation: installation.show(),
+      analyticsConsent,
     });
     return;
   }
@@ -138,6 +146,8 @@ document.addEventListener("click", (event) => {
     void reconcileLearning();
   } else if (target.dataset.action === "skip-upcoming") {
     void skipUpcoming(target.dataset.value);
+  } else if (target.dataset.action === "install-app") {
+    void installation.prompt();
   } else if (target.dataset.action === "protect-profile") {
     profiles.protect(profileSession.id, webauthn.createPasskey("This device"));
   } else if (target.dataset.action === "add-passkey") {
@@ -162,6 +172,14 @@ document.addEventListener("click", (event) => {
     void reconcileLearning();
     deletionConfirmation = false;
   }
+  render();
+});
+
+document.addEventListener("change", (event) => {
+  const target = event.target.closest('[data-action="analytics-consent"]');
+  if (!target) return;
+  analyticsConsent = target.checked;
+  localStorage.setItem("wordwell:analytics-consent", analyticsConsent ? "granted" : "denied");
   render();
 });
 

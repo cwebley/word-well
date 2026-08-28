@@ -55,6 +55,13 @@ export class LearnerDatabase {
     }
   }
 
+  async recordProductSignal(signal: ProductSignal): Promise<void> {
+    await this.#pool.query(
+      "INSERT INTO product_signals (event, capability, day, received_at) VALUES ($1, $2, $3, $4)",
+      [signal.event, signal.capability, signal.day, this.#now()]
+    );
+  }
+
   async readState(grant: string, timeZone?: string): Promise<RepositoryResponse> {
     if (timeZone) validateTimeZone(timeZone);
     return this.#withAuthorizedSession(grant, timeZone, async (client, authorization) => {
@@ -179,6 +186,12 @@ export class LearnerDatabase {
     }
   }
 }
+
+type ProductSignal = {
+  event: "install_cta_shown" | "install_cta_started" | "install_confirmed";
+  capability: "chromium_prompt" | "ios_home_screen";
+  day: string;
+};
 
 async function authorize(client: Queryable, grant: string, now: Date, renewContact = true, requestedTimeZone?: string): Promise<ActiveAuthorization | { status: "deleted" } | { status: "session-expired" }> {
   const result = await client.query<{

@@ -12,6 +12,11 @@ export function createApi(database: LearnerDatabase) {
         const clientContextId = request.headers["x-client-context"];
         return send(response, 201, await database.createAnonymousProfile(typeof clientContextId === "string" ? clientContextId : undefined, clientTimeZone(request) ?? "UTC"));
       }
+      if (request.method === "POST" && path === "/product-signals") {
+        const signal = productSignal(await readJson(request));
+        await database.recordProductSignal(signal);
+        return send(response, 204, null);
+      }
 
       const grant = bearerGrant(request);
       if (request.method === "GET" && path === "/learning-state") {
@@ -67,6 +72,23 @@ function bearerGrant(request: IncomingMessage): string {
 function clientTimeZone(request: IncomingMessage): string | undefined {
   const value = request.headers["x-time-zone"];
   return typeof value === "string" && value ? value : undefined;
+}
+
+function productSignal(value: unknown): {
+  event: "install_cta_shown" | "install_cta_started" | "install_confirmed";
+  capability: "chromium_prompt" | "ios_home_screen";
+  day: string;
+} {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A product signal is required.");
+  const { event, capability, day } = value as Record<string, unknown>;
+  if (
+    !["install_cta_shown", "install_cta_started", "install_confirmed"].includes(String(event)) ||
+    !["chromium_prompt", "ios_home_screen"].includes(String(capability)) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(String(day))
+  ) {
+    throw new ApiError(400, "Product signal was not valid.");
+  }
+  return { event: event as "install_cta_shown" | "install_cta_started" | "install_confirmed", capability: capability as "chromium_prompt" | "ios_home_screen", day: String(day) };
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {

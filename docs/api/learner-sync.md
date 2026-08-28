@@ -41,6 +41,9 @@ DATABASE_URL=postgresql://wordwell:wordwell@localhost:54329/wordwell_test npm ru
   canonical state with a replacement when an eligible candidate exists.
 - `POST /session/renew` revokes the presented grant and returns a rotated grant
   for the same client context.
+- `POST /product-signals` accepts only consented, coarse installation events:
+  `install_cta_shown`, `install_cta_started`, and `install_confirmed`, with an
+  allowed capability and UTC day. It has no profile or device identifier.
 
 Requests may include `X-Time-Zone` with the active client's IANA time zone. The
 server stores it on that client context and uses it to calculate the local
