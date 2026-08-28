@@ -35,6 +35,10 @@ function storage() {
 }
 
 describe("learner synchronization seam", () => {
+  it("constructs an HTTP adapter with its default browser client context", () => {
+    expect(() => new HttpLearningStateAdapter({ fetch: () => {} })).not.toThrow();
+  });
+
   it("keeps the app shell, fifty most recent lessons, history, and practice offline without sensitive profile data", async () => {
     const { server, profile, client } = setup();
     server.setLessons(Array.from({ length: 51 }, (_, index) => lesson(`lesson-${index}`, `word-${index}`)));

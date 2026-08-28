@@ -142,7 +142,7 @@ export class LearningStateClient {
     profile,
     now = () => new Date(),
     storage = indexedDbStorage(),
-    clientId = clientContextId(),
+    clientId = browserClientContextId(),
   }) {
     this.#server = server;
     this.#profile = profile;
@@ -288,7 +288,7 @@ export class HttpLearningStateAdapter {
     fetch = globalThis.fetch,
     baseUrl = "",
     session = browserSession(),
-    clientContextId = clientContextId(),
+    clientContextId = browserClientContextId(),
   } = {}) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/$/, "");
@@ -504,7 +504,7 @@ function browserSession() {
   };
 }
 
-function clientContextId() {
+function browserClientContextId() {
   const key = "wordwell:client-context";
   const stored = globalThis.sessionStorage?.getItem(key);
   if (stored) return stored;
