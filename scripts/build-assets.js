@@ -10,7 +10,7 @@ const isProduction =
 const STANDALONE_CSS = ["swatchkit-ui.css", "swatchkit-preview.css"];
 
 await esbuild.build({
-  entryPoints: ["src/css/main.css", "src/js/main.js", "src/js/navigation-preview.js"],
+  entryPoints: ["src/css/main.css", "src/js/main.js", "src/js/navigation-preview.js", "src/service-worker.js"],
   bundle: true,
   outdir: "dist",
   outbase: "src",

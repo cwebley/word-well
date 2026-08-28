@@ -26,6 +26,9 @@ export function home() {
           </main>
         </div>
 
+        <script>
+          if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+        </script>
         <script type="module" src="./js/main.js"></script>
       </body>
     </html>`;
