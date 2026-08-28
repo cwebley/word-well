@@ -50,6 +50,9 @@ describe("SwatchKit shared WordWell components", () => {
     const practice = renderPractice({ practice: seededVocabularyRecord.meanings[0].practice });
     expect(practice).toContain("Which sentence uses candid naturally?");
     expect(practice).toContain('class="button choice large"');
+    expect(practice).toContain('class="practice region region-space:space-l"');
+    expect(practice).toContain('class="wrapper"');
+    expect(practice).not.toContain('class="card practice');
     expect(practice).not.toContain("lesson-label");
     expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice, result: false })).not.toContain("Practice again");
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
