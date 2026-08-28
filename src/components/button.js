@@ -10,23 +10,28 @@
  * @param {string} [props.value]            - Value for a delegated action
  * @param {"primary"|"outline"|"choice"} [props.variant] - Visual style (default: primary)
  * @param {"small"|"large"} [props.size]    - Optional size modifier
+ * @param {boolean} [props.busy]            - Marks the button as a pending request, disables it, and sets aria-busy
  */
-export function renderButton({ label, href, action, value, variant = "primary", size } = {}) {
+export function renderButton({ label, href, action, value, variant = "primary", size, busy = false } = {}) {
   const classes = ["button"];
   if (variant === "outline") classes.push("outline");
   else if (variant === "choice") classes.push("choice");
   if (size === "small") classes.push("small");
   else if (size === "large") classes.push("large");
+  if (busy) classes.push("busy");
 
   const cls = classes.join(" ");
-  const attributes = [
+  const shared = [
     `class="${cls}"`,
     action ? `data-action="${escapeHtml(action)}"` : "",
     value ? `data-value="${escapeHtml(value)}"` : ""
   ].filter(Boolean).join(" ");
-  return href
-    ? `<a ${attributes} href="${escapeHtml(href)}">${escapeHtml(label)}</a>`
-    : `<button ${attributes} type="button">${escapeHtml(label)}</button>`;
+  if (href) {
+    const aria = busy ? ` aria-disabled="true"` : "";
+    return `<a ${shared} href="${escapeHtml(href)}"${aria}>${escapeHtml(label)}</a>`;
+  }
+  const busyAttrs = busy ? " disabled aria-busy=\"true\"" : "";
+  return `<button ${shared} type="button"${busyAttrs}>${escapeHtml(label)}</button>`;
 }
 
 export function escapeHtml(value) {

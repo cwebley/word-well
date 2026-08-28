@@ -59,6 +59,8 @@ describe("SwatchKit shared WordWell components", () => {
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
     expect(renderLearningSyncStatus("offline")).toContain('data-action="retry-learning"');
     expect(renderLearningSyncStatus("session-expired")).toContain("Session expired");
+    expect(renderLearningSyncStatus("offline", { busy: true })).toContain('disabled aria-busy="true"');
+    expect(renderLearningSyncStatus("offline", { error: "Retry failed. Try again in a moment." })).toContain("sync-status-error");
   });
 
   it("renders every meaning in a multi-meaning lesson", () => {

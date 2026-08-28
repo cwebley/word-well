@@ -88,6 +88,17 @@
   justify-self: start;
 }
 
+.sync-status-error {
+  color: var(--color-avoid);
+  font-size: var(--step--2);
+}
+
+.button.busy,
+.button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.65;
+}
+
 @container app-shell (width < 50rem) {
   .navigation-wordmark {
     display: none;

@@ -22,6 +22,8 @@ let familiarity;
 let revising = false;
 let practiceResult;
 let syncStatus;
+let syncBusy = false;
+let syncError;
 let deletionConfirmation = false;
 let recoveryVerification;
 let deleted = false;
@@ -48,7 +50,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 function render() {
-  syncStatusOutlet.innerHTML = renderLearningSyncStatus(syncStatus);
+  syncStatusOutlet.innerHTML = renderLearningSyncStatus(syncStatus, { busy: syncBusy, error: syncError });
   if (deleted) {
     main.innerHTML = renderProfile({ profile: { state: "tombstoned" } });
     return;
@@ -147,7 +149,7 @@ document.addEventListener("click", (event) => {
   } else if (target.dataset.action === "content-quality") {
     recordLearning("content-quality", { deliveryId: currentDelivery().id });
   } else if (target.dataset.action === "retry-learning") {
-    void reconcileLearning();
+    void reconcileLearning({ source: "retry" });
   } else if (target.dataset.action === "skip-upcoming") {
     void skipUpcoming(target.dataset.value);
   } else if (target.dataset.action === "install-app") {
@@ -220,7 +222,12 @@ async function startLearning() {
   await reconcileLearning();
 }
 
-async function reconcileLearning() {
+async function reconcileLearning({ source = "auto" } = {}) {
+  if (source === "retry") {
+    syncBusy = true;
+    syncError = undefined;
+    render();
+  }
   try {
     const result = await learning.synchronize();
     syncStatus = result.status;
@@ -228,9 +235,13 @@ async function reconcileLearning() {
     if (result.status === "active") {
       familiarity = currentDelivery()?.familiarity;
       practiceVisit = undefined;
+      syncError = undefined;
     }
-  } catch {
+  } catch (error) {
     syncStatus = "offline";
+    if (source === "retry") syncError = "Retry failed. Try again in a moment.";
+  } finally {
+    syncBusy = false;
   }
   render();
 }
