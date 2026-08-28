@@ -71,6 +71,8 @@
   }
   .navigation-link {
     flex: 1;
+    padding: var(--space-m) var(--space-l);
+    text-align: center;
   }
   .navigation-link[aria-current="page"]::before {
     height: 0.3rem;
