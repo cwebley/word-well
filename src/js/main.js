@@ -4,6 +4,7 @@ import { renderPractice } from "../components/practice.js";
 import { renderStatus } from "../components/status.js";
 import { bindNavigation } from "../components/navigation.js";
 import { seededVocabularyRecord } from "../fixtures/published-word-lesson.js";
+import { DailyLessons } from "../daily-lessons.js";
 
 const html = String.raw;
 
@@ -12,11 +13,22 @@ let route = "today";
 let familiarity;
 let revising = false;
 let practiceResult;
+let practiceVisit;
+const profileId = "local-preview-profile";
+const lessons = new DailyLessons([{ id: "seeded-candid", startingBand: "Stretch my vocabulary", record: seededVocabularyRecord }]);
+const delivery = lessons.deliver(profileId, "UTC");
 
 function render() {
   const lesson = seededVocabularyRecord;
   if (route === "practice") {
-    main.innerHTML = familiarity ? renderPractice({ practice: lesson.meanings[0].practice, result: practiceResult }) : renderStatus({ label: "Practice", detail: "Record your familiarity before beginning practice." });
+    practiceVisit = practiceResult === undefined && familiarity ? lessons.practice(profileId) : practiceVisit;
+    main.innerHTML = familiarity
+      ? practiceResult !== undefined
+        ? renderPractice({ practice: practiceVisit.practice, result: practiceResult })
+        : practiceVisit
+          ? renderPractice({ practice: practiceVisit.practice })
+          : renderStatus({ label: "Practice", detail: "Nothing is due for recall right now." })
+      : renderStatus({ label: "Practice", detail: "Record your familiarity before beginning practice." });
   } else if (route === "history") {
     main.innerHTML = familiarity ? html`<section class="card flow"><p class="lesson-label">History</p><h1 class="card-title">Words you've met</h1><p><strong>${lesson.headword}</strong> · ${familiarity}</p></section>` : renderStatus({ label: "History", detail: "Your word history will gather here after today's lesson." });
   } else if (route === "profile") {
@@ -32,6 +44,7 @@ bindNavigation(document.querySelector(".navigation"), {
   onNavigate(nextRoute) {
     route = nextRoute;
     practiceResult = undefined;
+    practiceVisit = undefined;
     render();
     main.focus();
   },
@@ -43,13 +56,19 @@ document.addEventListener("click", (event) => {
   event.preventDefault();
   if (target.dataset.action === "familiarity") {
     familiarity = target.dataset.value;
+    if (revising) lessons.reviseFamiliarity(profileId, delivery.id, familiarity);
+    else lessons.recordFamiliarity(profileId, delivery.id, familiarity);
     revising = false;
   } else if (target.dataset.action === "revise-familiarity") {
     revising = true;
   } else if (target.dataset.action === "practice-answer") {
-    practiceResult = target.dataset.value === "correct";
-  } else if (target.dataset.action === "practice-reset") {
-    practiceResult = undefined;
+    practiceResult = lessons.answerPractice(profileId, practiceVisit.delivery.id, target.dataset.value).correct;
+  } else if (target.dataset.action === "active-use") {
+    lessons.recordActiveUse(profileId, delivery.id, target.dataset.value);
+  } else if (target.dataset.action === "utility") {
+    lessons.recordUtility(profileId, delivery.id, target.dataset.value);
+  } else if (target.dataset.action === "content-quality") {
+    lessons.reportContentQuality(profileId, delivery.id);
   }
   render();
 });
