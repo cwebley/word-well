@@ -1,0 +1,61 @@
+/* Word hero — the headword panel shared by the familiarity gate and the word
+   lesson reading page. Rendered as `<div class="word-hero">…</div>`, the
+   internal pinned bar and header are always in that order so the hero can
+   scroll over the bar. */
+
+.word-hero-header {
+  align-content: center;
+  background: var(--color-surface);
+  border-block-end: var(--stroke-solid);
+  display: grid;
+  margin-block-start: calc(var(--word-hero-pinned-height, 4.5rem) * -1);
+  padding: var(--space-2xl-4xl) calc(var(--gutter) + var(--space-2xl-4xl));
+  position: relative;
+  z-index: 1;
+}
+
+.word-hero-header .lesson-label {
+  margin-block-end: var(--space-2xl);
+}
+
+.word-hero-word {
+  color: var(--color-link);
+  font-family: var(--font-reading);
+  font-size: min(var(--step-10), 28cqi);
+  font-weight: 440;
+  letter-spacing: -0.075em;
+  line-height: 0.8;
+}
+
+.word-hero-meta {
+  color: var(--color-link);
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+  margin-block-start: var(--space-m);
+}
+
+.word-hero-pinned {
+  align-items: baseline;
+  background: var(--color-surface);
+  display: flex;
+  gap: var(--space-m);
+  inset-block-start: 0;
+  padding: var(--space-s) calc(var(--gutter) + var(--space-2xl-4xl));
+  position: sticky;
+  z-index: 0;
+}
+
+.word-hero-pinned-word {
+  color: var(--color-link);
+  font-family: var(--font-reading);
+  font-size: var(--step-6);
+  font-weight: 440;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.word-hero-pinned-meta {
+  color: var(--color-text-muted);
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+}
