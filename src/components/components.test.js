@@ -37,8 +37,7 @@ describe("SwatchKit shared WordWell components", () => {
     expect(familiarity).toContain('class="familiarity-actions"');
     expect(familiarity).toContain('class="familiarity-gate"');
     expect(familiarity).toContain('class="familiarity-prompt flow"');
-    expect(familiarity).toContain('class="button"');
-    expect(familiarity).not.toContain('class="button choice"');
+    expect(familiarity).toContain('class="button choice large"');
     expect(lesson).toContain("In a sentence");
     expect(lesson).toContain("He was candid about why the plan had not worked.");
     expect(lesson).toContain("Use it when");

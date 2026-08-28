@@ -16,7 +16,7 @@ export function renderFamiliarityGate({ headword, partOfSpeech, pronunciation, r
     <div class="familiarity-prompt flow">
       <h1 id="familiarity-heading" class="familiarity-title">${revision ? "How familiar does this word feel now?" : "How familiar is this word?"}</h1>
       <p class="familiarity-copy">${revision ? "This updates your reference point without adding new learning evidence." : "Your answer sets the starting point for practice. It is not a test."}</p>
-      <div class="familiarity-actions">${choices.map((choice) => renderButton({ label: choice, action: "familiarity", value: choice })).join("")}</div>
+      <div class="familiarity-actions">${choices.map((choice) => renderButton({ label: choice, action: "familiarity", value: choice, variant: "choice", size: "large" })).join("")}</div>
     </div>
   </section>`;
 }
