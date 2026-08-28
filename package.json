@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "npm run clean && npm run build:site && npm run build:swatchkit && npm run build:assets",
+    "api": "tsx api/server.ts",
+    "db:migrate": "node db/migrate.mjs",
     "test": "vitest run",
+    "test:api": "vitest run api",
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "clean": "node scripts/clean.js",
@@ -17,9 +20,11 @@
     "watch:assets": "onchange 'src/css/**/*' 'src/js/**/*' 'src/components/**/*' -e 'src/css/utilities/utilities.css' -- npm run build:assets",
     "swatchkit:watch": "swatchkit --watch",
     "serve": "http-server dist -c-1 -p 0 -o",
-    "dev": "npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve"
+    "dev": "export API_BASE_URL=${API_BASE_URL:-http://localhost:3000} && npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve"
   },
   "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@types/pg": "^8.23.1",
     "esbuild": "^0.28.0",
     "http-server": "^14.1.1",
     "jsdom": "^29.1.1",
@@ -28,5 +33,9 @@
     "swatchkit": "^6.4.0",
     "typescript": "latest",
     "vitest": "latest"
+  },
+  "dependencies": {
+    "pg": "^8.23.0",
+    "tsx": "^4.23.12"
   }
 }

@@ -1,12 +1,12 @@
-import { renderFamiliarityGate } from "../components/familiarity.js";
 import { renderNavigation } from "../components/navigation.js";
-import { seededVocabularyRecord } from "../fixtures/published-word-lesson.js";
+import { renderStatus } from "../components/status.js";
+import { escapeHtml } from "../components/button.js";
 
 const html = String.raw;
 
-export function home() {
+export function home({ apiBaseUrl = process.env.API_BASE_URL ?? "" } = {}) {
   return html`<!doctype html>
-    <html lang="en">
+    <html lang="en" data-api-base-url="${escapeHtml(apiBaseUrl)}">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,11 +18,7 @@ export function home() {
         <div class="app-shell">
           ${renderNavigation()}
           <main class="app-main" id="app-main" tabindex="-1">
-            ${renderFamiliarityGate({
-              headword: seededVocabularyRecord.headword,
-              pronunciation: seededVocabularyRecord.pronunciation,
-              partOfSpeech: seededVocabularyRecord.meanings[0].partOfSpeech,
-            })}
+            ${renderStatus({ label: "Today", detail: "Your next lesson will appear here after it is delivered." })}
           </main>
         </div>
 

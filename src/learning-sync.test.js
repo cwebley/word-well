@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { LearningStateClient, LearningStateServer } from "./learning-sync.js";
+import { describe, expect, it, vi } from "vitest";
+import { HttpLearningStateAdapter, indexedDbStorage, LearningStateClient, LearningStateServer } from "./learning-sync.js";
 
 const day = 24 * 60 * 60 * 1000;
 
@@ -35,7 +35,28 @@ function storage() {
 }
 
 describe("learner synchronization seam", () => {
-  it("keeps the app shell, fifty most recent lessons, history, and practice offline without sensitive profile data", () => {
+  it("constructs an HTTP adapter with its default browser client context", () => {
+    expect(() => new HttpLearningStateAdapter({ fetch: () => {} })).not.toThrow();
+  });
+
+  it("calls the browser fetch function with its required global receiver", async () => {
+    const originalFetch = globalThis.fetch;
+    const fetch = vi.fn(function () {
+      if (this !== globalThis) throw new TypeError("Illegal invocation");
+      return response(200, { status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } });
+    });
+    globalThis.fetch = fetch;
+    const adapter = new HttpLearningStateAdapter({
+      clientContextId: "browser-tab",
+      session: { load: () => ({ grant: "grant" }), save() {}, clear() {} },
+    });
+
+    await expect(adapter.readState()).resolves.toMatchObject({ status: "active" });
+    expect(fetch).toHaveBeenCalledOnce();
+    globalThis.fetch = originalFetch;
+  });
+
+  it("keeps the app shell, fifty most recent lessons, history, and practice offline without sensitive profile data", async () => {
     const { server, profile, client } = setup();
     server.setLessons(Array.from({ length: 51 }, (_, index) => lesson(`lesson-${index}`, `word-${index}`)));
     for (let index = 0; index < 51; index += 1) {
@@ -43,7 +64,7 @@ describe("learner synchronization seam", () => {
     }
     const offline = client();
 
-    offline.synchronize();
+    await offline.synchronize();
 
     expect(offline.cache()).toMatchObject({ appShell: true, history: expect.any(Array), practice: expect.any(Array) });
     expect(offline.cache().history).toHaveLength(50);
@@ -51,7 +72,7 @@ describe("learner synchronization seam", () => {
     expect(JSON.stringify(offline.cache())).not.toMatch(/session|passkey|recovery|analytics/i);
   });
 
-  it("queues only permitted, idempotent learning changes while offline and expires them after thirty days", () => {
+  it("queues only permitted, idempotent learning changes while offline and expires them after thirty days", async () => {
     const { client, setTime } = setup();
     const offline = client();
 
@@ -61,40 +82,40 @@ describe("learner synchronization seam", () => {
     expect(offline.outbox()).toHaveLength(2);
 
     setTime(new Date("2026-08-27T12:00:00Z").getTime() + 31 * day);
-    offline.synchronize();
+    await offline.synchronize();
     expect(offline.outbox()).toEqual([]);
   });
 
-  it("deduplicates retries, orders mutable changes by server acceptance, and recomputes recall from retained evidence", () => {
+  it("deduplicates retries, orders mutable changes by server acceptance, and recomputes recall from retained evidence", async () => {
     const { server, profile, client } = setup();
     server.recordDelivery(profile, { id: "delivery-1", lessonId: "candid", localDate: "2026-08-27" });
     const first = client();
     const second = client();
-    first.synchronize();
-    second.synchronize();
+    await first.synchronize();
+    await second.synchronize();
 
     const familiarity = first.record("familiarity", { deliveryId: "delivery-1", familiarity: "Completely new to me" });
     const practice = first.record("practice", { deliveryId: "delivery-1", correct: true });
-    first.synchronize();
+    await first.synchronize();
     first.retry(familiarity.id);
     first.retry(practice.id);
     second.record("familiarity", { deliveryId: "delivery-1", familiarity: "I use it all the time" });
     second.record("active-use", { deliveryId: "delivery-1", activeUse: "using" });
-    second.synchronize();
-    first.synchronize();
+    await second.synchronize();
+    await first.synchronize();
 
     expect(server.state(profile).evidence).toHaveLength(1);
     expect(first.cache().history[0]).toMatchObject({ familiarity: "I use it all the time", recall: { mastery: 5, stage: "3 days" } });
   });
 
-  it("revalidates current content and clears local state when a remote deletion tombstone wins", () => {
+  it("revalidates current content and clears local state when a remote deletion tombstone wins", async () => {
     const { server, profile, client } = setup();
     server.recordDelivery(profile, { id: "delivery-1", lessonId: "candid", localDate: "2026-08-27" });
     const offline = client();
-    offline.synchronize();
+    await offline.synchronize();
     server.setLessons([]);
 
-    offline.synchronize();
+    await offline.synchronize();
     expect(offline.cache().history).toEqual([{ id: "delivery-1", lessonId: "candid", localDate: "2026-08-27", status: "unavailable" }]);
 
     server.deleteProfile(profile);
@@ -103,7 +124,7 @@ describe("learner synchronization seam", () => {
     expect(offline.cache()).toEqual({ appShell: true, lessons: [], history: [], practice: [] });
   });
 
-  it("reports session expiry without accepting queued changes", () => {
+  it("reports session expiry without accepting queued changes", async () => {
     const { server, profile, client } = setup();
     const offline = client();
     offline.record("content-quality", { deliveryId: "delivery-1" });
@@ -113,16 +134,159 @@ describe("learner synchronization seam", () => {
     expect(offline.outbox()).toHaveLength(1);
   });
 
-  it("restores a sanitized cache and queued changes after a client reload", () => {
+  it("restores a sanitized cache and queued changes after a client reload", async () => {
     const { server, profile, client } = setup();
     const persisted = storage();
     server.recordDelivery(profile, { id: "delivery-1", lessonId: "candid", localDate: "2026-08-27", recoveryEmail: "private@example.com" });
     const first = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser-tab" });
-    first.synchronize();
+    await first.synchronize();
     first.record("utility", { deliveryId: "delivery-1", utility: "useful" });
 
     const reloaded = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser-tab" });
     expect(reloaded.cache().history[0]).not.toHaveProperty("recoveryEmail");
     expect(reloaded.outbox()).toHaveLength(1);
   });
+
+  it("hydrates the server-issued delivery before offline rendering and queues changes for that delivery", async () => {
+    const persisted = storage();
+    const canonical = {
+      lessons: [lesson("candid", "candid")],
+      history: [{ id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" }],
+      delivery: { id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" },
+      evidence: [],
+      mutable: [],
+    };
+    await persisted.save("server-profile", "browser-tab", {
+      cache: { appShell: true, lessons: canonical.lessons, history: canonical.history, delivery: canonical.delivery, practice: [], evidence: [], mutable: [] },
+      outbox: [],
+      clientId: "browser-tab",
+      nextOperation: 1,
+    });
+    const client = new LearningStateClient({
+      server: {
+        synchronize: (_profile, operations) => ({ status: "active", state: { ...canonical, evidence: operations, mutable: [] } }),
+      },
+      profile: "server-profile",
+      storage: persisted,
+      clientId: "browser-tab",
+    });
+    await client.ready();
+
+    expect(client.cache().delivery.id).toBe("delivery-server-1");
+    client.record("utility", { deliveryId: client.cache().delivery.id, utility: "useful" });
+    expect(client.outbox()[0].deliveryId).toBe("delivery-server-1");
+  });
+
+  it("persists learner cache and outbox records in IndexedDB without using local storage", async () => {
+    const storage = indexedDbStorage({ indexedDB: fakeIndexedDb() });
+    const value = {
+      cache: { appShell: true, lessons: [], history: [], practice: [] },
+      outbox: [{ id: "browser:operation-1" }],
+      clientId: "browser",
+      nextOperation: 2
+    };
+
+    await storage.save("client:browser", "browser", value);
+    expect(await storage.load("client:browser", "browser")).toEqual(value);
+    const reloaded = new LearningStateClient({
+      server: { synchronize: () => ({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }) },
+      profile: "client:browser",
+      clientId: "browser",
+      storage
+    });
+    await reloaded.ready();
+    expect(reloaded.outbox()).toEqual(value.outbox);
+    await storage.clearProfile("client:browser");
+    expect(await storage.load("client:browser", "browser")).toBeUndefined();
+  });
+
+  it("uses a separate client-context session for HTTP state reads, syncs, renewals, and deletions", async () => {
+    const sessions = new Map();
+    const persisted = storage();
+    const calls = [];
+    const responses = [
+      response(201, { profile: { state: "anonymous" }, session: { grant: "first-grant" } }),
+      response(200, { status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }),
+      response(401, { status: "session-expired" }),
+      response(200, { status: "active", session: { grant: "renewed-grant" } }),
+      response(410, { status: "deleted" })
+    ];
+    const adapter = new HttpLearningStateAdapter({
+      clientContextId: "browser-tab",
+      fetch: async (url, options) => {
+        calls.push({ url, options });
+        return responses.shift();
+      },
+      session: {
+        load: (clientId) => sessions.get(clientId),
+        save: (clientId, session) => sessions.set(clientId, session),
+        clear: (clientId) => sessions.delete(clientId)
+      }
+    });
+    const client = new LearningStateClient({ server: adapter, profile: adapter.cacheKey, storage: persisted, clientId: "browser-tab" });
+
+    await client.hydrate();
+    client.record("utility", { deliveryId: "delivery-1", utility: "useful" });
+    await expect(client.synchronize()).resolves.toEqual({ status: "session-expired" });
+    expect(client.outbox()).toHaveLength(1);
+    expect(JSON.stringify(persisted.load(adapter.cacheKey, "browser-tab"))).not.toMatch(/grant/);
+    await expect(client.renewSession()).resolves.toEqual({ status: "active" });
+    await expect(client.hydrate()).resolves.toEqual({ status: "deleted" });
+
+    expect(calls.map(({ url, options }) => [url, options.method])).toEqual([
+      ["/profiles/anonymous", "POST"],
+      ["/learning-state", "GET"],
+      ["/learning-state/sync", "POST"],
+      ["/session/renew", "POST"],
+      ["/learning-state", "GET"]
+    ]);
+    expect(calls[2].options.headers.authorization).toBe("Bearer first-grant");
+    expect(calls[4].options.headers.authorization).toBe("Bearer renewed-grant");
+    expect(client.outbox()).toEqual([]);
+    expect(client.cache()).toEqual({ appShell: true, lessons: [], history: [], practice: [] });
+    expect(sessions.get("browser-tab")).toBeUndefined();
+  });
 });
+
+function response(status, body) {
+  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+}
+
+function fakeIndexedDb() {
+  const records = new Map();
+  const database = {
+    createObjectStore() {},
+    transaction() {
+      return {
+        objectStore() {
+          return {
+            get: (id) => operation(() => records.get(id)),
+            put: (record) => operation(() => records.set(record.id, structuredClone(record))),
+            getAll: () => operation(() => [...records.values()].map((record) => structuredClone(record))),
+            delete: (id) => operation(() => records.delete(id))
+          };
+        }
+      };
+    }
+  };
+  return {
+    open() {
+      const request = {};
+      queueMicrotask(() => {
+        request.result = database;
+        request.onupgradeneeded?.();
+        request.onsuccess?.();
+      });
+      return request;
+    }
+  };
+
+  function operation(action) {
+    const request = {};
+    queueMicrotask(() => {
+      request.result = action();
+      request.onsuccess?.();
+    });
+    return request;
+  }
+}
