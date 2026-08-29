@@ -1,0 +1,3325 @@
+{
+ "meta": {
+  "generated_at": "2026-08-28T21:45:22Z",
+  "sources": {
+   "oewn": {
+    "release": "oewn:2025",
+    "license": "CC BY 4.0",
+    "retrieved_via": "wn 1.1.1"
+   },
+   "cmudict": {
+    "release": "master @ sha256:81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "url": "https://raw.githubusercontent.com/cmusphinx/cmudict/master/cmudict.dict"
+   },
+   "scowl": {
+    "release": "scowl-2020.12.07",
+    "sha256": "5587667caa20c4891390c2d42dbb4d5c4c3f41bee77af1457ece3ba23fb859cc"
+   },
+   "wordfreq": {
+    "version": "3.1.1",
+    "lists": [
+     "small",
+     "large"
+    ]
+   },
+   "wiktionary": "2026-08-28T21:44:35Z"
+  }
+ },
+ "records": {
+  "candid": {
+   "word": "candid",
+   "zipf": 3.45,
+   "zipf_large": 3.45,
+   "cmudict": [
+    "K AE1 N D AH0 D",
+    "K AE1 N D IH0 D"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-candid__5.00.00.direct.02",
+     "pos": "a",
+     "lemma": "candid",
+     "synset_id": "oewn-00768027-s",
+     "definition": "characterized by directness in manner or speech; without subtlety or evasion",
+     "examples": [
+      "blunt talking and straight shooting",
+      "a blunt New England farmer",
+      "I gave them my candid opinion",
+      "forthright criticism",
+      "a forthright approach to the problem",
+      "tell me what you think \u2014 and you may just as well be frank",
+      "it is possible to be outspoken without being rude",
+      "plainspoken and to the point",
+      "a point-blank accusation"
+     ],
+     "members": [
+      "blunt",
+      "candid",
+      "forthright",
+      "frank",
+      "free-spoken",
+      "outspoken",
+      "plainspoken",
+      "point-blank",
+      "straight-from-the-shoulder"
+     ],
+     "ili": "i4222"
+    },
+    {
+     "sense_id": "oewn-candid__5.00.00.unstudied.00",
+     "pos": "a",
+     "lemma": "candid",
+     "synset_id": "oewn-01803806-s",
+     "definition": "informal or natural; especially caught off guard or unprepared",
+     "examples": [
+      "a candid photograph",
+      "a candid interview"
+     ],
+     "members": [
+      "candid"
+     ],
+     "ili": "i9886"
+    },
+    {
+     "sense_id": "oewn-candid__5.00.00.ingenuous.00",
+     "pos": "a",
+     "lemma": "candid",
+     "synset_id": "oewn-01313228-s",
+     "definition": "openly straightforward and direct without reserve or secretiveness",
+     "examples": [
+      "his candid eyes",
+      "an open and trusting nature",
+      "a heart-to-heart talk"
+     ],
+     "members": [
+      "candid",
+      "open",
+      "heart-to-heart"
+     ],
+     "ili": "i7138"
+    }
+   ],
+   "oewn_sense_count": 3,
+   "oewn_pos_counts": {
+    "a": 3
+   }
+  },
+  "run": {
+   "word": "run",
+   "zipf": 5.49,
+   "zipf_large": 5.49,
+   "cmudict": [
+    "R AH1 N"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-run__1.04.01..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00190414-n",
+     "definition": "a score in baseball made by a runner touching all four bases safely",
+     "examples": [
+      "the Yankees scored 3 runs in the bottom of the 9th",
+      "their first tally came in the 3rd inning"
+     ],
+     "members": [
+      "run",
+      "tally"
+     ],
+     "ili": "i36409"
+    },
+    {
+     "sense_id": "oewn-run__1.04.06..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00792739-n",
+     "definition": "the act of testing something",
+     "examples": [
+      "in the experimental trials the amount of carbon was measured separately",
+      "he called each flip of the coin a new trial"
+     ],
+     "members": [
+      "test",
+      "trial",
+      "run"
+     ],
+     "ili": "i39567"
+    },
+    {
+     "sense_id": "oewn-run__1.11.02..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-07475061-n",
+     "definition": "a race run on foot",
+     "examples": [
+      "she broke the record for the half-mile run"
+     ],
+     "members": [
+      "footrace",
+      "foot race",
+      "run"
+     ],
+     "ili": "i75920"
+    },
+    {
+     "sense_id": "oewn-run__1.14.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-08477596-n",
+     "definition": "an unbroken series of events",
+     "examples": [
+      "had a streak of bad luck",
+      "Nicklaus had a run of birdies"
+     ],
+     "members": [
+      "streak",
+      "run"
+     ],
+     "ili": "i81514"
+    },
+    {
+     "sense_id": "oewn-run__1.04.02..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00559920-n",
+     "definition": "(American football) a play in which a player attempts to carry the ball through or past the opposing team",
+     "examples": [
+      "the defensive line braced to stop the run",
+      "the coach put great emphasis on running"
+     ],
+     "members": [
+      "run",
+      "running",
+      "running play",
+      "running game"
+     ],
+     "ili": "i38329"
+    },
+    {
+     "sense_id": "oewn-run__1.04.04..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00309697-n",
+     "definition": "a regular trip",
+     "examples": [
+      "the ship made its run in record time"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i37027"
+    },
+    {
+     "sense_id": "oewn-run__1.04.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00294760-n",
+     "definition": "the act of running; traveling on foot at a fast pace",
+     "examples": [
+      "he broke into a run",
+      "his daily run keeps him fit"
+     ],
+     "members": [
+      "run",
+      "running"
+     ],
+     "ili": "i36946"
+    },
+    {
+     "sense_id": "oewn-run__1.28.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-15286931-n",
+     "definition": "the continuous period of time during which something (a machine or a factory) operates or continues in operation",
+     "examples": [
+      "the assembly line was on a 12-hour run"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i117447"
+    },
+    {
+     "sense_id": "oewn-run__1.26.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-14019420-n",
+     "definition": "unrestricted freedom to use",
+     "examples": [
+      "he has the run of the house"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i110484"
+    },
+    {
+     "sense_id": "oewn-run__1.23.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-13782269-n",
+     "definition": "the production achieved during a continuous period of operation (of a machine or factory etc.)",
+     "examples": [
+      "a daily run of 100,000 gallons of paint"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i109188"
+    },
+    {
+     "sense_id": "oewn-run__1.17.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-09438816-n",
+     "definition": "a small stream",
+     "examples": [],
+     "members": [
+      "rivulet",
+      "rill",
+      "run",
+      "runnel",
+      "streamlet"
+     ],
+     "ili": "i86082"
+    },
+    {
+     "sense_id": "oewn-run__1.11.03..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-07488069-n",
+     "definition": "a race between candidates for elective office",
+     "examples": [
+      "I managed his campaign for governor",
+      "he is raising money for a Senate run"
+     ],
+     "members": [
+      "political campaign",
+      "campaign",
+      "run"
+     ],
+     "ili": "i76002"
+    },
+    {
+     "sense_id": "oewn-run__1.11.01..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-07457610-n",
+     "definition": "a row of unravelled stitches",
+     "examples": [
+      "she got a run in her stocking"
+     ],
+     "members": [
+      "run",
+      "ladder",
+      "ravel"
+     ],
+     "ili": "i75826"
+    },
+    {
+     "sense_id": "oewn-run__1.11.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-07422377-n",
+     "definition": "the pouring forth of a fluid",
+     "examples": [],
+     "members": [
+      "discharge",
+      "outpouring",
+      "run"
+     ],
+     "ili": "i75635"
+    },
+    {
+     "sense_id": "oewn-run__1.07.00..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-05052992-n",
+     "definition": "an unbroken chronological sequence",
+     "examples": [
+      "the play had a long run on Broadway",
+      "the team enjoyed a brief run of victories"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i63517"
+    },
+    {
+     "sense_id": "oewn-run__1.04.05..",
+     "pos": "n",
+     "lemma": "run",
+     "synset_id": "oewn-00309837-n",
+     "definition": "a short trip",
+     "examples": [
+      "take a run into town"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i37028"
+    },
+    {
+     "sense_id": "oewn-run__2.38.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01930264-v",
+     "definition": "move fast by using one's feet, with one foot off the ground at any given time",
+     "examples": [
+      "Don't run \u2014 you'll be out of breath",
+      "The children ran to the store"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i31347"
+    },
+    {
+     "sense_id": "oewn-run__2.38.04..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02079296-v",
+     "definition": "flee; take to one's heels; cut and run",
+     "examples": [
+      "If you see this man, run!",
+      "The burglars escaped before the police showed up"
+     ],
+     "members": [
+      "scat",
+      "run",
+      "scarper",
+      "turn tail",
+      "lam",
+      "run away",
+      "hightail it",
+      "bunk",
+      "head for the hills",
+      "take to the woods",
+      "escape",
+      "fly the coop",
+      "break away"
+     ],
+     "ili": "i32121"
+    },
+    {
+     "sense_id": "oewn-run__2.42.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02691775-v",
+     "definition": "stretch out over a distance, space, time, or scope; run or extend between two points or beyond a certain point",
+     "examples": [
+      "Service runs all the way to Cranbury",
+      "His knowledge doesn't go very far",
+      "My memory extends back to my fourth year of life",
+      "The facts extend beyond a consideration of her personal assets"
+     ],
+     "members": [
+      "run",
+      "go",
+      "pass",
+      "lead",
+      "extend"
+     ],
+     "ili": "i35084"
+    },
+    {
+     "sense_id": "oewn-run__2.41.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02448714-v",
+     "definition": "direct or control; projects, businesses, etc.",
+     "examples": [
+      "She is running a relief operation in the Sudan"
+     ],
+     "members": [
+      "operate",
+      "run"
+     ],
+     "ili": "i33943"
+    },
+    {
+     "sense_id": "oewn-run__2.42.04..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02727159-v",
+     "definition": "have a particular form",
+     "examples": [
+      "the story or argument runs as follows",
+      "as the saying goes \u2026"
+     ],
+     "members": [
+      "run",
+      "go"
+     ],
+     "ili": "i35271"
+    },
+    {
+     "sense_id": "oewn-run__2.38.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02070867-v",
+     "definition": "move along, of liquids",
+     "examples": [
+      "Water flowed into the cave",
+      "the Missouri feeds into the Mississippi"
+     ],
+     "members": [
+      "run",
+      "flow",
+      "feed",
+      "course"
+     ],
+     "ili": "i32080"
+    },
+    {
+     "sense_id": "oewn-run__2.35.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01528454-v",
+     "definition": "perform as expected when applied",
+     "examples": [
+      "The washing machine won't go unless it's plugged in",
+      "Does this old car still run well?",
+      "This old radio doesn't work anymore"
+     ],
+     "members": [
+      "function",
+      "work",
+      "operate",
+      "go",
+      "run"
+     ],
+     "ili": "i29358"
+    },
+    {
+     "sense_id": "oewn-run__2.42.07..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02732914-v",
+     "definition": "change or be different within limits",
+     "examples": [
+      "Estimates for the losses in the earthquake range as high as $2 billion",
+      "Interest rates run from 5 to 10 percent",
+      "The instruments ranged from tuba to cymbals",
+      "My students range from very bright to dull"
+     ],
+     "members": [
+      "range",
+      "run"
+     ],
+     "ili": "i35302"
+    },
+    {
+     "sense_id": "oewn-run__2.33.06..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01096497-v",
+     "definition": "run, stand, or compete for an office or a position",
+     "examples": [
+      "Who's running for treasurer this year?"
+     ],
+     "members": [
+      "campaign",
+      "run"
+     ],
+     "ili": "i27063"
+    },
+    {
+     "sense_id": "oewn-run__2.36.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01721028-v",
+     "definition": "cause to emit recorded audio or video",
+     "examples": [
+      "They ran the tapes over and over again",
+      "I'll play you my favorite record",
+      "He never tires of playing that video"
+     ],
+     "members": [
+      "play",
+      "run"
+     ],
+     "ili": "i30329"
+    },
+    {
+     "sense_id": "oewn-run__2.38.11..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02104107-v",
+     "definition": "move about freely and without restraint, or act as if running around in an uncontrolled way",
+     "examples": [
+      "who are these people running around in the building?",
+      "She runs around telling everyone of her troubles",
+      "let the dogs run free"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i32261"
+    },
+    {
+     "sense_id": "oewn-run__2.42.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02725274-v",
+     "definition": "have a tendency or disposition to do or be something; be inclined",
+     "examples": [
+      "She tends to be nervous before her lectures",
+      "These dresses run small",
+      "He inclined to corpulence"
+     ],
+     "members": [
+      "tend",
+      "be given",
+      "lean",
+      "incline",
+      "run"
+     ],
+     "ili": "i35262"
+    },
+    {
+     "sense_id": "oewn-run__2.35.04..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01529078-v",
+     "definition": "be operating, running or functioning",
+     "examples": [
+      "The car is still running \u2014 turn it off!"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i29360"
+    },
+    {
+     "sense_id": "oewn-run__2.30.03..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00550143-v",
+     "definition": "change from one state to another",
+     "examples": [
+      "run amok",
+      "run rogue",
+      "run riot"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i24487"
+    },
+    {
+     "sense_id": "oewn-run__2.30.07..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00518609-v",
+     "definition": "cause to perform",
+     "examples": [
+      "run a subject",
+      "run a process"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i24303"
+    },
+    {
+     "sense_id": "oewn-run__2.42.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02726779-v",
+     "definition": "be affected by; be subjected to",
+     "examples": [
+      "run a temperature",
+      "run a risk"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i35269"
+    },
+    {
+     "sense_id": "oewn-run__2.42.03..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02653599-v",
+     "definition": "continue to exist",
+     "examples": [
+      "These stories die hard",
+      "The legend of Elvis endures"
+     ],
+     "members": [
+      "prevail",
+      "persist",
+      "die hard",
+      "run",
+      "endure"
+     ],
+     "ili": "i34905"
+    },
+    {
+     "sense_id": "oewn-run__2.42.06..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02618269-v",
+     "definition": "occur persistently",
+     "examples": [
+      "Musical talent runs in the family"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i34733"
+    },
+    {
+     "sense_id": "oewn-run__2.41.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02569242-v",
+     "definition": "carry out a process or program, as on a computer or a machine",
+     "examples": [
+      "Run the dishwasher",
+      "run a new program on the Mac",
+      "the computer executed the instruction"
+     ],
+     "members": [
+      "run",
+      "execute"
+     ],
+     "ili": "i34507"
+    },
+    {
+     "sense_id": "oewn-run__2.36.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01750167-v",
+     "definition": "include as the content; broadcast or publicize",
+     "examples": [
+      "We ran the ad three times",
+      "This paper carries a restaurant review",
+      "All major networks carried the press conference"
+     ],
+     "members": [
+      "carry",
+      "run"
+     ],
+     "ili": "i30464"
+    },
+    {
+     "sense_id": "oewn-run__2.36.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01645087-v",
+     "definition": "conduct to completion",
+     "examples": [
+      "run an errand"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i29946"
+    },
+    {
+     "sense_id": "oewn-run__2.35.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01214794-v",
+     "definition": "pass over, across, or through",
+     "examples": [
+      "He ran his eyes over her body",
+      "She ran her fingers along the carved figurine",
+      "He drew her hair through his fingers"
+     ],
+     "members": [
+      "guide",
+      "run",
+      "draw",
+      "pass"
+     ],
+     "ili": "i27684"
+    },
+    {
+     "sense_id": "oewn-run__2.42.08..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02692467-v",
+     "definition": "cause something to pass or lead somewhere",
+     "examples": [
+      "Run the wire behind the cabinet"
+     ],
+     "members": [
+      "run",
+      "lead"
+     ],
+     "ili": "i35086"
+    },
+    {
+     "sense_id": "oewn-run__2.41.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02530978-v",
+     "definition": "make without a miss",
+     "examples": [],
+     "members": [
+      "run"
+     ],
+     "ili": "i34334"
+    },
+    {
+     "sense_id": "oewn-run__2.40.06..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02247038-v",
+     "definition": "deal in illegally, such as arms or liquor",
+     "examples": [],
+     "members": [
+      "run",
+      "black market"
+     ],
+     "ili": "i32952"
+    },
+    {
+     "sense_id": "oewn-run__2.38.10..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02096576-v",
+     "definition": "cause an animal to move fast",
+     "examples": [
+      "run the dogs"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i32214"
+    },
+    {
+     "sense_id": "oewn-run__2.38.08..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02064720-v",
+     "definition": "be diffused",
+     "examples": [
+      "These dyes and colors are guaranteed not to run"
+     ],
+     "members": [
+      "run",
+      "bleed"
+     ],
+     "ili": "i32049"
+    },
+    {
+     "sense_id": "oewn-run__2.38.03..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01931856-v",
+     "definition": "sail before the wind",
+     "examples": [],
+     "members": [
+      "run"
+     ],
+     "ili": "i31355"
+    },
+    {
+     "sense_id": "oewn-run__2.38.05..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01918940-v",
+     "definition": "cover by running; run a certain distance",
+     "examples": [
+      "She ran 10 miles that day"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i31289"
+    },
+    {
+     "sense_id": "oewn-run__2.42.05..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02654212-v",
+     "definition": "extend or continue for a certain period of time",
+     "examples": [
+      "The film runs 5 hours"
+     ],
+     "members": [
+      "run",
+      "run for"
+     ],
+     "ili": "i34908"
+    },
+    {
+     "sense_id": "oewn-run__2.41.04..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-02427021-v",
+     "definition": "set animals loose to graze",
+     "examples": [],
+     "members": [
+      "run"
+     ],
+     "ili": "i33843"
+    },
+    {
+     "sense_id": "oewn-run__2.38.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01931700-v",
+     "definition": "keep company",
+     "examples": [
+      "the heifers run with the bulls to produce offspring"
+     ],
+     "members": [
+      "run",
+      "consort"
+     ],
+     "ili": "i31354"
+    },
+    {
+     "sense_id": "oewn-run__2.38.06..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01931400-v",
+     "definition": "run with the ball; in such sports as football",
+     "examples": [],
+     "members": [
+      "run"
+     ],
+     "ili": "i31352"
+    },
+    {
+     "sense_id": "oewn-run__2.38.13..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01930937-v",
+     "definition": "travel rapidly, by any (unspecified) means",
+     "examples": [
+      "Run to the store!",
+      "She always runs to Italy, because she has a lover there"
+     ],
+     "members": [
+      "run"
+     ],
+     "ili": "i31349"
+    },
+    {
+     "sense_id": "oewn-run__2.38.09..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01868024-v",
+     "definition": "travel a route regularly",
+     "examples": [
+      "Ships ply the waters near the coast"
+     ],
+     "members": [
+      "ply",
+      "run"
+     ],
+     "ili": "i31022"
+    },
+    {
+     "sense_id": "oewn-run__2.33.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01146304-v",
+     "definition": "pursue for food or sport (as of wild animals)",
+     "examples": [
+      "Goering often hunted wild boars in Poland",
+      "The dogs are running deer",
+      "The Duke hunted in these woods"
+     ],
+     "members": [
+      "hunt",
+      "run",
+      "hunt down",
+      "track down"
+     ],
+     "ili": "i27338"
+    },
+    {
+     "sense_id": "oewn-run__2.33.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-01088514-v",
+     "definition": "compete in a race",
+     "examples": [
+      "he is running the Marathon this year",
+      "let's race and see who gets there first"
+     ],
+     "members": [
+      "race",
+      "run"
+     ],
+     "ili": "i27023"
+    },
+    {
+     "sense_id": "oewn-run__2.30.02..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00540190-v",
+     "definition": "progress by being changed",
+     "examples": [
+      "The speech has to go through several more drafts",
+      "run through your presentation before the meeting"
+     ],
+     "members": [
+      "move",
+      "go",
+      "run"
+     ],
+     "ili": "i24430"
+    },
+    {
+     "sense_id": "oewn-run__2.30.00..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00445584-v",
+     "definition": "reduce or cause to be reduced from a solid to a liquid state, usually by heating",
+     "examples": [
+      "melt butter",
+      "melt down gold",
+      "The wax melted in the sun"
+     ],
+     "members": [
+      "melt",
+      "run",
+      "melt down"
+     ],
+     "ili": "i23944"
+    },
+    {
+     "sense_id": "oewn-run__2.30.01..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00335613-v",
+     "definition": "come unraveled or undone as if by snagging",
+     "examples": [
+      "Her nylons were running"
+     ],
+     "members": [
+      "ladder",
+      "run"
+     ],
+     "ili": "i23408"
+    },
+    {
+     "sense_id": "oewn-run__2.30.04..",
+     "pos": "v",
+     "lemma": "run",
+     "synset_id": "oewn-00333482-v",
+     "definition": "become undone",
+     "examples": [
+      "the sweater unraveled"
+     ],
+     "members": [
+      "run",
+      "unravel"
+     ],
+     "ili": "i23397"
+    }
+   ],
+   "oewn_sense_count": 57,
+   "oewn_pos_counts": {
+    "n": 16,
+    "v": 41
+   }
+  },
+  "line": {
+   "word": "line",
+   "zipf": 5.49,
+   "zipf_large": 5.49,
+   "cmudict": [
+    "L AY1 N"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-line__1.14.03..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08447525-n",
+     "definition": "a formation of people or things one beside another",
+     "examples": [
+      "the line of soldiers advanced with their bayonets fixed",
+      "they were arrayed in line of battle",
+      "the cast stood in line for the curtain call"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i81421"
+    },
+    {
+     "sense_id": "oewn-line__1.10.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-06812755-n",
+     "definition": "a mark that is long relative to its width",
+     "examples": [
+      "He drew a line on the chart"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i72219"
+    },
+    {
+     "sense_id": "oewn-line__1.14.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08447160-n",
+     "definition": "a formation of people or things one behind another",
+     "examples": [
+      "the line stretched clear around the corner",
+      "you must wait in a long line at the checkout counter"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i81420"
+    },
+    {
+     "sense_id": "oewn-line__1.25.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-13886392-n",
+     "definition": "a length (straight or curved) without breadth or thickness; the trace of a moving point",
+     "examples": [],
+     "members": [
+      "line"
+     ],
+     "ili": "i109781"
+    },
+    {
+     "sense_id": "oewn-line__1.10.02..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-07025650-n",
+     "definition": "text consisting of a row of words written across a page or computer screen",
+     "examples": [
+      "the letter consisted of three short lines",
+      "there are six lines in every stanza"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i73514"
+    },
+    {
+     "sense_id": "oewn-line__1.19.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-11495037-n",
+     "definition": "a single frequency (or very narrow band) of radiation in a spectrum",
+     "examples": [],
+     "members": [
+      "line"
+     ],
+     "ili": "i97893"
+    },
+    {
+     "sense_id": "oewn-line__1.15.02..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08611842-n",
+     "definition": "a fortified position (especially one marking the most forward position of troops)",
+     "examples": [
+      "they attacked the enemy's line"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i82140"
+    },
+    {
+     "sense_id": "oewn-line__1.09.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-05781046-n",
+     "definition": "a course of reasoning aimed at demonstrating a truth or falsehood; the methodical process of logical reasoning",
+     "examples": [
+      "I can't follow your line of reasoning"
+     ],
+     "members": [
+      "argumentation",
+      "logical argument",
+      "argument",
+      "line of reasoning",
+      "line"
+     ],
+     "ili": "i67228"
+    },
+    {
+     "sense_id": "oewn-line__1.06.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-02937552-n",
+     "definition": "a conductor for transmitting electrical or optical signals or electric power",
+     "examples": [],
+     "members": [
+      "cable",
+      "line",
+      "transmission line"
+     ],
+     "ili": "i51348"
+    },
+    {
+     "sense_id": "oewn-line__1.14.02..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08393816-n",
+     "definition": "a connected series of events or actions or developments",
+     "examples": [
+      "the government took a firm course",
+      "historians can only point out those lines for which evidence is available"
+     ],
+     "members": [
+      "course",
+      "line"
+     ],
+     "ili": "i81129"
+    },
+    {
+     "sense_id": "oewn-line__1.15.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08610818-n",
+     "definition": "a spatial location defined by a real or imaginary unidimensional extent",
+     "examples": [],
+     "members": [
+      "line"
+     ],
+     "ili": "i82138"
+    },
+    {
+     "sense_id": "oewn-line__1.25.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-13928798-n",
+     "definition": "a slight depression or fold in the smoothness of a surface",
+     "examples": [
+      "his face has many lines",
+      "ironing gets rid of most wrinkles"
+     ],
+     "members": [
+      "wrinkle",
+      "furrow",
+      "crease",
+      "crinkle",
+      "seam",
+      "line"
+     ],
+     "ili": "i110019"
+    },
+    {
+     "sense_id": "oewn-line__1.06.06..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-03952601-n",
+     "definition": "a pipe used to transport liquids or gases",
+     "examples": [
+      "a pipeline runs from the wells to the seaport"
+     ],
+     "members": [
+      "pipeline",
+      "line"
+     ],
+     "ili": "i57338"
+    },
+    {
+     "sense_id": "oewn-line__1.06.03..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-03676598-n",
+     "definition": "the road consisting of railroad track and roadbed",
+     "examples": [],
+     "members": [
+      "line",
+      "railway line",
+      "rail line"
+     ],
+     "ili": "i55709"
+    },
+    {
+     "sense_id": "oewn-line__1.06.07..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-04409192-n",
+     "definition": "a telephone connection",
+     "examples": [],
+     "members": [
+      "telephone line",
+      "phone line",
+      "telephone circuit",
+      "subscriber line",
+      "line"
+     ],
+     "ili": "i60070"
+    },
+    {
+     "sense_id": "oewn-line__1.04.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-01206784-n",
+     "definition": "acting in conformity",
+     "examples": [
+      "in line with",
+      "he got out of line",
+      "toe the line"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i41693"
+    },
+    {
+     "sense_id": "oewn-line__1.14.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08118903-n",
+     "definition": "the hereditary derivation of an individual",
+     "examples": [
+      "his entire lineage has been warriors"
+     ],
+     "members": [
+      "lineage",
+      "line",
+      "line of descent",
+      "descent",
+      "bloodline",
+      "blood line",
+      "blood",
+      "pedigree",
+      "ancestry",
+      "origin",
+      "parentage",
+      "stemma",
+      "stock"
+     ],
+     "ili": "i79781"
+    },
+    {
+     "sense_id": "oewn-line__1.06.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-03676175-n",
+     "definition": "something (as a cord or rope) that is long and thin and flexible",
+     "examples": [
+      "a washing line"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i55708"
+    },
+    {
+     "sense_id": "oewn-line__1.04.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-00583425-n",
+     "definition": "the principal activity in your life that you do to earn money",
+     "examples": [
+      "he's not in my line of business"
+     ],
+     "members": [
+      "occupation",
+      "business",
+      "job",
+      "line of work",
+      "line"
+     ],
+     "ili": "i38458"
+    },
+    {
+     "sense_id": "oewn-line__1.15.01..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-08611480-n",
+     "definition": "in games or sports; a mark indicating positions or bounds of the playing area",
+     "examples": [],
+     "members": [
+      "line"
+     ],
+     "ili": "i82139"
+    },
+    {
+     "sense_id": "oewn-line__1.10.05..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-06270774-n",
+     "definition": "(often plural) a means of communication or access",
+     "examples": [
+      "it must go through official channels",
+      "lines of communication were set up between the two firms"
+     ],
+     "members": [
+      "channel",
+      "communication channel",
+      "line"
+     ],
+     "ili": "i69405"
+    },
+    {
+     "sense_id": "oewn-line__1.06.08..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-03676994-n",
+     "definition": "a particular kind of product or merchandise",
+     "examples": [
+      "a nice line of shoes"
+     ],
+     "members": [
+      "line",
+      "product line",
+      "line of products",
+      "line of merchandise",
+      "business line",
+      "line of business"
+     ],
+     "ili": "i55711"
+    },
+    {
+     "sense_id": "oewn-line__1.06.05..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-03676799-n",
+     "definition": "a commercial organization serving as a common carrier",
+     "examples": [],
+     "members": [
+      "line"
+     ],
+     "ili": "i55710"
+    },
+    {
+     "sense_id": "oewn-line__1.23.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-13735108-n",
+     "definition": "space for one line of print (one column wide and 1/14 inch deep) used to measure advertising",
+     "examples": [],
+     "members": [
+      "agate line",
+      "line"
+     ],
+     "ili": "i108908"
+    },
+    {
+     "sense_id": "oewn-line__1.21.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-13400586-n",
+     "definition": "the maximum credit that a customer is allowed",
+     "examples": [],
+     "members": [
+      "credit line",
+      "line of credit",
+      "bank line",
+      "line",
+      "personal credit line",
+      "personal line of credit"
+     ],
+     "ili": "i107028"
+    },
+    {
+     "sense_id": "oewn-line__1.10.03..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-07041860-n",
+     "definition": "a succession of notes forming a distinctive sequence",
+     "examples": [
+      "she was humming an air from Beethoven"
+     ],
+     "members": [
+      "tune",
+      "melody",
+      "air",
+      "strain",
+      "melodic line",
+      "line",
+      "melodic phrase"
+     ],
+     "ili": "i73587"
+    },
+    {
+     "sense_id": "oewn-line__1.10.06..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-07026095-n",
+     "definition": "persuasive but insincere talk that is usually intended to deceive or impress",
+     "examples": [
+      "\u2018let me show you my etchings\u2019 is a rather worn line",
+      "he has a smooth line but I didn't fall for it",
+      "that salesman must have practiced his fast line of talk"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i73515"
+    },
+    {
+     "sense_id": "oewn-line__1.10.04..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-06638793-n",
+     "definition": "a short personal letter",
+     "examples": [
+      "drop me a line when you get there"
+     ],
+     "members": [
+      "note",
+      "short letter",
+      "line",
+      "billet"
+     ],
+     "ili": "i71301"
+    },
+    {
+     "sense_id": "oewn-line__1.09.00..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-05756783-n",
+     "definition": "a conceptual separation or distinction",
+     "examples": [
+      "there is a narrow line between sanity and insanity"
+     ],
+     "members": [
+      "line",
+      "dividing line",
+      "demarcation",
+      "contrast"
+     ],
+     "ili": "i67113"
+    },
+    {
+     "sense_id": "oewn-line__1.06.09..",
+     "pos": "n",
+     "lemma": "line",
+     "synset_id": "oewn-04014761-n",
+     "definition": "mechanical system in a factory whereby an article is conveyed through sites at which successive operations are performed on it",
+     "examples": [],
+     "members": [
+      "production line",
+      "assembly line",
+      "line"
+     ],
+     "ili": "i57700"
+    },
+    {
+     "sense_id": "oewn-line__2.42.00..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-02709399-v",
+     "definition": "be in line with; form a line along",
+     "examples": [
+      "trees line the riverbank"
+     ],
+     "members": [
+      "line",
+      "run along"
+     ],
+     "ili": "i35174"
+    },
+    {
+     "sense_id": "oewn-line__2.35.00..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-01273348-v",
+     "definition": "cover the interior of",
+     "examples": [
+      "line the gloves",
+      "line a chimney"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i28010"
+    },
+    {
+     "sense_id": "oewn-line__2.35.01..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-01585566-v",
+     "definition": "make a mark or lines on a surface",
+     "examples": [
+      "draw a line",
+      "trace the outline of a figure in the sand"
+     ],
+     "members": [
+      "trace",
+      "draw",
+      "line",
+      "describe",
+      "delineate"
+     ],
+     "ili": "i29642"
+    },
+    {
+     "sense_id": "oewn-line__2.35.02..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-01278925-v",
+     "definition": "mark with lines",
+     "examples": [
+      "sorrow had lined his face"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i28046"
+    },
+    {
+     "sense_id": "oewn-line__2.30.00..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-00455090-v",
+     "definition": "fill plentifully",
+     "examples": [
+      "line one's pockets"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i23991"
+    },
+    {
+     "sense_id": "oewn-line__2.30.01..",
+     "pos": "v",
+     "lemma": "line",
+     "synset_id": "oewn-00223419-v",
+     "definition": "reinforce with fabric",
+     "examples": [
+      "lined books are more enduring"
+     ],
+     "members": [
+      "line"
+     ],
+     "ili": "i22837"
+    }
+   ],
+   "oewn_sense_count": 36,
+   "oewn_pos_counts": {
+    "n": 30,
+    "v": 6
+   }
+  },
+  "sanction": {
+   "word": "sanction",
+   "zipf": 3.43,
+   "zipf_large": 3.43,
+   "cmudict": [
+    "S AE1 NG K SH AH0 N"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-sanction__1.10.00..",
+     "pos": "n",
+     "lemma": "sanction",
+     "synset_id": "oewn-06700103-n",
+     "definition": "formal and explicit approval",
+     "examples": [
+      "a Democrat usually gets the union's endorsement"
+     ],
+     "members": [
+      "sanction",
+      "countenance",
+      "endorsement",
+      "indorsement",
+      "warrant",
+      "imprimatur"
+     ],
+     "ili": "i71627"
+    },
+    {
+     "sense_id": "oewn-sanction__1.04.02..",
+     "pos": "n",
+     "lemma": "sanction",
+     "synset_id": "oewn-01126567-n",
+     "definition": "a mechanism of social control for enforcing a society's standards",
+     "examples": [],
+     "members": [
+      "sanction"
+     ],
+     "ili": "i41297"
+    },
+    {
+     "sense_id": "oewn-sanction__1.07.00..",
+     "pos": "n",
+     "lemma": "sanction",
+     "synset_id": "oewn-05184134-n",
+     "definition": "official permission or approval",
+     "examples": [
+      "authority for the program was renewed several times"
+     ],
+     "members": [
+      "authority",
+      "authorization",
+      "authorisation",
+      "sanction"
+     ],
+     "ili": "i64181"
+    },
+    {
+     "sense_id": "oewn-sanction__1.04.01..",
+     "pos": "n",
+     "lemma": "sanction",
+     "synset_id": "oewn-01141321-n",
+     "definition": "the act of final authorization",
+     "examples": [
+      "it had the sanction of the church"
+     ],
+     "members": [
+      "sanction"
+     ],
+     "ili": "i41369"
+    },
+    {
+     "sense_id": "oewn-sanction__2.32.01..",
+     "pos": "v",
+     "lemma": "sanction",
+     "synset_id": "oewn-00808164-v",
+     "definition": "give sanction to",
+     "examples": [
+      "I approve of his educational policies"
+     ],
+     "members": [
+      "approve",
+      "O.K.",
+      "okay",
+      "sanction"
+     ],
+     "ili": "i25700"
+    },
+    {
+     "sense_id": "oewn-sanction__2.41.01..",
+     "pos": "v",
+     "lemma": "sanction",
+     "synset_id": "oewn-02484743-v",
+     "definition": "give authority or permission to",
+     "examples": [],
+     "members": [
+      "sanction"
+     ],
+     "ili": "i34115"
+    },
+    {
+     "sense_id": "oewn-sanction__2.32.02..",
+     "pos": "v",
+     "lemma": "sanction",
+     "synset_id": "oewn-00808553-v",
+     "definition": "give religious sanction to, such as through an oath",
+     "examples": [
+      "sanctify the marriage"
+     ],
+     "members": [
+      "sanction",
+      "sanctify"
+     ],
+     "ili": "i25701"
+    }
+   ],
+   "oewn_sense_count": 7,
+   "oewn_pos_counts": {
+    "n": 4,
+    "v": 3
+   }
+  },
+  "qualify": {
+   "word": "qualify",
+   "zipf": 4.19,
+   "zipf_large": 4.19,
+   "cmudict": [
+    "K W AA1 L AH0 F AY2"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-qualify__2.42.00..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-02684822-v",
+     "definition": "prove capable or fit; meet requirements",
+     "examples": [],
+     "members": [
+      "qualify",
+      "measure up"
+     ],
+     "ili": "i35055"
+    },
+    {
+     "sense_id": "oewn-qualify__2.32.02..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-00974223-v",
+     "definition": "pronounce fit or able",
+     "examples": [
+      "She was qualified to run the marathon",
+      "The nurses were qualified to administer the injections"
+     ],
+     "members": [
+      "qualify"
+     ],
+     "ili": "i26453"
+    },
+    {
+     "sense_id": "oewn-qualify__2.30.02..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-00199684-v",
+     "definition": "make more specific",
+     "examples": [
+      "qualify these remarks"
+     ],
+     "members": [
+      "qualify"
+     ],
+     "ili": "i22721"
+    },
+    {
+     "sense_id": "oewn-qualify__2.30.00..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-00301542-v",
+     "definition": "make fit or prepared",
+     "examples": [
+      "Your education qualifies you for this job"
+     ],
+     "members": [
+      "qualify",
+      "dispose"
+     ],
+     "ili": "i23228"
+    },
+    {
+     "sense_id": "oewn-qualify__2.32.00..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-01020937-v",
+     "definition": "specify as a condition or requirement in a contract or agreement; make an express demand or provision in an agreement",
+     "examples": [
+      "The will stipulates that she can live in the house for the rest of her life",
+      "The contract stipulates the dates of the payments"
+     ],
+     "members": [
+      "stipulate",
+      "qualify",
+      "condition",
+      "specify"
+     ],
+     "ili": "i26673"
+    },
+    {
+     "sense_id": "oewn-qualify__2.32.01..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-00958719-v",
+     "definition": "describe or portray the character or the qualities or peculiarities of",
+     "examples": [
+      "You can characterize his behavior as that of an egotist",
+      "This poem can be characterized as a lament for a dead lover"
+     ],
+     "members": [
+      "qualify",
+      "characterize",
+      "characterise"
+     ],
+     "ili": "i26380"
+    },
+    {
+     "sense_id": "oewn-qualify__2.30.01..",
+     "pos": "v",
+     "lemma": "qualify",
+     "synset_id": "oewn-00171140-v",
+     "definition": "add a modifier to a constituent",
+     "examples": [],
+     "members": [
+      "modify",
+      "qualify"
+     ],
+     "ili": "i22565"
+    }
+   ],
+   "oewn_sense_count": 7,
+   "oewn_pos_counts": {
+    "v": 7
+   }
+  },
+  "defenestration": {
+   "word": "defenestration",
+   "zipf": 1.85,
+   "zipf_large": 1.85,
+   "cmudict": [
+    "D IY0 F EH2 N EH0 S T R EY1 SH AH0 N"
+   ],
+   "scowl_min_size": 70,
+   "scowl_lists": [
+    "english-words.70"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-defenestration__1.04.00..",
+     "pos": "n",
+     "lemma": "defenestration",
+     "synset_id": "oewn-00117809-n",
+     "definition": "the act of throwing someone or something out of a window",
+     "examples": [],
+     "members": [
+      "defenestration"
+     ],
+     "ili": "i36020"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "n": 1
+   }
+  },
+  "watershed": {
+   "word": "watershed",
+   "zipf": 3.53,
+   "zipf_large": 3.53,
+   "cmudict": [
+    "W AO1 T ER0 SH EH2 D",
+    "W AA1 T ER0 SH EH2 D"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-watershed__1.15.00..",
+     "pos": "n",
+     "lemma": "watershed",
+     "synset_id": "oewn-08697107-n",
+     "definition": "a ridge of land that separates two adjacent river systems",
+     "examples": [],
+     "members": [
+      "watershed",
+      "water parting",
+      "divide"
+     ],
+     "ili": "i82553"
+    },
+    {
+     "sense_id": "oewn-watershed__1.15.01..",
+     "pos": "n",
+     "lemma": "watershed",
+     "synset_id": "oewn-08536123-n",
+     "definition": "the entire geographical area drained by a river and its tributaries; an area characterized by all runoff being conveyed to the same outlet",
+     "examples": [
+      "flood control in the Missouri basin"
+     ],
+     "members": [
+      "river basin",
+      "basin",
+      "watershed",
+      "drainage basin",
+      "catchment area",
+      "catchment basin",
+      "drainage area"
+     ],
+     "ili": "i81821"
+    },
+    {
+     "sense_id": "oewn-watershed__1.11.00..",
+     "pos": "n",
+     "lemma": "watershed",
+     "synset_id": "oewn-07432451-n",
+     "definition": "an event marking a unique or important historical change of course or one on which important developments depend",
+     "examples": [
+      "the agreement was a watershed in the history of both nations"
+     ],
+     "members": [
+      "landmark",
+      "turning point",
+      "watershed"
+     ],
+     "ili": "i75693"
+    }
+   ],
+   "oewn_sense_count": 3,
+   "oewn_pos_counts": {
+    "n": 3
+   }
+  },
+  "crucible": {
+   "word": "crucible",
+   "zipf": 3.23,
+   "zipf_large": 3.23,
+   "cmudict": [
+    "K R UW1 S AH0 B AH0 L"
+   ],
+   "scowl_min_size": 50,
+   "scowl_lists": [
+    "english-words.50"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-crucible__1.06.00..",
+     "pos": "n",
+     "lemma": "crucible",
+     "synset_id": "oewn-03144777-n",
+     "definition": "a vessel made of material that does not melt easily; used for high temperature chemical reactions",
+     "examples": [],
+     "members": [
+      "crucible",
+      "melting pot"
+     ],
+     "ili": "i52559"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "n": 1
+   }
+  },
+  "byzantine": {
+   "word": "byzantine",
+   "zipf": 3.35,
+   "zipf_large": 3.35,
+   "cmudict": [
+    "B IH1 Z AH0 N T AY2 N",
+    "B IH1 Z AH0 N T IY2 N"
+   ],
+   "scowl_min_size": 55,
+   "scowl_lists": [
+    "english-words.55"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-byzantine__3.01.01..",
+     "pos": "a",
+     "lemma": "Byzantine",
+     "synset_id": "oewn-02981618-a",
+     "definition": "of or relating to the Eastern Orthodox Church or the rites performed in it",
+     "examples": [
+      "Byzantine monks",
+      "Byzantine rites"
+     ],
+     "members": [
+      "Byzantine"
+     ],
+     "ili": "i16941"
+    },
+    {
+     "sense_id": "oewn-byzantine__3.01.00..",
+     "pos": "a",
+     "lemma": "Byzantine",
+     "synset_id": "oewn-02981470-a",
+     "definition": "of or relating to or characteristic of the Byzantine Empire or the ancient city of Byzantium",
+     "examples": [],
+     "members": [
+      "Byzantine"
+     ],
+     "ili": "i16940"
+    },
+    {
+     "sense_id": "oewn-byzantine__5.00.00.complex.00",
+     "pos": "a",
+     "lemma": "Byzantine",
+     "synset_id": "oewn-02184401-s",
+     "definition": "highly complex or intricate and occasionally devious",
+     "examples": [
+      "the Byzantine tax structure",
+      "Byzantine methods for holding on to his chairmanship",
+      "convoluted legal language",
+      "convoluted reasoning",
+      "the plot was too involved",
+      "a knotty problem",
+      "got his way by labyrinthine maneuvering",
+      "Oh, what a tangled web we weave",
+      "tortuous legal procedures",
+      "tortuous negotiations lasting for months"
+     ],
+     "members": [
+      "Byzantine",
+      "convoluted",
+      "involved",
+      "knotty",
+      "tangled",
+      "tortuous",
+      "labyrinthine"
+     ],
+     "ili": "i11969"
+    },
+    {
+     "sense_id": "oewn-byzantine__1.18.00..",
+     "pos": "n",
+     "lemma": "Byzantine",
+     "synset_id": "oewn-09715520-n",
+     "definition": "a native or inhabitant of Byzantium or of the Byzantine Empire",
+     "examples": [],
+     "members": [
+      "Byzantine"
+     ],
+     "ili": "i87606"
+    }
+   ],
+   "oewn_sense_count": 4,
+   "oewn_pos_counts": {
+    "a": 3,
+    "n": 1
+   }
+  },
+  "perspicacious": {
+   "word": "perspicacious",
+   "zipf": 1.7,
+   "zipf_large": 1.7,
+   "cmudict": [
+    "P ER0 S P AH0 K EY1 SH AH0 S"
+   ],
+   "scowl_min_size": 50,
+   "scowl_lists": [
+    "english-words.50"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-perspicacious__5.00.00.wise.00",
+     "pos": "a",
+     "lemma": "perspicacious",
+     "synset_id": "oewn-02580114-s",
+     "definition": "acutely insightful and wise",
+     "examples": [
+      "much too perspicacious to be taken in by such a spurious argument",
+      "observant and thoughtful, he was given to asking sagacious questions",
+      "a source of valuable insights and sapient advice to educators"
+     ],
+     "members": [
+      "perspicacious",
+      "sagacious",
+      "sapient"
+     ],
+     "ili": "i14263"
+    },
+    {
+     "sense_id": "oewn-perspicacious__5.00.00.discerning.00",
+     "pos": "a",
+     "lemma": "perspicacious",
+     "synset_id": "oewn-00775362-s",
+     "definition": "mentally acute or penetratingly discerning",
+     "examples": [
+      "too clear-eyed not to see what problems would follow",
+      "chaos could be prevented only by clear-sighted leadership",
+      "much too perspicacious to be taken in by so spurious an argument"
+     ],
+     "members": [
+      "clear-eyed",
+      "clear-sighted",
+      "perspicacious"
+     ],
+     "ili": "i4253"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "a": 2
+   }
+  },
+  "pulchritude": {
+   "word": "pulchritude",
+   "zipf": 1.36,
+   "zipf_large": 1.36,
+   "cmudict": [],
+   "scowl_min_size": 50,
+   "scowl_lists": [
+    "english-words.50"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-pulchritude__1.07.00..",
+     "pos": "n",
+     "lemma": "pulchritude",
+     "synset_id": "oewn-04692411-n",
+     "definition": "physical beauty (especially of a woman)",
+     "examples": [],
+     "members": [
+      "pulchritude"
+     ],
+     "ili": "i61673"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "n": 1
+   }
+  },
+  "lugubrious": {
+   "word": "lugubrious",
+   "zipf": 2.02,
+   "zipf_large": 2.02,
+   "cmudict": [
+    "L UW0 G Y UW1 B R IY0 AH0 S"
+   ],
+   "scowl_min_size": 40,
+   "scowl_lists": [
+    "english-words.40"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-lugubrious__5.00.00.sorrowful.00",
+     "pos": "a",
+     "lemma": "lugubrious",
+     "synset_id": "oewn-01368978-s",
+     "definition": "excessively mournful",
+     "examples": [],
+     "members": [
+      "lugubrious"
+     ],
+     "ili": "i7443"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "a": 1
+   }
+  },
+  "salient": {
+   "word": "salient",
+   "zipf": 3.12,
+   "zipf_large": 3.12,
+   "cmudict": [
+    "S EY1 L IY0 AH0 N T",
+    "S EY1 L Y AH0 N T"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-salient__5.00.00.conspicuous.00",
+     "pos": "a",
+     "lemma": "salient",
+     "synset_id": "oewn-00583156-s",
+     "definition": "having a quality that thrusts itself into attention",
+     "examples": [
+      "an outstanding fact of our time is that nations poisoned by anti semitism proved less fortunate in regard to their own freedom",
+      "a new theory is the most prominent feature of the book",
+      "salient traits",
+      "a spectacular rise in prices",
+      "a striking thing about Picadilly Circus is the statue of Eros in the center",
+      "a striking resemblance between parent and child"
+     ],
+     "members": [
+      "outstanding",
+      "prominent",
+      "salient",
+      "spectacular",
+      "striking"
+     ],
+     "ili": "i3236"
+    },
+    {
+     "sense_id": "oewn-salient__3.00.00..",
+     "pos": "a",
+     "lemma": "salient",
+     "synset_id": "oewn-02602211-a",
+     "definition": "(of angles) pointing outward at an angle of less than 180 degrees",
+     "examples": [],
+     "members": [
+      "salient"
+     ],
+     "ili": "i14388"
+    },
+    {
+     "sense_id": "oewn-salient__5.00.00.inclined.01",
+     "pos": "a",
+     "lemma": "salient",
+     "synset_id": "oewn-01238312-s",
+     "definition": "represented as leaping (rampant but leaning forward)",
+     "examples": [],
+     "members": [
+      "salient"
+     ],
+     "ili": "i6759"
+    },
+    {
+     "sense_id": "oewn-salient__1.15.00..",
+     "pos": "n",
+     "lemma": "salient",
+     "synset_id": "oewn-08612442-n",
+     "definition": "(military) the part of the line of battle that projects closest to the enemy",
+     "examples": [],
+     "members": [
+      "salient"
+     ],
+     "ili": "i82143"
+    }
+   ],
+   "oewn_sense_count": 4,
+   "oewn_pos_counts": {
+    "a": 3,
+    "n": 1
+   }
+  },
+  "tacit": {
+   "word": "tacit",
+   "zipf": 2.94,
+   "zipf_large": 2.94,
+   "cmudict": [
+    "T AE1 S IH0 T"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-tacit__5.00.00.implicit.00",
+     "pos": "a",
+     "lemma": "tacit",
+     "synset_id": "oewn-00945432-s",
+     "definition": "implied by or inferred from actions or statements",
+     "examples": [
+      "gave silent consent",
+      "a tacit agreement",
+      "the understood provisos of a custody agreement"
+     ],
+     "members": [
+      "silent",
+      "tacit",
+      "understood"
+     ],
+     "ili": "i5159"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "a": 1
+   }
+  },
+  "mitigate": {
+   "word": "mitigate",
+   "zipf": 3.54,
+   "zipf_large": 3.54,
+   "cmudict": [
+    "M IH1 T AH0 G EY2 T"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-mitigate__2.32.00..",
+     "pos": "v",
+     "lemma": "mitigate",
+     "synset_id": "oewn-00907990-v",
+     "definition": "lessen or to try to lessen the seriousness or extent of",
+     "examples": [
+      "The circumstances extenuate the crime"
+     ],
+     "members": [
+      "extenuate",
+      "palliate",
+      "mitigate"
+     ],
+     "ili": "i26146"
+    },
+    {
+     "sense_id": "oewn-mitigate__2.30.04..",
+     "pos": "v",
+     "lemma": "mitigate",
+     "synset_id": "oewn-00199225-v",
+     "definition": "to temper",
+     "examples": [
+      "mitigating circumstances"
+     ],
+     "members": [
+      "mitigate"
+     ],
+     "ili": "i22719"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "v": 2
+   }
+  },
+  "preclude": {
+   "word": "preclude",
+   "zipf": 3.03,
+   "zipf_large": 3.03,
+   "cmudict": [
+    "P R IH0 K L UW1 D",
+    "P R IY0 K L UW1 D"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-preclude__2.41.00..",
+     "pos": "v",
+     "lemma": "preclude",
+     "synset_id": "oewn-02458316-v",
+     "definition": "keep from happening or arising; make impossible",
+     "examples": [
+      "My sense of tact forbids an honest answer",
+      "Your role in the projects precludes your involvement in the competitive project"
+     ],
+     "members": [
+      "prevent",
+      "forestall",
+      "foreclose",
+      "preclude",
+      "forbid"
+     ],
+     "ili": "i33989"
+    },
+    {
+     "sense_id": "oewn-preclude__2.42.00..",
+     "pos": "v",
+     "lemma": "preclude",
+     "synset_id": "oewn-02635471-v",
+     "definition": "make impossible, especially beforehand",
+     "examples": [],
+     "members": [
+      "preclude",
+      "rule out",
+      "close out"
+     ],
+     "ili": "i34819"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "v": 2
+   }
+  },
+  "betwixt": {
+   "word": "betwixt",
+   "zipf": 2.39,
+   "zipf_large": 2.39,
+   "cmudict": [
+    "B IY0 T W IH1 K S T"
+   ],
+   "scowl_min_size": 50,
+   "scowl_lists": [
+    "english-words.50"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-betwixt__4.02.00..",
+     "pos": "r",
+     "lemma": "betwixt",
+     "synset_id": "oewn-00500585-r",
+     "definition": "in the interval",
+     "examples": [
+      "dancing all the dances with little rest between"
+     ],
+     "members": [
+      "between",
+      "betwixt"
+     ],
+     "ili": "i21618"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "r": 1
+   }
+  },
+  "perchance": {
+   "word": "perchance",
+   "zipf": 2.51,
+   "zipf_large": 2.51,
+   "cmudict": [
+    "P ER0 CH AE1 N S"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-perchance__4.02.00..",
+     "pos": "r",
+     "lemma": "perchance",
+     "synset_id": "oewn-00421914-r",
+     "definition": "through chance",
+     "examples": [
+      "To sleep, perchance to dream \u2026"
+     ],
+     "members": [
+      "perchance",
+      "by chance"
+     ],
+     "ili": "i21024"
+    },
+    {
+     "sense_id": "oewn-perchance__4.02.01..",
+     "pos": "r",
+     "lemma": "perchance",
+     "synset_id": "oewn-00301501-r",
+     "definition": "by chance",
+     "examples": [
+      "perhaps she will call tomorrow",
+      "we may possibly run into them at the concert",
+      "it may peradventure be thought that there never was such a time"
+     ],
+     "members": [
+      "possibly",
+      "perchance",
+      "perhaps",
+      "maybe",
+      "mayhap",
+      "peradventure"
+     ],
+     "ili": "i20231"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "r": 2
+   }
+  },
+  "whilom": {
+   "word": "whilom",
+   "zipf": 1.34,
+   "zipf_large": 1.34,
+   "cmudict": [],
+   "scowl_min_size": 60,
+   "scowl_lists": [
+    "english-words.60"
+   ],
+   "oewn_senses": [],
+   "oewn_sense_count": 0,
+   "oewn_pos_counts": {}
+  },
+  "ameliorate": {
+   "word": "ameliorate",
+   "zipf": 2.56,
+   "zipf_large": 2.56,
+   "cmudict": [
+    "AH0 M IY1 L Y ER0 EY2 T"
+   ],
+   "scowl_min_size": 40,
+   "scowl_lists": [
+    "english-words.40"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-ameliorate__2.30.01..",
+     "pos": "v",
+     "lemma": "ameliorate",
+     "synset_id": "oewn-00206293-v",
+     "definition": "to make better",
+     "examples": [
+      "The editor improved the manuscript with his changes"
+     ],
+     "members": [
+      "better",
+      "improve",
+      "amend",
+      "ameliorate",
+      "meliorate"
+     ],
+     "ili": "i22752"
+    },
+    {
+     "sense_id": "oewn-ameliorate__2.30.00..",
+     "pos": "v",
+     "lemma": "ameliorate",
+     "synset_id": "oewn-00205454-v",
+     "definition": "get better",
+     "examples": [
+      "The weather improved toward evening"
+     ],
+     "members": [
+      "better",
+      "improve",
+      "ameliorate",
+      "meliorate"
+     ],
+     "ili": "i22749"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "v": 2
+   }
+  },
+  "schlep": {
+   "word": "schlep",
+   "zipf": 1.95,
+   "zipf_large": 1.95,
+   "cmudict": [],
+   "scowl_min_size": 40,
+   "scowl_lists": [
+    "english-words.40"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-schlep__1.18.00..",
+     "pos": "n",
+     "lemma": "schlep",
+     "synset_id": "oewn-10576381-n",
+     "definition": "(Yiddish) an awkward and stupid person",
+     "examples": [],
+     "members": [
+      "schlepper",
+      "shlepper",
+      "schlep",
+      "shlep"
+     ],
+     "ili": "i92746"
+    },
+    {
+     "sense_id": "oewn-schlep__1.04.00..",
+     "pos": "n",
+     "lemma": "schlep",
+     "synset_id": "oewn-00311251-n",
+     "definition": "a tedious or difficult journey",
+     "examples": [],
+     "members": [
+      "schlep",
+      "shlep"
+     ],
+     "ili": "i37039"
+    },
+    {
+     "sense_id": "oewn-schlep__2.35.00..",
+     "pos": "v",
+     "lemma": "schlep",
+     "synset_id": "oewn-01456329-v",
+     "definition": "pull along heavily, like a heavy load against a resistance",
+     "examples": [
+      "Can you shlep this bag of potatoes upstairs?",
+      "She pulled along a large trunk"
+     ],
+     "members": [
+      "shlep",
+      "schlep",
+      "pull along"
+     ],
+     "ili": "i28991"
+    }
+   ],
+   "oewn_sense_count": 3,
+   "oewn_pos_counts": {
+    "n": 2,
+    "v": 1
+   }
+  },
+  "whinge": {
+   "word": "whinge",
+   "zipf": 2.31,
+   "zipf_large": 2.31,
+   "cmudict": [],
+   "scowl_min_size": 55,
+   "scowl_lists": [
+    "english-words.55"
+   ],
+   "oewn_senses": [],
+   "oewn_sense_count": 0,
+   "oewn_pos_counts": {}
+  },
+  "schadenfreude": {
+   "word": "schadenfreude",
+   "zipf": 2.43,
+   "zipf_large": 2.43,
+   "cmudict": [
+    "SH AE1 D IH0 N F R OY2 D"
+   ],
+   "scowl_min_size": 55,
+   "scowl_lists": [
+    "english-words.55"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-schadenfreude__1.12.00..",
+     "pos": "n",
+     "lemma": "Schadenfreude",
+     "synset_id": "oewn-07506731-n",
+     "definition": "delight in another person's misfortune",
+     "examples": [],
+     "members": [
+      "Schadenfreude"
+     ],
+     "ili": "i76110"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "n": 1
+   }
+  },
+  "doomscroll": {
+   "word": "doomscroll",
+   "zipf": 0.0,
+   "zipf_large": 0.0,
+   "cmudict": [],
+   "scowl_min_size": null,
+   "scowl_lists": [],
+   "oewn_senses": [],
+   "oewn_sense_count": 0,
+   "oewn_pos_counts": {}
+  },
+  "nice": {
+   "word": "nice",
+   "zipf": 5.37,
+   "zipf_large": 5.37,
+   "cmudict": [
+    "N AY1 S",
+    "N IY1 S"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-nice__3.00.00..",
+     "pos": "a",
+     "lemma": "nice",
+     "synset_id": "oewn-01590750-a",
+     "definition": "pleasant or pleasing or agreeable in nature or appearance",
+     "examples": [
+      "what a nice fellow you are and we all thought you so nasty",
+      "nice manners",
+      "a nice dress",
+      "a nice face",
+      "a nice day",
+      "had a nice time at the party",
+      "the corn and tomatoes are nice today"
+     ],
+     "members": [
+      "nice"
+     ],
+     "ili": "i8695"
+    },
+    {
+     "sense_id": "oewn-nice__5.00.00.respectable.00",
+     "pos": "a",
+     "lemma": "nice",
+     "synset_id": "oewn-02000490-s",
+     "definition": "socially or conventionally correct; refined or virtuous",
+     "examples": [
+      "from a decent family",
+      "a nice girl"
+     ],
+     "members": [
+      "decent",
+      "nice"
+     ],
+     "ili": "i10917"
+    },
+    {
+     "sense_id": "oewn-nice__5.00.02.precise.00",
+     "pos": "a",
+     "lemma": "nice",
+     "synset_id": "oewn-01844650-s",
+     "definition": "done with delicacy and skill",
+     "examples": [
+      "a nice bit of craft",
+      "a job requiring nice measurements with a micrometer",
+      "a nice shot"
+     ],
+     "members": [
+      "nice",
+      "skillful"
+     ],
+     "ili": "i10103"
+    },
+    {
+     "sense_id": "oewn-nice__5.00.00.fastidious.00",
+     "pos": "a",
+     "lemma": "nice",
+     "synset_id": "oewn-00987524-s",
+     "definition": "excessively fastidious and easily disgusted",
+     "examples": [
+      "too nice about his food to take to camp cooking",
+      "so squeamish he would only touch the toilet handle with his elbow"
+     ],
+     "members": [
+      "dainty",
+      "nice",
+      "overnice",
+      "prissy",
+      "squeamish"
+     ],
+     "ili": "i5390"
+    },
+    {
+     "sense_id": "oewn-nice__5.00.00.polite.00",
+     "pos": "a",
+     "lemma": "nice",
+     "synset_id": "oewn-00644482-s",
+     "definition": "exhibiting courtesy and politeness",
+     "examples": [
+      "a nice gesture"
+     ],
+     "members": [
+      "courteous",
+      "gracious",
+      "nice"
+     ],
+     "ili": "i3568"
+    }
+   ],
+   "oewn_sense_count": 5,
+   "oewn_pos_counts": {
+    "a": 5
+   }
+  },
+  "sincere": {
+   "word": "sincere",
+   "zipf": 3.84,
+   "zipf_large": 3.84,
+   "cmudict": [
+    "S IH0 N S IH1 R"
+   ],
+   "scowl_min_size": 20,
+   "scowl_lists": [
+    "english-words.20"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-sincere__3.00.00..",
+     "pos": "a",
+     "lemma": "sincere",
+     "synset_id": "oewn-02186899-a",
+     "definition": "open and genuine; not deceitful",
+     "examples": [
+      "he was a good man, decent and sincere",
+      "felt sincere regret that they were leaving",
+      "sincere friendship"
+     ],
+     "members": [
+      "sincere"
+     ],
+     "ili": "i11982"
+    },
+    {
+     "sense_id": "oewn-sincere__5.00.00.serious.00",
+     "pos": "a",
+     "lemma": "sincere",
+     "synset_id": "oewn-02126120-s",
+     "definition": "characterized by a firm and humorless belief in the validity of your opinions",
+     "examples": [
+      "both sides were deeply in earnest, even passionate",
+      "an entirely sincere and cruel tyrant",
+      "a film with a solemn social message"
+     ],
+     "members": [
+      "earnest",
+      "sincere",
+      "solemn"
+     ],
+     "ili": "i11606"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "a": 2
+   }
+  },
+  "quarantine": {
+   "word": "quarantine",
+   "zipf": 3.64,
+   "zipf_large": 3.64,
+   "cmudict": [
+    "K W AO1 R AH0 N T IY2 N"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-quarantine__1.26.00..",
+     "pos": "n",
+     "lemma": "quarantine",
+     "synset_id": "oewn-14438739-n",
+     "definition": "enforced isolation of patients suffering from a contagious disease in order to prevent the spread of disease",
+     "examples": [],
+     "members": [
+      "quarantine"
+     ],
+     "ili": "i112760"
+    },
+    {
+     "sense_id": "oewn-quarantine__1.04.00..",
+     "pos": "n",
+     "lemma": "quarantine",
+     "synset_id": "oewn-01204135-n",
+     "definition": "isolation to prevent the spread of infectious disease",
+     "examples": [],
+     "members": [
+      "quarantine"
+     ],
+     "ili": "i41680"
+    },
+    {
+     "sense_id": "oewn-quarantine__2.30.00..",
+     "pos": "v",
+     "lemma": "quarantine",
+     "synset_id": "oewn-00497347-v",
+     "definition": "place into enforced isolation, as for medical reasons",
+     "examples": [
+      "My dog was quarantined before he could live in England"
+     ],
+     "members": [
+      "quarantine"
+     ],
+     "ili": "i24189"
+    }
+   ],
+   "oewn_sense_count": 3,
+   "oewn_pos_counts": {
+    "n": 2,
+    "v": 1
+   }
+  },
+  "astute": {
+   "word": "astute",
+   "zipf": 3.1,
+   "zipf_large": 3.1,
+   "cmudict": [
+    "AH0 S T UW1 T"
+   ],
+   "scowl_min_size": 35,
+   "scowl_lists": [
+    "english-words.35"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-astute__5.00.00.smart.00",
+     "pos": "a",
+     "lemma": "astute",
+     "synset_id": "oewn-00440649-s",
+     "definition": "marked by practical hardheaded intelligence",
+     "examples": [
+      "a smart businessman",
+      "an astute tenant always reads the small print in a lease",
+      "he was too shrewd to go along with them on a road that could lead only to their overthrow"
+     ],
+     "members": [
+      "astute",
+      "sharp",
+      "shrewd"
+     ],
+     "ili": "i2475"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "a": 1
+   }
+  },
+  "angry": {
+   "word": "angry",
+   "zipf": 4.66,
+   "zipf_large": 4.66,
+   "cmudict": [
+    "AE1 NG G R IY0"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-angry__3.00.00..",
+     "pos": "a",
+     "lemma": "angry",
+     "synset_id": "oewn-00114629-a",
+     "definition": "feeling or showing anger",
+     "examples": [
+      "angry at the weather",
+      "angry customers",
+      "an angry silence",
+      "sending angry letters to the papers"
+     ],
+     "members": [
+      "angry"
+     ],
+     "ili": "i601"
+    },
+    {
+     "sense_id": "oewn-angry__5.00.00.stormy.00",
+     "pos": "a",
+     "lemma": "angry",
+     "synset_id": "oewn-00304943-s",
+     "definition": "(of the elements) as if showing violent anger",
+     "examples": [
+      "angry clouds on the horizon",
+      "furious winds",
+      "the raging sea"
+     ],
+     "members": [
+      "angry",
+      "furious",
+      "raging",
+      "tempestuous",
+      "wild"
+     ],
+     "ili": "i1682"
+    },
+    {
+     "sense_id": "oewn-angry__5.00.00.unhealthy.00",
+     "pos": "a",
+     "lemma": "angry",
+     "synset_id": "oewn-01177241-s",
+     "definition": "severely inflamed and painful",
+     "examples": [
+      "an angry sore"
+     ],
+     "members": [
+      "angry"
+     ],
+     "ili": "i6414"
+    }
+   ],
+   "oewn_sense_count": 3,
+   "oewn_pos_counts": {
+    "a": 3
+   }
+  },
+  "ad hominem": {
+   "word": "ad hominem",
+   "zipf": 2.47,
+   "zipf_large": 2.47,
+   "cmudict": [],
+   "cmudict_per_token": {
+    "ad": [
+     "AE1 D"
+    ],
+    "hominem": [
+     "HH AA1 M IH0 N EH0 M"
+    ]
+   },
+   "scowl_min_size": null,
+   "scowl_lists": [],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-ad_hominem__5.00.00.personal.00",
+     "pos": "a",
+     "lemma": "ad hominem",
+     "synset_id": "oewn-01772338-s",
+     "definition": "appealing to personal considerations (rather than to fact or reason)",
+     "examples": [
+      "ad hominem arguments"
+     ],
+     "members": [
+      "ad hominem"
+     ],
+     "ili": "i9699"
+    }
+   ],
+   "oewn_sense_count": 1,
+   "oewn_pos_counts": {
+    "a": 1
+   }
+  },
+  "Kafkaesque": {
+   "word": "Kafkaesque",
+   "zipf": 1.98,
+   "zipf_large": 1.98,
+   "cmudict": [
+    "K AA1 F K AH0 EH1 S K"
+   ],
+   "scowl_min_size": 95,
+   "scowl_lists": [
+    "english-words.95"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-kafkaesque__3.01.00..",
+     "pos": "a",
+     "lemma": "Kafkaesque",
+     "synset_id": "oewn-03145834-a",
+     "definition": "relating to or in the manner of Franz Kafka or his writings",
+     "examples": [],
+     "members": [
+      "Kafkaesque"
+     ],
+     "ili": "i18001"
+    },
+    {
+     "sense_id": "oewn-kafkaesque__5.00.00.unrealistic.00",
+     "pos": "a",
+     "lemma": "kafkaesque",
+     "synset_id": "oewn-01949505-s",
+     "definition": "characterized by surreal distortion and a sense of impending danger",
+     "examples": [
+      "the kafkaesque terror of the endless interrogations"
+     ],
+     "members": [
+      "kafkaesque"
+     ],
+     "ili": "i10637"
+    }
+   ],
+   "oewn_sense_count": 2,
+   "oewn_pos_counts": {
+    "a": 2
+   }
+  },
+  "table": {
+   "word": "table",
+   "zipf": 5.05,
+   "zipf_large": 5.05,
+   "cmudict": [
+    "T EY1 B AH0 L"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-table__1.14.00..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-08283156-n",
+     "definition": "a set of data arranged in rows and columns",
+     "examples": [
+      "see table 1"
+     ],
+     "members": [
+      "table",
+      "tabular array"
+     ],
+     "ili": "i80574"
+    },
+    {
+     "sense_id": "oewn-table__1.06.01..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-04386330-n",
+     "definition": "a piece of furniture having a smooth flat top that is usually supported by one or more vertical legs",
+     "examples": [
+      "it was a sturdy table"
+     ],
+     "members": [
+      "table"
+     ],
+     "ili": "i59922"
+    },
+    {
+     "sense_id": "oewn-table__1.06.02..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-04387051-n",
+     "definition": "a piece of furniture with tableware for a meal laid out on it",
+     "examples": [
+      "I reserved a table at my favorite restaurant"
+     ],
+     "members": [
+      "table"
+     ],
+     "ili": "i59923"
+    },
+    {
+     "sense_id": "oewn-table__1.17.00..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-09374802-n",
+     "definition": "flat tableland with steep edges",
+     "examples": [
+      "the tribe was relatively safe on the mesa but they had to descend into the valley for water"
+     ],
+     "members": [
+      "mesa",
+      "table"
+     ],
+     "ili": "i85772"
+    },
+    {
+     "sense_id": "oewn-table__1.14.01..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-08497146-n",
+     "definition": "a company of people assembled at a table for a meal or game",
+     "examples": [
+      "he entertained the whole table with his witty remarks"
+     ],
+     "members": [
+      "table"
+     ],
+     "ili": "i81614"
+    },
+    {
+     "sense_id": "oewn-table__1.13.01..",
+     "pos": "n",
+     "lemma": "table",
+     "synset_id": "oewn-07580824-n",
+     "definition": "food or meals in general",
+     "examples": [
+      "she sets a fine table",
+      "room and board"
+     ],
+     "members": [
+      "board",
+      "table"
+     ],
+     "ili": "i76508"
+    },
+    {
+     "sense_id": "oewn-table__2.42.00..",
+     "pos": "v",
+     "lemma": "table",
+     "synset_id": "oewn-02648898-v",
+     "definition": "hold back to a later time",
+     "examples": [
+      "let's postpone the exam"
+     ],
+     "members": [
+      "postpone",
+      "prorogue",
+      "hold over",
+      "put over",
+      "table",
+      "shelve",
+      "set back",
+      "defer",
+      "remit",
+      "put off"
+     ],
+     "ili": "i34882"
+    },
+    {
+     "sense_id": "oewn-table__2.36.00..",
+     "pos": "v",
+     "lemma": "table",
+     "synset_id": "oewn-01749344-v",
+     "definition": "arrange or enter in tabular form",
+     "examples": [],
+     "members": [
+      "table",
+      "tabularize",
+      "tabularise",
+      "tabulate"
+     ],
+     "ili": "i30461"
+    }
+   ],
+   "oewn_sense_count": 8,
+   "oewn_pos_counts": {
+    "n": 6,
+    "v": 2
+   }
+  },
+  "important": {
+   "word": "important",
+   "zipf": 5.44,
+   "zipf_large": 5.44,
+   "cmudict": [
+    "IH2 M P AO1 R T AH0 N T"
+   ],
+   "scowl_min_size": 10,
+   "scowl_lists": [
+    "english-words.10"
+   ],
+   "oewn_senses": [
+    {
+     "sense_id": "oewn-important__3.00.00..",
+     "pos": "a",
+     "lemma": "important",
+     "synset_id": "oewn-01278672-a",
+     "definition": "of great significance or value",
+     "examples": [
+      "important people",
+      "the important questions of the day"
+     ],
+     "members": [
+      "important",
+      "of import"
+     ],
+     "ili": "i6968"
+    },
+    {
+     "sense_id": "oewn-important__3.00.04..",
+     "pos": "a",
+     "lemma": "important",
+     "synset_id": "oewn-02168847-a",
+     "definition": "important in effect or meaning",
+     "examples": [
+      "a significant change in tax laws",
+      "a significant change in the Constitution",
+      "a significant contribution",
+      "significant details",
+      "statistically significant"
+     ],
+     "members": [
+      "significant",
+      "important"
+     ],
+     "ili": "i11879"
+    },
+    {
+     "sense_id": "oewn-important__3.00.02..",
+     "pos": "a",
+     "lemma": "important",
+     "synset_id": "oewn-00658802-a",
+     "definition": "of extreme importance; vital to the resolution of a crisis",
+     "examples": [
+      "a crucial moment in his career",
+      "a crucial election",
+      "a crucial issue for women"
+     ],
+     "members": [
+      "crucial",
+      "important"
+     ],
+     "ili": "i3644"
+    },
+    {
+     "sense_id": "oewn-important__5.00.00.influential.00",
+     "pos": "a",
+     "lemma": "important",
+     "synset_id": "oewn-01836121-s",
+     "definition": "having authority or ascendancy or influence",
+     "examples": [
+      "an important official",
+      "the captain's authoritative manner"
+     ],
+     "members": [
+      "authoritative",
+      "important"
+     ],
+     "ili": "i10054"
+    },
+    {
+     "sense_id": "oewn-important__5.00.00.immodest.02",
+     "pos": "a",
+     "lemma": "important",
+     "synset_id": "oewn-01544055-s",
+     "definition": "having or suggesting a consciousness of high position",
+     "examples": [
+      "recited the decree with an important air",
+      "took long important strides in the direction of his office"
+     ],
+     "members": [
+      "important"
+     ],
+     "ili": "i8453"
+    }
+   ],
+   "oewn_sense_count": 5,
+   "oewn_pos_counts": {
+    "a": 5
+   }
+  }
+ }
+}
