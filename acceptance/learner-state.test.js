@@ -291,6 +291,7 @@ async function openLearner(context) {
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();
   await page.waitForFunction(() => navigator.serviceWorker?.controller);
+  await page.getByRole("button", { name: "Start fresh" }).click();
   await visible(page.getByRole("heading", { name: "candid" }));
   return page;
 }
