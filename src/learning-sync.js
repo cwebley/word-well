@@ -263,6 +263,15 @@ export class LearningStateClient {
     return structuredClone(this.#outbox);
   }
 
+  async discard() {
+    await this.ready();
+    this.#outbox = [];
+    this.#sent.clear();
+    this.#cache = { appShell: true, lessons: [], history: [], practice: [] };
+    const cleared = this.#storage.clearProfile(this.#profile);
+    if (cleared instanceof Promise) await cleared;
+  }
+
   #queue(operation) {
     this.#outbox.push(operation);
     if (this.#outbox.length > maxOutboxOperations) this.#outbox.shift();

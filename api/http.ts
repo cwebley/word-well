@@ -34,6 +34,17 @@ export function createApi(database: LearnerDatabase) {
         const body = await readJson(request);
         return send(response, 200, await database.completeRecovery(recoveryTokenFromBody(body), recoverCredential(body)));
       }
+      if (request.method === "POST" && path === "/profile/sign-in/options") {
+        return send(response, 200, await database.createSignInOptions());
+      }
+      if (request.method === "POST" && path === "/profile/sign-in") {
+        const body = await readJson(request);
+        return send(response, 200, await database.signIn(webauthnResponse(body), clientContextId(request), clientTimeZone(request) ?? "UTC"));
+      }
+      if (request.method === "POST" && path === "/profile/handoff/redeem") {
+        const body = await readJson(request);
+        return send(response, 200, await database.redeemHandoff(handoffCode(body), clientContextId(request), clientTimeZone(request) ?? "UTC"));
+      }
 
       const grant = bearerGrant(request);
       if (request.method === "GET" && path === "/learning-state") {
@@ -53,28 +64,22 @@ export function createApi(database: LearnerDatabase) {
       if (request.method === "POST" && path === "/profile/history-accessed") {
         return sendProfile(response, await database.recordHistoryAccess(grant));
       }
-      if (request.method === "POST" && path === "/profile/passkey-challenge") {
-        const body = await readJson(request);
-        const result = await database.createPasskeyChallenge(grant, passkeyChallengePurpose(body), passkeyCredentialId(body));
-        if (result.status === "active") return send(response, 200, result.challenge);
+      if (request.method === "POST" && path === "/profile/passkey-registration/options") {
+        const result = await database.createRegistrationOptions(grant);
+        if (result.status === "active") return send(response, 200, result);
         if (result.status === "rejected") return send(response, 400, { error: result.reason });
         return sendProfile(response, result);
       }
-      if (request.method === "POST" && path === "/profile/protect") {
+      if (request.method === "POST" && path === "/profile/passkeys/register") {
         const body = await readJson(request);
-        return sendProfile(response, await database.protectProfile(grant, passkeyCredential(body)));
+        return sendProfile(response, await database.registerPasskey(grant, webauthnResponse(body), passkeyLabel(body)));
       }
-      if (request.method === "POST" && path === "/profile/passkeys") {
-        const body = await readJson(request);
-        return sendProfile(response, await database.addPasskey(grant, passkeyCredential(body)));
+      if (request.method === "POST" && path === "/profile/handoff") {
+        return send(response, 201, await database.createHandoff(grant));
       }
       const revoke = path.match(/^\/profile\/passkeys\/([^/]+)$/);
       if (request.method === "DELETE" && revoke) {
         return sendProfile(response, await database.revokePasskey(grant, decodeURIComponent(revoke[1]!)));
-      }
-      if (request.method === "POST" && path === "/profile/authenticate") {
-        const body = await readJson(request);
-        return sendProfile(response, await database.authenticate(grant, authenticateCredential(body)));
       }
       if (request.method === "POST" && path === "/profile/recovery-email/request") {
         const body = await readJson(request);
@@ -105,7 +110,7 @@ function setCorsHeaders(request: IncomingMessage, response: ServerResponse): voi
     response.setHeader("access-control-allow-origin", origin);
     response.setHeader("vary", "Origin");
   }
-  response.setHeader("access-control-allow-methods", "GET, POST, OPTIONS");
+  response.setHeader("access-control-allow-methods", "GET, POST, DELETE, OPTIONS");
   response.setHeader("access-control-allow-headers", "authorization, content-type, x-client-context, x-time-zone");
 }
 
@@ -134,6 +139,11 @@ function bearerGrant(request: IncomingMessage): string {
 
 function clientTimeZone(request: IncomingMessage): string | undefined {
   const value = request.headers["x-time-zone"];
+  return typeof value === "string" && value ? value : undefined;
+}
+
+function clientContextId(request: IncomingMessage): string | undefined {
+  const value = request.headers["x-client-context"];
   return typeof value === "string" && value ? value : undefined;
 }
 
@@ -212,6 +222,27 @@ function recoveryEmailFromBody(value: unknown): string {
   const email = (value as Record<string, unknown>).email;
   if (typeof email !== "string" || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ApiError(400, "A recovery email is required.");
   return email;
+}
+
+function webauthnResponse(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A passkey response is required.");
+  const response = (value as Record<string, unknown>).response;
+  if (!response || typeof response !== "object") throw new ApiError(400, "A passkey response is required.");
+  return response as Record<string, unknown>;
+}
+
+function passkeyLabel(value: unknown): string {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A passkey label is required.");
+  const label = (value as Record<string, unknown>).label;
+  if (typeof label !== "string" || !label.trim() || label.length > 100) throw new ApiError(400, "A passkey label is required.");
+  return label.trim();
+}
+
+function handoffCode(value: unknown): string {
+  if (!value || typeof value !== "object") throw new ApiError(400, "A continuation code is required.");
+  const code = (value as Record<string, unknown>).code;
+  if (typeof code !== "string" || !code) throw new ApiError(400, "A continuation code is required.");
+  return code;
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {

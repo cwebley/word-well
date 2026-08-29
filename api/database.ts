@@ -17,6 +17,7 @@ import {
   type Session,
   type SyncOperation
 } from "./types.js";
+import { authenticationOptions, registrationOptions, verifyAuthentication, verifyRegistration } from "./webauthn.js";
 
 type Queryable = Pick<PoolClient, "query">;
 type Clock = () => Date;
@@ -331,6 +332,120 @@ export class LearnerDatabase {
     } finally {
       client.release();
     }
+  }
+
+  async createRegistrationOptions(grant: string): Promise<{ status: "active"; options: Record<string, unknown> } | { status: "rejected"; reason: string } | { status: "deleted" } | { status: "session-expired" }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), false);
+      if (authorization.status !== "active") { await client.query("ROLLBACK"); return authorization; }
+      const profile = await readProfileRow(client, authorization.profileId);
+      if (profile.state === "anonymous" && !profile.canProtect) { await client.query("ROLLBACK"); return { status: "rejected", reason: "Protection is not available yet." }; }
+      if (profile.state === "protected" && !await recentAuthentication(client, grant, this.#now())) { await client.query("ROLLBACK"); return { status: "rejected", reason: "Recent passkey authentication is required." }; }
+      const now = this.#now();
+      const options = await registrationOptions(authorization.profileId, profile.passkeys);
+      await client.query(
+        `INSERT INTO passkey_challenges (id, profile_id, session_id, purpose, challenge, created_at, expires_at)
+         VALUES ($1, $2, $3, 'register', $4, $5, $6)`,
+        [randomUUID(), authorization.profileId, await sessionIdForGrant(client, grant), options.challenge, now, new Date(now.getTime() + challengeLifetimeMs)]
+      );
+      await client.query("COMMIT");
+      return { status: "active", options: options as unknown as Record<string, unknown> };
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  }
+
+  async registerPasskey(grant: string, response: Record<string, unknown>, label: string): Promise<ProfileResponse> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), true);
+      if (authorization.status !== "active") { await client.query("ROLLBACK"); return authorization; }
+      const profileState = await client.query<{ state: string }>("SELECT state FROM profiles WHERE id = $1", [authorization.profileId]);
+      if (profileState.rows[0]?.state === "protected" && !await recentAuthentication(client, grant, this.#now())) throw new ApiError(400, "Recent passkey authentication is required.");
+      const challenge = await activeChallenge(client, authorization.profileId, "register", this.#now(), responseChallenge(response));
+      if (!challenge) throw new ApiError(400, "The register challenge was not valid.");
+      const credential = await verifyRegistration(response, challenge.challenge);
+      if (!credential) throw new ApiError(400, "The passkey registration could not be verified.");
+      await client.query("UPDATE passkey_challenges SET consumed_at = $2 WHERE id = $1", [challenge.id, this.#now()]);
+      await client.query(
+        `INSERT INTO passkeys (id, profile_id, credential_id, label, public_key, counter, transports, device_type, backed_up, registered_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [randomUUID(), authorization.profileId, credential.id, label, credential.publicKey, credential.counter, credential.transports, credential.deviceType, credential.backedUp, this.#now()]
+      );
+      await client.query("UPDATE profiles SET state = 'protected', protected_at = COALESCE(protected_at, $2) WHERE id = $1", [authorization.profileId, this.#now()]);
+      await client.query("UPDATE sessions SET recently_authenticated_at = $2 WHERE grant_digest = $1", [digest(grant), this.#now()]);
+      const profile = await readProfileRow(client, authorization.profileId);
+      await client.query("COMMIT");
+      return { status: profile.state, profile };
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  }
+
+  async createSignInOptions(): Promise<{ options: Record<string, unknown> }> {
+    const now = this.#now();
+    const options = await authenticationOptions();
+    await this.#pool.query(
+      `INSERT INTO passkey_challenges (id, profile_id, purpose, challenge, created_at, expires_at)
+       VALUES ($1, NULL, 'authenticate', $2, $3, $4)`,
+      [randomUUID(), options.challenge, now, new Date(now.getTime() + challengeLifetimeMs)]
+    );
+    return { options: options as unknown as Record<string, unknown> };
+  }
+
+  async signIn(response: Record<string, unknown>, clientContextId?: string, timeZone = "UTC"): Promise<{ status: "active"; profile: Profile; session: Session }> {
+    validateTimeZone(timeZone);
+    const credentialId = typeof response.id === "string" ? response.id : "";
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const credential = await client.query<{ profile_id: string; credential_id: string; public_key: string; counter: string; transports: string[] }>(
+        "SELECT profile_id, credential_id, public_key, counter, transports FROM passkeys WHERE credential_id = $1 FOR UPDATE", [credentialId]
+      );
+      const key = credential.rows[0];
+      if (!key) throw new ApiError(400, "Passkey was not registered.");
+      const challenge = await activeChallenge(client, undefined, "authenticate", this.#now(), responseChallenge(response));
+      if (!challenge) throw new ApiError(400, "The sign-in challenge was not valid.");
+      const counter = await verifyAuthentication(response, challenge.challenge, { id: key.credential_id, publicKey: key.public_key, counter: Number(key.counter), transports: key.transports });
+      if (counter === undefined) throw new ApiError(400, "The passkey assertion could not be verified.");
+      await client.query("UPDATE passkey_challenges SET consumed_at = $2 WHERE id = $1", [challenge.id, this.#now()]);
+      await client.query("UPDATE passkeys SET counter = $2 WHERE credential_id = $1", [credentialId, counter]);
+      const session = makeSession(this.#now());
+      await insertSession(client, key.profile_id, session, this.#now(), clientContextId, timeZone);
+      const profile = await readProfileRow(client, key.profile_id);
+      await client.query("COMMIT");
+      return { status: "active", profile, session: publicSession(session) };
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  }
+
+  async createHandoff(grant: string): Promise<{ code: string; expiresAt: string }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const authorization = await authorize(client, grant, this.#now(), false);
+      if (authorization.status !== "active") throw new ApiError(401, "An active session is required.");
+      const now = this.#now();
+      const code = randomBytes(18).toString("base64url");
+      const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
+      await client.query(`INSERT INTO profile_handoffs (id, profile_id, source_session_id, code_digest, created_at, expires_at) VALUES ($1, $2, $3, $4, $5, $6)`, [randomUUID(), authorization.profileId, await sessionIdForGrant(client, grant), digest(code), now, expiresAt]);
+      await client.query("COMMIT");
+      return { code, expiresAt: expiresAt.toISOString() };
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
+  }
+
+  async redeemHandoff(code: string, clientContextId?: string, timeZone = "UTC"): Promise<{ status: "active"; profile: Profile; session: Session }> {
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const now = this.#now();
+      const handoff = await client.query<{ id: string; profile_id: string }>(`SELECT h.id, h.profile_id FROM profile_handoffs h JOIN profiles p ON p.id = h.profile_id WHERE h.code_digest = $1 AND h.consumed_at IS NULL AND h.expires_at > $2 AND p.state <> 'tombstoned' FOR UPDATE`, [digest(code), now]);
+      if (!handoff.rows[0]) throw new ApiError(400, "The continuation code is invalid or expired.");
+      await client.query("UPDATE profile_handoffs SET consumed_at = $2 WHERE id = $1", [handoff.rows[0].id, now]);
+      const session = makeSession(now);
+      await insertSession(client, handoff.rows[0].profile_id, session, now, clientContextId, timeZone);
+      const profile = await readProfileRow(client, handoff.rows[0].profile_id);
+      await client.query("COMMIT");
+      return { status: "active", profile, session: publicSession(session) };
+    } catch (error) { await client.query("ROLLBACK"); throw error; } finally { client.release(); }
   }
 
   async recordHistoryAccess(grant: string): Promise<ProfileResponse> {
@@ -657,6 +772,7 @@ export class LearnerDatabase {
       await client.query("DELETE FROM passkeys WHERE profile_id = $1", [authorization.profileId]);
       await client.query("DELETE FROM passkey_challenges WHERE profile_id = $1", [authorization.profileId]);
       await client.query("DELETE FROM recovery_tokens WHERE profile_id = $1", [authorization.profileId]);
+      await client.query("DELETE FROM profile_handoffs WHERE profile_id = $1", [authorization.profileId]);
       await client.query("COMMIT");
       return { status: "tombstoned", deletedAt: deletedAt.toISOString(), retention: publicRetention(retention) };
     } catch (error) {
@@ -790,6 +906,28 @@ async function authorize(client: Queryable, grant: string, now: Date, renewConta
     );
   }
   return { status: "active", profileId: session.profile_id, clientContextId: session.client_context_id, timeZone };
+}
+
+async function activeChallenge(client: Queryable, profileId: string | undefined, purpose: "register" | "authenticate", now: Date, challenge?: string): Promise<{ id: string; challenge: string } | undefined> {
+  const result = await client.query<{ id: string; challenge: string }>(
+    `SELECT id, challenge FROM passkey_challenges
+      WHERE profile_id IS NOT DISTINCT FROM $1 AND purpose = $2 AND consumed_at IS NULL AND expires_at > $3
+        AND ($4::text IS NULL OR challenge = $4)
+      ORDER BY created_at DESC LIMIT 1 FOR UPDATE`,
+    [profileId ?? null, purpose, now, challenge ?? null]
+  );
+  return result.rows[0];
+}
+
+function responseChallenge(response: Record<string, unknown>): string | undefined {
+  const value = response.response;
+  if (!value || typeof value !== "object") return undefined;
+  const clientDataJSON = (value as Record<string, unknown>).clientDataJSON;
+  if (typeof clientDataJSON !== "string") return undefined;
+  try {
+    const parsed = JSON.parse(Buffer.from(clientDataJSON, "base64url").toString("utf8"));
+    return typeof parsed.challenge === "string" ? parsed.challenge : undefined;
+  } catch { return undefined; }
 }
 
 async function acceptOperation(client: Queryable, profileId: string, clientContextId: string, operation: SyncOperation, now: Date): Promise<void> {

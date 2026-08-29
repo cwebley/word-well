@@ -43,19 +43,19 @@ suite("learner-state browser acceptance", () => {
     database = new LearnerDatabase({ pool, now: () => new Date(testTime) });
     apiServer = createServer(createApi(database));
     await listen(apiServer);
-    apiUrl = `http://127.0.0.1:${apiServer.address().port}`;
+    apiUrl = `http://localhost:${apiServer.address().port}`;
     await exec("npm", ["run", "build"], {
       cwd: root,
       env: { ...process.env, API_BASE_URL: apiUrl },
     });
     siteServer = createServer(serveBuiltSite);
     await listen(siteServer);
-    siteUrl = `http://127.0.0.1:${siteServer.address().port}`;
+    siteUrl = `http://localhost:${siteServer.address().port}`;
     browser = await chromium.launch();
   });
 
   beforeEach(async () => {
-    await pool.query("TRUNCATE recovery_tokens, passkey_challenges, passkeys, profile_access_events, reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_lessons");
+    await pool.query("TRUNCATE profile_handoffs, recovery_tokens, passkey_challenges, passkeys, profile_access_events, reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_lessons");
     await seedPublishedLesson();
   });
 
@@ -291,6 +291,7 @@ async function openLearner(context) {
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();
   await page.waitForFunction(() => navigator.serviceWorker?.controller);
+  await page.getByRole("button", { name: "Start fresh" }).click();
   await visible(page.getByRole("heading", { name: "candid" }));
   return page;
 }
@@ -339,7 +340,7 @@ function databaseUrlFor(database) {
 }
 
 function listen(server) {
-  return new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  return new Promise((resolve) => server.listen(0, "localhost", resolve));
 }
 
 function close(server) {
