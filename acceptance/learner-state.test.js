@@ -339,7 +339,7 @@ function databaseUrlFor(database) {
 }
 
 function listen(server) {
-  return new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  return new Promise((resolve) => server.listen(0, "localhost", resolve));
 }
 
 function close(server) {
