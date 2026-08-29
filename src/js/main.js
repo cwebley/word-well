@@ -5,7 +5,7 @@ import { renderStatus } from "../components/status.js";
 import { bindNavigation } from "../components/navigation.js";
 import { renderProfile, renderRecoveryCompletion } from "../components/profile.js";
 import { escapeHtml, renderButton } from "../components/button.js";
-import { WebAuthnSimulator } from "../webauthn-simulator.js";
+import { BrowserWebAuthn } from "../webauthn.js";
 import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
 import { HttpProfileAdapter } from "../profile-api.js";
 import { ProfileClient } from "../profile-client.js";
@@ -28,14 +28,17 @@ let syncBusy = false;
 let deletionConfirmation = false;
 let recoveryVerification;
 let recoveryStart;
+let handoff;
 let deleted = false;
 let recoveryToken = new URL(window.location.href).searchParams.get("recover-token");
+let handoffCode = new URL(window.location.href).searchParams.get("continue-code");
 let analyticsConsent = localStorage.getItem("wordwell:analytics-consent") === "granted";
 let installation;
-const webauthn = new WebAuthnSimulator();
+const webauthn = new BrowserWebAuthn();
 const profileAdapter = new HttpProfileAdapter({
   baseUrl: document.documentElement.dataset.apiBaseUrl ?? "",
 });
+let learningStarted = profileAdapterHasSession();
 const profileClient = new ProfileClient({ adapter: profileAdapter, webauthn });
 let practiceVisit;
 const learningAdapter = new HttpLearningStateAdapter({
@@ -64,12 +67,17 @@ function render() {
     main.innerHTML = renderRecoveryCompletion();
     return;
   }
+  if (!learningStarted) {
+    main.innerHTML = renderWelcome();
+    return;
+  }
   if (route === "profile") {
     main.innerHTML = renderProfile({
       profile: profileClient.cache(),
       deletionConfirmation,
       recoveryVerification,
       recoveryStart,
+      handoff,
       installation: installation.show(),
       analyticsConsent,
     });
@@ -165,11 +173,38 @@ document.addEventListener("click", async (event) => {
     void skipUpcoming(target.dataset.value);
   } else if (target.dataset.action === "install-app") {
     void installation.prompt();
+  } else if (target.dataset.action === "start-fresh-profile") {
+    try {
+      await profileAdapter.createAnonymousProfile();
+      learningStarted = true;
+      await startLearning();
+    } catch (error) {
+      console.error("anonymous profile creation failed", error);
+    }
   } else if (target.dataset.action === "protect-profile") {
     try {
       await profileClient.protect("This device");
     } catch (error) {
       console.error("protect failed", error);
+    }
+  } else if (target.dataset.action === "sign-in-passkey") {
+    try {
+      await learning.discard();
+      await profileClient.authenticate();
+      learningStarted = true;
+      await learning.hydrate();
+    } catch (error) {
+      console.error("passkey sign-in failed", error);
+    }
+  } else if (target.dataset.action === "create-handoff") {
+    try {
+      const result = await profileClient.createHandoff();
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.searchParams.set("continue-code", result.code);
+      handoff = { ...result, url: url.toString() };
+    } catch (error) {
+      console.error("handoff creation failed", error);
     }
   } else if (target.dataset.action === "add-passkey") {
     try {
@@ -242,6 +277,21 @@ document.addEventListener("submit", async (event) => {
 });
 
 document.addEventListener("submit", async (event) => {
+  const form = event.target.closest('[data-action="redeem-handoff"]');
+  if (!form) return;
+  event.preventDefault();
+  try {
+    await learning.discard();
+    await profileClient.redeemHandoff(String(new FormData(form).get("continuation-code")));
+    learningStarted = true;
+    await learning.hydrate();
+  } catch (error) {
+    console.error("handoff redemption failed", error);
+  }
+  render();
+});
+
+document.addEventListener("submit", async (event) => {
   const form = event.target.closest('[data-action="start-profile-recovery"]');
   if (!form) return;
   event.preventDefault();
@@ -268,12 +318,35 @@ function recordLearning(kind, details) {
 
 async function startLearning() {
   await learning.ready();
+  if (handoffCode) {
+    try {
+      await learning.discard();
+      await profileClient.redeemHandoff(handoffCode);
+      window.history.replaceState({}, "", window.location.pathname);
+      handoffCode = undefined;
+      learningStarted = true;
+    } catch (error) {
+      console.error("handoff redemption failed", error);
+    }
+  }
+  if (!learningStarted) {
+    render();
+    return;
+  }
   await profileClient.load().catch((error) => console.error("profile load failed", error));
   const cached = learning.cache();
   familiarity = currentDelivery(cached)?.familiarity;
   if (!navigator.onLine) syncStatus = "offline";
   render();
   await reconcileLearning();
+}
+
+function profileAdapterHasSession() {
+  return profileAdapter.hasSession;
+}
+
+function renderWelcome() {
+  return html`<section class="card flow"><p class="lesson-label">WordWell</p><h1 class="card-title">Continue your learning</h1><p>Use a continuation code or passkey to join an existing profile. Start fresh only when you want a new anonymous profile.</p><form data-action="redeem-handoff"><label for="continuation-code">Continuation code</label><input id="continuation-code" name="continuation-code" autocomplete="one-time-code" required /><button class="button" type="submit">Continue</button></form>${renderButton({ label: "Sign in with a passkey", action: "sign-in-passkey", variant: "outline" })}${renderButton({ label: "Start fresh", action: "start-fresh-profile", variant: "outline" })}</section>`;
 }
 
 async function reconcileLearning({ source = "auto" } = {}) {

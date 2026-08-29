@@ -2,7 +2,7 @@ import { escapeHtml, renderButton } from "./button.js";
 
 const html = String.raw;
 
-export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification, recoveryStart, installation, analyticsConsent = false } = {}) {
+export function renderProfile({ profile, deletionConfirmation = false, recoveryVerification, recoveryStart, handoff, installation, analyticsConsent = false } = {}) {
   if (profile.state === "tombstoned") {
     return html`<section class="region wrapper profile flow" aria-labelledby="profile-title">
       <p class="lesson-label">Profile deleted</p>
@@ -22,8 +22,14 @@ export function renderProfile({ profile, deletionConfirmation = false, recoveryV
     <h1 id="profile-title">Keep your learning private and portable.</h1>
     <p>Starting band: Stretch my vocabulary.</p>
     ${protection}
+    ${renderHandoff(handoff)}
     ${renderInstallation(installation, analyticsConsent)}
   </section>`;
+}
+
+function renderHandoff(handoff) {
+  if (!handoff) return html`<section class="profile-section flow"><h2>Continue in the installed app</h2><p>Create a one-time continuation code after installation. In a fresh app, use that code or sign in with your passkey.</p>${renderButton({ label: "Create continuation code", action: "create-handoff", variant: "outline" })}${renderButton({ label: "Sign in with a passkey", action: "sign-in-passkey", variant: "outline" })}<form data-action="redeem-handoff"><label for="continuation-code">Continuation code</label><input id="continuation-code" name="continuation-code" autocomplete="one-time-code" required /><button class="button" type="submit">Continue</button></form></section>`;
+  return html`<section class="profile-section flow"><h2>Continue in WordWell</h2><p>Open the installed app with this link, or enter this one-time code there.</p><p><code>${escapeHtml(handoff.code)}</code></p><a class="button" href="${escapeHtml(handoff.url)}">Open WordWell and continue</a></section>`;
 }
 
 function renderInstallation(installation, analyticsConsent) {

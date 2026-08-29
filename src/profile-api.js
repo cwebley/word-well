@@ -23,8 +23,54 @@ export class HttpProfileAdapter {
     return `profile:${this.#clientContextId}`;
   }
 
+  get hasSession() {
+    return Boolean(this.#session.load(this.#clientContextId)?.grant);
+  }
+
   async readProfile() {
     return this.#request("GET", "/profile");
+  }
+
+  async createAnonymousProfile() {
+    const response = await this.#fetch(`${this.#baseUrl}/profiles/anonymous`, {
+      method: "POST",
+      headers: { "x-client-context": this.#clientContextId, "x-time-zone": this.#timeZone },
+    });
+    const value = await response.json();
+    if (!response.ok || !value.session?.grant) throw new Error(value.error ?? "Could not create an anonymous profile.");
+    this.#session.save(this.#clientContextId, value.session);
+    return value;
+  }
+
+  async registrationOptions() {
+    const response = await this.#request("POST", "/profile/passkey-registration/options");
+    if (response.error) throw new Error(response.error);
+    return response.options;
+  }
+
+  async registerPasskey(response, label) {
+    return this.#request("POST", "/profile/passkeys/register", { response, label });
+  }
+
+  async signInOptions() {
+    const response = await this.#anonymousRequest("POST", "/profile/sign-in/options", {});
+    return response.options;
+  }
+
+  async signIn(response) {
+    const result = await this.#anonymousRequest("POST", "/profile/sign-in", { response });
+    if (result.status === "active" && result.session) this.#session.save(this.#clientContextId, result.session);
+    return result;
+  }
+
+  async createHandoff() {
+    return this.#request("POST", "/profile/handoff");
+  }
+
+  async redeemHandoff(code) {
+    const result = await this.#anonymousRequest("POST", "/profile/handoff/redeem", { code });
+    if (result.status === "active" && result.session) this.#session.save(this.#clientContextId, result.session);
+    return result;
   }
 
   async recordHistoryAccess() {
@@ -123,15 +169,7 @@ export class HttpProfileAdapter {
   async #grant() {
     const session = this.#session.load(this.#clientContextId);
     if (session?.grant) return session.grant;
-    const response = await this.#fetch(`${this.#baseUrl}/profiles/anonymous`, {
-      method: "POST",
-      headers: { "x-client-context": this.#clientContextId, "x-time-zone": this.#timeZone },
-    });
-    const value = await response.json();
-    if (!response.ok || !value.session?.grant) {
-      throw new Error(value.error ?? "Could not create an anonymous profile.");
-    }
-    this.#session.save(this.#clientContextId, value.session);
+    const value = await this.createAnonymousProfile();
     return value.session.grant;
   }
 }

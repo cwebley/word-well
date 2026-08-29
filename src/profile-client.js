@@ -29,16 +29,14 @@ export class ProfileClient {
   }
 
   async protect(label) {
-    const credential = this.#createCredential(label, await this.#registerChallenge());
-    const response = await this.#adapter.protect(credential);
+    const response = await this.#adapter.registerPasskey(await this.#webauthn.register(await this.#adapter.registrationOptions()), label);
     this.#update(response);
     return response;
   }
 
   async addPasskey(label) {
     await this.#assertRecentAuthentication();
-    const credential = this.#createCredential(label, await this.#registerChallenge());
-    const response = await this.#adapter.addPasskey(credential);
+    const response = await this.#adapter.registerPasskey(await this.#webauthn.register(await this.#adapter.registrationOptions()), label);
     this.#update(response);
     return response;
   }
@@ -51,10 +49,18 @@ export class ProfileClient {
   }
 
   async authenticate() {
-    const passkey = this.#cache?.passkeys?.[0];
-    if (!passkey) throw new Error("No registered passkey on this profile.");
-    const credential = this.#existingCredential(passkey, await this.#authenticateChallenge(passkey.id));
-    const response = await this.#adapter.authenticate(credential);
+    const response = await this.#adapter.signIn(await this.#webauthn.authenticate(await this.#adapter.signInOptions()));
+    this.#update(response);
+    return response;
+  }
+
+  async createHandoff() {
+    return this.#adapter.createHandoff();
+  }
+
+  async redeemHandoff(code) {
+    const response = await this.#adapter.redeemHandoff(code);
+    this.#update(response);
     return response;
   }
 
@@ -74,10 +80,7 @@ export class ProfileClient {
   }
 
   async completeRecovery(token, label) {
-    const credential = this.#createCredential(label, "");
-    const response = await this.#adapter.completeRecovery(token, credential);
-    this.#update(response);
-    return response;
+    throw new Error(`Passkey recovery is not available until a recovery registration challenge is requested for ${label}.`);
   }
 
   async deleteProfile() {
@@ -90,28 +93,7 @@ export class ProfileClient {
   async #assertRecentAuthentication() {
     const profile = this.#cache;
     if (!profile?.state || profile.state !== "protected") return;
-    const passkey = profile.passkeys?.[0];
-    if (!passkey) throw new Error("No registered passkey on this profile.");
-    const credential = this.#existingCredential(passkey, await this.#authenticateChallenge(passkey.id));
-    await this.#adapter.authenticate(credential);
-  }
-
-  #createCredential(label, challenge) {
-    return { ...this.#webauthn.createPasskey(label), challenge };
-  }
-
-  #existingCredential(passkey, challenge) {
-    return { id: passkey.id, challenge };
-  }
-
-  async #registerChallenge() {
-    const challenge = await this.#adapter.createPasskeyChallenge("register");
-    return challenge.challenge;
-  }
-
-  async #authenticateChallenge(credentialId) {
-    const challenge = await this.#adapter.createPasskeyChallenge("authenticate", credentialId);
-    return challenge.challenge;
+    await this.authenticate();
   }
 
   #update(response) {
