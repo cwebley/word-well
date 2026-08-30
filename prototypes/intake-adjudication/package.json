@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "PROTOTYPE (issue #46) — morphology adjudication runner and evaluation harness. Throwaway: no schema, no migrations, no pipeline integration.",
+  "description": "PROTOTYPE (issue #46) \u2014 morphology adjudication runner and evaluation harness. Throwaway: no schema, no migrations, no pipeline integration.",
   "scripts": {
     "adjudicate": "dotenv -e .env.local -- tsx src/cli.ts",
     "propose": "CASE_SET=calibration-review dotenv -e .env.local -- tsx src/cli.ts",
@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit",
     "models": "dotenv -e .env.local -- tsx src/models-cli.ts",
     "review:build": "tsx src/review-cli.ts",
-    "review:import": "tsx src/import-review-progress.ts"
+    "review:import": "tsx src/import-review-progress.ts",
+    "usefulness": "dotenv -e .env.local -- tsx src/usefulness-cli.ts",
+    "eval:usefulness": "dotenv -e .env.local -- braintrust eval evals/usefulness.eval.ts"
   },
   "dependencies": {
     "openai": "^7.2.0",

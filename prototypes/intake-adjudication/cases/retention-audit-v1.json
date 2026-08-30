@@ -1,0 +1,999 @@
+{
+  "set_version": "retention-audit/1",
+  "gate": "audience-usefulness",
+  "issue": 56,
+  "note": [
+    "UNLABELLED BY DESIGN. Do not add a verdict to any word in this file.",
+    "It reports one number: the share of these endorsed words the gate keeps.",
+    "Never tune the prompt toward that number. A drop is a question, not a target.",
+    "Disjoint from cases/usefulness-golden-v1.json, which is what keeps it",
+    "independent evidence rather than a second read on the training signal."
+  ],
+  "sampling": {
+    "population": "candidate pool headwords with endorsements > 0",
+    "population_size": 2906,
+    "eligible_after_golden_exclusion": 2900,
+    "excluded_as_golden": 6,
+    "method": "proportional allocation within strata, largest remainder",
+    "strata": [
+      "endorsement_band",
+      "zipf_band",
+      "pos"
+    ],
+    "seed": 20260830,
+    "target": 100,
+    "pool_sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+  },
+  "strata_counts": {
+    "1|2.0-2.5|adj": {
+      "population": 104,
+      "sampled": 4
+    },
+    "1|2.0-2.5|noun": {
+      "population": 68,
+      "sampled": 2
+    },
+    "1|2.0-2.5|verb": {
+      "population": 41,
+      "sampled": 1
+    },
+    "1|2.5-3.0|adj": {
+      "population": 145,
+      "sampled": 5
+    },
+    "1|2.5-3.0|noun": {
+      "population": 119,
+      "sampled": 4
+    },
+    "1|2.5-3.0|verb": {
+      "population": 52,
+      "sampled": 2
+    },
+    "1|3.0-3.5|adj": {
+      "population": 175,
+      "sampled": 6
+    },
+    "1|3.0-3.5|noun": {
+      "population": 153,
+      "sampled": 5
+    },
+    "1|3.0-3.5|verb": {
+      "population": 56,
+      "sampled": 2
+    },
+    "1|3.5+|adj": {
+      "population": 170,
+      "sampled": 6
+    },
+    "1|3.5+|noun": {
+      "population": 143,
+      "sampled": 5
+    },
+    "1|3.5+|verb": {
+      "population": 47,
+      "sampled": 2
+    },
+    "1|<2.0|adj": {
+      "population": 76,
+      "sampled": 3
+    },
+    "1|<2.0|noun": {
+      "population": 72,
+      "sampled": 3
+    },
+    "1|<2.0|verb": {
+      "population": 25,
+      "sampled": 1
+    },
+    "2-3|2.0-2.5|adj": {
+      "population": 87,
+      "sampled": 3
+    },
+    "2-3|2.0-2.5|noun": {
+      "population": 62,
+      "sampled": 2
+    },
+    "2-3|2.0-2.5|verb": {
+      "population": 23,
+      "sampled": 1
+    },
+    "2-3|2.5-3.0|adj": {
+      "population": 131,
+      "sampled": 5
+    },
+    "2-3|2.5-3.0|noun": {
+      "population": 91,
+      "sampled": 3
+    },
+    "2-3|2.5-3.0|verb": {
+      "population": 35,
+      "sampled": 1
+    },
+    "2-3|3.0-3.5|adj": {
+      "population": 117,
+      "sampled": 4
+    },
+    "2-3|3.0-3.5|noun": {
+      "population": 71,
+      "sampled": 3
+    },
+    "2-3|3.0-3.5|verb": {
+      "population": 41,
+      "sampled": 1
+    },
+    "2-3|3.5+|adj": {
+      "population": 70,
+      "sampled": 2
+    },
+    "2-3|3.5+|noun": {
+      "population": 59,
+      "sampled": 2
+    },
+    "2-3|3.5+|verb": {
+      "population": 24,
+      "sampled": 1
+    },
+    "2-3|<2.0|adj": {
+      "population": 45,
+      "sampled": 2
+    },
+    "2-3|<2.0|noun": {
+      "population": 21,
+      "sampled": 1
+    },
+    "2-3|<2.0|verb": {
+      "population": 21,
+      "sampled": 1
+    },
+    "4-7|2.0-2.5|adj": {
+      "population": 82,
+      "sampled": 3
+    },
+    "4-7|2.0-2.5|noun": {
+      "population": 28,
+      "sampled": 1
+    },
+    "4-7|2.0-2.5|verb": {
+      "population": 15,
+      "sampled": 1
+    },
+    "4-7|2.5-3.0|adj": {
+      "population": 95,
+      "sampled": 3
+    },
+    "4-7|2.5-3.0|noun": {
+      "population": 37,
+      "sampled": 1
+    },
+    "4-7|2.5-3.0|verb": {
+      "population": 26,
+      "sampled": 1
+    },
+    "4-7|3.0-3.5|adj": {
+      "population": 59,
+      "sampled": 2
+    },
+    "4-7|3.0-3.5|noun": {
+      "population": 26,
+      "sampled": 1
+    },
+    "4-7|3.0-3.5|verb": {
+      "population": 21,
+      "sampled": 1
+    },
+    "4-7|3.5+|adj": {
+      "population": 33,
+      "sampled": 1
+    },
+    "4-7|<2.0|adj": {
+      "population": 32,
+      "sampled": 1
+    },
+    "8+|2.5-3.0|adj": {
+      "population": 17,
+      "sampled": 1
+    }
+  },
+  "sample": [
+    {
+      "lemma": "abeyance",
+      "display": "abeyance",
+      "pos": "n",
+      "zipf_summed": 2.36,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "abridge",
+      "display": "abridge",
+      "pos": "v",
+      "zipf_summed": 2.288,
+      "endorsements": 2,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "acidulous",
+      "display": "acidulous",
+      "pos": "a",
+      "zipf_summed": 1.07,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "allusion",
+      "display": "allusion",
+      "pos": "n",
+      "zipf_summed": 3.221,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "appropriate",
+      "display": "appropriate",
+      "pos": "a,v",
+      "zipf_summed": 4.689,
+      "endorsements": 3,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "arresting",
+      "display": "arresting",
+      "pos": "a",
+      "zipf_summed": 3.5,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "arriviste",
+      "display": "arriviste",
+      "pos": "n",
+      "zipf_summed": 1.11,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "artful",
+      "display": "artful",
+      "pos": "a",
+      "zipf_summed": 2.88,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "audacious",
+      "display": "audacious",
+      "pos": "a",
+      "zipf_summed": 2.95,
+      "endorsements": 8,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "banal",
+      "display": "banal",
+      "pos": "a",
+      "zipf_summed": 2.88,
+      "endorsements": 7,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "beneficence",
+      "display": "beneficence",
+      "pos": "n",
+      "zipf_summed": 2.02,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "benighted",
+      "display": "benighted",
+      "pos": "a",
+      "zipf_summed": 2.18,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "berate",
+      "display": "berate",
+      "pos": "v",
+      "zipf_summed": 2.966,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "bias",
+      "display": "bias",
+      "pos": "a,n,v",
+      "zipf_summed": 4.241,
+      "endorsements": 1,
+      "oewn_senses": 5
+    },
+    {
+      "lemma": "boor",
+      "display": "boor",
+      "pos": "n",
+      "zipf_summed": 2.23,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "candidness",
+      "display": "candidness",
+      "pos": "n",
+      "zipf_summed": 1.41,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "canon",
+      "display": "canon",
+      "pos": "n",
+      "zipf_summed": 4.15,
+      "endorsements": 2,
+      "oewn_senses": 6
+    },
+    {
+      "lemma": "capacious",
+      "display": "capacious",
+      "pos": "a",
+      "zipf_summed": 2.2,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "churlish",
+      "display": "churlish",
+      "pos": "a",
+      "zipf_summed": 2.19,
+      "endorsements": 6,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "circumscribe",
+      "display": "circumscribe",
+      "pos": "v",
+      "zipf_summed": 2.12,
+      "endorsements": 4,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "collude",
+      "display": "collude",
+      "pos": "v",
+      "zipf_summed": 3.18,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "comply",
+      "display": "comply",
+      "pos": "v",
+      "zipf_summed": 4.184,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "confound",
+      "display": "confound",
+      "pos": "v",
+      "zipf_summed": 2.779,
+      "endorsements": 5,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "convivial",
+      "display": "convivial",
+      "pos": "a",
+      "zipf_summed": 2.39,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "convoluted",
+      "display": "convoluted",
+      "pos": "a",
+      "zipf_summed": 3.05,
+      "endorsements": 6,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "curb",
+      "display": "curb",
+      "pos": "n,v",
+      "zipf_summed": 3.856,
+      "endorsements": 1,
+      "oewn_senses": 6
+    },
+    {
+      "lemma": "decadent",
+      "display": "decadent",
+      "pos": "a,n",
+      "zipf_summed": 3.045,
+      "endorsements": 1,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "decry",
+      "display": "decry",
+      "pos": "v",
+      "zipf_summed": 3.126,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "deposition",
+      "display": "deposition",
+      "pos": "n",
+      "zipf_summed": 3.57,
+      "endorsements": 1,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "diminutive",
+      "display": "diminutive",
+      "pos": "a,n",
+      "zipf_summed": 3.105,
+      "endorsements": 2,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "discerning",
+      "display": "discerning",
+      "pos": "a",
+      "zipf_summed": 3.02,
+      "endorsements": 1,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "economy",
+      "display": "economy",
+      "pos": "n",
+      "zipf_summed": 4.913,
+      "endorsements": 1,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "edict",
+      "display": "edict",
+      "pos": "n",
+      "zipf_summed": 3.237,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "epistolary",
+      "display": "epistolary",
+      "pos": "a",
+      "zipf_summed": 2.3,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "epithet",
+      "display": "epithet",
+      "pos": "n",
+      "zipf_summed": 3.057,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "ersatz",
+      "display": "ersatz",
+      "pos": "a,n",
+      "zipf_summed": 2.34,
+      "endorsements": 4,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "exuberant",
+      "display": "exuberant",
+      "pos": "a",
+      "zipf_summed": 2.97,
+      "endorsements": 2,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "faction",
+      "display": "faction",
+      "pos": "n",
+      "zipf_summed": 4.076,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "flotilla",
+      "display": "flotilla",
+      "pos": "n",
+      "zipf_summed": 2.901,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "frank",
+      "display": "frank",
+      "pos": "a,n,v",
+      "zipf_summed": 4.764,
+      "endorsements": 1,
+      "oewn_senses": 7
+    },
+    {
+      "lemma": "gratis",
+      "display": "gratis",
+      "pos": "a,r",
+      "zipf_summed": 2.94,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "grouse",
+      "display": "grouse",
+      "pos": "n,v",
+      "zipf_summed": 3.175,
+      "endorsements": 3,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "haphazard",
+      "display": "haphazard",
+      "pos": "a,r",
+      "zipf_summed": 2.77,
+      "endorsements": 2,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "heretic",
+      "display": "heretic",
+      "pos": "n",
+      "zipf_summed": 3.327,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "illustrious",
+      "display": "illustrious",
+      "pos": "a",
+      "zipf_summed": 3.31,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "imminent",
+      "display": "imminent",
+      "pos": "a",
+      "zipf_summed": 3.67,
+      "endorsements": 4,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "indict",
+      "display": "indict",
+      "pos": "v",
+      "zipf_summed": 3.614,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "indigence",
+      "display": "indigence",
+      "pos": "n",
+      "zipf_summed": 1.57,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "iniquity",
+      "display": "iniquity",
+      "pos": "n",
+      "zipf_summed": 2.863,
+      "endorsements": 3,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "inscrutable",
+      "display": "inscrutable",
+      "pos": "a",
+      "zipf_summed": 2.56,
+      "endorsements": 5,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "intentional",
+      "display": "intentional",
+      "pos": "a",
+      "zipf_summed": 3.72,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "intractable",
+      "display": "intractable",
+      "pos": "a",
+      "zipf_summed": 2.88,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "ire",
+      "display": "ire",
+      "pos": "n",
+      "zipf_summed": 3.236,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "jubilant",
+      "display": "jubilant",
+      "pos": "a",
+      "zipf_summed": 2.63,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "lambaste",
+      "display": "lambaste",
+      "pos": "v",
+      "zipf_summed": 1.66,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "lampoon",
+      "display": "lampoon",
+      "pos": "n,v",
+      "zipf_summed": 2.751,
+      "endorsements": 4,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "longevity",
+      "display": "longevity",
+      "pos": "n",
+      "zipf_summed": 3.55,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "malign",
+      "display": "malign",
+      "pos": "a,v",
+      "zipf_summed": 2.985,
+      "endorsements": 3,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "mar",
+      "display": "mar",
+      "pos": "n,v",
+      "zipf_summed": 4.535,
+      "endorsements": 2,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "meander",
+      "display": "meander",
+      "pos": "n,v",
+      "zipf_summed": 2.977,
+      "endorsements": 1,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "melange",
+      "display": "melange",
+      "pos": "n",
+      "zipf_summed": 2.28,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "metamorphosis",
+      "display": "metamorphosis",
+      "pos": "n",
+      "zipf_summed": 3.03,
+      "endorsements": 1,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "mocking",
+      "display": "mocking",
+      "pos": "a",
+      "zipf_summed": 3.55,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "moribund",
+      "display": "moribund",
+      "pos": "a",
+      "zipf_summed": 2.57,
+      "endorsements": 3,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "noisome",
+      "display": "noisome",
+      "pos": "a",
+      "zipf_summed": 1.68,
+      "endorsements": 5,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "obsolete",
+      "display": "obsolete",
+      "pos": "a",
+      "zipf_summed": 3.65,
+      "endorsements": 3,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "obtuse",
+      "display": "obtuse",
+      "pos": "a",
+      "zipf_summed": 3.04,
+      "endorsements": 3,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "occluded",
+      "display": "occluded",
+      "pos": "a",
+      "zipf_summed": 2.21,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "ogle",
+      "display": "ogle",
+      "pos": "v",
+      "zipf_summed": 2.9,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "ostracize",
+      "display": "ostracize",
+      "pos": "v",
+      "zipf_summed": 2.724,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "parsimonious",
+      "display": "parsimonious",
+      "pos": "a",
+      "zipf_summed": 2.18,
+      "endorsements": 6,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "parvenu",
+      "display": "parvenu",
+      "pos": "a,n",
+      "zipf_summed": 1.695,
+      "endorsements": 1,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "perpetuate",
+      "display": "perpetuate",
+      "pos": "v",
+      "zipf_summed": 3.599,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "plangent",
+      "display": "plangent",
+      "pos": "a",
+      "zipf_summed": 1.45,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "pliant",
+      "display": "pliant",
+      "pos": "a",
+      "zipf_summed": 2.17,
+      "endorsements": 3,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "poignant",
+      "display": "poignant",
+      "pos": "a",
+      "zipf_summed": 3.27,
+      "endorsements": 4,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "premonition",
+      "display": "premonition",
+      "pos": "n",
+      "zipf_summed": 2.769,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "presumptuous",
+      "display": "presumptuous",
+      "pos": "a",
+      "zipf_summed": 2.86,
+      "endorsements": 5,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "putrefy",
+      "display": "putrefy",
+      "pos": "v",
+      "zipf_summed": 1.98,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "qualm",
+      "display": "qualm",
+      "pos": "n",
+      "zipf_summed": 2.959,
+      "endorsements": 3,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "receptive",
+      "display": "receptive",
+      "pos": "a",
+      "zipf_summed": 3.32,
+      "endorsements": 1,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "reconnoiter",
+      "display": "reconnoiter",
+      "pos": "v",
+      "zipf_summed": 2.049,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "refulgent",
+      "display": "refulgent",
+      "pos": "a",
+      "zipf_summed": 1.22,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "rescind",
+      "display": "rescind",
+      "pos": "v",
+      "zipf_summed": 3.32,
+      "endorsements": 6,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "sacrosanct",
+      "display": "sacrosanct",
+      "pos": "a",
+      "zipf_summed": 2.43,
+      "endorsements": 3,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "salve",
+      "display": "salve",
+      "pos": "n,v",
+      "zipf_summed": 2.879,
+      "endorsements": 1,
+      "oewn_senses": 4
+    },
+    {
+      "lemma": "sapid",
+      "display": "sapid",
+      "pos": "a",
+      "zipf_summed": 1.02,
+      "endorsements": 1,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "serendipity",
+      "display": "serendipity",
+      "pos": "n",
+      "zipf_summed": 2.74,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "shrewd",
+      "display": "shrewd",
+      "pos": "a",
+      "zipf_summed": 3.135,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "slander",
+      "display": "slander",
+      "pos": "n,v",
+      "zipf_summed": 3.484,
+      "endorsements": 2,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "stark",
+      "display": "stark",
+      "pos": "a,r",
+      "zipf_summed": 4.016,
+      "endorsements": 1,
+      "oewn_senses": 6
+    },
+    {
+      "lemma": "tantalizing",
+      "display": "tantalizing",
+      "pos": "a",
+      "zipf_summed": 2.71,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "torpor",
+      "display": "torpor",
+      "pos": "n",
+      "zipf_summed": 2.37,
+      "endorsements": 4,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "underscore",
+      "display": "underscore",
+      "pos": "n,v",
+      "zipf_summed": 3.42,
+      "endorsements": 5,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "unscrupulous",
+      "display": "unscrupulous",
+      "pos": "a",
+      "zipf_summed": 3.07,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "usurp",
+      "display": "usurp",
+      "pos": "v",
+      "zipf_summed": 3.155,
+      "endorsements": 1,
+      "oewn_senses": 2
+    },
+    {
+      "lemma": "utilitarian",
+      "display": "utilitarian",
+      "pos": "a,n",
+      "zipf_summed": 3.067,
+      "endorsements": 2,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "venality",
+      "display": "venality",
+      "pos": "n",
+      "zipf_summed": 1.8,
+      "endorsements": 2,
+      "oewn_senses": 1
+    },
+    {
+      "lemma": "voluminous",
+      "display": "voluminous",
+      "pos": "a",
+      "zipf_summed": 2.84,
+      "endorsements": 1,
+      "oewn_senses": 3
+    },
+    {
+      "lemma": "willful",
+      "display": "willful",
+      "pos": "a",
+      "zipf_summed": 3.08,
+      "endorsements": 1,
+      "oewn_senses": 2
+    }
+  ]
+}
