@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pinnate|oewn-pinnate__5.00.00.compound.00",
+  "fingerprint_key": "fdba0ef7f9bdabf7fe289cb118ea93bd3bae7efadc8f72f902b1b1513e9efff0",
+  "fingerprint": {
+    "input_digest": "08bf1c256a0b09d8eb5f066463b261df6bc134316d36fa212b57bd466020e659",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/1",
+    "rubric_version": "usefulness-rubric/1",
+    "contract_version": "usefulness-finding/1",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-30T21:13:13.599Z",
+  "finding": {
+    "sense_id": "oewn-pinnate__5.00.00.compound.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning is a highly specialized botanical term (leaf shape), and the recorded frequency is very low (Zipf 2.17). An adult building general professional and academic vocabulary would not be better off knowing this specific meaning.",
+    "evidence_ids": [
+      "frequency_Zipf_2.17",
+      "definition_leaf_shape_featherlike",
+      "part_of_speech_a"
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "sense_id": "oewn-pinnate__5.00.00.compound.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning is a highly specialized botanical term (leaf shape), and the recorded frequency is very low (Zipf 2.17). An adult building general professional and academic vocabulary would not be better off knowing this specific meaning.",
+    "evidence_ids": [
+      "frequency_Zipf_2.17",
+      "definition_leaf_shape_featherlike",
+      "part_of_speech_a"
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 394,
+    "completion_tokens": 351,
+    "reasoning_tokens": 219,
+    "total_tokens": 745,
+    "cost_usd": 0.0000947
+  },
+  "latency_ms": 10562
+}

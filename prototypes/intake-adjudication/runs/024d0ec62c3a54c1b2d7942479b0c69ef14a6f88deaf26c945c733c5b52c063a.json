@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "herbivorous|oewn-herbivorous__3.00.00..",
+  "fingerprint_key": "024d0ec62c3a54c1b2d7942479b0c69ef14a6f88deaf26c945c733c5b52c063a",
+  "fingerprint": {
+    "input_digest": "e272986f8b8e93f4a9f50068d839eee68419cc7cacd6341858479650501b3171",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/1",
+    "rubric_version": "usefulness-rubric/1",
+    "contract_version": "usefulness-finding/1",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-30T21:12:26.021Z",
+  "finding": {
+    "sense_id": "oewn-herbivorous__3.00.00..",
+    "usefulness": "useful",
+    "rationale": "The recorded meaning is clear: 'feeding only on plants.' This is a precise scientific term used in academic fields such as biology, ecology, and animal science. Even though the frequency is low (2.31), adult learners building professional and academic vocabulary would benefit from knowing this term because it names a core concept encountered in those disciplines.",
+    "evidence_ids": [
+      "oewn-herbivorous__3.00.00.."
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "sense_id": "oewn-herbivorous__3.00.00..",
+    "usefulness": "useful",
+    "rationale": "The recorded meaning is clear: 'feeding only on plants.' This is a precise scientific term used in academic fields such as biology, ecology, and animal science. Even though the frequency is low (2.31), adult learners building professional and academic vocabulary would benefit from knowing this term because it names a core concept encountered in those disciplines.",
+    "evidence_ids": [
+      "oewn-herbivorous__3.00.00.."
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 368,
+    "completion_tokens": 523,
+    "reasoning_tokens": 378,
+    "total_tokens": 891,
+    "cost_usd": 0.00012358
+  },
+  "latency_ms": 49333
+}

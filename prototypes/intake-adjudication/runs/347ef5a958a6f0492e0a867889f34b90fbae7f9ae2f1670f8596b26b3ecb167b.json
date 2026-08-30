@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "nuance|oewn-nuance__1.10.00..",
+  "fingerprint_key": "347ef5a958a6f0492e0a867889f34b90fbae7f9ae2f1670f8596b26b3ecb167b",
+  "fingerprint": {
+    "input_digest": "96339fbadb4eea25ed725717f2107d8134e9f2367dfd7c4669536d71b91b97be",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/1",
+    "rubric_version": "usefulness-rubric/1",
+    "contract_version": "usefulness-finding/1",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-30T21:10:12.915Z",
+  "finding": {
+    "sense_id": "oewn-nuance__1.10.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning is a precise term for a subtle difference in meaning, opinion, or attitude, and the examples show it used in contexts where interpretive sensitivity matters. For adults building professional and academic vocabulary, this meaning is valuable because it names a concept they will encounter in analysis, discussion, and writing.",
+    "evidence_ids": [
+      "oewn-nuance__1.10.00.."
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "sense_id": "oewn-nuance__1.10.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning is a precise term for a subtle difference in meaning, opinion, or attitude, and the examples show it used in contexts where interpretive sensitivity matters. For adults building professional and academic vocabulary, this meaning is valuable because it names a concept they will encounter in analysis, discussion, and writing.",
+    "evidence_ids": [
+      "oewn-nuance__1.10.00.."
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 6
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 413,
+    "completion_tokens": 271,
+    "reasoning_tokens": 139,
+    "total_tokens": 684,
+    "cost_usd": 0.00008182
+  },
+  "latency_ms": 8972
+}

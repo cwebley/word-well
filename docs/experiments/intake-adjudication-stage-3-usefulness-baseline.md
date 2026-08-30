@@ -82,3 +82,163 @@ Stop at the human checkpoint #56 requires.
 labelled by one person, six of which are trip-wires that must never break, cannot
 support an accuracy claim; if the gate passes all twelve the useful output is the
 retention audit and the next set of capability cases, not the number.
+
+## Results
+
+Nineteen meanings, nineteen calls, no repairs. Every record persisted, and the
+run reconciles exactly against the ledger: nineteen entries, `$0.002358`,
+matching the sum of `usage.cost_usd` across the nineteen records to the cent.
+
+**One deviation from the pre-run record.** `morph/bf16` returned `429 Provider
+returned error` on two consecutive attempts, after the SDK's transport retries.
+It is the only `bf16` endpoint serving this model, so the run went to
+`deepinfra/fp8` instead. `npm run models` succeeded on the same key throughout,
+so the limit was the upstream's, not the account's. The quantization is part of
+the config fingerprint, so this is recorded rather than hidden, and no persisted
+record from an earlier stage was reused across the change. A later `bf16` run
+would produce new fingerprints and new records, not a contradiction.
+
+### Scores
+
+| Scorer | Mean | Note |
+|---|---|---|
+| ContractSchemaValid | 1.0000 | 19/19 |
+| ContractEnumsAllowed | 1.0000 | 19/19 |
+| ContractMeaningIdentity | 1.0000 | 19/19 |
+| ContractMeaningCoverage | 1.0000 | every meaning judged |
+| ContractNoInventedDisposition | 1.0000 | the alarm staying silent |
+| **ContractEvidenceExists** | **0.6326** | see finding 1 |
+| **HeadwordDisposition** | **0.8333** | 10/12 |
+| **NoSilentExclusion** | **1.0000** | 12/12 — nothing the owner wanted was lost |
+
+### Finding 1: the contract holds, but `evidence_ids` does not earn its place here
+
+Five of the six contract scorers are perfect. The sixth is not, and it is a
+contract design fault rather than a judge failure.
+
+Pooled across all 34 citations, 15 are legal identifiers and 19 are not — 44%.
+The scorer reports 63%, which is the mean of per-headword ratios; headwords where
+the judge cited only the sense id score 1.00 and pull the average up. Both
+numbers are honest measures of different things and neither is an accuracy claim.
+
+What the other 19 are is the point. Every one is **real content from the supplied
+evidence** — synset members (`felicitous`, `glad`), example text (`a desert
+nomad's austere life`), definition fragments, the Zipf value. Checked
+specifically: `laconic`'s quoted `the laconic reply: 'yes'` *is* in the supplied
+examples. Nothing was hallucinated and the closed-book rule held.
+
+The field is simply asking a question with one possible answer. For morphology it
+earned its keep because a claim carried several components each with their own
+sense identifiers, so *which of these did you use* was real. Here each call
+carries exactly one meaning and therefore exactly one citable id, so the judge
+either restates it — adding nothing — or fills the field with what it actually
+leaned on. This is the first thing to fix, and it is a contract change, not a
+prompt change.
+
+### Finding 2: both misses are admits, at the two ends of the tier-2 band
+
+Ten of twelve. `herbivorous` and `happy` both came back `advance` where the label
+says `exclude`. There is not one error in the other direction, and
+`NoSilentExclusion` is 12/12: no word the owner wanted was lost.
+
+That is the failure direction the plan asks for. Selection is a global hard
+exclude, so a wrong admit turns up in the app and can be caught while a wrong
+exclude is terminal and silent. A thin prompt that errs by admitting is a better
+starting point than one that errs by excluding, and the score understates that.
+
+### Finding 3: the judge reads frequency monotonically; the criterion is a band
+
+The mechanism behind `happy` is legible in the rationales, and it is not
+carelessness. On `happy` the judge wrote that the meaning is "a core, everyday
+sense of a **very frequent** English word" and concluded it is therefore
+"foundational and useful". On `pinnate` and `Texan` it wrote that "the **low
+frequency** further indicates it is not a core academic word".
+
+So frequency is being used in one direction: common counts *for*, rare counts
+*against*. The criterion is not directional. Tier 2 is a band, with everyday
+words below it and domain-technical words above, and version 1 never says there
+is an upper bound — so the judge cannot apply one. The evidence was sufficient;
+`happy`'s Zipf of 5.38 was right there in the prompt and was read as support.
+
+This is the clean case for the start-thin discipline. The clause that fixes it
+now traces to a named case, and would have been guesswork written up front.
+
+### Finding 4: "academic" is being read as "used in an academic discipline"
+
+`herbivorous` was admitted because it is "a precise scientific term used in
+academic fields such as biology, ecology, and animal science". That is tier 3
+arriving through the word *academic* in the criterion itself.
+
+`pinnate` is the control, and it was rejected correctly — as "a highly
+specialized botanical term". The difference between them is not the judge: it is
+that `pinnate`'s gloss self-marks its domain, `(of a leaf shape)`, and
+`herbivorous`'s gloss, `feeding only on plants`, reads as general prose. So the
+gate currently catches domain-technical words only when OEWN happens to announce
+the domain, which is not a property anything downstream can rely on.
+
+### Finding 5: the two register rejects came back correct with no register evidence
+
+`homegirl` was the pre-run hypothesis's most likely miss. It was rejected, on the
+gloss alone: "a slang term for a female gang member... informal, subcultural
+context". `dimwit` likewise: "a colloquial, informal insult".
+
+These are exactly the two words `wik_labels` would have helped with, and they did
+not need it. The register signal was already recoverable from the gloss and the
+synset members (`nitwit`, `half-wit`, `doofus`), which is what the evidence
+decision predicted. That decision cost two of six keeps a misleading label and
+bought nothing measurable; this run is the evidence that it bought nothing
+because there was nothing to buy.
+
+### Operations
+
+| | |
+|---|---|
+| Calls | 19, one per meaning, no retries, no repairs |
+| Prompt tokens | 7,255 |
+| Completion tokens | 9,964, of which **7,384 reasoning** |
+| Actual spend | `$0.002358` (mean `$0.000124` per meaning, `$0.000197` per headword) |
+| Pre-run estimate | `$0.0121` — **5.1x** the actual, in line with stage 2's 6.0x |
+| Latency | min 5,684 ms, median 10,562 ms, max 49,333 ms |
+| True spend to date | `$0.0835` of the `$10` cap, `$9.9165` remaining |
+
+Latency is four times stage 2's median, and the reason is visible in the token
+split: three quarters of the completion budget is hidden reasoning. Nothing here
+argues for or against that — it is recorded so a later model comparison has a
+baseline that is not mistaken for a property of the gate.
+
+Projected over the full pool, the per-meaning cost is the number that matters,
+not the per-headword one, because the fan-out scales with meanings.
+
+## Decision
+
+Stop here for the human checkpoint, as #56 requires.
+
+**What this run supports.** The path holds end to end for a second gate: fixed
+evidence, one strict contract, a per-meaning fan-out, a deterministic fold, a
+persisted record, a reconciled ledger. The failure direction is the safe one. The
+two misses have identified mechanisms rather than being noise.
+
+**What it does not support.** Any accuracy claim. Twelve cases labelled by one
+person, six of which are trip-wires that must never break, cannot carry one, and
+`0.8333` should not be quoted as accuracy. There is no capability partition and
+no hidden holdout. The retention audit has been built but not run, so there is no
+resolution instrument behind this number yet.
+
+**Deliberately not done in this session.** No prompt v2. The pre-run record
+forbids iterating in the same session as the baseline, and the working-decisions
+comment puts the owner in front of the failures first. Findings 3 and 4 each name
+a single clause that would trace to a specific case, which is the shape a
+revision is supposed to have — but writing them now would be choosing what
+counts as useful, and that is the one judgment this gate cannot borrow.
+
+Open questions for the checkpoint:
+
+1. Does `evidence_ids` survive into `usefulness-finding/2` at all, given finding
+   1? The options are dropping it, or widening what counts as citable to the
+   evidence's content rather than its identifiers.
+2. Findings 3 and 4 both point at the same root — version 1 states a direction
+   where the criterion is a band. One clause naming the tier-1 and tier-3 edges,
+   or two clauses traced separately?
+3. Run the retention audit now, at roughly `$0.03` for ~100 words, to get a
+   resolution instrument behind the next prompt change? It costs no labelling
+   time and the sample is already drawn.

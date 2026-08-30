@@ -1,0 +1,70 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.harmful.00",
+  "fingerprint_key": "8d8b03cccf639e1a595baaca2e61293df5a96b5061496660ce1cb2c79ed83871",
+  "fingerprint": {
+    "input_digest": "f1f54374abe76905856465c5358daec2814fa872c72508252a9c7648533b9386",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/1",
+    "rubric_version": "usefulness-rubric/1",
+    "contract_version": "usefulness-finding/1",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-30T21:09:45.136Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning is a precise, non-common way of describing harm that operates invisibly or gradually. This concept is valuable in academic and professional writing, where precise vocabulary for causes, risks, and effects is needed. The supplied definition and synonyms (insidious, subtle) support this as a distinct, learnable meaning, and the low frequency does not outweigh its utility for advanced vocabulary building.",
+    "evidence_ids": [],
+    "diagnostic_confidence": 0.85
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning is a precise, non-common way of describing harm that operates invisibly or gradually. This concept is valuable in academic and professional writing, where precise vocabulary for causes, risks, and effects is needed. The supplied definition and synonyms (insidious, subtle) support this as a distinct, learnable meaning, and the low frequency does not outweigh its utility for advanced vocabulary building.",
+    "evidence_ids": [],
+    "diagnostic_confidence": 0.85
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 409,
+    "completion_tokens": 588,
+    "reasoning_tokens": 441,
+    "total_tokens": 997,
+    "cost_usd": 0.00013856
+  },
+  "latency_ms": 15885
+}
