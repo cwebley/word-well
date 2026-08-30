@@ -59,6 +59,7 @@ export async function adjudicate(
   model: ModelConfig,
   manifest: EvidenceManifest,
   store?: RunStore,
+  runsDir: string = RUNS_DIR,
 ): Promise<AdjudicationOutcome> {
   const fingerprint = buildFingerprint(claim.input_digest, manifest, model);
 
@@ -97,7 +98,9 @@ export async function adjudicate(
   const record = buildRecord(claim, fingerprint, completion, latencyMs);
   store?.put(record);
   // Logged even when nothing is persisted, so the cap sees every paid call.
-  recordSpend(RUNS_DIR, {
+  // The directory is injectable for the same reason the store is: a test that
+  // exercises this path must not append fabricated spend to the real ledger.
+  recordSpend(runsDir, {
     at: record.recorded_at,
     claim_id: record.claim_id,
     fingerprint_key: record.fingerprint_key,
