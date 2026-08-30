@@ -1,8 +1,29 @@
-# PROTOTYPE — morphology intake adjudication, issue #46
+# PROTOTYPE — intake adjudication, issue #46
 
 Throwaway. No schema, no migrations, no pipeline integration. The plan is
-[`docs/plans/intake-adjudication-evaluation.md`](../../docs/plans/intake-adjudication-evaluation.md);
-this directory is its first three modules.
+[`docs/plans/intake-adjudication-evaluation.md`](../../docs/plans/intake-adjudication-evaluation.md),
+and its `## Revision` section at the top is authoritative — read that before
+anything below it.
+
+## Two gates
+
+Since stage 2, **audience usefulness is the word-selection gate** and morphology
+is content preparation with no `exclude` path. They ask different questions of
+different subjects and share no rubric, contract, policy or labels.
+
+| | Morphology (#46, #49) | Audience usefulness (#56) |
+|---|---|---|
+| Question | Is the word built the way the mechanical rule claims? | Is this meaning worth learning for an adult building a professional and academic vocabulary? |
+| Subject | A mechanical claim | One source meaning |
+| Authority | A lexicographer could settle it | The product owner alone — the ceiling is their own self-agreement |
+| Endorsement | Overrides a fuzzy exclusion | Decides nothing; it is the retention audit's sample |
+| Modules | `src/morphology/` | `src/usefulness/` |
+
+What they share is `src/gate.ts` and everything behind it: one path that calls a
+model, one config fingerprint, one spend guard against the shared $10 cap. A
+gate supplies what to send, how to read the reply and how policy decides;
+`adjudicate` supplies the rest. A second copy of the runner is how an experiment
+ends up measuring a prompt that is not the one under test.
 
 The mechanical intake rules from spike #44 fail in one specific way: **they
 invent word formation that does not exist.** `rebut` is not `re` + `but`,
@@ -11,7 +32,7 @@ such claim. This prototype asks a model to adjudicate each claim against fixed
 lexical evidence, and lets deterministic policy — never the model — decide what
 happens to the word.
 
-## The unit of judgment
+## Morphology's unit of judgment
 
 A **mechanical claim**, not a headword:
 
@@ -46,7 +67,13 @@ takes two fields and `verdictOf` is the only way to produce them, so
 
 | File | What it does |
 |---|---|
+| `src/gate.ts` | what every gate has in common: versions, schema, parse, decide |
+| `src/disposition.ts` | advance / quarantine / exclude, shared so downstream never depends on which gate spoke |
+| `src/parse.ts` | JSON, schema and subject-identity checks, shared by both contracts |
 | `export_evidence.py` | scratch pool + pinned OEWN → versioned JSONL claims, with explicit missing-evidence markers |
+| `export_usefulness_evidence.py` | the same, for the usefulness gate: one record per source meaning |
+| `sample_retention_audit.py` | draws the 100-word unlabelled retention audit, seeded and reproducible |
+| `src/usefulness/` | the usefulness gate: subject, contract, prompt, policy, fan-out runner |
 | `cases/*.claims.json` | which claims to materialise, and why those |
 | `evidence/*.claims.jsonl` | the fixed evidence a judge sees. Committed, so a run is reproducible |
 | `evidence/*.manifest.json` | pinned source releases, digests, and per-claim input digests |
@@ -101,9 +128,29 @@ cd ../content-pipeline-source-shapes
 ```sh
 npm test          # policy, contract and runner tests. No network, no spend
 npm run typecheck
-npm run adjudicate  # the five cases, persisted under runs/
-npm run eval        # the same five cases as a Braintrust experiment
+
+npm run adjudicate        # morphology: the five contract-test cases
+npm run eval              # the same five as a Braintrust experiment
+
+npm run usefulness        # usefulness: 19 meanings across the golden 12
+npm run usefulness -- --dry
+npm run eval:usefulness   # the same twelve as a Braintrust experiment
 ```
+
+## The retention audit
+
+`cases/retention-audit-v1.json` is 100 endorsed headwords, drawn by proportional
+allocation within strata (endorsement band, frequency band, part of speech) at a
+recorded seed. It reports exactly one number — the share the usefulness gate
+keeps — and three properties make it worth having:
+
+- **Unlabelled.** Nobody assigns a verdict. Labelling it makes it a second golden
+  set with all the problems the first was cut down to avoid.
+- **Disjoint** from every golden case. Endorsement can seed golden cases *or*
+  serve as the audit, never both on the same words.
+- **Never tuned toward.** A drop in retention is a question, not a target.
+
+`evals/retention-audit.test.ts` asserts all three rather than trusting them.
 
 ## Local calibration review
 
