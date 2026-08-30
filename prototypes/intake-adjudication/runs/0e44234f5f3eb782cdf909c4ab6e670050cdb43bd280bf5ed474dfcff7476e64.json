@@ -1,0 +1,89 @@
+{
+  "claim_id": "overweening|lexicalised_participle",
+  "fingerprint_key": "0e44234f5f3eb782cdf909c4ab6e670050cdb43bd280bf5ed474dfcff7476e64",
+  "fingerprint": {
+    "input_digest": "91e7da3e65e1d5ed3951ecd8444490599f2249fafc398d77650244deaa12634a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": null,
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/1"
+  },
+  "recorded_at": "2026-08-29T22:44:06.551Z",
+  "finding": {
+    "claim_id": "overweening|lexicalised_participle",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed decomposition lists the root as null and provides no root or component. Without a root, the claim that 'overweening' is formed by adding the suffix '-ing' cannot be evaluated, so the analysis is unsupported.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-overweening__5.00.00.immodest.02",
+          "oewn-overweening__5.00.00.unrestrained.00"
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [],
+        "rationale": "No root or component is supplied, so no meaning can be derived from the claimed parts."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "analysis_evidence_ids": [],
+    "analysis_rationale": "The proposed decomposition lists the root as null and provides no root or component. Without a root, the claim that 'overweening' is formed by adding the suffix '-ing' cannot be evaluated, so the analysis is unsupported.",
+    "analysis_support": "unsupported",
+    "claim_id": "overweening|lexicalised_participle",
+    "diagnostic_confidence": 0.9,
+    "meanings": [
+      {
+        "evidence_ids": [],
+        "predictability": "insufficient_evidence",
+        "rationale": "No root or component is supplied, so no meaning can be derived from the claimed parts.",
+        "sense_ids": [
+          "oewn-overweening__5.00.00.immodest.02",
+          "oewn-overweening__5.00.00.unrestrained.00"
+        ]
+      }
+    ]
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 3,
+  "served_by": "OpenInference",
+  "usage": {
+    "prompt_tokens": 879,
+    "completion_tokens": 635,
+    "reasoning_tokens": 403,
+    "total_tokens": 1514,
+    "cost_usd": 0.00007515
+  },
+  "latency_ms": 18304
+}

@@ -1,0 +1,159 @@
+{
+  "claim_id": "mercurial|meaning_shift_derivation",
+  "fingerprint_key": "0d4e37d6252979c36121cac9f946c68c18473f6bbbf4cfed6fef76731b032850",
+  "fingerprint": {
+    "input_digest": "b2bf952320fd605613113f1016dfa4c49b53eaf8c5aa26110bf7c5ecece5fa71",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "morph/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T00:50:59.777Z",
+  "finding": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The suffix -al is a standard English adjectival suffix, and the spelling change from -y to -i is regular. The root 'mercury' is attested as a noun referring to the metal, and the word 'mercurial' is recorded as an adjective relating to or containing mercury, showing a transparent derivational relationship.",
+    "analysis_evidence_ids": [
+      "oewn-mercury__1.27.00..",
+      "oewn-mercurial__3.01.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__3.01.00.."
+        ],
+        "rationale": "The meaning 'relating to or containing or caused by mercury' is directly derivable from the root 'mercury' (the metal) plus the adjectival suffix -al, which forms adjectives meaning 'relating to'."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.01.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.01.."
+        ],
+        "rationale": "The meaning 'relating to or having characteristics attributed to the god Mercury' is not derivable from the root 'mercury' as the metal; it requires knowledge of the mythological figure, which is not present in the supplied root evidence."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.02.."
+        ],
+        "rationale": "The meaning 'relating to or under the astrological influence of the planet Mercury' is not derivable from the root 'mercury' as the metal; it requires knowledge of the planet and astrological associations, which are not present in the supplied root evidence."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "rationale": "The meaning 'liable to sudden unpredictable change' is a figurative extension not derivable from the root 'mercury' as the metal; it requires additional knowledge of the god Mercury's characteristics or the metal's quicksilver nature, which is not supplied in the root evidence."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The suffix -al is a standard English adjectival suffix, and the spelling change from -y to -i is regular. The root 'mercury' is attested as a noun referring to the metal, and the word 'mercurial' is recorded as an adjective relating to or containing mercury, showing a transparent derivational relationship.",
+    "analysis_evidence_ids": [
+      "oewn-mercury__1.27.00..",
+      "oewn-mercurial__3.01.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__3.01.00.."
+        ],
+        "rationale": "The meaning 'relating to or containing or caused by mercury' is directly derivable from the root 'mercury' (the metal) plus the adjectival suffix -al, which forms adjectives meaning 'relating to'."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.01.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.01.."
+        ],
+        "rationale": "The meaning 'relating to or having characteristics attributed to the god Mercury' is not derivable from the root 'mercury' as the metal; it requires knowledge of the mythological figure, which is not present in the supplied root evidence."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.02.."
+        ],
+        "rationale": "The meaning 'relating to or under the astrological influence of the planet Mercury' is not derivable from the root 'mercury' as the metal; it requires knowledge of the planet and astrological associations, which are not present in the supplied root evidence."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "rationale": "The meaning 'liable to sudden unpredictable change' is a figurative extension not derivable from the root 'mercury' as the metal; it requires additional knowledge of the god Mercury's characteristics or the metal's quicksilver nature, which is not supplied in the root evidence."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components",
+    "endorsementOverride": false
+  },
+  "endorsements": 9,
+  "served_by": "Morph",
+  "usage": {
+    "prompt_tokens": 1649,
+    "completion_tokens": 626,
+    "reasoning_tokens": 0,
+    "total_tokens": 2275,
+    "cost_usd": 0.00033686675
+  },
+  "latency_ms": 23223
+}

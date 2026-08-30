@@ -1,0 +1,121 @@
+{
+  "claim_id": "pastoral|compound_split",
+  "fingerprint_key": "9101695d6026812b7ebb80a2f55f8f9a14a29f9e514f2f006290996834d9d476",
+  "fingerprint": {
+    "input_digest": "4f56e7baaac7b42b15dcd77407b192708aeaae67ab0cb9aa15016ac03e4a3559",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": null,
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/1"
+  },
+  "recorded_at": "2026-08-29T22:44:02.147Z",
+  "finding": {
+    "claim_id": "pastoral|compound_split",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The recorded meanings of pastoral all involve pastors, shepherds, or idealized rural life, while the proposed parts 'past' and 'oral' denote time, being outgoing, the mouth, or spoken communication. The match is therefore a string-coincidence split, not a real word-formation account.",
+    "analysis_evidence_ids": [
+      "oewn-past__1.28.00..",
+      "oewn-past__3.00.00..",
+      "oewn-oral__3.00.00..",
+      "oewn-oral__5.00.00.spoken.00",
+      "oewn-pastoral__3.01.00..",
+      "oewn-pastoral__3.01.02.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-pastoral__1.10.00..",
+          "oewn-pastoral__1.10.01..",
+          "oewn-pastoral__1.10.02..",
+          "oewn-pastoral__3.01.00..",
+          "oewn-pastoral__3.01.02..",
+          "oewn-pastoral__5.00.00.rural.00"
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-past__1.28.00..",
+          "oewn-past__3.00.00..",
+          "oewn-oral__3.00.00..",
+          "oewn-oral__5.00.00.spoken.00"
+        ],
+        "rationale": "Since the claimed decomposition is unsupported, the parts 'past' and 'oral' cannot provide a real basis for any of the pastoral senses. Their recorded meanings do not include pastor, shepherd, or rural life, so none of the six senses is predictable from the proposed components."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "raw": {
+    "claim_id": "pastoral|compound_split",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The recorded meanings of pastoral all involve pastors, shepherds, or idealized rural life, while the proposed parts 'past' and 'oral' denote time, being outgoing, the mouth, or spoken communication. The match is therefore a string-coincidence split, not a real word-formation account.",
+    "analysis_evidence_ids": [
+      "oewn-past__1.28.00..",
+      "oewn-past__3.00.00..",
+      "oewn-oral__3.00.00..",
+      "oewn-oral__5.00.00.spoken.00",
+      "oewn-pastoral__3.01.00..",
+      "oewn-pastoral__3.01.02.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-pastoral__1.10.00..",
+          "oewn-pastoral__1.10.01..",
+          "oewn-pastoral__1.10.02..",
+          "oewn-pastoral__3.01.00..",
+          "oewn-pastoral__3.01.02..",
+          "oewn-pastoral__5.00.00.rural.00"
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-past__1.28.00..",
+          "oewn-past__3.00.00..",
+          "oewn-oral__3.00.00..",
+          "oewn-oral__5.00.00.spoken.00"
+        ],
+        "rationale": "Since the claimed decomposition is unsupported, the parts 'past' and 'oral' cannot provide a real basis for any of the pastoral senses. Their recorded meanings do not include pastor, shepherd, or rural life, so none of the six senses is predictable from the proposed components."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 1,
+  "served_by": "Baidu",
+  "usage": {
+    "prompt_tokens": 2253,
+    "completion_tokens": 2572,
+    "reasoning_tokens": 2096,
+    "total_tokens": 4825,
+    "cost_usd": 0.000295606332
+  },
+  "latency_ms": 13899
+}

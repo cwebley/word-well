@@ -49,8 +49,13 @@ tar xzf data/scowl.tar.gz -C data
 Then `build_pool.py` (~60s), `fetch_labels.py` (~3m), `build_browser.py`.
 
 Raw snapshots are not committed — 107 MB of OEWN index, ~6 MB of CMUdict and
-SCOWL, 384 KB of wikitext. The extracted JSON and `pool.sqlite` are, so the
-numbers in both findings docs can be checked without re-downloading.
+SCOWL, 384 KB of wikitext. The extracted JSON is, so the numbers in both findings
+docs can be checked without re-downloading.
+
+`pool.sqlite` is **not** committed either, despite what an earlier version of
+this file claimed. It is a build output: rebuild it with `rebuild_all.sh`. Any
+evidence manifest derived from it records its sha256, so a run can tell whether
+it was built against a different pool.
 
 ## Current settings
 

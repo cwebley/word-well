@@ -1,0 +1,95 @@
+{
+  "claim_id": "naughtiness|grammatical_derivation",
+  "fingerprint_key": "fb8ecaedd039e1e4190981a8d859f0df8a62fffa7510ce0b1397b2a3fc583148",
+  "fingerprint": {
+    "input_digest": "a2fe0fecd38a14293d3a95d9146f861cfa208c5f5acea7da399735f951c0839d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "morph/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T00:50:45.406Z",
+  "finding": {
+    "claim_id": "naughtiness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'naughtiness' is transparently formed by adding the suffix '-ness' to the adjective 'naughty', with the regular spelling change of final -y to -i. The root 'naughty' is recorded as an adjective meaning 'badly behaved', which is the appropriate base for this nominalization.",
+    "analysis_evidence_ids": [
+      "oewn-naughty__5.00.00.bad.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-naughtiness__1.07.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-naughty__5.00.00.bad.00"
+        ],
+        "rationale": "The meaning 'an attribute of mischievous children' is directly derivable from the root 'naughty' meaning 'badly behaved' plus the suffix '-ness', which forms abstract nouns denoting a state or quality. A learner knowing 'naughty' and '-ness' would understand 'naughtiness' as the quality of being naughty."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "raw": {
+    "claim_id": "naughtiness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'naughtiness' is transparently formed by adding the suffix '-ness' to the adjective 'naughty', with the regular spelling change of final -y to -i. The root 'naughty' is recorded as an adjective meaning 'badly behaved', which is the appropriate base for this nominalization.",
+    "analysis_evidence_ids": [
+      "oewn-naughty__5.00.00.bad.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-naughtiness__1.07.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-naughty__5.00.00.bad.00"
+        ],
+        "rationale": "The meaning 'an attribute of mischievous children' is directly derivable from the root 'naughty' meaning 'badly behaved' plus the suffix '-ness', which forms abstract nouns denoting a state or quality. A learner knowing 'naughty' and '-ness' would understand 'naughtiness' as the quality of being naughty."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Morph",
+  "usage": {
+    "prompt_tokens": 1503,
+    "completion_tokens": 275,
+    "reasoning_tokens": 0,
+    "total_tokens": 1778,
+    "cost_usd": 0.00014935125
+  },
+  "latency_ms": 8849
+}

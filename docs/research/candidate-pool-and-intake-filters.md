@@ -32,7 +32,7 @@ needs only the conclusions can stop here.
 | **Headword is the lemma**, except noun-only entries whose plural carries ≥90% of the mass | "most common form wins" would make `demurred`, `derided` and `castigated` headwords — past-tense dominance is a prose artifact, not evidence | [The teaching unit](#the-teaching-unit) |
 | **Bands are a starting point for the rating**, changeable in the UI at any time | under continuous ratings a band is a starting value and a label, not a curriculum | [The rating model](#the-rating-model-and-a-poc-for-it) |
 | **Retire a word at ceiling + 0.25**, not at the ceiling | without hysteresis a word sitting at 3.49 is served once and vanishes; band transitions are not events | [The rating model](#the-rating-model-and-a-poc-for-it) |
-| **Persist every model output** keyed by input + prompt version | makes "run it on small subsets first" safe: re-runs cost nothing, only a prompt change re-bills | [LLM adjudication](#proposed-llm-adjudication-of-the-fuzzy-filters) |
+| **Persist every model output** keyed by the complete config fingerprint | makes "run it on small subsets first" safe: an unchanged input and configuration costs nothing to re-run, while a source, extractor, rule, model, prompt, rubric or contract change produces a new result | [LLM adjudication](#proposed-llm-adjudication-of-the-fuzzy-filters) |
 | **Terms of service: settled** | these are open web lists | — |
 
 The **cost budget** remains open but is no longer treated as a gate — the
@@ -450,10 +450,15 @@ factual one:
 | compound split | 2,090 | 62 |
 | derivation, grammatical | 1,619 | 32 |
 | derivation, may shift | 7,587 | 399 |
-| union | **12,781** | **623** |
+| union | **12,781** | **578** |
 
-One short judgment each, once per pool build rather than per delivery, and the
-623 endorsed words in the set are a built-in accuracy check.
+Each distinct rule claim requires one short judgment per pool build rather than
+per delivery. The 578 distinct endorsed words provide an external retention audit.
+The four rule rows contain 623 endorsement occurrences because 45 endorsed
+headwords carry two flags. Endorsement establishes editorial interest, not
+whether a proposed morphological analysis is true, so morphology precision and
+recall need a human-validated claim set. See
+`docs/plans/intake-adjudication-evaluation.md`.
 
 INFERRED: this is the same job as three others the spike identified — synonym
 junk ("is this member the same meaning as the headword"), derivation drift

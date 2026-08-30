@@ -1,0 +1,101 @@
+{
+  "claim_id": "rebut|affix_strip",
+  "fingerprint_key": "aeed86cb5302eb6b6eca623c1894118c7bf51b2cf78bae084718a1f6d3f30fd3",
+  "fingerprint": {
+    "input_digest": "d09f989663d6a01df8c6ebd7e53e11e0994628fcff49b43db4eadde3336243ac",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "morph/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T00:50:47.722Z",
+  "finding": {
+    "claim_id": "rebut|affix_strip",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed decomposition treats 'rebut' as 're' + 'but', but the root 'but' is an adverb meaning 'and nothing more', which cannot combine with a prefix to form a verb. The word 'rebut' is a verb meaning 'to refute', and the string match with the adverb 'but' is coincidental; there is no evidence that 'rebut' is formed from 're' and 'but'.",
+    "analysis_evidence_ids": [
+      "oewn-but__4.02.01..",
+      "oewn-rebut__2.31.00..",
+      "oewn-rebut__2.32.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-rebut__2.31.00..",
+          "oewn-rebut__2.32.00.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-but__4.02.01.."
+        ],
+        "rationale": "Since the analysis is unsupported, the meanings cannot be predicted from the claimed parts. The root 'but' as an adverb does not contribute to the verb meanings of 'rebut', and there is no evidence that the parts combine to yield these senses."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "raw": {
+    "claim_id": "rebut|affix_strip",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed decomposition treats 'rebut' as 're' + 'but', but the root 'but' is an adverb meaning 'and nothing more', which cannot combine with a prefix to form a verb. The word 'rebut' is a verb meaning 'to refute', and the string match with the adverb 'but' is coincidental; there is no evidence that 'rebut' is formed from 're' and 'but'.",
+    "analysis_evidence_ids": [
+      "oewn-but__4.02.01..",
+      "oewn-rebut__2.31.00..",
+      "oewn-rebut__2.32.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-rebut__2.31.00..",
+          "oewn-rebut__2.32.00.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-but__4.02.01.."
+        ],
+        "rationale": "Since the analysis is unsupported, the meanings cannot be predicted from the claimed parts. The root 'but' as an adverb does not contribute to the verb meanings of 'rebut', and there is no evidence that the parts combine to yield these senses."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 1,
+  "served_by": "Morph",
+  "usage": {
+    "prompt_tokens": 1463,
+    "completion_tokens": 332,
+    "reasoning_tokens": 0,
+    "total_tokens": 1795,
+    "cost_usd": 0.00023676725
+  },
+  "latency_ms": 11163
+}
