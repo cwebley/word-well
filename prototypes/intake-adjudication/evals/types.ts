@@ -4,8 +4,9 @@
 // against the author's reading of the evidence, not a human labelling pass, and
 // a score computed against provisional labels must never be quoted as accuracy.
 
-import { readFileSync } from "node:fs";
 import { z } from "zod";
+
+import { readJsonl } from "../src/jsonl.ts";
 
 import { predictabilityValues, analysisSupportValues } from "../src/contract.ts";
 import { dispositions } from "../src/policy.ts";
@@ -27,11 +28,5 @@ export const expectedLabelSchema = z.object({
 export type ExpectedLabel = z.infer<typeof expectedLabelSchema>;
 
 export function readLabels(path: string): Map<string, ExpectedLabel> {
-  const labels = new Map<string, ExpectedLabel>();
-  for (const line of readFileSync(path, "utf-8").split("\n")) {
-    if (!line.trim()) continue;
-    const label = expectedLabelSchema.parse(JSON.parse(line));
-    labels.set(label.claim_id, label);
-  }
-  return labels;
+  return new Map(readJsonl(path, expectedLabelSchema).map((label) => [label.claim_id, label]));
 }

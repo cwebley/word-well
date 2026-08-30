@@ -13,6 +13,8 @@
 import OpenAI from "openai";
 import { wrapOpenAI } from "braintrust";
 
+import { recordSpend } from "./budget.ts";
+import { OPENROUTER_BASE_URL, RUNS_DIR } from "./config.ts";
 import type { Claim } from "./claim.ts";
 import type { Finding } from "./contract.ts";
 import { CONTRACT_VERSION, findingJsonSchema, findingSchema } from "./contract.ts";
@@ -21,8 +23,6 @@ import { buildFingerprint, fingerprintKey } from "./fingerprint.ts";
 import { applyEndorsement, deriveMorphologyDisposition, verdictOf } from "./policy.ts";
 import { buildMessages } from "./prompt.ts";
 import type { AdjudicationRecord, RunStore, Usage } from "./store.ts";
-
-const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export function createClient(apiKey: string): OpenAI {
   return wrapOpenAI(
@@ -96,6 +96,14 @@ export async function adjudicate(
 
   const record = buildRecord(claim, fingerprint, completion, latencyMs);
   store?.put(record);
+  // Logged even when nothing is persisted, so the cap sees every paid call.
+  recordSpend(RUNS_DIR, {
+    at: record.recorded_at,
+    claim_id: record.claim_id,
+    fingerprint_key: record.fingerprint_key,
+    cost_usd: record.usage.cost_usd ?? 0,
+    persisted: store !== undefined,
+  });
   return { record, reused: false };
 }
 

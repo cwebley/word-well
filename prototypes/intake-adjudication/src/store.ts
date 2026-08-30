@@ -13,7 +13,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { Claim } from "./claim.ts";
 import type { Finding } from "./contract.ts";
 import type { ConfigFingerprint } from "./fingerprint.ts";
 import { fingerprintKey } from "./fingerprint.ts";
@@ -69,7 +68,7 @@ export class RunStore {
 }
 
 /** A run record shaped for a human reading `runs/`, not for a machine. */
-export function summarise(record: AdjudicationRecord, claim: Claim): string {
+export function summarise(record: AdjudicationRecord): string {
   const verdict = record.finding
     ? `${record.finding.analysis_support}; meanings ${record.finding.meanings
         .map((m) => m.predictability)
@@ -78,5 +77,5 @@ export function summarise(record: AdjudicationRecord, claim: Claim): string {
   const disposition = record.effective
     ? `${record.effective.disposition}${record.effective.endorsementOverride ? " (endorsement override)" : ""}`
     : "none";
-  return `${claim.claim_id}\n  ${verdict}\n  disposition: ${disposition}\n  ${record.usage.total_tokens ?? "?"} tokens, $${record.usage.cost_usd ?? "?"}, ${record.latency_ms} ms`;
+  return `${record.claim_id}\n  ${verdict}\n  disposition: ${disposition}\n  ${record.usage.total_tokens ?? "?"} tokens, $${record.usage.cost_usd ?? "?"}, ${record.latency_ms} ms`;
 }

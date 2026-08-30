@@ -8,7 +8,7 @@
 import type { EvalScorer } from "braintrust";
 
 import type { Claim } from "../../src/claim.ts";
-import { candidateSenseIds, citableEvidenceIds } from "../../src/claim.ts";
+import { candidateSourceMeaningIds, citableEvidenceIds } from "../../src/claim.ts";
 import {
   analysisSupportValues,
   findingSchema,
@@ -84,7 +84,7 @@ export const claimIdentityScorer: Scorer = ({ input, output }) => {
  * something new. Missing, duplicated and invented identifiers are all faults.
  */
 export const meaningAccountingScorer: Scorer = ({ input, output }) => {
-  const expectedIds = candidateSenseIds(input);
+  const expectedIds = candidateSourceMeaningIds(input);
   const cited = rawMeanings(asObject(output.raw)).flatMap((m) => strings(m.sense_ids));
 
   const counts = new Map<string, number>();
@@ -114,12 +114,12 @@ export const evidenceCitationScorer: Scorer = ({ input, output }) => {
   if (cited.length === 0) return null;
 
   const citable = citableEvidenceIds(input);
-  const invented = [...new Set(cited.filter((id) => !citable.has(id)))];
+  const bad = cited.filter((id) => !citable.has(id));
 
   return {
     name: "ContractEvidenceExists",
-    score: (cited.length - cited.filter((id) => !citable.has(id)).length) / cited.length,
-    metadata: { cited: cited.length, invented },
+    score: (cited.length - bad.length) / cited.length,
+    metadata: { cited: cited.length, invented: [...new Set(bad)] },
   };
 };
 

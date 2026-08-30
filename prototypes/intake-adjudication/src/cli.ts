@@ -36,7 +36,7 @@ async function main() {
   const claims = readClaims(join(EVIDENCE_DIR, `${CASE_SET}.claims.jsonl`));
   const manifest = readManifest(join(EVIDENCE_DIR, `${CASE_SET}.manifest.json`));
 
-  const price = await fetchPrice(model.model, apiKey);
+  const price = await fetchPrice(model, apiKey);
   const check = checkBudget(
     spentSoFar(RUNS_DIR),
     estimateCost(claims, price),
@@ -68,7 +68,7 @@ async function main() {
   for (const claim of claims) {
     const { record, reused } = await adjudicate(claim, client, model, manifest, store);
     if (record.contract_error) failures += 1;
-    console.log(`${reused ? "reused " : "called "}${summarise(record, claim)}\n`);
+    console.log(`${reused ? "reused " : "called "}${summarise(record)}\n`);
   }
 
   const after = spentSoFar(RUNS_DIR);

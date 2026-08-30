@@ -58,7 +58,7 @@ Eval<Claim, AdjudicationRecord, ExpectedLabel>("WordWell morphology adjudication
   },
 
   data: async () => {
-    const price = await fetchPrice(model.model, apiKey);
+    const price = await fetchPrice(model, apiKey);
     const budget = checkBudget(spentSoFar(RUNS_DIR), estimateCost(claims, price), PILOT_BUDGET_USD);
     if (!budget.allowed) {
       throw new Error(

@@ -14,3 +14,5 @@ prototypes/content-pipeline-source-shapes/pool.sqlite
 prototypes/**/venv/
 prototypes/**/data/
 prototypes/**/out/
+__pycache__/
+*.pyc

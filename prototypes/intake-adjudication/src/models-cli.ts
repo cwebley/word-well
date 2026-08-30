@@ -10,7 +10,7 @@
 //   npm run models -- 40                             # cheapest 40
 //   npm run models -- deepseek/deepseek-v4-flash-0731  # its upstreams
 
-import { requireEnv } from "./config.ts";
+import { OPENROUTER_BASE_URL, requireEnv } from "./config.ts";
 
 interface CatalogueModel {
   id: string;
@@ -31,7 +31,7 @@ interface Endpoint {
 const perMillion = (v: string) => `$${(Number(v) * 1e6).toFixed(3)}`;
 
 async function get<T>(path: string, apiKey: string): Promise<T> {
-  const response = await fetch(`https://openrouter.ai/api/v1/${path}`, {
+  const response = await fetch(`${OPENROUTER_BASE_URL}/${path}`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
   if (!response.ok) throw new Error(`${path}: ${response.status} ${response.statusText}`);

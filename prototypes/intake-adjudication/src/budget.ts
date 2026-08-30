@@ -6,14 +6,13 @@
 // actually charged rather than what was predicted, and a reused record costs
 // nothing because no call is made.
 
-import { readdirSync, readFileSync } from "node:fs";
-import { existsSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { Claim } from "./claim.ts";
+import { OPENROUTER_BASE_URL, PILOT_BUDGET_USD, RUNS_DIR } from "./config.ts";
 import type { ModelConfig } from "./fingerprint.ts";
 import { buildMessages } from "./prompt.ts";
-import type { AdjudicationRecord } from "./store.ts";
 
 /** Rough characters-per-token. Deliberately pessimistic. */
 const CHARS_PER_TOKEN = 3.5;
@@ -28,30 +27,66 @@ export interface ModelPrice {
   completion: number;
 }
 
-export function spentSoFar(runsDir: string): number {
-  if (!existsSync(runsDir)) return 0;
-  let total = 0;
-  for (const file of readdirSync(runsDir)) {
-    if (!file.endsWith(".json")) continue;
-    const record = JSON.parse(readFileSync(join(runsDir, file), "utf-8")) as AdjudicationRecord;
-    total += record.usage.cost_usd ?? 0;
-  }
-  return total;
+export const LEDGER = "spend-ledger.jsonl";
+
+/**
+ * Every paid call, whether or not its record was persisted.
+ *
+ * Summing the run records was wrong: a `--fresh` reliability probe deliberately
+ * stores no record, so its spend was invisible to the cap. Money spent is money
+ * spent, and the guard has to see all of it.
+ */
+export function recordSpend(runsDir: string, entry: SpendEntry): void {
+  mkdirSync(runsDir, { recursive: true });
+  appendFileSync(join(runsDir, LEDGER), `${JSON.stringify(entry)}\n`);
 }
 
-export async function fetchPrice(model: string, apiKey: string): Promise<ModelPrice> {
-  const response = await fetch("https://openrouter.ai/api/v1/models", {
+export interface SpendEntry {
+  at: string;
+  claim_id: string;
+  fingerprint_key: string;
+  cost_usd: number;
+  persisted: boolean;
+}
+
+export function spentSoFar(runsDir: string): number {
+  const ledger = join(runsDir, LEDGER);
+  if (!existsSync(ledger)) return 0;
+  return readFileSync(ledger, "utf-8")
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .reduce((total, line) => total + ((JSON.parse(line) as SpendEntry).cost_usd ?? 0), 0);
+}
+
+/**
+ * The price of the upstream we actually pinned, not the model's headline price.
+ *
+ * The catalogue quotes one price per model id, but a model id is served by many
+ * upstreams at very different rates: this one spans 14x, $0.030/M to $0.440/M.
+ * Estimating from the catalogue would have under-priced the pinned run by half,
+ * which is a spend guard that does not guard.
+ */
+export async function fetchPrice(model: ModelConfig, apiKey: string): Promise<ModelPrice> {
+  const response = await fetch(`${OPENROUTER_BASE_URL}/models/${model.model}/endpoints`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
   if (!response.ok) {
-    throw new Error(`could not read model prices: ${response.status} ${response.statusText}`);
+    throw new Error(`could not read endpoint prices: ${response.status} ${response.statusText}`);
   }
   const body = (await response.json()) as {
-    data: { id: string; pricing: { prompt: string; completion: string } }[];
+    data: { endpoints: { tag: string; provider_name: string; pricing: ModelPrice }[] };
   };
-  const entry = body.data.find((m) => m.id === model);
-  if (!entry) throw new Error(`OpenRouter does not list a model called ${model}`);
-  return { prompt: Number(entry.pricing.prompt), completion: Number(entry.pricing.completion) };
+  const endpoint = body.data.endpoints.find((e) => e.tag === model.upstreamProvider);
+  if (!endpoint) {
+    const available = body.data.endpoints.map((e) => e.tag).join(", ");
+    throw new Error(
+      `${model.upstreamProvider} does not serve ${model.model}. Available: ${available}`,
+    );
+  }
+  return {
+    prompt: Number(endpoint.pricing.prompt),
+    completion: Number(endpoint.pricing.completion),
+  };
 }
 
 export function estimateCost(claims: Claim[], price: ModelPrice): number {
@@ -84,4 +119,21 @@ export function describeBudget(check: BudgetCheck, model: ModelConfig, cap: numb
     `estimate:  $${check.estimate.toFixed(4)} (pessimistic, ${ESTIMATE_MARGIN}x margin)`,
     `remaining: $${check.remaining.toFixed(4)}`,
   ].join("\n");
+}
+
+/**
+ * The check both paid entry points run before spending anything.
+ *
+ * Shared rather than repeated, so the cap can never be enforced in one place and
+ * not the other: a run that cannot afford itself must fail the same way whether
+ * it was started by the CLI or by the eval harness.
+ */
+export async function preflight(
+  claims: Claim[],
+  model: ModelConfig,
+  apiKey: string,
+): Promise<{ price: ModelPrice; check: BudgetCheck }> {
+  const price = await fetchPrice(model, apiKey);
+  const check = checkBudget(spentSoFar(RUNS_DIR), estimateCost(claims, price), PILOT_BUDGET_USD);
+  return { price, check };
 }

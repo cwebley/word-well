@@ -61,10 +61,13 @@ export function deriveMorphologyDisposition(verdict: MorphologyVerdict): Disposi
 
   // Order matters, and this order is v2. A single meaning that demonstrably does
   // not follow from the parts is a sufficient reason to keep the word, and no
-  // undecided meaning alongside it can take that reason away. Checking for
-  // uncertainty first let one undecided meaning quarantine a word we already had
-  // grounds to advance — which is exactly how two runs of the same fingerprint
-  // reached different dispositions for `mercurial` at stage 1.
+  // undecided meaning alongside it can take that reason away.
+  //
+  // This is a judgement about what the dispositions mean, not a fix for the
+  // stage-1 instability: pinning the upstream fixed that. What the reorder does
+  // is make the disposition robust to a judge that is unsure about some meanings
+  // while certain about one — under v1, `mercurial` was quarantined despite a
+  // confident not_predictable verdict sitting right there in the same finding.
   if (predictabilities.includes("not_predictable")) {
     return {
       disposition: "advance",

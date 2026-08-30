@@ -6,6 +6,15 @@ import type { ModelConfig } from "./fingerprint.ts";
 
 export const PILOT_BUDGET_USD = 10;
 
+export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
+// Where the case set lives. Shared so the CLI and the eval cannot drift onto
+// different datasets or different run stores while reporting the same spend.
+export const CASE_SET = process.env.CASE_SET ?? "contract-test";
+export const EVIDENCE_DIR = "evidence";
+export const LABELS_DIR = "labels";
+export const RUNS_DIR = "runs";
+
 const HINTS: Record<string, string> = {
   OPENROUTER_PROVIDER:
     "Run `npm run models -- <model-id>` to list the upstreams serving your model, then pin one.",

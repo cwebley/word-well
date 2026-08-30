@@ -1,0 +1,20 @@
+{"at": "2026-08-29T19:52:00Z", "claim_id": "fresh-probe-1[0]", "fingerprint_key": "unrecorded", "cost_usd": 0.00016807475, "persisted": false}
+{"at": "2026-08-29T19:52:00Z", "claim_id": "fresh-probe-1[1]", "fingerprint_key": "unrecorded", "cost_usd": 0.00021274475, "persisted": false}
+{"at": "2026-08-29T19:52:00Z", "claim_id": "fresh-probe-1[2]", "fingerprint_key": "unrecorded", "cost_usd": 0.00015352125, "persisted": false}
+{"at": "2026-08-29T19:52:00Z", "claim_id": "fresh-probe-1[3]", "fingerprint_key": "unrecorded", "cost_usd": 0.0002023065, "persisted": false}
+{"at": "2026-08-29T19:52:00Z", "claim_id": "fresh-probe-1[4]", "fingerprint_key": "unrecorded", "cost_usd": 0.00021480525, "persisted": false}
+{"at": "2026-08-29T19:53:00Z", "claim_id": "fresh-probe-2[0]", "fingerprint_key": "unrecorded", "cost_usd": 0.00016807475, "persisted": false, "estimated": true}
+{"at": "2026-08-29T19:53:00Z", "claim_id": "fresh-probe-2[1]", "fingerprint_key": "unrecorded", "cost_usd": 0.00021274475, "persisted": false, "estimated": true}
+{"at": "2026-08-29T19:53:00Z", "claim_id": "fresh-probe-2[2]", "fingerprint_key": "unrecorded", "cost_usd": 0.00015352125, "persisted": false, "estimated": true}
+{"at": "2026-08-29T19:53:00Z", "claim_id": "fresh-probe-2[3]", "fingerprint_key": "unrecorded", "cost_usd": 0.0002023065, "persisted": false, "estimated": true}
+{"at": "2026-08-29T19:53:00Z", "claim_id": "fresh-probe-2[4]", "fingerprint_key": "unrecorded", "cost_usd": 0.00021480525, "persisted": false, "estimated": true}
+{"at": "2026-08-29T22:43:59.690Z", "claim_id": "naughtiness|grammatical_derivation", "fingerprint_key": "f8a91d448156b7e3c61b467fd2d4942edaa0c18a869affd50f612c4340c7f200", "cost_usd": 0.000545, "persisted": true}
+{"at": "2026-08-29T22:44:02.147Z", "claim_id": "pastoral|compound_split", "fingerprint_key": "9101695d6026812b7ebb80a2f55f8f9a14a29f9e514f2f006290996834d9d476", "cost_usd": 0.000295606332, "persisted": true}
+{"at": "2026-08-29T22:44:04.490Z", "claim_id": "rebut|affix_strip", "fingerprint_key": "7b6ddafac173936cca0d529975359de0601f63a0fbf63f33744f28b0c77fa4e7", "cost_usd": 7.0204e-05, "persisted": true}
+{"at": "2026-08-29T22:44:06.551Z", "claim_id": "overweening|lexicalised_participle", "fingerprint_key": "0e44234f5f3eb782cdf909c4ab6e670050cdb43bd280bf5ed474dfcff7476e64", "cost_usd": 7.515e-05, "persisted": true}
+{"at": "2026-08-29T22:44:47.080Z", "claim_id": "mercurial|meaning_shift_derivation", "fingerprint_key": "24e5c438f9c015607a672487107bd2084a3cf58a0ac6ab38391d1a49ea8a5696", "cost_usd": 0.0053471, "persisted": true}
+{"at": "2026-08-30T00:50:45.236Z", "claim_id": "convoluted|lexicalised_participle", "fingerprint_key": "96e87b41ab6dcb061f7c937ad2f2068ac44954be31d9b276b5bd807923c17c2f", "cost_usd": 0.00027496075, "persisted": true}
+{"at": "2026-08-30T00:50:45.406Z", "claim_id": "naughtiness|grammatical_derivation", "fingerprint_key": "fb8ecaedd039e1e4190981a8d859f0df8a62fffa7510ce0b1397b2a3fc583148", "cost_usd": 0.00014935125, "persisted": true}
+{"at": "2026-08-30T00:50:47.722Z", "claim_id": "rebut|affix_strip", "fingerprint_key": "aeed86cb5302eb6b6eca623c1894118c7bf51b2cf78bae084718a1f6d3f30fd3", "cost_usd": 0.00023676725, "persisted": true}
+{"at": "2026-08-30T00:50:59.707Z", "claim_id": "pastoral|compound_split", "fingerprint_key": "de33207abdda3e3f9e8f4e1590b2479302c4c01daa7851bd0ee08501b5702189", "cost_usd": 0.0003059045, "persisted": true}
+{"at": "2026-08-30T00:50:59.777Z", "claim_id": "mercurial|meaning_shift_derivation", "fingerprint_key": "0d4e37d6252979c36121cac9f946c68c18473f6bbbf4cfed6fef76731b032850", "cost_usd": 0.00033686675, "persisted": true}

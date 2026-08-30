@@ -6,8 +6,9 @@
 // nothing about whether a proposed decomposition is true. It reaches the policy
 // layer and the retention audit, never the prompt.
 
-import { readFileSync } from "node:fs";
 import { z } from "zod";
+
+import { readJsonl } from "./jsonl.ts";
 
 export const sourceMeaningSchema = z.object({
   sense_id: z.string(),
@@ -62,26 +63,17 @@ export type Claim = z.infer<typeof claimSchema>;
 export type RuleKind = (typeof ruleKinds)[number];
 
 export function readClaims(path: string): Claim[] {
-  return readFileSync(path, "utf-8")
-    .split("\n")
-    .filter((line) => line.trim().length > 0)
-    .map((line, i) => {
-      const parsed = claimSchema.safeParse(JSON.parse(line));
-      if (!parsed.success) {
-        throw new Error(`${path} line ${i + 1} is not a valid claim: ${parsed.error.message}`);
-      }
-      return parsed.data;
-    });
+  return readJsonl(path, claimSchema);
 }
 
 /** Every source-meaning identifier the judge is allowed to be asked about. */
-export function candidateSenseIds(claim: Claim): string[] {
+export function candidateSourceMeaningIds(claim: Claim): string[] {
   return claim.candidate.source_meanings.map((m) => m.sense_id);
 }
 
 /** Every identifier a finding may legitimately cite, from anywhere in the evidence. */
 export function citableEvidenceIds(claim: Claim): Set<string> {
-  const ids = new Set<string>(candidateSenseIds(claim));
+  const ids = new Set<string>(candidateSourceMeaningIds(claim));
   for (const component of claim.claim.components) {
     for (const meaning of component.source_meanings) ids.add(meaning.sense_id);
   }
