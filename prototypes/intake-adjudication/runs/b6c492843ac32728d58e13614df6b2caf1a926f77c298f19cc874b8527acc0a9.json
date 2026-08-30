@@ -1,0 +1,125 @@
+{
+  "claim_id": "convoluted|lexicalised_participle",
+  "fingerprint_key": "b6c492843ac32728d58e13614df6b2caf1a926f77c298f19cc874b8527acc0a9",
+  "fingerprint": {
+    "input_digest": "af0e0f1a06b6782f96dd18bc1c8a503dc9a47dd4959dfd30763e2d458da71fb9",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.842Z",
+  "finding": {
+    "claim_id": "convoluted|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'convoluted' is the past participle form of the verb 'convolute'. The adjective meaning 'rolled longitudinally upon itself' is shared by both 'convolute' and 'convoluted'.",
+    "analysis_evidence_ids": [
+      "oewn-convolute__2.35.00..",
+      "oewn-convolute__5.00.00.coiled.00",
+      "oewn-convoluted__5.00.00.coiled.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-convoluted__5.00.00.coiled.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-convolute__5.00.00.coiled.00",
+          "oewn-convoluted__5.00.00.coiled.00"
+        ],
+        "rationale": "The meaning 'rolled longitudinally upon itself' is directly present in the root 'convolute' as an adjective, making it predictable for 'convoluted'."
+      },
+      {
+        "sense_ids": [
+          "oewn-convoluted__5.00.00.complex.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-convolute__2.32.00..",
+          "oewn-convolute__2.35.00..",
+          "oewn-convoluted__5.00.00.complex.00"
+        ],
+        "rationale": "While the root 'convolute' has meanings related to twisting or changing meaning to mislead, the sense of 'highly complex or intricate' for 'convoluted' is a figurative extension not directly predictable from the root's provided meanings."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "convoluted|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'convoluted' is the past participle form of the verb 'convolute'. The adjective meaning 'rolled longitudinally upon itself' is shared by both 'convolute' and 'convoluted'.",
+    "analysis_evidence_ids": [
+      "oewn-convolute__2.35.00..",
+      "oewn-convolute__5.00.00.coiled.00",
+      "oewn-convoluted__5.00.00.coiled.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-convoluted__5.00.00.coiled.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-convolute__5.00.00.coiled.00",
+          "oewn-convoluted__5.00.00.coiled.00"
+        ],
+        "rationale": "The meaning 'rolled longitudinally upon itself' is directly present in the root 'convolute' as an adjective, making it predictable for 'convoluted'."
+      },
+      {
+        "sense_ids": [
+          "oewn-convoluted__5.00.00.complex.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-convolute__2.32.00..",
+          "oewn-convolute__2.35.00..",
+          "oewn-convoluted__5.00.00.complex.00"
+        ],
+        "rationale": "While the root 'convolute' has meanings related to twisting or changing meaning to mislead, the sense of 'highly complex or intricate' for 'convoluted' is a figurative extension not directly predictable from the root's provided meanings."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components",
+    "endorsementOverride": false
+  },
+  "endorsements": 6,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1111,
+    "completion_tokens": 523,
+    "reasoning_tokens": 0,
+    "total_tokens": 1634,
+    "cost_usd": 0.0016408
+  },
+  "latency_ms": 2649
+}

@@ -10,32 +10,28 @@
 // Run with:
 //   npm run eval
 
-import { join } from "node:path";
-
 import { Eval } from "braintrust";
 
 import { adjudicate, createClient } from "../src/adjudicate.ts";
-import { checkBudget, estimateCost, fetchPrice, spentSoFar } from "../src/budget.ts";
+import { preflight } from "../src/budget.ts";
 import type { Claim } from "../src/claim.ts";
-import { readClaims } from "../src/claim.ts";
 import { modelConfigFromEnv, PILOT_BUDGET_USD, requireEnv } from "../src/config.ts";
-import { readManifest } from "../src/fingerprint.ts";
 import type { AdjudicationRecord } from "../src/store.ts";
 import { RunStore } from "../src/store.ts";
+import { loadDataset } from "./datasets.ts";
 import { contractScorers } from "./scorers/contract.ts";
 import { policyScorers } from "./scorers/policy.ts";
 import { semanticScorers } from "./scorers/semantic.ts";
 import type { ExpectedLabel } from "./types.ts";
-import { readLabels } from "./types.ts";
 
 const CASE_SET = process.env.CASE_SET ?? "contract-test";
 const RUNS_DIR = "runs";
 
 const apiKey = requireEnv("OPENROUTER_API_KEY");
 const model = modelConfigFromEnv();
-const claims = readClaims(join("evidence", `${CASE_SET}.claims.jsonl`));
-const manifest = readManifest(join("evidence", `${CASE_SET}.manifest.json`));
-const labels = readLabels(join("labels", `${CASE_SET}.labels.jsonl`));
+const dataset = loadDataset(CASE_SET);
+const claims = dataset.cases.map(({ claim }) => claim);
+const manifest = dataset.manifest;
 
 const client = createClient(apiKey);
 const store = new RunStore(RUNS_DIR);
@@ -46,29 +42,26 @@ const store = new RunStore(RUNS_DIR);
 Eval<Claim, AdjudicationRecord, ExpectedLabel>("WordWell morphology adjudication", {
   experimentName: `${CASE_SET} · ${model.model}`,
   metadata: {
-    stage: "1 — contract test",
+    stage: CASE_SET === "prompt-smoke" ? "2 — prompt smoke test" : "1 — contract test",
     case_set: CASE_SET,
-    issue: "https://github.com/cwebley/word-well/issues/48",
+    issue: `https://github.com/cwebley/word-well/issues/${CASE_SET === "prompt-smoke" ? "49" : "48"}`,
     model: model.model,
     upstream_provider: model.upstreamProvider,
     temperature: model.temperature,
     extraction_version: manifest.extraction_version,
     pool_sha256: manifest.sources.candidate_pool.sha256,
-    label_status: "provisional-unvalidated",
+    label_status: "human-validated",
   },
 
   data: async () => {
-    const price = await fetchPrice(model, apiKey);
-    const budget = checkBudget(spentSoFar(RUNS_DIR), estimateCost(claims, price), PILOT_BUDGET_USD);
+    const { price, check: budget } = await preflight(claims, model, apiKey);
     if (!budget.allowed) {
       throw new Error(
         `estimate $${budget.estimate.toFixed(4)} exceeds the $${budget.remaining.toFixed(4)} left of the $${PILOT_BUDGET_USD} pilot cap`,
       );
     }
 
-    return claims.map((claim) => {
-      const expected = labels.get(claim.claim_id);
-      if (!expected) throw new Error(`no label for ${claim.claim_id}`);
+    return dataset.cases.map(({ claim, expected }) => {
       return {
         input: claim,
         expected,

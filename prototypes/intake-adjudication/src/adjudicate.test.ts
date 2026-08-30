@@ -1,3 +1,7 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import type OpenAI from "openai";
 import { describe, expect, it, vi } from "vitest";
 
@@ -33,6 +37,11 @@ const validFinding = (claimId: string) => ({
   })),
   diagnostic_confidence: 0.8,
 });
+
+// The runner appends every paid call to a spend ledger. These tests drive that
+// path with a stubbed cost, so they get their own directory: the real ledger is
+// the audit record for the pilot cap and must contain only real charges.
+const ledgerDir = mkdtempSync(join(tmpdir(), "wordwell-ledger-"));
 
 function stubClient(content: string) {
   const create = vi.fn().mockResolvedValue({
@@ -73,7 +82,7 @@ describe("parseFinding", () => {
 describe("adjudicate", () => {
   it("does not retry or repair output that violates the contract", async () => {
     const { client, create } = stubClient("not json at all");
-    const { record } = await adjudicate(claim, client, model, manifest);
+    const { record } = await adjudicate(claim, client, model, manifest, undefined, ledgerDir);
 
     expect(create).toHaveBeenCalledTimes(1);
     expect(record.contract_error).toContain("not JSON");
@@ -86,7 +95,7 @@ describe("adjudicate", () => {
 
   it("derives a disposition from a valid finding", async () => {
     const { client } = stubClient(JSON.stringify(validFinding(claim.claim_id)));
-    const { record } = await adjudicate(claim, client, model, manifest);
+    const { record } = await adjudicate(claim, client, model, manifest, undefined, ledgerDir);
 
     expect(record.morphology?.disposition).toBe("advance");
     expect(record.effective?.disposition).toBe("advance");
@@ -102,8 +111,8 @@ describe("adjudicate", () => {
       },
     };
 
-    const first = await adjudicate(claim, client, model, manifest, store as never);
-    const second = await adjudicate(claim, client, model, manifest, store as never);
+    const first = await adjudicate(claim, client, model, manifest, store as never, ledgerDir);
+    const second = await adjudicate(claim, client, model, manifest, store as never, ledgerDir);
 
     expect(first.reused).toBe(false);
     expect(second.reused).toBe(true);

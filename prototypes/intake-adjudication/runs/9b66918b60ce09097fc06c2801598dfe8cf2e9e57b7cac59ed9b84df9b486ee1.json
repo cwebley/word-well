@@ -1,0 +1,133 @@
+{
+  "claim_id": "mercurial|meaning_shift_derivation",
+  "fingerprint_key": "9b66918b60ce09097fc06c2801598dfe8cf2e9e57b7cac59ed9b84df9b486ee1",
+  "fingerprint": {
+    "input_digest": "39c8ef6857710750368f1b36b97c945e29da36b6a4175db741727df182fa183d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:28.125Z",
+  "finding": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'mercurial' is formed from the root 'mercury' with the suffix '-al', indicating 'relating to' or 'having characteristics of'. The spelling change from '-y' to '-i' before '-al' is a common English morphological process.",
+    "analysis_evidence_ids": [
+      "oewn-mercurial__3.01.00..",
+      "oewn-mercurial__3.01.01..",
+      "oewn-mercurial__3.01.02..",
+      "oewn-mercury__1.27.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00..",
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.00..",
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02..",
+          "oewn-mercury__1.27.00.."
+        ],
+        "rationale": "These meanings directly relate to the element mercury, the god Mercury, or the planet Mercury, which are all senses of the root 'mercury' combined with the adjectival suffix '-al'."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__5.00.00.changeable.00",
+          "oewn-mercury__1.27.00.."
+        ],
+        "rationale": "While the meaning 'liable to sudden unpredictable change' is metaphorically linked to the liquid nature of the element mercury, it represents a figurative extension that is not directly predictable from the literal meaning of the root 'mercury' alone."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'mercurial' is formed from the root 'mercury' with the suffix '-al', indicating 'relating to' or 'having characteristics of'. The spelling change from '-y' to '-i' before '-al' is a common English morphological process.",
+    "analysis_evidence_ids": [
+      "oewn-mercurial__3.01.00..",
+      "oewn-mercurial__3.01.01..",
+      "oewn-mercurial__3.01.02..",
+      "oewn-mercury__1.27.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00..",
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.00..",
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02..",
+          "oewn-mercury__1.27.00.."
+        ],
+        "rationale": "These meanings directly relate to the element mercury, the god Mercury, or the planet Mercury, which are all senses of the root 'mercury' combined with the adjectival suffix '-al'."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercurial__5.00.00.changeable.00",
+          "oewn-mercury__1.27.00.."
+        ],
+        "rationale": "While the meaning 'liable to sudden unpredictable change' is metaphorically linked to the liquid nature of the element mercury, it represents a figurative extension that is not directly predictable from the literal meaning of the root 'mercury' alone."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components",
+    "endorsementOverride": false
+  },
+  "endorsements": 9,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1122,
+    "completion_tokens": 589,
+    "reasoning_tokens": 0,
+    "total_tokens": 1711,
+    "cost_usd": 0.0018091
+  },
+  "latency_ms": 2935
+}

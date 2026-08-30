@@ -13,7 +13,7 @@ import { dispositions } from "../src/policy.ts";
 
 export const expectedLabelSchema = z.object({
   claim_id: z.string(),
-  label_status: z.enum(["provisional-unvalidated", "human-validated"]),
+  label_status: z.enum(["provisional-unvalidated", "agent-reviewed", "human-validated"]),
   slice: z.string(),
   analysis_support: z.enum(analysisSupportValues),
   meanings: z.array(
@@ -23,10 +23,21 @@ export const expectedLabelSchema = z.object({
   effective_disposition: z.enum(dispositions),
   endorsements: z.number(),
   note: z.string(),
+  input_digest: z.string().optional(),
+  rubric_version: z.string().optional(),
+  partition: z.enum(["development", "regression", "hidden_holdout"]).optional(),
+  review_decision: z.enum(["accepted", "corrected", "agent-reviewed"]).optional(),
+  validated_at: z.string().optional(),
+  endorsement_override: z.boolean().optional(),
 });
 
 export type ExpectedLabel = z.infer<typeof expectedLabelSchema>;
 
 export function readLabels(path: string): Map<string, ExpectedLabel> {
-  return new Map(readJsonl(path, expectedLabelSchema).map((label) => [label.claim_id, label]));
+  const labels = new Map<string, ExpectedLabel>();
+  for (const label of readJsonl(path, expectedLabelSchema)) {
+    if (labels.has(label.claim_id)) throw new Error(`${path} has duplicate label ${label.claim_id}`);
+    labels.set(label.claim_id, label);
+  }
+  return labels;
 }

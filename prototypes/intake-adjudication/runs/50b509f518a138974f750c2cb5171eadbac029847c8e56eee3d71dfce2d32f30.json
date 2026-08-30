@@ -1,0 +1,97 @@
+{
+  "claim_id": "fruitfulness|affix_strip",
+  "fingerprint_key": "50b509f518a138974f750c2cb5171eadbac029847c8e56eee3d71dfce2d32f30",
+  "fingerprint": {
+    "input_digest": "731b3241e95e27bac87b08a4c3b4bee829ce9ac2cfd4747186ee089069210684",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.016Z",
+  "finding": {
+    "claim_id": "fruitfulness|affix_strip",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'fruitfulness' is formed by adding the suffix '-ness' to the adjective 'fruitful', creating a noun that denotes the quality or state of being fruitful.",
+    "analysis_evidence_ids": [
+      "oewn-fruitful__3.00.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-fruitfulness__1.07.00..",
+          "oewn-fruitfulness__1.09.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-fruitful__3.00.00.."
+        ],
+        "rationale": "Both meanings of 'fruitfulness' directly derive from the meaning of 'fruitful' (productive or conducive to producing in abundance) combined with the nominalizing function of the '-ness' suffix, indicating the quality or state of being fruitful."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "fruitfulness|affix_strip",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'fruitfulness' is formed by adding the suffix '-ness' to the adjective 'fruitful', creating a noun that denotes the quality or state of being fruitful.",
+    "analysis_evidence_ids": [
+      "oewn-fruitful__3.00.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-fruitfulness__1.07.00..",
+          "oewn-fruitfulness__1.09.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-fruitful__3.00.00.."
+        ],
+        "rationale": "Both meanings of 'fruitfulness' directly derive from the meaning of 'fruitful' (productive or conducive to producing in abundance) combined with the nominalizing function of the '-ness' suffix, indicating the quality or state of being fruitful."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 884,
+    "completion_tokens": 271,
+    "reasoning_tokens": 0,
+    "total_tokens": 1155,
+    "cost_usd": 0.0009427
+  },
+  "latency_ms": 1833
+}

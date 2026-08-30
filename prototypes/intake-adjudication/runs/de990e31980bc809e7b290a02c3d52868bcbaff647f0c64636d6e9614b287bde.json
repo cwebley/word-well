@@ -1,0 +1,121 @@
+{
+  "claim_id": "pastoral|compound_split",
+  "fingerprint_key": "de990e31980bc809e7b290a02c3d52868bcbaff647f0c64636d6e9614b287bde",
+  "fingerprint": {
+    "input_digest": "f1539d720ca2b1eda4debba09eefe366270928d2f541cbf01913b90a774437a4",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.984Z",
+  "finding": {
+    "claim_id": "pastoral|compound_split",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed decomposition of 'pastoral' into 'past' and 'oral' is a string coincidence. The word 'pastoral' is derived from 'pastor', meaning shepherd or spiritual guide, which is not related to 'past' (time elapsed) or 'oral' (mouth/speech).",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-pastoral__1.10.00..",
+          "oewn-pastoral__1.10.01..",
+          "oewn-pastoral__1.10.02..",
+          "oewn-pastoral__3.01.00..",
+          "oewn-pastoral__3.01.02..",
+          "oewn-pastoral__5.00.00.rural.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-past__1.10.00..",
+          "oewn-past__1.28.00..",
+          "oewn-past__1.28.01..",
+          "oewn-past__3.00.00..",
+          "oewn-past__4.02.00..",
+          "oewn-past__5.00.00.outgoing.00",
+          "oewn-oral__1.10.00..",
+          "oewn-oral__3.00.00..",
+          "oewn-oral__3.00.02..",
+          "oewn-oral__3.01.00..",
+          "oewn-oral__5.00.00.spoken.00"
+        ],
+        "rationale": "None of the meanings of 'pastoral' relate to the concepts of 'past' (time) or 'oral' (mouth/speech). The meanings of 'pastoral' relate to shepherds, rural life, or a pastor, which are entirely unrelated to the proposed components."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "pastoral|compound_split",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed decomposition of 'pastoral' into 'past' and 'oral' is a string coincidence. The word 'pastoral' is derived from 'pastor', meaning shepherd or spiritual guide, which is not related to 'past' (time elapsed) or 'oral' (mouth/speech).",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-pastoral__1.10.00..",
+          "oewn-pastoral__1.10.01..",
+          "oewn-pastoral__1.10.02..",
+          "oewn-pastoral__3.01.00..",
+          "oewn-pastoral__3.01.02..",
+          "oewn-pastoral__5.00.00.rural.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-past__1.10.00..",
+          "oewn-past__1.28.00..",
+          "oewn-past__1.28.01..",
+          "oewn-past__3.00.00..",
+          "oewn-past__4.02.00..",
+          "oewn-past__5.00.00.outgoing.00",
+          "oewn-oral__1.10.00..",
+          "oewn-oral__3.00.00..",
+          "oewn-oral__3.00.02..",
+          "oewn-oral__3.01.00..",
+          "oewn-oral__5.00.00.spoken.00"
+        ],
+        "rationale": "None of the meanings of 'pastoral' relate to the concepts of 'past' (time) or 'oral' (mouth/speech). The meanings of 'pastoral' relate to shepherds, rural life, or a pastor, which are entirely unrelated to the proposed components."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 1,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1638,
+    "completion_tokens": 548,
+    "reasoning_tokens": 0,
+    "total_tokens": 2186,
+    "cost_usd": 0.0018614
+  },
+  "latency_ms": 2800
+}

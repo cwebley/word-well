@@ -8,7 +8,7 @@
 import type { Claim, Component, SourceMeaning } from "./claim.ts";
 
 export const PROMPT_VERSION = "morphology-prompt/1";
-export const RUBRIC_VERSION = "morphology-rubric/1";
+export const RUBRIC_VERSION = "morphology-rubric/2";
 
 export const RUBRIC = `You judge a single mechanical claim about how one English word is formed.
 
@@ -38,11 +38,14 @@ already knows the claimed root or components arrive at this meaning?
   figurative extension, a specialised or technical sense, or drift away from the
   root. "mercurial" meaning "liable to sudden unpredictable change" is not
   predictable from the metal, even though the derivation is real.
-- insufficient_evidence: the supplied evidence cannot settle it.
+- insufficient_evidence: the supplied evidence is missing or incomplete, so the
+  question cannot be settled.
 
-Judge predictability only when the analysis is supported or partly supported. If
-the analysis is unsupported, still list every meaning, and mark each one
-insufficient_evidence unless a component genuinely bears on it.
+Judge predictability for every candidate meaning against the proposed parts. If
+the analysis is unsupported because the parts are a string coincidence or the
+wrong roots, the meaning will normally be not_predictable from those parts. Use
+insufficient_evidence only when missing or incomplete evidence stops you deciding,
+not as a stand-in for "not applicable".
 
 RULES
 

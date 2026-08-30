@@ -6,6 +6,78 @@ candidate-pool findings in
 not the production intake design. The candidate intake ADR remains #47 and
 follows the experiments described here.
 
+## Revision, 2026-08-30: morphology is no longer the selection gate
+
+**Read this before acting on anything below it.** Stage 2 changed the plan's
+direction. The sections on fixed evidence, the contract, scores, reproducibility,
+spend controls, secret handling and prototype shape all still hold. The gate
+ordering, the golden-case sizing and the staged-experiment list do not.
+
+Evidence is in `docs/experiments/intake-adjudication-stage-2-prompt-smoke.md`.
+
+**What stage 2 found.** Across twelve human-labelled claims, `analysis_support`
+— *is this word actually built the way the mechanical rule claims* — scored
+12/12, including both invented decompositions. Every error fell in per-meaning
+predictability. On review most of those disagreements were label errors rather
+than judge errors, which is the second time this has happened; stage 1 closed on
+the same finding. A judgment the domain owner cannot apply consistently cannot
+be calibrated, and therefore cannot be a gate.
+
+**Three consequences.**
+
+1. **Morphology loses its exclude path.** It stops deciding which words are
+   served and becomes content preparation: given a word already selected, is the
+   decomposition we would show a learner real? That is the half that scored
+   12/12. A future `morphology-policy/3` has no `exclude`, which also retires
+   the endorsement override, since that exists only to rescue a word from a
+   fuzzy exclusion.
+
+2. **The gate order inverts.** Audience usefulness becomes the selection engine
+   and runs first, on the full pool. Morphology runs afterwards on the
+   survivors, which is both correct and much cheaper.
+
+   ```text
+   candidate pool
+     -> deterministic factual filters      (incl. demonym, display-form, eponym marker)
+     -> audience usefulness   #56          <- selection happens here
+     -> sensitive language    #57
+     -> morphology adjudication            <- content preparation, no exclude
+     -> eligible candidate
+     -> lesson drafting and content evaluation
+   ```
+
+3. **Golden sets shrink by an order of magnitude.** The 200-case /
+   120-40-40 design was abandoned: the labelling burden was unsustainable and
+   the labels it did produce contained errors that were later retracted. Target
+   15-25 curated cases per gate, split capability / regression, using
+   categorical buckets rather than a verdict per source meaning. This follows
+   Scott Moss's eval discipline (Master.dev AI Engineering Fundamentals, lessons
+   4-5), which ships 18-23 cases for an entire agent and is explicit that cases
+   scoring badly today are what give later work something to lift.
+
+**A usefulness gate is not a morphology gate.** Morphology asks a question with
+an answer a lexicographer could confirm. Usefulness asks a question whose only
+authority is the product owner, so the accuracy ceiling is their own
+self-agreement. Measure that before tuning against a set, and expect a lower bar
+than a factual gate warrants.
+
+**Errors there are asymmetric.** Selection is a global hard exclude by explicit
+product decision. A wrong admit is visible; a wrong exclude is terminal and
+silent. Lean toward admitting, and spend review effort on what the gate lets in.
+
+**Retention audit.** Roughly 100 endorsed words, sampled randomly within strata,
+carrying no labels and kept disjoint from every golden set. It reports one
+number — retention rate — and exists to catch unexplained movement in it, never
+to be scored against or tuned toward. Endorsement can seed golden cases or serve
+as an independent audit, not both: tuning against endorsed words makes the audit
+report its own training signal. Keeping the two pools disjoint buys both, and
+this is the one holdout that costs no labelling time because editors already did
+the work.
+
+**Ticket state.** #50-#55 are parked with the reasoning recorded on each. #56 is
+unblocked and promoted. #49 is complete to its checkpoint and explicitly does
+not meet its original acceptance criteria.
+
 ## Goal
 
 Build a WordWell-specific intake adjudication workflow that is also a legible
@@ -44,6 +116,9 @@ external retention audit, while morphology accuracy is measured against a
 human-validated golden dataset.
 
 ## Intake gates
+
+> **Superseded in part.** The ordering below is pre-stage-2. Morphology no
+> longer selects words and no longer runs first; see the Revision above.
 
 The intended intake sequence is:
 
@@ -179,6 +254,11 @@ reported as ground truth.
 
 ### Golden cases
 
+> **Superseded.** The 200-case slice table and the 120/40/40 partition were
+> abandoned at stage 2 as unsustainable to label. Target 15-25 curated cases per
+> gate; see the Revision above. The table is retained as the record of what was
+> originally planned.
+
 Human-validate 200 cases, initially distributed as follows:
 
 | Slice | Cases |
@@ -274,6 +354,11 @@ retention requirements first. Among qualifying models, prefer higher selective
 accuracy, lower quarantine, stronger reliability, then lower cost and latency.
 
 ## Staged experiments
+
+> **Superseded from stage 3 onward.** Stages 1 and 2 ran as written and are
+> recorded in `docs/experiments/`. Stages 3-8 assume the 120/40/40 corpus and
+> morphology-as-selection, and are parked as #50-#55. The pre-run / post-run
+> recording discipline in the last paragraph still applies to every run.
 
 Every stage ends with a human checkpoint. The next stage does not start until
 the results, failures, case mix, and cost are reviewed.
