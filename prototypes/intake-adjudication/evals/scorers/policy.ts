@@ -8,22 +8,23 @@
 
 import type { EvalScorer } from "braintrust";
 
-import type { Claim } from "../../src/claim.ts";
+import type { Claim } from "../../src/morphology/claim.ts";
+import type { Finding } from "../../src/morphology/contract.ts";
 import type { AdjudicationRecord } from "../../src/store.ts";
 import type { ExpectedLabel } from "../types.ts";
 
-type Scorer = EvalScorer<Claim, AdjudicationRecord, ExpectedLabel>;
+type Scorer = EvalScorer<Claim, AdjudicationRecord<Finding>, ExpectedLabel>;
 
 export const morphologyDispositionScorer: Scorer = ({ output, expected }) => {
   if (!expected) return null;
-  const actual = output.morphology?.disposition;
+  const actual = output.decision?.disposition;
   return {
     name: "MorphologyDisposition",
     score: actual === expected.morphology_disposition ? 1 : 0,
     metadata: {
       expected: expected.morphology_disposition,
       actual: actual ?? "none (no valid finding)",
-      reason: output.morphology?.reason,
+      reason: output.decision?.reason,
     },
   };
 };
@@ -37,8 +38,8 @@ export const effectiveDispositionScorer: Scorer = ({ output, expected }) => {
     metadata: {
       expected: expected.effective_disposition,
       actual: actual ?? "none (no valid finding)",
-      endorsements: output.endorsements,
-      endorsementOverride: output.effective?.endorsementOverride ?? false,
+      endorsements: output.policy_context.endorsements,
+      endorsementOverride: output.effective?.overridden ?? false,
     },
   };
 };

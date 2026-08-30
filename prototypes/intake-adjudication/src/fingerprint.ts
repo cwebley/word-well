@@ -9,9 +9,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 
-import { CONTRACT_VERSION } from "./contract.ts";
-import { POLICY_VERSION } from "./policy.ts";
-import { PROMPT_VERSION, RUBRIC_VERSION } from "./prompt.ts";
+import type { GateVersions } from "./gate.ts";
 
 export interface EvidenceManifest {
   case_set: string;
@@ -54,10 +52,23 @@ export function readManifest(path: string): EvidenceManifest {
   return JSON.parse(readFileSync(path, "utf-8")) as EvidenceManifest;
 }
 
+/**
+ * The gate's four versions arrive as a parameter rather than as imports.
+ *
+ * They used to be imported straight from morphology's modules, which quietly
+ * made this function morphology's. The field names and their values are
+ * unchanged, so every fingerprint already on disk still keys to the same hash —
+ * `fingerprint.test.ts` checks that against the committed run records.
+ *
+ * The gate's *name* is deliberately not a field. Adding one would move all 24
+ * persisted keys, and it would buy nothing: the four version strings are already
+ * namespaced per gate, so two gates cannot collide on a fingerprint.
+ */
 export function buildFingerprint(
   inputDigest: string,
   manifest: EvidenceManifest,
   model: ModelConfig,
+  versions: GateVersions,
 ): ConfigFingerprint {
   return {
     input_digest: inputDigest,
@@ -69,10 +80,10 @@ export function buildFingerprint(
     upstream_provider: model.upstreamProvider,
     temperature: model.temperature,
     seed: model.seed,
-    prompt_version: PROMPT_VERSION,
-    rubric_version: RUBRIC_VERSION,
-    contract_version: CONTRACT_VERSION,
-    policy_version: POLICY_VERSION,
+    prompt_version: versions.prompt,
+    rubric_version: versions.rubric,
+    contract_version: versions.contract,
+    policy_version: versions.policy,
   };
 }
 

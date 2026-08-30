@@ -10,17 +10,10 @@
 // layers — mechanical attributes, judge findings, endorsement, and effective
 // disposition — stay separate records.
 
+import type { DispositionResult } from "../disposition.ts";
 import type { AnalysisSupport, Finding, Predictability } from "./contract.ts";
 
 export const POLICY_VERSION = "morphology-policy/2";
-
-export const dispositions = ["advance", "quarantine", "exclude"] as const;
-export type Disposition = (typeof dispositions)[number];
-
-export interface DispositionResult {
-  disposition: Disposition;
-  reason: string;
-}
 
 export interface MorphologyVerdict {
   analysisSupport: AnalysisSupport;
@@ -99,15 +92,16 @@ export function deriveMorphologyDisposition(verdict: MorphologyVerdict): Disposi
 export function applyEndorsement(
   morphology: DispositionResult,
   endorsements: number,
-): DispositionResult & { endorsementOverride: boolean } {
+): DispositionResult & { endorsementOverride: boolean; overridden: boolean } {
   if (morphology.disposition === "exclude" && endorsements > 0) {
     return {
       disposition: "advance",
       reason: `endorsed by ${endorsements} editorial source${endorsements === 1 ? "" : "s"}, which overrides a fuzzy morphology exclusion`,
       endorsementOverride: true,
+      overridden: true,
     };
   }
-  return { ...morphology, endorsementOverride: false };
+  return { ...morphology, endorsementOverride: false, overridden: false };
 }
 
 /** Reads the two policy-relevant fields off a finding, and only those two. */

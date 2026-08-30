@@ -3,8 +3,8 @@ import { join } from "node:path";
 
 import { z } from "zod";
 
-import type { Claim } from "../src/claim.ts";
-import { candidateSourceMeaningIds, readClaims } from "../src/claim.ts";
+import type { Claim } from "../src/morphology/claim.ts";
+import { candidateSourceMeaningIds, readClaims } from "../src/morphology/claim.ts";
 import type { EvidenceManifest } from "../src/fingerprint.ts";
 import { readManifest } from "../src/fingerprint.ts";
 import type { ExpectedLabel } from "./types.ts";

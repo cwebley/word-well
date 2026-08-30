@@ -1,6 +1,6 @@
-// The spend guard. The pilot budget is $10 and no run starts when its estimate
-// would exceed what is left, so the failure mode is a refused run rather than a
-// surprise on the invoice.
+// The spend guard. The pilot budget is $10 for all of #46 — every gate, not one
+// each — and no run starts when its estimate would exceed what is left, so the
+// failure mode is a refused run rather than a surprise on the invoice.
 //
 // Spend is read back from the persisted run records, so it counts what was
 // actually charged rather than what was predicted, and a reused record costs
@@ -9,10 +9,9 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { Claim } from "./claim.ts";
 import { OPENROUTER_BASE_URL, PILOT_BUDGET_USD, RUNS_DIR } from "./config.ts";
 import type { ModelConfig } from "./fingerprint.ts";
-import { buildMessages } from "./prompt.ts";
+import type { Gate } from "./gate.ts";
 
 /** Rough characters-per-token. Deliberately pessimistic. */
 const CHARS_PER_TOKEN = 3.5;
@@ -89,10 +88,14 @@ export async function fetchPrice(model: ModelConfig, apiKey: string): Promise<Mo
   };
 }
 
-export function estimateCost(claims: Claim[], price: ModelPrice): number {
+export function estimateCost<TSubject>(
+  subjects: TSubject[],
+  gate: Gate<TSubject, unknown>,
+  price: ModelPrice,
+): number {
   let total = 0;
-  for (const claim of claims) {
-    const chars = buildMessages(claim).reduce((sum, m) => sum + m.content.length, 0);
+  for (const subject of subjects) {
+    const chars = gate.buildMessages(subject).reduce((sum, m) => sum + m.content.length, 0);
     const promptTokens = chars / CHARS_PER_TOKEN;
     total += promptTokens * price.prompt + ASSUMED_OUTPUT_TOKENS * price.completion;
   }
@@ -128,12 +131,17 @@ export function describeBudget(check: BudgetCheck, model: ModelConfig, cap: numb
  * not the other: a run that cannot afford itself must fail the same way whether
  * it was started by the CLI or by the eval harness.
  */
-export async function preflight(
-  claims: Claim[],
+export async function preflight<TSubject>(
+  subjects: TSubject[],
+  gate: Gate<TSubject, unknown>,
   model: ModelConfig,
   apiKey: string,
 ): Promise<{ price: ModelPrice; check: BudgetCheck }> {
   const price = await fetchPrice(model, apiKey);
-  const check = checkBudget(spentSoFar(RUNS_DIR), estimateCost(claims, price), PILOT_BUDGET_USD);
+  const check = checkBudget(
+    spentSoFar(RUNS_DIR),
+    estimateCost(subjects, gate, price),
+    PILOT_BUDGET_USD,
+  );
   return { price, check };
 }
