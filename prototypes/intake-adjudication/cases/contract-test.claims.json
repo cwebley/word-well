@@ -38,6 +38,12 @@
       "rule_kind": "lexicalised_participle",
       "slice": "lexicalised participle, root recovered",
       "note": "The word that exposed the extractor bug: build_pool stripped two or three characters and never one, so `convolute` was invisible and this read as rootless. It is the paired opposite of `overweening` — same rule, root found rather than absent — so the two together show both sides of the filter."
+    },
+    {
+      "lemma": "nonplussed",
+      "rule_kind": "lexicalised_participle",
+      "slice": "root evidenced, frequency missing",
+      "note": "The only missing-evidence marker the extractor can actually produce. OEWN has the verb `nonplus` with meanings, but wordfreq has no frequency for it, so the claim carries `claim.root.zipf`. A negative control: the rubric says frequency is not evidence about whether a decomposition is real, so a marker here must not derail an otherwise clear case, and the judge must not invent the number."
     }
   ]
 }

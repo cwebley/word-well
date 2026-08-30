@@ -18,3 +18,7 @@
 {"at": "2026-08-30T00:50:47.722Z", "claim_id": "rebut|affix_strip", "fingerprint_key": "aeed86cb5302eb6b6eca623c1894118c7bf51b2cf78bae084718a1f6d3f30fd3", "cost_usd": 0.00023676725, "persisted": true}
 {"at": "2026-08-30T00:50:59.707Z", "claim_id": "pastoral|compound_split", "fingerprint_key": "de33207abdda3e3f9e8f4e1590b2479302c4c01daa7851bd0ee08501b5702189", "cost_usd": 0.0003059045, "persisted": true}
 {"at": "2026-08-30T00:50:59.777Z", "claim_id": "mercurial|meaning_shift_derivation", "fingerprint_key": "0d4e37d6252979c36121cac9f946c68c18473f6bbbf4cfed6fef76731b032850", "cost_usd": 0.00033686675, "persisted": true}
+{"at":"2026-08-30T01:09:40.035Z","claim_id":"nonplussed|lexicalised_participle","fingerprint_key":"bbc00f390d1802934feaea8619865845e61d00b0943e40c3e4af879d59139385","cost_usd":0.000194148,"persisted":true}
+{"at":"2026-08-30T01:10:19.720Z","claim_id":"rebut|affix_strip","fingerprint_key":"e9bd0427df577c48923acc5a2a5454263453d46c80e5ae99e3210fb8a793b45e","cost_usd":0.0001,"persisted":false}
+{"at":"2026-08-30T01:10:19.720Z","claim_id":"rebut|affix_strip","fingerprint_key":"e9bd0427df577c48923acc5a2a5454263453d46c80e5ae99e3210fb8a793b45e","cost_usd":0.0001,"persisted":false}
+{"at":"2026-08-30T01:10:19.721Z","claim_id":"rebut|affix_strip","fingerprint_key":"e9bd0427df577c48923acc5a2a5454263453d46c80e5ae99e3210fb8a793b45e","cost_usd":0.0001,"persisted":true}

@@ -323,15 +323,87 @@ This is recorded rather than quietly fixed because changing a label to agree wit
 a model is the classic way an evaluation stops measuring anything. The
 justification has to stand on the evidence, and a human has to make the call.
 
+## Close-out
+
+Reviewed with `/code-review`, which found two real defects in the spend guard,
+both in code committed an hour earlier and both fixed:
+
+**The budget guard priced the wrong machine.** `fetchPrice` read the catalogue's
+headline price for a model id, but a model id is served by many upstreams at
+rates spanning 14x. Pinning `morph/bf16` while estimating against the catalogue's
+$0.065/$0.180 under-priced the run by roughly half. It now reads the pinned
+endpoint's own price and fails loudly if the pinned upstream does not serve the
+model. The five-case estimate moved from $0.0037 to $0.0057.
+
+**`--fresh` spent money the cap could not see.** A reliability probe persists
+nothing by design, and `spentSoFar` summed the run records, so both probes were
+invisible to the guard. Every paid call now appends to `runs/spend-ledger.jsonl`
+whether or not its record is stored. Reported spend was $0.0076; actual was
+$0.0095.
+
+The review also observed that filtering `overweening` left no live case carrying
+a missing-evidence marker, so AC2 and the `insufficient_evidence` path rested on
+unit tests alone. Measuring which markers can fire at all, across the band:
+
+| | claims | |
+|---|---:|---:|
+| Fully evidenced | 12,565 | 98.2% |
+| No root proposed, filtered before adjudication | 168 | 1.3% |
+| Root has meanings but no frequency | 64 | 0.5% |
+| **Root has no recorded meanings** | **0** | **0.0%** |
+
+Zero, and structurally so: every path that finds a root requires the root to be
+in OEWN, so a root without meanings cannot be produced. The marker exists in the
+schema and cannot fire.
+
+The consequence is worth stating plainly, because it is not what the plan
+assumed. **After the filter, an evidence gap can no longer produce
+`insufficient_evidence`.** Quarantine is reachable only when the model declares
+uncertainty from its own reading, never because the extractor handed it a hole.
+That follows from removing the holes deliberately, but it means the quarantine
+branch is thinly exercised by design, and stage 6 should not be the first place
+anyone notices.
+
+`nonplussed` was added as the sixth case on that basis: it carries the only
+marker the extractor can produce, and it is a negative control rather than a
+quarantine test. The rubric says frequency is not evidence about whether a
+decomposition is real, so a marker there must not change the verdict. It did not
+— and the case turned out to earn its place twice over, because it is also the
+only case that fires the endorsement override.
+
+### Final result
+
+Six claims, all ten scorers at **100%**, including every semantic and disposition
+score now that the labels are human-validated.
+
+| Claim | Verdict | Disposition |
+|---|---|---|
+| `rebut` <- `re` + `but` | unsupported | advance |
+| `pastoral` <- `past` + `oral` | unsupported | advance |
+| `naughtiness` <- `naughty` + `-ness` | supported, predictable | **exclude** |
+| `mercurial` <- `mercury` + `-al` | supported, 3 of 4 not predictable | advance |
+| `convoluted` <- `convolute` + `-ed` | supported, 1 of 2 not predictable | advance |
+| `nonplussed` <- `nonplus` + `-ed` | supported, both predictable | exclude -> **advance**, endorsement override |
+| `overweening` <- ? + `-ing` | *not judged* | advance, filtered before adjudication |
+
+One label was corrected at the checkpoint. `convoluted`'s "highly complex or
+intricate and occasionally devious" was labelled `predictable` on the argument
+that the root's two verb senses supply it. The judge returned `not_predictable`
+in all three runs, reasoning that the sophistry sense is about misleading rather
+than about being intricate. The judge is right: joining half of one root sense to
+half of another is not a route a learner takes. Recorded rather than quietly
+fixed, and confirmed by a human, because a label changed to agree with a model is
+how an evaluation stops measuring anything.
+
+All six labels are now `label_status: human-validated`.
+
+**Total spend $0.0097 of the $10 pilot cap**, across 21 paid calls.
+
 ### Decision
 
 Stage 1 is complete. The contract path holds, the two defects it found are fixed,
-and the configuration is now reproducible. Remaining before stage 2:
-
-1. Confirm the `convoluted` label correction, then promote all five to
-   `label_status: human-validated`.
-2. Nothing else. The rubric ambiguity was removed by removing the case, and the
-   pinning question is closed.
+and the configuration is now reproducible. Nothing remains before stage 2. The labels are validated, the rubric ambiguity
+was removed by removing the case, and the pinning question is closed.
 
 Carried forward as named stage-3 candidates, neither of them blocking:
 
