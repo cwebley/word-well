@@ -1,0 +1,103 @@
+{
+  "claim_id": "rebut|affix_strip",
+  "fingerprint_key": "7b6ddafac173936cca0d529975359de0601f63a0fbf63f33744f28b0c77fa4e7",
+  "fingerprint": {
+    "input_digest": "d09f989663d6a01df8c6ebd7e53e11e0994628fcff49b43db4eadde3336243ac",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": null,
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/1"
+  },
+  "recorded_at": "2026-08-29T22:44:04.490Z",
+  "finding": {
+    "claim_id": "rebut|affix_strip",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The word 'rebut' is not formed from the prefix 're-' plus the word 'but' meaning 'and nothing more'. 'Rebut' comes from Old French 'rebuter', and the claimed root 'but' (a conjunction/adverb meaning 'and nothing more') does not combine with 're-' to produce the meaning 'prove false' or 'overthrow by argument'. The string match is coincidental.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-rebut__2.31.00.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [],
+        "rationale": "The analysis is unsupported, and the claimed root 'but' does not genuinely contribute to the meaning 'prove false or incorrect'."
+      },
+      {
+        "sense_ids": [
+          "oewn-rebut__2.32.00.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [],
+        "rationale": "The analysis is unsupported, and the claimed root 'but' does not genuinely contribute to the meaning 'overthrow by argument, evidence, or proof'."
+      }
+    ],
+    "diagnostic_confidence": 0.95
+  },
+  "raw": {
+    "analysis_evidence_ids": [],
+    "analysis_rationale": "The word 'rebut' is not formed from the prefix 're-' plus the word 'but' meaning 'and nothing more'. 'Rebut' comes from Old French 'rebuter', and the claimed root 'but' (a conjunction/adverb meaning 'and nothing more') does not combine with 're-' to produce the meaning 'prove false' or 'overthrow by argument'. The string match is coincidental.",
+    "analysis_support": "unsupported",
+    "claim_id": "rebut|affix_strip",
+    "diagnostic_confidence": 0.95,
+    "meanings": [
+      {
+        "evidence_ids": [],
+        "predictability": "insufficient_evidence",
+        "rationale": "The analysis is unsupported, and the claimed root 'but' does not genuinely contribute to the meaning 'prove false or incorrect'.",
+        "sense_ids": [
+          "oewn-rebut__2.31.00.."
+        ]
+      },
+      {
+        "evidence_ids": [],
+        "predictability": "insufficient_evidence",
+        "rationale": "The analysis is unsupported, and the claimed root 'but' does not genuinely contribute to the meaning 'overthrow by argument, evidence, or proof'.",
+        "sense_ids": [
+          "oewn-rebut__2.32.00.."
+        ]
+      }
+    ]
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 1,
+  "served_by": "OpenInference",
+  "usage": {
+    "prompt_tokens": 876,
+    "completion_tokens": 557,
+    "reasoning_tokens": 231,
+    "total_tokens": 1433,
+    "cost_usd": 0.000070204
+  },
+  "latency_ms": 16241
+}

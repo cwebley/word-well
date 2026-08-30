@@ -1,0 +1,204 @@
+{
+ "retrieved_at": "2026-08-28T21:44:35Z",
+ "api": "https://en.wiktionary.org/w/api.php",
+ "pages": {
+  "sanction": {
+   "pageid": 5431,
+   "revid": 92048794,
+   "rev_timestamp": "2026-08-17T08:04:45Z",
+   "bytes": 10970
+  },
+  "run": {
+   "pageid": 7532,
+   "revid": 92342889,
+   "rev_timestamp": "2026-08-26T12:56:25Z",
+   "bytes": 53082
+  },
+  "line": {
+   "pageid": 28238,
+   "revid": 92375810,
+   "rev_timestamp": "2026-08-28T20:00:23Z",
+   "bytes": 46534
+  },
+  "defenestration": {
+   "pageid": 37401,
+   "revid": 91125064,
+   "rev_timestamp": "2026-06-07T23:06:54Z",
+   "bytes": 11959
+  },
+  "qualify": {
+   "pageid": 39753,
+   "revid": 91639207,
+   "rev_timestamp": "2026-07-18T01:51:57Z",
+   "bytes": 7684
+  },
+  "perspicacious": {
+   "pageid": 50844,
+   "revid": 91690506,
+   "rev_timestamp": "2026-07-24T00:08:06Z",
+   "bytes": 3492
+  },
+  "lugubrious": {
+   "pageid": 53941,
+   "revid": 92135073,
+   "rev_timestamp": "2026-08-23T18:23:51Z",
+   "bytes": 3326
+  },
+  "mitigate": {
+   "pageid": 54733,
+   "revid": 92143830,
+   "rev_timestamp": "2026-08-23T20:48:03Z",
+   "bytes": 6911
+  },
+  "ameliorate": {
+   "pageid": 54769,
+   "revid": 92131015,
+   "rev_timestamp": "2026-08-23T17:45:45Z",
+   "bytes": 3070
+  },
+  "pulchritude": {
+   "pageid": 56975,
+   "revid": 84901474,
+   "rev_timestamp": "2025-05-22T18:39:58Z",
+   "bytes": 1642
+  },
+  "salient": {
+   "pageid": 57528,
+   "revid": 91429574,
+   "rev_timestamp": "2026-06-30T13:46:25Z",
+   "bytes": 10617
+  },
+  "tacit": {
+   "pageid": 62762,
+   "revid": 91748880,
+   "rev_timestamp": "2026-07-30T05:10:43Z",
+   "bytes": 3860
+  },
+  "candid": {
+   "pageid": 66885,
+   "revid": 91389964,
+   "rev_timestamp": "2026-06-26T11:22:05Z",
+   "bytes": 6711
+  },
+  "crucible": {
+   "pageid": 78959,
+   "revid": 92289706,
+   "rev_timestamp": "2026-08-24T20:31:09Z",
+   "bytes": 7457
+  },
+  "watershed": {
+   "pageid": 79125,
+   "revid": 91970280,
+   "rev_timestamp": "2026-08-12T14:30:34Z",
+   "bytes": 6531
+  },
+  "betwixt": {
+   "pageid": 79483,
+   "revid": 91312283,
+   "rev_timestamp": "2026-06-17T16:13:42Z",
+   "bytes": 3591
+  },
+  "perchance": {
+   "pageid": 93485,
+   "revid": 91743220,
+   "rev_timestamp": "2026-07-29T14:15:26Z",
+   "bytes": 1906
+  },
+  "preclude": {
+   "pageid": 206959,
+   "revid": 91757119,
+   "rev_timestamp": "2026-07-31T07:15:49Z",
+   "bytes": 4181
+  },
+  "byzantine": {
+   "pageid": 251427,
+   "revid": 91035901,
+   "rev_timestamp": "2026-06-01T11:23:21Z",
+   "bytes": 1391
+  },
+  "whilom": {
+   "pageid": 408142,
+   "revid": 92193916,
+   "rev_timestamp": "2026-08-24T04:54:08Z",
+   "bytes": 8272
+  },
+  "quarantine": {
+   "pageid": 4340,
+   "revid": 91975987,
+   "rev_timestamp": "2026-08-13T06:21:58Z",
+   "bytes": 22658
+  },
+  "angry": {
+   "pageid": 4353,
+   "revid": 92129199,
+   "rev_timestamp": "2026-08-23T14:20:31Z",
+   "bytes": 27139
+  },
+  "important": {
+   "pageid": 8406,
+   "revid": 91794622,
+   "rev_timestamp": "2026-08-04T07:33:47Z",
+   "bytes": 10838
+  },
+  "nice": {
+   "pageid": 35376,
+   "revid": 92338066,
+   "rev_timestamp": "2026-08-26T11:35:55Z",
+   "bytes": 25086
+  },
+  "table": {
+   "pageid": 38559,
+   "revid": 92086817,
+   "rev_timestamp": "2026-08-20T20:55:06Z",
+   "bytes": 40405
+  },
+  "ad hominem": {
+   "pageid": 45108,
+   "revid": 92310413,
+   "rev_timestamp": "2026-08-25T19:40:10Z",
+   "bytes": 4188
+  },
+  "astute": {
+   "pageid": 51059,
+   "revid": 89178264,
+   "rev_timestamp": "2026-01-14T02:01:02Z",
+   "bytes": 3311
+  },
+  "schlep": {
+   "pageid": 68269,
+   "revid": 92185759,
+   "rev_timestamp": "2026-08-24T03:13:17Z",
+   "bytes": 9860
+  },
+  "Kafkaesque": {
+   "pageid": 86292,
+   "revid": 90822252,
+   "rev_timestamp": "2026-05-17T21:38:24Z",
+   "bytes": 3961
+  },
+  "sincere": {
+   "pageid": 97156,
+   "revid": 92010876,
+   "rev_timestamp": "2026-08-15T01:09:00Z",
+   "bytes": 6841
+  },
+  "whinge": {
+   "pageid": 97316,
+   "revid": 91734122,
+   "rev_timestamp": "2026-07-28T12:49:23Z",
+   "bytes": 5252
+  },
+  "schadenfreude": {
+   "pageid": 262159,
+   "revid": 92156596,
+   "rev_timestamp": "2026-08-23T22:30:10Z",
+   "bytes": 6143
+  },
+  "doomscroll": {
+   "pageid": 8548945,
+   "revid": 92059395,
+   "rev_timestamp": "2026-08-18T11:53:54Z",
+   "bytes": 2870
+  }
+ }
+}

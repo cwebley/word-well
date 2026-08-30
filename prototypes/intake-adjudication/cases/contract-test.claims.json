@@ -1,0 +1,49 @@
+{
+  "case_set": "contract-test",
+  "stage": "1 — contract test (issue #48)",
+  "why_these_five": "One claim per mechanical rule kind, plus the rootless lexicalised participle that the plan names as the evidence gap. Between them they exercise every disposition, a polysemous headword, an endorsed and an unendorsed headword, the deterministic pre-adjudication filter, and the widened root recovery that stage 1 added.",
+  "claims": [
+    {
+      "lemma": "rebut",
+      "rule_kind": "affix_strip",
+      "slice": "affix strip",
+      "note": "The flagship bogus analysis from the #44 spike: re- + but. The root is a conjunction/adverb, not a verb stem."
+    },
+    {
+      "lemma": "pastoral",
+      "rule_kind": "compound_split",
+      "slice": "compound split",
+      "note": "past + oral is a string coincidence. Six source meanings across two parts of speech, so it also stresses meaning accounting."
+    },
+    {
+      "lemma": "naughtiness",
+      "rule_kind": "grammatical_derivation",
+      "slice": "grammatical derivation",
+      "note": "A true grammatical derivation from a known root. Unendorsed, so no endorsement override masks the exclude path."
+    },
+    {
+      "lemma": "mercurial",
+      "rule_kind": "meaning_shift_derivation",
+      "slice": "meaning-may-shift derivation",
+      "note": "Supported analysis, split predictability: the mercury-the-metal meanings follow from the root, 'liable to sudden unpredictable change' does not."
+    },
+    {
+      "lemma": "overweening",
+      "rule_kind": "lexicalised_participle",
+      "slice": "rootless lexicalised participle",
+      "note": "The pool stored no root, and OEWN records no `overween` at all, so no root evidence exists to supply. A closed-book judge has to say so rather than answer from memory. Endorsed three times, which must not rescue it from quarantine: an editorial list does not supply missing lexical evidence."
+    },
+    {
+      "lemma": "convoluted",
+      "rule_kind": "lexicalised_participle",
+      "slice": "lexicalised participle, root recovered",
+      "note": "The word that exposed the extractor bug: build_pool stripped two or three characters and never one, so `convolute` was invisible and this read as rootless. It is the paired opposite of `overweening` — same rule, root found rather than absent — so the two together show both sides of the filter."
+    },
+    {
+      "lemma": "nonplussed",
+      "rule_kind": "lexicalised_participle",
+      "slice": "root evidenced, frequency missing",
+      "note": "The only missing-evidence marker the extractor can actually produce. OEWN has the verb `nonplus` with meanings, but wordfreq has no frequency for it, so the claim carries `claim.root.zipf`. A negative control: the rubric says frequency is not evidence about whether a decomposition is real, so a marker here must not derail an otherwise clear case, and the judge must not invent the number."
+    }
+  ]
+}

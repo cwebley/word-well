@@ -1,0 +1,26 @@
+{
+  "name": "wordwell-intake-adjudication",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "PROTOTYPE (issue #46) — morphology adjudication runner and evaluation harness. Throwaway: no schema, no migrations, no pipeline integration.",
+  "scripts": {
+    "adjudicate": "dotenv -e .env.local -- tsx src/cli.ts",
+    "eval": "dotenv -e .env.local -- braintrust eval evals/contract.eval.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "models": "dotenv -e .env.local -- tsx src/models-cli.ts"
+  },
+  "dependencies": {
+    "openai": "^7.2.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "braintrust": "^3.7.1",
+    "dotenv-cli": "^11.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "case_set": "contract-test",
+  "claim_count": 6,
+  "claims": {
+    "convoluted|lexicalised_participle": "d130ae2cca85a9113460f15c40466c86aeeee3ebf0800ecdec5ab592304610ca",
+    "mercurial|meaning_shift_derivation": "b2bf952320fd605613113f1016dfa4c49b53eaf8c5aa26110bf7c5ecece5fa71",
+    "naughtiness|grammatical_derivation": "a2fe0fecd38a14293d3a95d9146f861cfa208c5f5acea7da399735f951c0839d",
+    "nonplussed|lexicalised_participle": "b3f21d81342fa18cc03885a514fd347d3a1751532a07d69987ae14816e075d35",
+    "pastoral|compound_split": "4f56e7baaac7b42b15dcd77407b192708aeaae67ab0cb9aa15016ac03e4a3559",
+    "rebut|affix_strip": "d09f989663d6a01df8c6ebd7e53e11e0994628fcff49b43db4eadde3336243ac"
+  },
+  "deterministic_rules": {
+    "sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "source": "build_pool.py"
+  },
+  "extraction_version": "intake-evidence/1",
+  "filtered_count": 1,
+  "max_examples": 6,
+  "sources": {
+    "candidate_pool": {
+      "path": "pool.sqlite",
+      "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+    },
+    "oewn": {
+      "release": "oewn:2025",
+      "retrieved_via": "wn 1.1.1"
+    },
+    "wordfreq": {
+      "version": "3.1.1",
+      "wordlist": "large"
+    }
+  }
+}

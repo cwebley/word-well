@@ -1,0 +1,119 @@
+{
+  "claim_id": "nonplussed|lexicalised_participle",
+  "fingerprint_key": "bbc00f390d1802934feaea8619865845e61d00b0943e40c3e4af879d59139385",
+  "fingerprint": {
+    "input_digest": "b3f21d81342fa18cc03885a514fd347d3a1751532a07d69987ae14816e075d35",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "morph/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T01:09:40.035Z",
+  "finding": {
+    "claim_id": "nonplussed|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'nonplussed' is transparently formed by adding the past-participle suffix '-ed' to the verb 'nonplus', which is recorded in the evidence. The spelling change from 'nonplus' to 'nonplussed' (doubling the final 's') is a regular orthographic adjustment when adding a suffix beginning with a vowel.",
+    "analysis_evidence_ids": [
+      "oewn-nonplus__2.31.00..",
+      "oewn-nonplussed__5.00.00.perplexed.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "rationale": "This is the verb meaning of the root itself, so a learner who knows 'nonplus' as a verb meaning 'bewilder' would directly understand this meaning."
+      },
+      {
+        "sense_ids": [
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00..",
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "rationale": "The adjective meaning 'filled with bewilderment' is the natural result of the past participle of the verb 'nonplus' meaning 'bewilder'. A learner who knows the verb and the participial adjective pattern would arrive at this meaning."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "claim_id": "nonplussed|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'nonplussed' is transparently formed by adding the past-participle suffix '-ed' to the verb 'nonplus', which is recorded in the evidence. The spelling change from 'nonplus' to 'nonplussed' (doubling the final 's') is a regular orthographic adjustment when adding a suffix beginning with a vowel.",
+    "analysis_evidence_ids": [
+      "oewn-nonplus__2.31.00..",
+      "oewn-nonplussed__5.00.00.perplexed.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "rationale": "This is the verb meaning of the root itself, so a learner who knows 'nonplus' as a verb meaning 'bewilder' would directly understand this meaning."
+      },
+      {
+        "sense_ids": [
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00..",
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "rationale": "The adjective meaning 'filled with bewilderment' is the natural result of the past participle of the verb 'nonplus' meaning 'bewilder'. A learner who knows the verb and the participial adjective pattern would arrive at this meaning."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "endorsed by 6 editorial sources, which overrides a fuzzy morphology exclusion",
+    "endorsementOverride": true
+  },
+  "endorsements": 6,
+  "served_by": "Morph",
+  "usage": {
+    "prompt_tokens": 1616,
+    "completion_tokens": 396,
+    "reasoning_tokens": 0,
+    "total_tokens": 2012,
+    "cost_usd": 0.000194148
+  },
+  "latency_ms": 9982
+}

@@ -57,6 +57,29 @@ never learner-facing content and is distinct from the source evidence that
 backs a published claim.
 _Avoid_: Candidate source, suggestion, referral
 
+**Candidate pool**:
+The deduplicated set of headwords eligible for consideration, derived from a
+pinned frequency list resolved to source lemmas, with each intake filter
+recorded as an attribute rather than applied as a deletion. It is not a
+publication queue: membership means a word may be considered, never that it
+will be delivered.
+_Avoid_: Word list, corpus, dictionary
+
+**Endorsement**:
+A count of how many independent editorial sources nominated a headword. It is
+evidence about a word's interest, used as a ranking prior and to override
+mechanical intake filters that only guess at word formation. It never overrides
+a factual filter such as spelling variant or register.
+_Avoid_: Vote, score, popularity
+
+**Intake adjudication**:
+A judgment pass over headwords that mechanical intake filters flagged but could
+not decide, recording a verdict per word as data alongside the mechanical
+attributes. It exists because affix and compound rules invent word formation
+that does not hold, and because no rule separates a derivation that teaches
+something new from one that does not.
+_Avoid_: Cleanup, moderation, review
+
 **Config fingerprint**:
 The identifier for one reproducible pipeline configuration, derived from the
 pinned source releases, the extraction version, and the model, prompt,
@@ -135,7 +158,25 @@ the lesson is read and used as initial scheduling evidence.
 **Word difficulty**:
 An editorial estimate of how challenging a word is based on frequency, register,
 usage or meaning complexity, and practical usefulness. It is separate from any
-learner's mastery.
+learner's mastery, and distinct from a word rating, which is measured rather
+than estimated.
+
+**Word rating**:
+A word's measured difficulty on the shared rating scale, seeded from its
+frequency and revised as learners report familiarity. A word rating drifting
+above its frequency prior means the word is better known than frequency
+predicted. A word is retired from delivery once its rating passes the band
+ceiling by a margin, not at the ceiling itself, so a word near the boundary is
+not served once and lost.
+_Avoid_: Difficulty score, Elo, weight
+
+**Learner rating**:
+A learner's measured position on the same scale as a word rating, seeded from
+their starting band and revised by familiarity and practice evidence. The gap
+between a learner rating and a word rating predicts familiarity, and the size of
+each revision scales with how surprising the outcome was. It is distinct from
+learner mastery, which concerns individual delivered words.
+_Avoid_: Level, skill score, ability
 
 **Adult-interest candidate**:
 A published word lesson eligible for delivery because it may be unfamiliar yet
@@ -146,10 +187,13 @@ useful meaning rather than on its headword alone, so a rare word with a live
 figurative meaning can qualify.
 
 **Starting band**:
-The learner's initial adult-interest candidate range. `Build foundations`
-contains approachable but worthwhile words, `Stretch my vocabulary` is the
-default broad range, and `Challenge me` favors rarer, more specialized, or more
-linguistically demanding words. No band includes remedial vocabulary.
+The learner's initial position on the rating scale, chosen at sign-up and
+changeable at any time. `Build foundations` contains approachable but worthwhile
+words, `Stretch my vocabulary` is the default broad range, and `Challenge me`
+favors rarer, more specialized, or more linguistically demanding words. No band
+includes remedial vocabulary. A band sets a starting point for a learner rating
+rather than fixing a range: learners move continuously across band boundaries as
+their rating changes.
 
 **Editorial review signal**:
 Aggregate learner feedback, including skip and replacement patterns, that

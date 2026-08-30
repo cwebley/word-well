@@ -1,0 +1,2236 @@
+{
+ "candid": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "impartial|Impartial and free from prejudice."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "straightforward|Straightforward, open and sincere, whether people find either refreshing or distasteful."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "unposed|Unposed or rehearsed."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "bright|Bright; white."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A spontaneous or unposed photograph."
+   }
+  ],
+  "sense_count": 5,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "obsolete"
+  ]
+ },
+ "run": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To move swiftly."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To flow."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "nautical",
+     "of a vessel"
+    ],
+    "gloss": "To sail before the wind, in distinction from reaching or sailing close-hauled."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To control or manage; to be in charge of."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To be a candidate in an election."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To make participate in certain kinds of competitions."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To exert continuous activity; to proceed."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To be presented in the media."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To print or broadcast in the media."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To smuggle (illegal goods)."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "agriculture"
+    ],
+    "gloss": "To sort through a large volume of produce in quality control."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To extend or persist, statically or dynamically, through space or time."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To execute or carry out a plan, procedure or program."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To pass or go quickly in thought or conversation."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "copulative"
+    ],
+    "gloss": "To become different in a way mentioned (usually to become worse)."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To cost an amount of money."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "Of stitches or stitched clothing, to unravel."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To cause stitched clothing to unravel."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To pursue in thought; to carry in contemplation."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To cause to enter; to thrust."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To drive or force; to cause, or permit, to be driven."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To cause to be drawn; to mark out; to indicate; to determine."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To encounter or incur (a danger or risk)."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "obsolete"
+    ],
+    "gloss": "To put at hazard; to venture; to risk."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "obsolete"
+    ],
+    "gloss": "To tease with sarcasms and ridicule."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To sew (a seam) by passing the needle through material in a continuous line, generally taking a series of stitches on the needle at the same time."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To control or have precedence in a card game. <!--is this used only with \"table\"?-->"
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To be in form thus, as a combination of words."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "archaic"
+    ],
+    "gloss": "To be popularly known; to be generally received."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To have growth or development."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To tend, as to an effect or consequence; to incline."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To have a legal course; to be attached; to continue in force, effect, or operation; to follow; to go in company."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To encounter or suffer (a particular, usually bad, fate or misfortune)."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "golf"
+    ],
+    "gloss": "To strike (the ball) in such a way as to cause it to run along the ground, as when approaching a hole."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "video games",
+     "rare"
+    ],
+    "gloss": "To ."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "sports",
+     "especially",
+     "baseball"
+    ],
+    "gloss": "To eject from a game or match."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To press (a bank, etc.) with immediate demands for payment."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "basketball",
+     "slang"
+    ],
+    "gloss": "To play basketball (usually pickup)."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Act or instance of running, of moving rapidly using the feet."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Act or instance of hurrying (to or from a place) ; dash or errand, trip."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A pleasure trip."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "flight|Flight, instance or period of fleeing."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "migration|Migration of fish."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "collective"
+    ],
+    "gloss": "A group of fish that migrate, or ascend a river for the purpose of spawning."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A literal or figurative path or course for movement relating to:"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Unrestricted use. . <!--and \"given\" the run of, etc.-->"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "An enclosure for an animal; a track or path along which something can travel."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "Australia",
+     "New Zealand"
+    ],
+    "gloss": "A rural#Adjective|rural landholding for farm#Verb|farming, usually for run#Verb|running sheep, and operated by a runholder."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "State of being current; currency; popularity."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Something continuous or sequential."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A flow of liquid; a leak."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "chiefly",
+     "eastern",
+     "_",
+     "North Midland US",
+     "especially",
+     "Ohio",
+     "Pennsylvania",
+     "West Virginia"
+    ],
+    "gloss": "A small creek or part thereof."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A quick pace, faster than a walk."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "banking"
+    ],
+    "gloss": "A sudden series of demands on a bank or other financial institution, especially characterised by great withdrawals."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Any sudden large demand for something."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Various horizontal dimensions or surfaces"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A standard or unexceptional group or category."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": ":"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The distance drilled with a bit, in oil drilling."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A line of knit stitches that have unravelled, particularly in a nylon stocking."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "nautical"
+    ],
+    "gloss": "The stern of the underwater body of a ship from where it begins to curve upward and inward."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "mining"
+    ],
+    "gloss": "The horizontal distance to which a drift may be carried, either by licence of the proprietor of a mine or by the nature of the formation; also, the direction which a vein of ore or other substance takes."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A pair or set of millstones."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "One\u2019s gait while running; the way one runs."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "In a liquid state; melted or molten."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "cast|Cast in a mould."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "exhaust|Exhausted; depleted ."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "of a",
+     "fish"
+    ],
+    "gloss": "travelled|Travelled, migrated; having made a migration or a spawning #Noun|run."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "smuggled|Smuggled."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": ""
+   }
+  ],
+  "sense_count": 70,
+  "labelled_senses": 27,
+  "headword_labels": [],
+  "all_labels": [
+   "Australia",
+   "New Zealand",
+   "North Midland US",
+   "Ohio",
+   "Pennsylvania",
+   "West Virginia",
+   "_",
+   "agriculture",
+   "archaic",
+   "banking",
+   "baseball",
+   "basketball",
+   "chiefly",
+   "collective",
+   "copulative",
+   "eastern",
+   "especially",
+   "fish",
+   "golf",
+   "intransitive",
+   "mining",
+   "nautical",
+   "obsolete",
+   "of a",
+   "of a vessel",
+   "rare",
+   "slang",
+   "sports",
+   "transitive",
+   "video games"
+  ]
+ },
+ "line": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A path through two or more points (compare \u2018segment\u2019); a continuous mark, including as made by a pen; any path, curved or straight. <!-- should this be split into two senses: \"path\" and \"mark\" ? -->"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A rope, cord, string, thread or cable, of any thickness."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A hose, tube or pipe, of any size."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "direction|Direction, path."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A procession, either physical or conceptual, which results from the application or effect of a given rationale or other controlling principles of belief, opinion, practice, or phenomenon."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The wire connecting one telegraphic station with another, a telephone or internet cable between two points: a telephone or network connection."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A clothesline."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A short letter, a written form of communication."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A connected series of public conveyances, as a roadbed or railway track; and hence, an established arrangement for forwarding merchandise, etc.; a railroad line, railway line, etc."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "especially",
+     "military"
+    ],
+    "gloss": "A trench or rampart, or the non-physical demarcation of the extent of the territory occupied by specified forces."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The exterior limit of a figure or territory: a boundary, contour, or outline; a demarcation."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A conceptual division or distinction."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A long tape or ribbon marked with units for measuring; a tape measure."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "A measuring line or cord."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "That which was measured by a line, such as a field or any piece of land set apart; hence, allotted place of abode."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A threadlike crease or wrinkle marking the face, hand, or body; hence, a characteristic mark."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "; feature; figure (of one's body)."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A more-or-less straight sequence of people, objects, etc., either arranged as a queue or column and often waiting to be processed or deal with|dealt with, or arranged abreast of one another in a row (and contrasted with a column), as in a military formation."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "military"
+    ],
+    "gloss": "The regular infantry of an army, as distinguished from militia, guards, volunteer corps, cavalry, artillery etc."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "music"
+    ],
+    "gloss": "A series of notes forming a certain part (such as the bass or melody) of a greater work."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A series or succession of ancestors or descendants of a given person; a family or race; compare ."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A small amount of text. Specifically:"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Course of conduct, thought, occupation, or policy; method of argument; department of industry, trade, or intellectual activity."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The official, stated position (or set of positions) of an individual or group, particularly a political or religious faction."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "slang"
+    ],
+    "gloss": "information|Information about or understanding of something."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A set of products or services sold by a business, or by extension, the business itself."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "stock exchange"
+    ],
+    "gloss": "A number of shares taken by a jobber."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Any of an ill-defined set of units of length, varying according to the country, discipline, industry, and date of application, commonly with no indication of the intended magnitude:"
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "advertising"
+    ],
+    "gloss": "(one fourteenth of an inch)."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "historical"
+    ],
+    "gloss": "A maxwell, a unit of magnetic flux."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "baseball",
+     "slang",
+     "1800s",
+     "with \"the\""
+    ],
+    "gloss": "The batter's box."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "fencing"
+    ],
+    "gloss": "The position in which the fencers hold their swords. <!-- but: -->"
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "engineering"
+    ],
+    "gloss": "proper|Proper relative position or adjustment (of parts, not as to design or proportion, but with reference to smooth working)."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "informal"
+    ],
+    "gloss": "A portion or serving of a powdery recreational drug, especially cocaine, formed into a line on a flat surface in preparation for snorting."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "; doctrine."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "genetics"
+    ],
+    "gloss": "A population of cells derived from a single cell and containing the same genetic makeup."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "(perfusion line) a set composed of a spike, a drip chamber, a clamp, a Y-injection site, a three-way stopcock and a catheter."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "ice hockey"
+    ],
+    "gloss": "A group of forwards that play together."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "Australian rules football"
+    ],
+    "gloss": "A set of positions in a team which play in a similar position on the field; in a traditional team, consisting of three players and acting as one of six such sets in the team."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "medicine",
+     "colloquial"
+    ],
+    "gloss": "A vascular catheter."
+   },
+   {
+    "pos": "Interjection",
+    "labels": [
+     "acting"
+    ],
+    "gloss": "Expresses that the speaker has forgotten their dialogue and needs to be prompted with it."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To place (objects) into a #Noun|line (usually used with \"up\"); to form into a line; to align."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To place persons or things along the side of for security or defense; to strengthen by adding; to fortify."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To form a #Noun|line along."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To mark with a #Noun|line or #Noun|lines; to cover with #Noun|lines."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "railroading"
+    ],
+    "gloss": "To align (one or more switches) to direct a train onto a particular track."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "obsolete"
+    ],
+    "gloss": "To represent by #Noun|lines; to delineate; to portray."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "dated",
+     "now more often [[line out]]"
+    ],
+    "gloss": "To read or repeat #Noun|line by #Noun|line."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive",
+     "baseball"
+    ],
+    "gloss": "To hit a line drive; to hit a line drive which is caught for an out. Compare fly and ground."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To track (wild bees) to their nest by following their #Noun|line of flight."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To measure. <!--Chambers 1908-->"
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "South Korean idol fandom"
+    ],
+    "gloss": "A group of people born in a certain year ()."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "flax|Flax, linen."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The longer fiber(s) of flax."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To cover the inner surface of (something), originally especially with linen."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To fill or supply (something), as a purse with money."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "now",
+     "rare",
+     "of a dog"
+    ],
+    "gloss": "To copulate with, to impregnate."
+   }
+  ],
+  "sense_count": 57,
+  "labelled_senses": 33,
+  "headword_labels": [],
+  "all_labels": [
+   "1800s",
+   "Australian rules football",
+   "South Korean idol fandom",
+   "acting",
+   "advertising",
+   "baseball",
+   "colloquial",
+   "dated",
+   "engineering",
+   "especially",
+   "fencing",
+   "genetics",
+   "historical",
+   "ice hockey",
+   "informal",
+   "intransitive",
+   "medicine",
+   "military",
+   "music",
+   "now",
+   "now more often [[line out]]",
+   "obsolete",
+   "of a dog",
+   "railroading",
+   "rare",
+   "slang",
+   "stock exchange",
+   "transitive",
+   "with \"the\""
+  ]
+ },
+ "sanction": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "An approval, by an authority, generally one that makes something valid."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "mostly",
+     "in the plural"
+    ],
+    "gloss": "A penalty, punishment, or some coercive measure, intended to ensure compliance; especially one adopted by several nations, or by an international body."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A law, treaty, or contract, or a clause within a law, treaty, or contract, specifying any of the above."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To ratify; to make valid."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To give official authorization or approval to; to countenance."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To penalize (a state etc.) with sanctions."
+   }
+  ],
+  "sense_count": 6,
+  "labelled_senses": 4,
+  "headword_labels": [],
+  "all_labels": [
+   "in the plural",
+   "mostly",
+   "transitive"
+  ]
+ },
+ "qualify": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To describe or characterize something by listing its qualities."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To successfully fall under some category or description by meeting requisite conditions."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To make someone competent or eligible for some position or task."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive",
+     "or",
+     "reflexive"
+    ],
+    "gloss": "To become competent or eligible for some position or task."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To certify or license someone for something."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To modify, limit, restrict or moderate something; especially to add conditions or requirements for an assertion to be true."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "now",
+     "_",
+     "rare"
+    ],
+    "gloss": "To mitigate, alleviate (something); to make less disagreeable."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To compete successfully in some stage of a competition and become eligible for the next stage."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To give individual quality to; to modulate; to vary; to regulate."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "juggling"
+    ],
+    "gloss": "To throw and catch each object at least twice."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "juggling"
+    ],
+    "gloss": "An instance of throwing and catching each prop at least twice."
+   }
+  ],
+  "sense_count": 11,
+  "labelled_senses": 11,
+  "headword_labels": [],
+  "all_labels": [
+   "_",
+   "intransitive",
+   "juggling",
+   "now",
+   "or",
+   "rare",
+   "reflexive",
+   "transitive"
+  ]
+ },
+ "defenestration": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The act of throw#Verb|throwing something or especially someone out of a window, especially lethally. }}"
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "Britain"
+    ],
+    "gloss": "The high-profile removal of a person from an organization."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "computing",
+     "humorous"
+    ],
+    "gloss": "The act of remove|removing the operating system from a computer in order to install an alternative one."
+   }
+  ],
+  "sense_count": 3,
+  "labelled_senses": 2,
+  "headword_labels": [],
+  "all_labels": [
+   "Britain",
+   "computing",
+   "humorous"
+  ]
+ },
+ "watershed": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [
+     "hydrology",
+     "UK",
+     "Ireland",
+     "Australia",
+     "New Zealand"
+    ],
+    "gloss": "The topographical boundary dividing two adjacent catchment basins, such as a ridge or a crest."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "hydrology",
+     "US",
+     "Canada"
+    ],
+    "gloss": "A region of land within which water flows down into a specified body, such as a river, lake, sea, or ocean; a drainage basin."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "figurative"
+    ],
+    "gloss": "A critical point marking a change in course or development."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "Canada",
+     "British",
+     "television",
+     "radio"
+    ],
+    "gloss": "The time of day after which material of a more adult nature (e.g., violence, swear words, or nudity) may be broadcast on television or radio, either one permitted by law or one contrived from convention (e.g. when children are not watching)."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Serving to mark a significant development, change in direction, etc."
+   }
+  ],
+  "sense_count": 5,
+  "labelled_senses": 4,
+  "headword_labels": [],
+  "all_labels": [
+   "Australia",
+   "British",
+   "Canada",
+   "Ireland",
+   "New Zealand",
+   "UK",
+   "US",
+   "figurative",
+   "hydrology",
+   "radio",
+   "television"
+  ]
+ },
+ "crucible": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [
+     "chemistry"
+    ],
+    "gloss": "A cup-shaped piece of laboratory equipment used to contain chemical compounds when heating them to very high temperatures."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A heat-resistant container in which metals are melted, usually at temperatures above 500\u00b0C, commonly made of graphite with clay as a binder."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "The bottom and hottest part of a blast furnace; the hearth."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "figuratively"
+    ],
+    "gloss": "A very difficult and trying experience, that acts as a refining or hardening process."
+   }
+  ],
+  "sense_count": 4,
+  "labelled_senses": 2,
+  "headword_labels": [],
+  "all_labels": [
+   "chemistry",
+   "figuratively"
+  ]
+ },
+ "byzantine": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "historical"
+    ],
+    "gloss": "A byzant ."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "historical"
+  ]
+ },
+ "perspicacious": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [
+     "figuratively"
+    ],
+    "gloss": "Of acute discernment; having keen insight; mentally perceptive."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "Able to physically see clearly; quick-sighted; sharp-sighted."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 2,
+  "headword_labels": [],
+  "all_labels": [
+   "figuratively",
+   "obsolete"
+  ]
+ },
+ "pulchritude": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Physical beauty."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 0,
+  "headword_labels": [],
+  "all_labels": []
+ },
+ "lugubrious": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "gloomy|Gloomy, mournful or dismal, especially to an exaggerated degree."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 0,
+  "headword_labels": [],
+  "all_labels": []
+ },
+ "salient": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "worthy|Worthy of note; pertinent or relevant."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "prominent|Prominent; conspicuous."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "heraldry",
+     "usually of a [[quadruped]]"
+    ],
+    "gloss": "Depicted in a leaping posture. File:V\u00e5g\u00e5 komm.svg|right|thumb|Gules, a reindeer salient (arms of )."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "often",
+     "military"
+    ],
+    "gloss": "project|Projecting outwards, pointing outwards."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "Moving by leaps or springs; jumping."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "Shooting or springing out; projecting."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "geometry"
+    ],
+    "gloss": "Denoting any angle less than two right angles."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "military"
+    ],
+    "gloss": "An outwardly projecting part of a fortification, trench system, or line of defense."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "geography"
+    ],
+    "gloss": "A protrusion of the administrative borders of a geopolitical entity, such as a subnational entity or a sovereign state into another geopolitical entity, generally of the same administrative level."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "geology"
+    ],
+    "gloss": "An overall-convex, protruding section of a sinuous fold and thrust belt, thrust sheet, or a single thrust fault, caused by one or more of: deformation (folding and faulting) of strata and geologic structures during orogenesis, differences in the angle of critical taper during orogenesis, or differing erosional level of the present geomorphological surface."
+   }
+  ],
+  "sense_count": 10,
+  "labelled_senses": 8,
+  "headword_labels": [],
+  "all_labels": [
+   "geography",
+   "geology",
+   "geometry",
+   "heraldry",
+   "military",
+   "obsolete",
+   "often",
+   "usually of a [[quadruped]]"
+  ]
+ },
+ "tacit": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "implied|Implied, but not made explicit, especially through silence."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "logic"
+    ],
+    "gloss": "Not derived from formal principles of reasoning; based on induction rather than deduction."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "logic"
+  ]
+ },
+ "mitigate": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "of problems or flaws"
+    ],
+    "gloss": "To reduce, lessen, or decrease and thereby to make less severe or easier to bear."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To downplay."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive",
+     "proscribed"
+    ],
+    "gloss": "To give force or effect toward preventing a problem."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "mitigated|Mitigated, alleviated."
+   }
+  ],
+  "sense_count": 4,
+  "labelled_senses": 4,
+  "headword_labels": [],
+  "all_labels": [
+   "intransitive",
+   "obsolete",
+   "of problems or flaws",
+   "proscribed",
+   "transitive"
+  ]
+ },
+ "preclude": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To remove the possibility of; to ; to prevent or exclude; to render ."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "transitive"
+  ]
+ },
+ "betwixt": {
+  "senses": [
+   {
+    "pos": "Preposition",
+    "labels": [
+     "literary",
+     "or",
+     "archaic"
+    ],
+    "gloss": "between#Preposition|Between."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "archaic",
+   "literary",
+   "or"
+  ]
+ },
+ "perchance": {
+  "senses": [
+   {
+    "pos": "Adverb",
+    "labels": [
+     "literary",
+     "or",
+     "humorous"
+    ],
+    "gloss": "perhaps|Perhaps."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "humorous",
+   "literary",
+   "or"
+  ]
+ },
+ "whilom": {
+  "senses": [
+   {
+    "pos": "Adverb",
+    "labels": [
+     "archaic",
+     "except",
+     "literary"
+    ],
+    "gloss": "At some time#Noun|time in the past#Noun|past; formerly, once upon a time."
+   },
+   {
+    "pos": "Adverb",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": ""
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "archaic",
+     "except",
+     "literary"
+    ],
+    "gloss": "At some time#Noun|time in the past#Noun|past; former#Adjective|former, sometime#Adjective|sometime."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "Of a person#Noun|person: deceased#Adjective|deceased, late#Adjective|late."
+   },
+   {
+    "pos": "Conjunction",
+    "labels": [],
+    "gloss": "during|During the same#Adjective|same time#Noun|time that; while#Conjunction|while."
+   },
+   {
+    "pos": "Conjunction",
+    "labels": [],
+    "gloss": "Up to the time that; till#Conjunction|till, until."
+   }
+  ],
+  "sense_count": 6,
+  "labelled_senses": 4,
+  "headword_labels": [
+   "archaic",
+   "except",
+   "Britain",
+   "dialectal",
+   "and",
+   "literary"
+  ],
+  "all_labels": [
+   "archaic",
+   "except",
+   "literary",
+   "obsolete"
+  ]
+ },
+ "ameliorate": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To make better, or improve, something perceived to be in a negative condition."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To become better; improve."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 2,
+  "headword_labels": [],
+  "all_labels": [
+   "intransitive",
+   "transitive"
+  ]
+ },
+ "schlep": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To carry, drag, or lug."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To go, as on an errand; to carry out a task."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To act in a slovenly, lazy, or sloppy manner."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A long or burdensome journey."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A boring person, a drag; a good-for-nothing person."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A sloppy or slovenly person."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A \u201cpull#Noun|pull\u201d or influence#Noun|influence."
+   }
+  ],
+  "sense_count": 7,
+  "labelled_senses": 3,
+  "headword_labels": [],
+  "all_labels": [
+   "intransitive",
+   "transitive"
+  ]
+ },
+ "whinge": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "UK",
+     "Commonwealth",
+     "Irish"
+    ],
+    "gloss": "To whine; to complain, especially in an annoying or persistent manner."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "UK",
+     "AU",
+     "NZ",
+     "Irish"
+    ],
+    "gloss": "A cry."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "UK",
+     "AU",
+     "NZ",
+     "Irish"
+    ],
+    "gloss": "A peevish complaint."
+   }
+  ],
+  "sense_count": 3,
+  "labelled_senses": 3,
+  "headword_labels": [],
+  "all_labels": [
+   "AU",
+   "Commonwealth",
+   "Irish",
+   "NZ",
+   "UK"
+  ]
+ },
+ "schadenfreude": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "enjoyment derived from observe|observing someone else's misfortune; counterempathy."
+   }
+  ],
+  "sense_count": 1,
+  "labelled_senses": 0,
+  "headword_labels": [],
+  "all_labels": []
+ },
+ "doomscroll": {
+  "senses": [
+   {
+    "pos": "Verb",
+    "labels": [
+     "neologism"
+    ],
+    "gloss": "To continually read Internet news about catastrophic events."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "by extension"
+    ],
+    "gloss": "To excessively and unproductively consume Internet posts."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 2,
+  "headword_labels": [
+   "ambitransitive",
+   "social media"
+  ],
+  "all_labels": [
+   "by extension",
+   "neologism"
+  ]
+ },
+ "nice": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [
+     "chiefly",
+     "informal"
+    ],
+    "gloss": "pleasant|Pleasant, satisfactory, complimentary."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "chiefly",
+     "informal"
+    ],
+    "gloss": "Of a person: friendly, attractive."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "respectable|Respectable; virtuous."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "with ''[[and]]''",
+     "chiefly",
+     "informal"
+    ],
+    "gloss": "; pleasantly, quite."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "chiefly",
+     "informal"
+    ],
+    "gloss": "Giving a favorable review or having a favorable impression."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "chiefly",
+     "informal"
+    ],
+    "gloss": "Showing refinement or delicacy, proper, seemly"
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "silly|Silly, ignorant; foolish."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "now",
+     "rare"
+    ],
+    "gloss": "particular|Particular in one's conduct; scrupulous, painstaking; choosy."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "dated"
+    ],
+    "gloss": "Having particular tastes; fussy, fastidious."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "particular|Particular as regards rules or qualities; strict."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "show|Showing or require|requiring great precision or sensitive discernment; subtle."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "Easily injured; delicate; dainty."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "doubtful|Doubtful, as to the outcome; risky."
+   },
+   {
+    "pos": "Adverb",
+    "labels": [
+     "colloquial"
+    ],
+    "gloss": "nicely|Nicely."
+   },
+   {
+    "pos": "Interjection",
+    "labels": [],
+    "gloss": ""
+   },
+   {
+    "pos": "Interjection",
+    "labels": [],
+    "gloss": ""
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "niceness."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "computing",
+     "Unix"
+    ],
+    "gloss": "To run a process with a specified (usually lower) priority."
+   }
+  ],
+  "sense_count": 18,
+  "labelled_senses": 13,
+  "headword_labels": [],
+  "all_labels": [
+   "Unix",
+   "chiefly",
+   "colloquial",
+   "computing",
+   "dated",
+   "informal",
+   "now",
+   "obsolete",
+   "rare",
+   "transitive",
+   "with ''[[and]]''"
+  ]
+ },
+ "sincere": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "genuine|Genuine, honest, and free from pretense or deceit; heartfelt."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Meant truly or earnestly."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "archaic"
+    ],
+    "gloss": "clean|Clean; pure."
+   }
+  ],
+  "sense_count": 3,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "archaic"
+  ]
+ },
+ "quarantine": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A period of 40 days, particularly"
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A period, instance, or state of isolation from the general public or from native livestock and flora enacted to prevent the spread of any contagious disease."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "figurative"
+    ],
+    "gloss": "A similar period, instance, or state of rigidly enforced or self-enforced detention or isolation."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A place where such isolation is enforced, a lazaret."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "colloquial"
+    ],
+    "gloss": "A period of time where people are not allowed to leave their homes to contain the spread of an infectious disease."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "politics",
+     "figurative"
+    ],
+    "gloss": "A blockade of trade, suspension of diplomatic relations, or other action whereby one country seeks to isolate another."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "computing",
+     "figurative"
+    ],
+    "gloss": "An isolation of one program, drive, computer, etc. from the rest of a computer network to limit the damage from a bug, computer virus, etc."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "computing",
+     "figurative"
+    ],
+    "gloss": "The program, drive, computer, etc. thus isolated."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive"
+    ],
+    "gloss": "To place into isolation to prevent the spread of any contagious disease."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive"
+    ],
+    "gloss": "To enter or stay in #Noun|quarantine, particularly to self-quarantine to avoid an epidemic disease."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "intransitive",
+     "obsolete"
+    ],
+    "gloss": "To impose a #Noun|quarantine, to establish #Noun|quarantine regulations."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "figurative",
+     "transitive"
+    ],
+    "gloss": "more generally."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "figurative",
+     "transitive"
+    ],
+    "gloss": "."
+   },
+   {
+    "pos": "Proper noun",
+    "labels": [
+     "Christianity",
+     "obsolete"
+    ],
+    "gloss": ": the Mount of Temptation where Jesus Christ supposedly fasted for 40 days, Jebel Quruntul near Jericho."
+   }
+  ],
+  "sense_count": 14,
+  "labelled_senses": 11,
+  "headword_labels": [],
+  "all_labels": [
+   "Christianity",
+   "colloquial",
+   "computing",
+   "figurative",
+   "intransitive",
+   "obsolete",
+   "politics",
+   "transitive"
+  ]
+ },
+ "astute": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "quick|Quickly and critically discerning."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "shrewd|Shrewd or crafty."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 0,
+  "headword_labels": [],
+  "all_labels": []
+ },
+ "angry": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Displaying or feeling anger."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "said about a wound or a rash"
+    ],
+    "gloss": "and painful."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "figuratively",
+     "said about the elements, like the sky or the sea"
+    ],
+    "gloss": "Dark and stormy, menacing."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "informal",
+     "rare"
+    ],
+    "gloss": "An #Adjective|angry person."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "transitive",
+     "obsolete"
+    ],
+    "gloss": "To anger."
+   }
+  ],
+  "sense_count": 5,
+  "labelled_senses": 4,
+  "headword_labels": [],
+  "all_labels": [
+   "figuratively",
+   "informal",
+   "obsolete",
+   "rare",
+   "said about a wound or a rash",
+   "said about the elements, like the sky or the sea",
+   "transitive"
+  ]
+ },
+ "ad hominem": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": ": A fallacious objection to an argument or factual claim by appealing to a characteristic or belief of the person making the argument or claim, rather than by addressing the substance of the argument or producing evidence against the claim; an attempt to argue against an opponent's idea by discrediting the opponent themselves."
+   },
+   {
+    "pos": "Noun",
+    "labels": [
+     "informal",
+     "proscribed"
+    ],
+    "gloss": "A personal attack."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Of or relating to this kind of fallacious objection."
+   },
+   {
+    "pos": "Adverb",
+    "labels": [],
+    "gloss": "In an ad hominem manner."
+   }
+  ],
+  "sense_count": 4,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "informal",
+   "proscribed"
+  ]
+ },
+ "Kafkaesque": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Marked by a senseless, disorienting, often menacing complexity."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Marked by surreal distortion and often a sense of looming danger."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "In the manner of something written by Franz Kafka."
+   }
+  ],
+  "sense_count": 3,
+  "labelled_senses": 0,
+  "headword_labels": [],
+  "all_labels": []
+ },
+ "table": {
+  "senses": [
+   {
+    "pos": "Noun",
+    "labels": [
+     "countable"
+    ],
+    "gloss": "Furniture with a top surface to accommodate a variety of uses."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A group of people at a table, for example, for a meal, meeting or game; a meeting at a table."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "A two-dimensional presentation of data; an enumeration of data or contents."
+   },
+   {
+    "pos": "Noun",
+    "labels": [],
+    "gloss": "Any of various flat surfaces or items with a planar surface."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To tabulate; to put into a table or grid."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "now",
+     "rare"
+    ],
+    "gloss": "To supply (a guest, client etc.) with food at a table; to feed."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "To delineate; to represent, as in a picture; to depict."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "non-US"
+    ],
+    "gloss": "To put on the table of a commission or legislative assembly; to propose for formal discussion or consideration, to put on the agenda."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "chiefly",
+     "US"
+    ],
+    "gloss": "To remove from the agenda, to postpone dealing with; to shelve ."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "metonym"
+    ],
+    "gloss": "To represent a company or organization (at an exposition, fair, etc.), usually at a booth or display."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "carpentry",
+     "obsolete"
+    ],
+    "gloss": "To join (pieces of timber) together using coaks."
+   },
+   {
+    "pos": "Verb",
+    "labels": [],
+    "gloss": "To put on a table."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "poker",
+     "colloquial"
+    ],
+    "gloss": "To show one's cards face-up, especially during showdown."
+   },
+   {
+    "pos": "Verb",
+    "labels": [
+     "nautical"
+    ],
+    "gloss": "To make board hem#Etymology 2|hems in the skirts and bottoms of (sails) in order to strengthen them in the part attached to the bolt-rope."
+   }
+  ],
+  "sense_count": 14,
+  "labelled_senses": 9,
+  "headword_labels": [],
+  "all_labels": [
+   "US",
+   "carpentry",
+   "chiefly",
+   "colloquial",
+   "countable",
+   "metonym",
+   "nautical",
+   "non-US",
+   "now",
+   "obsolete",
+   "poker",
+   "rare"
+  ]
+ },
+ "important": {
+  "senses": [
+   {
+    "pos": "Adjective",
+    "labels": [],
+    "gloss": "Having relevant and crucial value; having import."
+   },
+   {
+    "pos": "Adjective",
+    "labels": [
+     "obsolete"
+    ],
+    "gloss": "pompous|Pompous; self-important."
+   }
+  ],
+  "sense_count": 2,
+  "labelled_senses": 1,
+  "headword_labels": [],
+  "all_labels": [
+   "obsolete"
+  ]
+ }
+}

@@ -1,0 +1,145 @@
+{
+  "claim_id": "mercurial|meaning_shift_derivation",
+  "fingerprint_key": "24e5c438f9c015607a672487107bd2084a3cf58a0ac6ab38391d1a49ea8a5696",
+  "fingerprint": {
+    "input_digest": "b2bf952320fd605613113f1016dfa4c49b53eaf8c5aa26110bf7c5ecece5fa71",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": null,
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/1",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/1"
+  },
+  "recorded_at": "2026-08-29T22:44:47.080Z",
+  "finding": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The adjective 'mercurial' is transparently formed from the noun 'mercury' by adding the adjective-forming suffix '-al' with the regular spelling change of final -y to -i; the root's metal sense and the adjective's 'relating to mercury' sense show the derivational connection.",
+    "analysis_evidence_ids": [
+      "oewn-mercury__1.27.00..",
+      "oewn-mercurial__3.01.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__3.01.00.."
+        ],
+        "rationale": "Knowing 'mercury' as the metallic element and the suffix '-al' (relating to) yields 'relating to or containing or caused by mercury' directly."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "rationale": "These meanings depend on the god Mercury and the planet Mercury, but the supplied root senses for 'mercury' cover only the metal and thermometer temperature; with those root senses missing, the evidence cannot settle whether a learner knowing the root would arrive at these meanings."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "rationale": "The metal sense gives only 'relating to mercury'; 'liable to sudden unpredictable change' is a figurative extension not derivable from the parts."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "raw": {
+    "claim_id": "mercurial|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The adjective 'mercurial' is transparently formed from the noun 'mercury' by adding the adjective-forming suffix '-al' with the regular spelling change of final -y to -i; the root's metal sense and the adjective's 'relating to mercury' sense show the derivational connection.",
+    "analysis_evidence_ids": [
+      "oewn-mercury__1.27.00..",
+      "oewn-mercurial__3.01.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__3.01.00.."
+        ],
+        "rationale": "Knowing 'mercury' as the metallic element and the suffix '-al' (relating to) yields 'relating to or containing or caused by mercury' directly."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "predictability": "insufficient_evidence",
+        "evidence_ids": [
+          "oewn-mercurial__3.01.01..",
+          "oewn-mercurial__3.01.02.."
+        ],
+        "rationale": "These meanings depend on the god Mercury and the planet Mercury, but the supplied root senses for 'mercury' cover only the metal and thermometer temperature; with those root senses missing, the evidence cannot settle whether a learner knowing the root would arrive at these meanings."
+      },
+      {
+        "sense_ids": [
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-mercury__1.27.00..",
+          "oewn-mercurial__5.00.00.changeable.00"
+        ],
+        "rationale": "The metal sense gives only 'relating to mercury'; 'liable to sudden unpredictable change' is a figurative extension not derivable from the parts."
+      }
+    ],
+    "diagnostic_confidence": 0.9
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "quarantine",
+    "reason": "at least one meaning could not be judged on the supplied evidence"
+  },
+  "effective": {
+    "disposition": "quarantine",
+    "reason": "at least one meaning could not be judged on the supplied evidence",
+    "endorsementOverride": false
+  },
+  "endorsements": 9,
+  "served_by": "Fireworks",
+  "usage": {
+    "prompt_tokens": 1697,
+    "completion_tokens": 7536,
+    "reasoning_tokens": 7045,
+    "total_tokens": 9233,
+    "cost_usd": 0.0053471
+  },
+  "latency_ms": 58837
+}
