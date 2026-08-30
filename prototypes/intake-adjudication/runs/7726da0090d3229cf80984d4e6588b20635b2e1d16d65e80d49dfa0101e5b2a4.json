@@ -1,0 +1,97 @@
+{
+  "claim_id": "rebut|affix_strip",
+  "fingerprint_key": "7726da0090d3229cf80984d4e6588b20635b2e1d16d65e80d49dfa0101e5b2a4",
+  "fingerprint": {
+    "input_digest": "b0dd31841ba0e41de3ee8a0eded46467c37b6295c59d74b74d8618d4a2e203c3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:26.896Z",
+  "finding": {
+    "claim_id": "rebut|affix_strip",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed root 'but' is a conjunction or adverb, which is the wrong part of speech to form the verb 'rebut'. The word 'rebut' is not formed from 're' + 'but'.",
+    "analysis_evidence_ids": [
+      "oewn-but__4.02.01.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-rebut__2.31.00..",
+          "oewn-rebut__2.32.00.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-but__4.02.01.."
+        ],
+        "rationale": "The meanings of 'rebut' (to prove false or overthrow by argument) are not predictable from the meaning of 'but' (merely, simply, just, only)."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "rebut|affix_strip",
+    "analysis_support": "unsupported",
+    "analysis_rationale": "The proposed root 'but' is a conjunction or adverb, which is the wrong part of speech to form the verb 'rebut'. The word 'rebut' is not formed from 're' + 'but'.",
+    "analysis_evidence_ids": [
+      "oewn-but__4.02.01.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-rebut__2.31.00..",
+          "oewn-rebut__2.32.00.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-but__4.02.01.."
+        ],
+        "rationale": "The meanings of 'rebut' (to prove false or overthrow by argument) are not predictable from the meaning of 'but' (merely, simply, just, only)."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "the mechanical rule invented a decomposition the evidence does not support",
+    "endorsementOverride": false
+  },
+  "endorsements": 1,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 937,
+    "completion_tokens": 268,
+    "reasoning_tokens": 0,
+    "total_tokens": 1205,
+    "cost_usd": 0.0009511
+  },
+  "latency_ms": 1715
+}

@@ -1,0 +1,121 @@
+{
+  "claim_id": "sheepskin|compound_split",
+  "fingerprint_key": "aa7539d9cc2bca4672fe6cadfde773b885fd3037aec47428c9c5b2ea97b884c8",
+  "fingerprint": {
+    "input_digest": "7ea4742aa843d8e36143cb084556e169b09db80926bea6dd2c44ef64e8d7316b",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.116Z",
+  "finding": {
+    "claim_id": "sheepskin|compound_split",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'sheepskin' is a compound of 'sheep' and 'skin', referring to the skin of a sheep.",
+    "analysis_evidence_ids": [
+      "oewn-sheep__1.05.00..",
+      "oewn-skin__1.05.01.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-sheepskin__1.27.00..",
+          "oewn-sheepskin__1.27.01.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-sheep__1.05.00..",
+          "oewn-skin__1.05.01.."
+        ],
+        "rationale": "These meanings directly refer to the skin of a sheep, which is the literal combination of the two parts."
+      },
+      {
+        "sense_ids": [
+          "oewn-sheepskin__1.10.00.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-sheepskin__1.10.00.."
+        ],
+        "rationale": "The meaning 'a document certifying the successful completion of a course of study' is a metonymic extension of the material (sheepskin parchment) used for such documents, and is not directly predictable from 'sheep' and 'skin' alone."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "sheepskin|compound_split",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'sheepskin' is a compound of 'sheep' and 'skin', referring to the skin of a sheep.",
+    "analysis_evidence_ids": [
+      "oewn-sheep__1.05.00..",
+      "oewn-skin__1.05.01.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-sheepskin__1.27.00..",
+          "oewn-sheepskin__1.27.01.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-sheep__1.05.00..",
+          "oewn-skin__1.05.01.."
+        ],
+        "rationale": "These meanings directly refer to the skin of a sheep, which is the literal combination of the two parts."
+      },
+      {
+        "sense_ids": [
+          "oewn-sheepskin__1.10.00.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [
+          "oewn-sheepskin__1.10.00.."
+        ],
+        "rationale": "The meaning 'a document certifying the successful completion of a course of study' is a metonymic extension of the material (sheepskin parchment) used for such documents, and is not directly predictable from 'sheep' and 'skin' alone."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1543,
+    "completion_tokens": 325,
+    "reasoning_tokens": 0,
+    "total_tokens": 1868,
+    "cost_usd": 0.0012754
+  },
+  "latency_ms": 1918
+}

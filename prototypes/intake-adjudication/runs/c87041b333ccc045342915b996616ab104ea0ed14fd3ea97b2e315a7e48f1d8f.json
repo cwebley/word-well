@@ -1,0 +1,127 @@
+{
+  "claim_id": "sameness|grammatical_derivation",
+  "fingerprint_key": "c87041b333ccc045342915b996616ab104ea0ed14fd3ea97b2e315a7e48f1d8f",
+  "fingerprint": {
+    "input_digest": "eb3a3fd589151bef82237d9f4205c3070fe84ab4e049e2130846167de1cb2a24",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.734Z",
+  "finding": {
+    "claim_id": "sameness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'sameness' is formed by adding the suffix '-ness' to the adjective 'same', which is a common grammatical derivation in English to form nouns denoting a state or quality.",
+    "analysis_evidence_ids": [
+      "oewn-same__3.00.00..",
+      "oewn-same__3.00.02..",
+      "oewn-same__3.00.04..",
+      "oewn-same__5.00.00.unchanged.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-sameness__1.07.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-same__3.00.00..",
+          "oewn-same__3.00.02..",
+          "oewn-same__3.00.04..",
+          "oewn-same__5.00.00.unchanged.00"
+        ],
+        "rationale": "The meaning 'the quality of being alike' directly follows from the adjective 'same' (meaning 'closely similar or comparable' or 'same in identity') combined with the '-ness' suffix indicating a quality or state."
+      },
+      {
+        "sense_ids": [
+          "oewn-sameness__1.07.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-same__5.00.00.unchanged.00"
+        ],
+        "rationale": "The meaning 'the quality of wearisome constancy, routine, and lack of variety' is a predictable extension of 'same' meaning 'unchanged in character or nature', where constancy can lead to monotony."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "sameness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'sameness' is formed by adding the suffix '-ness' to the adjective 'same', which is a common grammatical derivation in English to form nouns denoting a state or quality.",
+    "analysis_evidence_ids": [
+      "oewn-same__3.00.00..",
+      "oewn-same__3.00.02..",
+      "oewn-same__3.00.04..",
+      "oewn-same__5.00.00.unchanged.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-sameness__1.07.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-same__3.00.00..",
+          "oewn-same__3.00.02..",
+          "oewn-same__3.00.04..",
+          "oewn-same__5.00.00.unchanged.00"
+        ],
+        "rationale": "The meaning 'the quality of being alike' directly follows from the adjective 'same' (meaning 'closely similar or comparable' or 'same in identity') combined with the '-ness' suffix indicating a quality or state."
+      },
+      {
+        "sense_ids": [
+          "oewn-sameness__1.07.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-same__5.00.00.unchanged.00"
+        ],
+        "rationale": "The meaning 'the quality of wearisome constancy, routine, and lack of variety' is a predictable extension of 'same' meaning 'unchanged in character or nature', where constancy can lead to monotony."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1308,
+    "completion_tokens": 496,
+    "reasoning_tokens": 0,
+    "total_tokens": 1804,
+    "cost_usd": 0.0016324
+  },
+  "latency_ms": 2548
+}

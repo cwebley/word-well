@@ -1,0 +1,99 @@
+{
+  "claim_id": "handspring|compound_split",
+  "fingerprint_key": "43c06e529ee0af3d6c8664112f671e218be183a7eb02e12ae51552801abcbabd",
+  "fingerprint": {
+    "input_digest": "3151bc48c9e8afddb10b2db85c9d059a6995b67d5c040f1206eb85668b7a7241",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.023Z",
+  "finding": {
+    "claim_id": "handspring|compound_split",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'handspring' is a compound of 'hand' and 'spring', referring to an acrobatic feat performed using the hands and involving a springing motion.",
+    "analysis_evidence_ids": [
+      "oewn-hand__1.08.00..",
+      "oewn-spring__1.04.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-handspring__1.04.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-hand__1.08.00..",
+          "oewn-spring__1.04.00.."
+        ],
+        "rationale": "The meaning 'an acrobatic feat in which a person goes from a standing position to a handstand and back again' is predictable from 'hand' (the extremity of the superior limb) and 'spring' (a light, self-propelled movement upwards or forwards), as the feat involves using hands to spring."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "handspring|compound_split",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'handspring' is a compound of 'hand' and 'spring', referring to an acrobatic feat performed using the hands and involving a springing motion.",
+    "analysis_evidence_ids": [
+      "oewn-hand__1.08.00..",
+      "oewn-spring__1.04.00.."
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-handspring__1.04.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-hand__1.08.00..",
+          "oewn-spring__1.04.00.."
+        ],
+        "rationale": "The meaning 'an acrobatic feat in which a person goes from a standing position to a handstand and back again' is predictable from 'hand' (the extremity of the superior limb) and 'spring' (a light, self-propelled movement upwards or forwards), as the feat involves using hands to spring."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 2141,
+    "completion_tokens": 298,
+    "reasoning_tokens": 0,
+    "total_tokens": 2439,
+    "cost_usd": 0.0013873
+  },
+  "latency_ms": 1827
+}

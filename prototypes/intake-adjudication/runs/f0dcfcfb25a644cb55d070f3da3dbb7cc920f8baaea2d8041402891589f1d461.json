@@ -1,0 +1,119 @@
+{
+  "claim_id": "nonplussed|lexicalised_participle",
+  "fingerprint_key": "f0dcfcfb25a644cb55d070f3da3dbb7cc920f8baaea2d8041402891589f1d461",
+  "fingerprint": {
+    "input_digest": "23e20ae8ab2080ef7a588c667a31266a90eb29af79eaa8b503fd3c9719b70cd3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.379Z",
+  "finding": {
+    "claim_id": "nonplussed|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'nonplussed' is the past participle form of the verb 'nonplus'.",
+    "analysis_evidence_ids": [
+      "oewn-nonplus__2.31.00..",
+      "oewn-nonplussed__5.00.00.perplexed.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "rationale": "The verb meaning of 'nonplussed' is directly the meaning of its root 'nonplus'."
+      },
+      {
+        "sense_ids": [
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00..",
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "rationale": "The adjectival meaning 'filled with bewilderment' is a predictable result of forming the past participle of the verb 'nonplus', which means 'to bewilder'."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "nonplussed|lexicalised_participle",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'nonplussed' is the past participle form of the verb 'nonplus'.",
+    "analysis_evidence_ids": [
+      "oewn-nonplus__2.31.00..",
+      "oewn-nonplussed__5.00.00.perplexed.00"
+    ],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00.."
+        ],
+        "rationale": "The verb meaning of 'nonplussed' is directly the meaning of its root 'nonplus'."
+      },
+      {
+        "sense_ids": [
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-nonplus__2.31.00..",
+          "oewn-nonplussed__5.00.00.perplexed.00"
+        ],
+        "rationale": "The adjectival meaning 'filled with bewilderment' is a predictable result of forming the past participle of the verb 'nonplus', which means 'to bewilder'."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "endorsed by 6 editorial sources, which overrides a fuzzy morphology exclusion",
+    "endorsementOverride": true
+  },
+  "endorsements": 6,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1094,
+    "completion_tokens": 391,
+    "reasoning_tokens": 0,
+    "total_tokens": 1485,
+    "cost_usd": 0.0013057
+  },
+  "latency_ms": 2184
+}

@@ -16,3 +16,9 @@ prototypes/**/data/
 prototypes/**/out/
 __pycache__/
 *.pyc
+
+# Generated local calibration review artifacts; validated labels remain canonical JSONL.
+prototypes/intake-adjudication/review/
+prototypes/intake-adjudication/*.progress.json
+/*.progress.json
+prototypes/intake-adjudication/*.validated.labels.jsonl

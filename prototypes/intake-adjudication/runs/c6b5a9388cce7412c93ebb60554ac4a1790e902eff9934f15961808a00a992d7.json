@@ -1,0 +1,131 @@
+{
+  "claim_id": "ringer|meaning_shift_derivation",
+  "fingerprint_key": "c6b5a9388cce7412c93ebb60554ac4a1790e902eff9934f15961808a00a992d7",
+  "fingerprint": {
+    "input_digest": "8adae481b1f6758b9e8cea1b34a20e940f4ba728413811f560007e68c3998046",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.670Z",
+  "finding": {
+    "claim_id": "ringer|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'ringer' is formed from the root 'ring' and the suffix '-er', which commonly denotes an agent or instrument.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-ringer__1.04.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-ring__1.06.02..",
+          "oewn-ring__2.35.03.."
+        ],
+        "rationale": "The meaning 'successful throw of a horseshoe or quoit so as to encircle a stake or peg' is predictable from the sense of 'ring' as a circular object or the act of encircling."
+      },
+      {
+        "sense_ids": [
+          "oewn-ringer__1.18.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-ring__2.39.01.."
+        ],
+        "rationale": "The meaning 'a person who rings church bells' is predictable from the verb 'ring' meaning 'make (bells) ring' and the agentive suffix '-er'."
+      },
+      {
+        "sense_ids": [
+          "oewn-ringer__1.18.00..",
+          "oewn-ringer__1.18.01.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [],
+        "rationale": "The meanings 'a contestant entered in a competition under false pretenses' and 'a person who is almost identical to another' are not predictable from the provided senses of 'ring' and the agentive suffix '-er'. These are specialized or figurative extensions."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "ringer|meaning_shift_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'ringer' is formed from the root 'ring' and the suffix '-er', which commonly denotes an agent or instrument.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-ringer__1.04.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-ring__1.06.02..",
+          "oewn-ring__2.35.03.."
+        ],
+        "rationale": "The meaning 'successful throw of a horseshoe or quoit so as to encircle a stake or peg' is predictable from the sense of 'ring' as a circular object or the act of encircling."
+      },
+      {
+        "sense_ids": [
+          "oewn-ringer__1.18.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-ring__2.39.01.."
+        ],
+        "rationale": "The meaning 'a person who rings church bells' is predictable from the verb 'ring' meaning 'make (bells) ring' and the agentive suffix '-er'."
+      },
+      {
+        "sense_ids": [
+          "oewn-ringer__1.18.00..",
+          "oewn-ringer__1.18.01.."
+        ],
+        "predictability": "not_predictable",
+        "evidence_ids": [],
+        "rationale": "The meanings 'a contestant entered in a competition under false pretenses' and 'a person who is almost identical to another' are not predictable from the provided senses of 'ring' and the agentive suffix '-er'. These are specialized or figurative extensions."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "at least one meaning does not follow from the claimed root or components",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1761,
+    "completion_tokens": 475,
+    "reasoning_tokens": 0,
+    "total_tokens": 2236,
+    "cost_usd": 0.0017158
+  },
+  "latency_ms": 2478
+}

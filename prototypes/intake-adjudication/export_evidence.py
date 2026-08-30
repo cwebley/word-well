@@ -24,7 +24,7 @@ import wn
 
 # The extraction contract. Bump when the shape or content of an emitted claim
 # changes, because the config fingerprint keys persisted model output on it.
-EXTRACTION_VERSION = "intake-evidence/1"
+EXTRACTION_VERSION = "intake-evidence/2"
 
 # Cap on examples carried per source meaning. A fixed, versioned truncation rule
 # rather than an ad-hoc one, so two exports of the same claim are byte-identical.
@@ -195,7 +195,7 @@ def build_claim(en, con, case):
     components = []
     decomposition = {"kind": rule_kind}
 
-    if rule_kind in ("affix_strip", "meaning_shift_derivation"):
+    if rule_kind == "affix_strip":
         root = row["transparent_root"] or row["derived_root"]
         if not root:
             missing.append("claim.decomposition.root")
@@ -204,6 +204,19 @@ def build_claim(en, con, case):
             if affix is None:
                 sys.exit(f"cannot recover the affix that turns {root!r} into {lemma!r}")
             decomposition.update({"whole": lemma, "root": root, **affix})
+            components.append(build_component(en, con, root, "root", missing, "claim.root"))
+
+    elif rule_kind == "meaning_shift_derivation":
+        root = row["transparent_root"] or row["derived_root"]
+        if not root:
+            missing.append("claim.decomposition.root")
+        else:
+            affix = recover_affix(lemma, root)
+            decomposition.update({"whole": lemma, "root": root,
+                                  **(affix or {"affix": None, "position": None,
+                                               "spelling_change": None})})
+            if affix is None:
+                missing.append("claim.decomposition.affix")
             components.append(build_component(en, con, root, "root", missing, "claim.root"))
 
     elif rule_kind == "grammatical_derivation":

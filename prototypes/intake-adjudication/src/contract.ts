@@ -38,7 +38,7 @@ export const meaningFindingSchema = z.strictObject({
   predictability: z
     .enum(predictabilityValues)
     .describe(
-      "predictable: a learner who knows the claimed root or components could arrive at this meaning. not_predictable: the meaning carries something the parts do not give. insufficient_evidence: the supplied evidence cannot settle it.",
+      "predictable: a learner who knows the claimed root or components could arrive at this meaning. not_predictable: the meaning carries something the parts do not give, including when the claimed parts are not the word's real formation. insufficient_evidence: missing or incomplete supplied evidence prevents a decision.",
     ),
   evidence_ids: z
     .array(z.string())

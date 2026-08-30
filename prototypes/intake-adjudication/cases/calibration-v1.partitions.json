@@ -1,0 +1,174 @@
+{
+  "dataset_size_decision": {
+    "limitations": "There is no regression or hidden holdout partition. Later accuracy, reliability, and holdout claims require additional human-reviewed cases.",
+    "original_plan": "200 cases: 120 development, 40 regression, 40 hidden holdout",
+    "reason": "The human review burden was too high. All prior human and agent labels were discarded, and the user requested a fresh difficult set.",
+    "selected": "12 challenging human-reviewed development cases with at least two claims from every rule kind"
+  },
+  "evidence_manifest_sha256": "d8cbd31cde9dc6074c81359cc6d3da6304e914ebce0c2d101e4752b8366872de",
+  "members": [
+    {
+      "claim_id": "convoluted|lexicalised_participle",
+      "coverage_tags": [
+        "endorsed",
+        "human_review_set",
+        "known_regression",
+        "polysemous",
+        "wiktionary_label"
+      ],
+      "input_digest": "af0e0f1a06b6782f96dd18bc1c8a503dc9a47dd4959dfd30763e2d458da71fb9",
+      "partition": "development",
+      "primary_slice": "lexicalised_participle",
+      "rule_kind": "lexicalised_participle"
+    },
+    {
+      "claim_id": "fruitfulness|affix_strip",
+      "coverage_tags": [
+        "human_review_set",
+        "multi_flag",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "731b3241e95e27bac87b08a4c3b4bee829ce9ac2cfd4747186ee089069210684",
+      "partition": "development",
+      "primary_slice": "affix_strip",
+      "rule_kind": "affix_strip"
+    },
+    {
+      "claim_id": "handspring|compound_split",
+      "coverage_tags": [
+        "human_review_set",
+        "single_meaning",
+        "unendorsed"
+      ],
+      "input_digest": "3151bc48c9e8afddb10b2db85c9d059a6995b67d5c040f1206eb85668b7a7241",
+      "partition": "development",
+      "primary_slice": "stress",
+      "rule_kind": "compound_split"
+    },
+    {
+      "claim_id": "mercurial|meaning_shift_derivation",
+      "coverage_tags": [
+        "endorsed",
+        "human_review_set",
+        "known_regression",
+        "polysemous",
+        "wiktionary_label"
+      ],
+      "input_digest": "39c8ef6857710750368f1b36b97c945e29da36b6a4175db741727df182fa183d",
+      "partition": "development",
+      "primary_slice": "meaning_shift_derivation",
+      "rule_kind": "meaning_shift_derivation"
+    },
+    {
+      "claim_id": "nighthawk|compound_split",
+      "coverage_tags": [
+        "human_review_set",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "a391a3c52258b5e1b0452b0f67ce7faf8082631c25f5c63f9c2f6b17f2c48ea3",
+      "partition": "development",
+      "primary_slice": "compound_split",
+      "rule_kind": "compound_split"
+    },
+    {
+      "claim_id": "nonplussed|lexicalised_participle",
+      "coverage_tags": [
+        "endorsed",
+        "human_review_set",
+        "known_regression",
+        "polysemous"
+      ],
+      "input_digest": "23e20ae8ab2080ef7a588c667a31266a90eb29af79eaa8b503fd3c9719b70cd3",
+      "partition": "development",
+      "primary_slice": "lexicalised_participle",
+      "rule_kind": "lexicalised_participle"
+    },
+    {
+      "claim_id": "pastoral|compound_split",
+      "coverage_tags": [
+        "endorsed",
+        "human_review_set",
+        "known_regression",
+        "multi_flag",
+        "polysemous"
+      ],
+      "input_digest": "f1539d720ca2b1eda4debba09eefe366270928d2f541cbf01913b90a774437a4",
+      "partition": "development",
+      "primary_slice": "compound_split",
+      "rule_kind": "compound_split"
+    },
+    {
+      "claim_id": "rebut|affix_strip",
+      "coverage_tags": [
+        "endorsed",
+        "human_review_set",
+        "known_regression",
+        "polysemous"
+      ],
+      "input_digest": "b0dd31841ba0e41de3ee8a0eded46467c37b6295c59d74b74d8618d4a2e203c3",
+      "partition": "development",
+      "primary_slice": "affix_strip",
+      "rule_kind": "affix_strip"
+    },
+    {
+      "claim_id": "ringer|meaning_shift_derivation",
+      "coverage_tags": [
+        "human_review_set",
+        "multi_flag",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "8adae481b1f6758b9e8cea1b34a20e940f4ba728413811f560007e68c3998046",
+      "partition": "development",
+      "primary_slice": "meaning_shift_derivation",
+      "rule_kind": "meaning_shift_derivation"
+    },
+    {
+      "claim_id": "sameness|grammatical_derivation",
+      "coverage_tags": [
+        "human_review_set",
+        "multi_flag",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "eb3a3fd589151bef82237d9f4205c3070fe84ab4e049e2130846167de1cb2a24",
+      "partition": "development",
+      "primary_slice": "grammatical_derivation",
+      "rule_kind": "grammatical_derivation"
+    },
+    {
+      "claim_id": "sheepskin|compound_split",
+      "coverage_tags": [
+        "human_review_set",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "7ea4742aa843d8e36143cb084556e169b09db80926bea6dd2c44ef64e8d7316b",
+      "partition": "development",
+      "primary_slice": "stress",
+      "rule_kind": "compound_split"
+    },
+    {
+      "claim_id": "tightness|grammatical_derivation",
+      "coverage_tags": [
+        "human_review_set",
+        "multi_flag",
+        "polysemous",
+        "unendorsed"
+      ],
+      "input_digest": "3b19c573c388ce605e1b5b35972c14e16f81472264dc37f262155da54028b294",
+      "partition": "development",
+      "primary_slice": "grammatical_derivation",
+      "rule_kind": "grammatical_derivation"
+    }
+  ],
+  "partition_version": "morphology-calibration/2",
+  "quarantine_coverage": {
+    "decision": "real_post_filter_workload",
+    "note": "Rootless claims filtered before adjudication are not manufactured as golden cases; synthetic insufficiency remains in policy tests."
+  },
+  "sampling_seed": "wordwell-morphology-calibration-v1",
+  "sampling_version": "morphology-silver/1"
+}

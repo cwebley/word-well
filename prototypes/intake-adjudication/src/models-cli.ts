@@ -20,10 +20,12 @@ interface CatalogueModel {
 }
 
 interface Endpoint {
+  tag: string;
   name: string;
   provider_name: string;
   context_length: number;
   pricing: { prompt: string; completion: string };
+  quantization?: string | null;
   supported_parameters?: string[];
   status?: number | null;
 }
@@ -52,8 +54,8 @@ async function listEndpoints(model: string, apiKey: string) {
   console.log("Pin one of these as OPENROUTER_PROVIDER:\n");
   for (const e of usable) {
     console.log(
-      `  ${e.provider_name.padEnd(24)} ${perMillion(e.pricing.prompt).padStart(9)}/M in  ` +
-        `${perMillion(e.pricing.completion).padStart(10)}/M out  ${e.context_length} ctx`,
+      `  ${e.tag.padEnd(36)} ${e.provider_name.padEnd(20)} ${(e.quantization ?? "unknown").padEnd(8)} ` +
+        `${perMillion(e.pricing.prompt).padStart(9)}/M in  ${perMillion(e.pricing.completion).padStart(10)}/M out  ${e.context_length} ctx`,
     );
   }
   const skipped = data.endpoints.filter((e) => !usable.includes(e));

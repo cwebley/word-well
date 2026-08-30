@@ -14,17 +14,16 @@
 // probe needs to ask the same question twice and see whether the answer holds.
 // Reusing a record there would manufacture perfect agreement.
 
-import { join } from "node:path";
+import { writeFileSync } from "node:fs";
 
-import { readClaims } from "./claim.ts";
 import { adjudicate, createClient } from "./adjudicate.ts";
-import { checkBudget, describeBudget, estimateCost, fetchPrice, spentSoFar } from "./budget.ts";
+import { describeBudget, preflight, spentSoFar } from "./budget.ts";
 import { modelConfigFromEnv, PILOT_BUDGET_USD, requireEnv } from "./config.ts";
-import { readManifest } from "./fingerprint.ts";
 import { RunStore, summarise } from "./store.ts";
+import { loadDataset, loadReviewClaims } from "../evals/datasets.ts";
+import type { AdjudicationRecord } from "./store.ts";
 
 const CASE_SET = process.env.CASE_SET ?? "contract-test";
-const EVIDENCE_DIR = "evidence";
 const RUNS_DIR = "runs";
 
 async function main() {
@@ -33,15 +32,11 @@ async function main() {
   const apiKey = requireEnv("OPENROUTER_API_KEY");
   const model = modelConfigFromEnv();
 
-  const claims = readClaims(join(EVIDENCE_DIR, `${CASE_SET}.claims.jsonl`));
-  const manifest = readManifest(join(EVIDENCE_DIR, `${CASE_SET}.manifest.json`));
-
-  const price = await fetchPrice(model, apiKey);
-  const check = checkBudget(
-    spentSoFar(RUNS_DIR),
-    estimateCost(claims, price),
-    PILOT_BUDGET_USD,
-  );
+  const review = CASE_SET === "calibration-review" ? loadReviewClaims() : null;
+  const dataset = review ? null : loadDataset(CASE_SET);
+  const claims = review?.claims ?? dataset!.cases.map(({ claim }) => claim);
+  const manifest = review?.manifest ?? dataset!.manifest;
+  const { price, check } = await preflight(claims, model, apiKey);
 
   console.log(`${claims.length} claims in ${CASE_SET}`);
   console.log(describeBudget(check, model, PILOT_BUDGET_USD));
@@ -65,10 +60,42 @@ async function main() {
   if (fresh) console.log("--fresh: ignoring persisted records, storing nothing\n");
 
   let failures = 0;
+  const records: AdjudicationRecord[] = [];
   for (const claim of claims) {
     const { record, reused } = await adjudicate(claim, client, model, manifest, store);
+    records.push(record);
     if (record.contract_error) failures += 1;
     console.log(`${reused ? "reused " : "called "}${summarise(record)}\n`);
+  }
+
+  if (review) {
+    const members = new Map(review.members.map((member) => [member.claim_id, member]));
+    const labels = records
+      .filter((record) => record.finding && record.morphology && record.effective)
+      .map((record) => {
+        const member = members.get(record.claim_id)!;
+        return {
+          claim_id: record.claim_id,
+          label_status: "provisional-unvalidated",
+          slice: "provisional model suggestion",
+          analysis_support: record.finding!.analysis_support,
+          meanings: record.finding!.meanings,
+          morphology_disposition: record.morphology!.disposition,
+          effective_disposition: record.effective!.disposition,
+          endorsements: record.endorsements,
+          note: record.finding!.meanings.map((meaning) => meaning.rationale).join(" "),
+          input_digest: member.input_digest,
+          partition: member.partition,
+          proposed_at: record.recorded_at,
+          proposal_fingerprint: record.fingerprint_key,
+        };
+      })
+      .sort((left, right) => left.claim_id.localeCompare(right.claim_id));
+    writeFileSync(
+      "labels/calibration-silver.provisional.jsonl",
+      `${labels.map((label) => JSON.stringify(label)).join("\n")}\n`,
+    );
+    console.log(`wrote ${labels.length} provisional labels for local review`);
   }
 
   const after = spentSoFar(RUNS_DIR);

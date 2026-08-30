@@ -6,10 +6,14 @@
   "description": "PROTOTYPE (issue #46) — morphology adjudication runner and evaluation harness. Throwaway: no schema, no migrations, no pipeline integration.",
   "scripts": {
     "adjudicate": "dotenv -e .env.local -- tsx src/cli.ts",
+    "propose": "CASE_SET=calibration-review dotenv -e .env.local -- tsx src/cli.ts",
     "eval": "dotenv -e .env.local -- braintrust eval evals/contract.eval.ts",
+    "smoke": "CASE_SET=prompt-smoke dotenv -e .env.local -- braintrust eval evals/contract.eval.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "models": "dotenv -e .env.local -- tsx src/models-cli.ts"
+    "models": "dotenv -e .env.local -- tsx src/models-cli.ts",
+    "review:build": "tsx src/review-cli.ts",
+    "review:import": "tsx src/import-review-progress.ts"
   },
   "dependencies": {
     "openai": "^7.2.0",

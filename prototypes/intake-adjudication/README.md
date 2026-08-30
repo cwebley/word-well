@@ -55,6 +55,7 @@ takes two fields and `verdictOf` is the only way to produce them, so
 | `src/prompt.ts` | versioned rubric and claim rendering |
 | `src/adjudicate.ts` | the shared runner used by both the CLI and the eval |
 | `src/policy.ts` | versioned deterministic policy, plus the endorsement override |
+| `src/review-cli.ts` | generates the dependency-free local calibration review page |
 | `src/fingerprint.ts` | the config fingerprint that keys persistence |
 | `src/store.ts` | one JSON record per fingerprint, under `runs/` |
 | `src/budget.ts` | spend guard against the $10 pilot cap |
@@ -103,6 +104,35 @@ npm run typecheck
 npm run adjudicate  # the five cases, persisted under runs/
 npm run eval        # the same five cases as a Braintrust experiment
 ```
+
+## Local calibration review
+
+Generate a self-contained page containing only the 12 human-review members frozen in
+`cases/calibration-v1.partitions.json`:
+
+```sh
+npm run review:build
+open review/calibration-v1.html
+```
+
+If `labels/calibration-silver.labels.jsonl` (or the explicit
+`calibration-silver.provisional.jsonl` variant) exists, the generator includes
+its `provisional-unvalidated` semantic labels. Override that path with
+`npm run review:build -- --labels path/to/labels.jsonl`, or use `--no-labels`.
+Use `--out path/to/page.html` to change the generated page location.
+
+The page stores noncanonical working state in `localStorage`, keyed by partition
+version, evidence digest, rubric version, and each claim's input digest. Export
+progress regularly if review spans browsers or machines; progress JSON can be
+imported only by a page with the same fingerprints. "Export validated JSONL"
+emits canonical, claim-ID-sorted records only for complete accepted or corrected
+decisions. Uncertain and incomplete cases are omitted. The generated HTML,
+progress snapshots, and local exports are ignored; intentionally reviewed JSONL
+must be moved into `labels/` before it becomes canonical project data.
+
+Endorsement and its deterministic policy effect stay hidden until all semantic
+fields have been decided. They are policy context, never evidence for the
+semantic judgment.
 
 Both paid paths refuse to start when the estimate exceeds what is left of the
 pilot cap, and both reuse a persisted record when the configuration is unchanged.

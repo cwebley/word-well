@@ -1,0 +1,17 @@
+{
+  "claim_ids": [
+    "rebut|affix_strip",
+    "fruitfulness|affix_strip",
+    "pastoral|compound_split",
+    "nighthawk|compound_split",
+    "sameness|grammatical_derivation",
+    "tightness|grammatical_derivation",
+    "mercurial|meaning_shift_derivation",
+    "ringer|meaning_shift_derivation",
+    "convoluted|lexicalised_participle",
+    "nonplussed|lexicalised_participle",
+    "handspring|compound_split",
+    "sheepskin|compound_split"
+  ],
+  "partition_version": "morphology-calibration/2"
+}

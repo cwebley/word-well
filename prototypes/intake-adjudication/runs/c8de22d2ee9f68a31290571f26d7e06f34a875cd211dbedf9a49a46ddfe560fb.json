@@ -1,0 +1,141 @@
+{
+  "claim_id": "tightness|grammatical_derivation",
+  "fingerprint_key": "c8de22d2ee9f68a31290571f26d7e06f34a875cd211dbedf9a49a46ddfe560fb",
+  "fingerprint": {
+    "input_digest": "3b19c573c388ce605e1b5b35972c14e16f81472264dc37f262155da54028b294",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "intake-evidence/2",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "morphology-prompt/1",
+    "rubric_version": "morphology-rubric/2",
+    "contract_version": "morphology-finding/1",
+    "policy_version": "morphology-policy/2"
+  },
+  "recorded_at": "2026-08-30T06:55:27.936Z",
+  "finding": {
+    "claim_id": "tightness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'tightness' is formed by adding the suffix '-ness' to the adjective 'tight', which is a common grammatical derivation in English to form a noun denoting a state or quality.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-tightness__1.07.00..",
+          "oewn-tightness__1.09.00..",
+          "oewn-tightness__1.07.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__3.00.01..",
+          "oewn-tight__5.00.00.closed.03",
+          "oewn-tight__5.00.00.compact.00",
+          "oewn-tight__5.00.00.tense.01"
+        ],
+        "rationale": "These meanings directly reflect the state or quality of being 'tight' in various physical senses, such as being closely constrained, pressed together, or having a constricted feeling."
+      },
+      {
+        "sense_ids": [
+          "oewn-tightness__1.07.01.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__5.00.00.stingy.00"
+        ],
+        "rationale": "This meaning is predictable as it refers to the state of being 'tight' in the sense of being stingy or ungenerous, which is a direct meaning of the root word 'tight'."
+      },
+      {
+        "sense_ids": [
+          "oewn-tightness__1.26.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__5.00.00.scarce.00"
+        ],
+        "rationale": "This meaning is predictable as it refers to the state of being 'tight' in the economic sense of scarcity or shortage, which is a direct meaning of the root word 'tight'."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "raw": {
+    "claim_id": "tightness|grammatical_derivation",
+    "analysis_support": "supported",
+    "analysis_rationale": "The word 'tightness' is formed by adding the suffix '-ness' to the adjective 'tight', which is a common grammatical derivation in English to form a noun denoting a state or quality.",
+    "analysis_evidence_ids": [],
+    "meanings": [
+      {
+        "sense_ids": [
+          "oewn-tightness__1.07.00..",
+          "oewn-tightness__1.09.00..",
+          "oewn-tightness__1.07.02.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__3.00.01..",
+          "oewn-tight__5.00.00.closed.03",
+          "oewn-tight__5.00.00.compact.00",
+          "oewn-tight__5.00.00.tense.01"
+        ],
+        "rationale": "These meanings directly reflect the state or quality of being 'tight' in various physical senses, such as being closely constrained, pressed together, or having a constricted feeling."
+      },
+      {
+        "sense_ids": [
+          "oewn-tightness__1.07.01.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__5.00.00.stingy.00"
+        ],
+        "rationale": "This meaning is predictable as it refers to the state of being 'tight' in the sense of being stingy or ungenerous, which is a direct meaning of the root word 'tight'."
+      },
+      {
+        "sense_ids": [
+          "oewn-tightness__1.26.00.."
+        ],
+        "predictability": "predictable",
+        "evidence_ids": [
+          "oewn-tight__5.00.00.scarce.00"
+        ],
+        "rationale": "This meaning is predictable as it refers to the state of being 'tight' in the economic sense of scarcity or shortage, which is a direct meaning of the root word 'tight'."
+      }
+    ],
+    "diagnostic_confidence": 1
+  },
+  "contract_error": null,
+  "morphology": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "the analysis is supported and every meaning follows from the claimed parts",
+    "endorsementOverride": false
+  },
+  "endorsements": 0,
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 1922,
+    "completion_tokens": 570,
+    "reasoning_tokens": 0,
+    "total_tokens": 2492,
+    "cost_usd": 0.0020016
+  },
+  "latency_ms": 2747
+}
