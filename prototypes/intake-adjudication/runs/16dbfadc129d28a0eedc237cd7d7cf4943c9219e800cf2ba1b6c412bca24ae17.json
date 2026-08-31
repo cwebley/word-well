@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "ogle|oewn-ogle__2.39.00..",
+  "fingerprint_key": "16dbfadc129d28a0eedc237cd7d7cf4943c9219e800cf2ba1b6c412bca24ae17",
+  "fingerprint": {
+    "input_digest": "df965551f186572320ea21fad7f2fc51da81b0f4b88c0fde029e6dae53f652f5",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:30:40.113Z",
+  "finding": {
+    "sense_id": "oewn-ogle__2.39.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word 'ogle' is relatively rare (E3) and its meaning, 'look at with amorous intentions' (E1), is adequately covered by more common words. It does not appear to be a key term for professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-ogle__2.39.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word 'ogle' is relatively rare (E3) and its meaning, 'look at with amorous intentions' (E1), is adequately covered by more common words. It does not appear to be a key term for professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 346,
+    "completion_tokens": 118,
+    "reasoning_tokens": 0,
+    "total_tokens": 464,
+    "cost_usd": 0.0003988
+  },
+  "latency_ms": 946
+}

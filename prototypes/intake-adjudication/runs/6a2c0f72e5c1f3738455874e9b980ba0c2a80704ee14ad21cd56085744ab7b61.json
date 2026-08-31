@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "decadent|oewn-decadent__1.18.00..",
+  "fingerprint_key": "6a2c0f72e5c1f3738455874e9b980ba0c2a80704ee14ad21cd56085744ab7b61",
+  "fingerprint": {
+    "input_digest": "5ea24dc9e7bb44e8107518975a3b66ea8602c5ea0ceb4f6e4d75e1dfb6685f8b",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:29:04.801Z",
+  "finding": {
+    "sense_id": "oewn-decadent__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The noun form of 'decadent' (meaning a person) is not common enough (E2) to be considered useful for an adult building a professional and academic vocabulary, especially given that the adjective form is likely more prevalent.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-decadent__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The noun form of 'decadent' (meaning a person) is not common enough (E2) to be considered useful for an adult building a professional and academic vocabulary, especially given that the adjective form is likely more prevalent.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 346,
+    "completion_tokens": 122,
+    "reasoning_tokens": 0,
+    "total_tokens": 468,
+    "cost_usd": 0.0004088
+  },
+  "latency_ms": 999
+}

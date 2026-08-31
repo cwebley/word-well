@@ -80,15 +80,26 @@ def source_meanings(en, display, normalized):
     return sorted(unique.values(), key=lambda m: m["sense_id"])
 
 
-def build_records(en, con, case):
-    """One record per source meaning of one headword."""
+def build_records(en, con, case, allow_missing=False):
+    """One record per source meaning of one headword.
+
+    `allow_missing` is for unlabelled sets. A golden case that cannot be
+    materialised is a broken dataset and should stop the export; one absentee in
+    a hundred-word audit sample is a fact to report, not a reason to abandon the
+    run. Either way the count is recorded, because a retention rate computed over
+    a shrinking denominator is not comparable to an earlier one.
+    """
     lemma = case["lemma"]
     row = con.execute("SELECT * FROM lemma WHERE lemma = ?", (lemma.lower(),)).fetchone()
     if row is None:
+        if allow_missing:
+            return None
         sys.exit(f"{lemma!r} is not in the candidate pool")
 
     meanings = source_meanings(en, row["display"], row["lemma"])
     if not meanings:
+        if allow_missing:
+            return None
         sys.exit(f"{lemma!r} has no OEWN senses; it cannot be judged closed-book")
 
     candidate = {
@@ -133,6 +144,8 @@ def main():
     ap.add_argument("--pool", default=pathlib.Path("pool.sqlite"), type=pathlib.Path)
     ap.add_argument("--rules", default=pathlib.Path("build_pool.py"), type=pathlib.Path)
     ap.add_argument("--wn-data", default=pathlib.Path("data/wn"), type=pathlib.Path)
+    ap.add_argument("--allow-missing", action="store_true",
+                    help="skip headwords that cannot be materialised (unlabelled sets only)")
     args = ap.parse_args()
 
     if not args.pool.exists():
@@ -146,9 +159,16 @@ def main():
 
     spec = json.loads(args.cases.read_text())
     case_set = spec.get("case_set", args.cases.stem)
-    records = []
-    for case in spec["cases"]:
-        records.extend(build_records(en, con, case))
+    # Golden sets list `cases` with a label; the retention audit lists `sample`
+    # and carries none, deliberately. Both are just headwords to this exporter.
+    entries = spec.get("cases") or spec["sample"]
+    records, skipped = [], []
+    for case in entries:
+        built = build_records(en, con, case, allow_missing=args.allow_missing)
+        if built is None:
+            skipped.append(case["lemma"])
+            continue
+        records.extend(built)
     records.sort(key=lambda r: r["subject_id"])
 
     args.out.mkdir(parents=True, exist_ok=True)
@@ -162,7 +182,9 @@ def main():
         "case_set": case_set,
         "extraction_version": EXTRACTION_VERSION,
         "max_examples": MAX_EXAMPLES,
-        "headword_count": len(spec["cases"]),
+        "headword_count": len(entries) - len(skipped),
+        "headwords_requested": len(entries),
+        "headwords_skipped": sorted(skipped),
         "meaning_count": len(records),
         "sources": {
             "oewn": {"release": "oewn:2025", "retrieved_via": f"wn {wn.__version__}"},
@@ -181,10 +203,13 @@ def main():
     by_word = {}
     for record in records:
         by_word.setdefault(record["candidate"]["display"], []).append(record)
-    for display, group in by_word.items():
-        marks = sorted({m for r in group for m in r["missing_evidence"]})
-        print(f"{display:14} zipf={group[0]['candidate']['zipf']:<6} "
-              f"meanings={len(group)} missing=[{', '.join(marks) or 'none'}]")
+    if len(by_word) <= 20:
+        for display, group in by_word.items():
+            marks = sorted({m for r in group for m in r["missing_evidence"]})
+            print(f"{display:14} zipf={group[0]['candidate']['zipf']:<6} "
+                  f"meanings={len(group)} missing=[{', '.join(marks) or 'none'}]")
+    if skipped:
+        print(f"skipped {len(skipped)}: {', '.join(sorted(skipped))}")
     print(f"\nwrote {len(records)} meanings across {len(by_word)} headwords to {jsonl}")
 
 

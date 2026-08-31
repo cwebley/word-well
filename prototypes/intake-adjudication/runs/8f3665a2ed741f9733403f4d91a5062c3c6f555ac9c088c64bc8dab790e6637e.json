@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "underscore|oewn-underscore__1.10.00..",
+  "fingerprint_key": "8f3665a2ed741f9733403f4d91a5062c3c6f555ac9c088c64bc8dab790e6637e",
+  "fingerprint": {
+    "input_digest": "90b7070e887120e3541d2ba230e2ac4b3b7525634609990f5f1d0a25759db3d0",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:31:31.074Z",
+  "finding": {
+    "sense_id": "oewn-underscore__1.10.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning refers to a physical line drawn under text, which is a very basic concept unlikely to be unknown to an adult learner. Its low frequency also suggests it's not a high-priority word for an academic or professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-underscore__1.10.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning refers to a physical line drawn under text, which is a very basic concept unlikely to be unknown to an adult learner. Its low frequency also suggests it's not a high-priority word for an academic or professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 5
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 348,
+    "completion_tokens": 113,
+    "reasoning_tokens": 0,
+    "total_tokens": 461,
+    "cost_usd": 0.0003869
+  },
+  "latency_ms": 1009
+}

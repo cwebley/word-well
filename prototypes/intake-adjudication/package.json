@@ -16,7 +16,8 @@
     "review:import": "tsx src/import-review-progress.ts",
     "usefulness": "dotenv -e .env.local -- tsx src/usefulness-cli.ts",
     "eval:usefulness": "dotenv -e .env.local -- braintrust eval evals/usefulness.eval.ts",
-    "report": "tsx src/report-usefulness.ts"
+    "report": "tsx src/report-usefulness.ts",
+    "audit": "dotenv -e .env.local -- tsx src/audit-cli.ts"
   },
   "dependencies": {
     "openai": "^7.2.0",

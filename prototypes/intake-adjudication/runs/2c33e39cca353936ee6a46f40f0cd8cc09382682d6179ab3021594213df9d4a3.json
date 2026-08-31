@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "intentional|oewn-intentional__5.00.00.intended.00",
+  "fingerprint_key": "2c33e39cca353936ee6a46f40f0cd8cc09382682d6179ab3021594213df9d4a3",
+  "fingerprint": {
+    "input_digest": "7dcc32a5fbffb5ef94089252fbafa80c140fb312faaf72fdac7895c406bb02aa",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:30:00.529Z",
+  "finding": {
+    "sense_id": "oewn-intentional__5.00.00.intended.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'characterized by conscious design or purpose' is fundamental for understanding actions and their implications in professional and academic contexts, especially when distinguishing between accidental and deliberate acts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-intentional__5.00.00.intended.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'characterized by conscious design or purpose' is fundamental for understanding actions and their implications in professional and academic contexts, especially when distinguishing between accidental and deliberate acts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 383,
+    "completion_tokens": 109,
+    "reasoning_tokens": 0,
+    "total_tokens": 492,
+    "cost_usd": 0.0003874
+  },
+  "latency_ms": 976
+}

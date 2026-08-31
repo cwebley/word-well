@@ -471,3 +471,129 @@ would be settling the wrong variable first.
 **`openai/gpt-oss-120b` is disqualified**, not ranked. A model that puts the
 verdict in the identifier field half the time cannot be trusted with a contract
 whatever it costs.
+
+---
+
+# Stage 3d: the retention audit baseline
+
+## Pre-run record
+
+**Question.** What share of editorially-endorsed words does the gate keep, and
+what kind of word does it drop?
+
+**Changed variable.** None. This is the first reading of a new instrument, on the
+configuration chosen in stage 3c: `google/gemini-2.5-flash` via
+`google-ai-studio`, `usefulness-prompt/2`, `usefulness-finding/2`.
+
+**Dataset.** `retention-audit/1` — 100 endorsed headwords, 218 meanings, drawn by
+proportional allocation within strata at seed 20260830, **unlabelled**, disjoint
+from every golden case. Disjointness is asserted on load, not trusted.
+
+**What this cannot report.** Accuracy. These words carry no verdicts, so a
+retention rate is not a score and neither direction of movement is automatically
+good. It exists to catch unexplained change, and to be read — never to be tuned
+toward.
+
+**Expected spend.** The guard estimated `$1.7978`. That is the estimator being
+deliberately pessimistic: `ASSUMED_OUTPUT_TOKENS = 1600` against gemini's
+measured 107, so the estimate ran **21.5x** the actual. Stage 2 measured 6x on a
+verbose model; on a terse one with an expensive output token it is far worse. The
+guard's direction is right and its number should not be used for planning.
+
+## Results
+
+**Retention rate: 88.0%.** 88 kept of 100, 12 excluded, 0 quarantined, 0 contract
+failures across 218 meanings. Actual spend `$0.0834`.
+
+This is the frozen baseline. Every future prompt change is measured against it.
+
+### Finding 1: all twelve exclusions are rejections for rarity
+
+Not most. Every one. The rationales say so in their own words:
+
+| Word | Endorsements | Zipf | The reason given |
+|---|---|---|---|
+| `noisome` | **5** | 1.68 | "extremely rare (E5)" |
+| `refulgent` | 3 | 1.22 | "extremely rare" |
+| `acidulous` | 3 | 1.07 | "extremely rare (E3)" |
+| `grouse` | 3 | 3.18 | "not common enough (E2)" |
+| `venality` | 2 | 1.80 | "extremely rare (E2)" |
+| `putrefy` | 2 | 1.98 | "very rare (E3)" |
+| `beneficence` | 1 | 2.02 | "very rare (E2)" |
+| `capacious` | 1 | 2.20 | "very rare (E3)" |
+| `plangent` | 1 | 1.45 | "extremely rare (E4)" |
+| `arriviste` | 1 | 1.11 | "extremely rare (E3)" |
+| `sapid` | 1 | 1.02 | "extremely rare (E3)" |
+| `ogle` | 1 | 2.90 | "relatively rare (E3)" |
+
+The separation is frequency and nothing else:
+
+```text
+excluded:  mean Zipf 1.80   mean endorsements 2.0
+kept:      mean Zipf 3.01   mean endorsements 2.2
+```
+
+Endorsement is flat across the split. Editors did not favour the kept words. The
+gate is sorting on one axis, and it is the wrong one.
+
+### Finding 2: this is the same defect as `happy`, at the other end
+
+Stage 3's finding 3 recorded that the judge reads frequency monotonically —
+common counts *for*, rare counts *against*. `happy` was that bias at the top. This
+is the same bias at the bottom, and at the bottom it is far more damaging.
+
+`beneficence`, `venality`, `capacious`, `noisome`, `refulgent`, `plangent` are
+precisely the tier-2 vocabulary this product exists to teach. Every one was
+nominated by at least one editorial source; `noisome` by five. **A word the
+learner does not already know is the point, not a disqualification.**
+
+The golden set could not have found this. It holds six keeps in a Zipf band of
+2.12 to 3.43 — no word rare enough to trip the low end. Twelve hand-picked
+obvious cases are a regression net, not a sample, and this is what the audit is
+for.
+
+### Finding 3: a second, inconsistent rejection reason
+
+Six of the twelve also argue redundancy — the meaning is "adequately covered by
+more common synonyms": `acidulous`/acidic, `beneficence`/kindness,
+`refulgent`/radiant, `sapid`/flavourful.
+
+That reasoning is not obviously wrong, but it is applied inconsistently with the
+labels. `laconic` is a golden **keep**, and its own synset members are `crisp`,
+`curt` and `terse` — sitting in the prompt as evidence. The same argument that
+drops `refulgent` would drop `laconic`, and the owner says `laconic` stays.
+
+So there is a real criterion question the prompt has never stated: when does a
+near-synonym make a word redundant, and when does it carry a distinction worth
+teaching? `pernicious` is kept in the golden set for exactly that reason — a
+sense `harmful` does not have.
+
+### What must not happen next
+
+These twelve words **do not become golden cases.** Promoting the words an audit
+rejects is how the audit stops working: the sample would drift, one cycle at a
+time, toward words the gate already handles, and would report a rising retention
+rate while detecting nothing.
+
+Reading them is the intended use. What they identify is a *kind* of failure —
+rejection-for-rarity, and inconsistent redundancy reasoning. New golden cases
+must come from a separate exploration draw containing different words with those
+properties.
+
+## Decision
+
+The 88.0% baseline is frozen. Prompt v3 now has three findings behind it rather
+than two, and the new one is the most consequential:
+
+1. Frequency is read monotonically, and the low end is where it does real damage.
+2. "Academic" reads as "used in an academic discipline" (`herbivorous`).
+3. Synonym redundancy is applied inconsistently with the labels (`refulgent`
+   against `laconic`).
+
+All three point at the same root: version 1 states a direction where the
+criterion is a band, and never says what makes a word worth its place next to its
+synonyms.
+
+Next is the exploration draw — pool-representative, mostly un-endorsed, disjoint
+from both existing sets — which is where the capability cases for those clauses
+come from.

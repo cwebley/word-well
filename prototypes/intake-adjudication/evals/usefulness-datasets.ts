@@ -158,3 +158,57 @@ export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v1"
   );
   return new Set(spec.cases.map((entry) => entry.lemma.toLowerCase()));
 }
+
+// ── Unlabelled sets ────────────────────────────────────────────────────────
+//
+// The retention audit and any exploration draw carry no verdicts, and the
+// loader is separate so they cannot accidentally acquire one. `loadUsefulness-
+// Dataset` requires a bucket per case; anything routed through it would have to
+// be labelled first, which is precisely what must not happen to the audit.
+
+const unlabelledFileSchema = z.object({
+  set_version: z.string(),
+  gate: z.literal("audience-usefulness"),
+  sample: z.array(z.object({ lemma: z.string(), display: z.string() })).min(1),
+});
+
+export interface LoadedUnlabelledSet {
+  name: string;
+  setVersion: string;
+  manifest: EvidenceManifest;
+  groups: HeadwordGroup[];
+  /** Requested headwords the exporter could not materialise. */
+  missing: string[];
+}
+
+export function loadUnlabelledSet(name: string, root = process.cwd()): LoadedUnlabelledSet {
+  const spec = unlabelledFileSchema.parse(
+    JSON.parse(readFileSync(join(root, `cases/${name}.json`), "utf8")),
+  );
+  const manifest = readManifest(join(root, `evidence/${name}.manifest.json`));
+  const groups = groupByHeadword(
+    readCandidateMeanings(join(root, `evidence/${name}.meanings.jsonl`)),
+  );
+
+  for (const group of groups) {
+    for (const meaning of group.meanings) {
+      if (manifest.claims[meaning.subject_id] !== meaning.input_digest) {
+        throw new Error(`input digest mismatch for ${meaning.subject_id}`);
+      }
+    }
+  }
+
+  const present = new Set(groups.map((g) => g.headword));
+  const missing = spec.sample.map((w) => w.lemma).filter((lemma) => !present.has(lemma));
+
+  // The audit must stay disjoint from every golden case. Checked on load rather
+  // than trusted, because a retention rate measured over words the prompt was
+  // tuned on reads exactly like an honest one.
+  const golden = goldenLemmas(root);
+  const overlap = [...present].filter((lemma) => golden.has(lemma));
+  if (overlap.length) {
+    throw new Error(`${name} overlaps the golden set: ${overlap.join(", ")}`);
+  }
+
+  return { name, setVersion: spec.set_version, manifest, groups, missing };
+}

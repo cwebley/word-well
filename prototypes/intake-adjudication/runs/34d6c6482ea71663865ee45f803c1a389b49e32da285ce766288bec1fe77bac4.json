@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "decadent|oewn-decadent__5.00.00.indulgent.00",
+  "fingerprint_key": "34d6c6482ea71663865ee45f803c1a389b49e32da285ce766288bec1fe77bac4",
+  "fingerprint": {
+    "input_digest": "5b6cea76cbcf52909b280944cd220e45ae48fc5ece1e8bda4482f791a784aea0",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:29:06.589Z",
+  "finding": {
+    "sense_id": "oewn-decadent__5.00.00.indulgent.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'luxuriously self-indulgent' is useful for an adult building a professional and academic vocabulary, as it describes a specific type of indulgence that can be encountered in various contexts, and the word has a moderate frequency.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-decadent__5.00.00.indulgent.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'luxuriously self-indulgent' is useful for an adult building a professional and academic vocabulary, as it describes a specific type of indulgence that can be encountered in various contexts, and the word has a moderate frequency.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 357,
+    "completion_tokens": 117,
+    "reasoning_tokens": 0,
+    "total_tokens": 474,
+    "cost_usd": 0.0003996
+  },
+  "latency_ms": 831
+}

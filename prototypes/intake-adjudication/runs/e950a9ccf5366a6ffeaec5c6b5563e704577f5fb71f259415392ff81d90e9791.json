@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "epistolary|oewn-epistolary__5.00.00.informal.02",
+  "fingerprint_key": "e950a9ccf5366a6ffeaec5c6b5563e704577f5fb71f259415392ff81d90e9791",
+  "fingerprint": {
+    "input_digest": "6b616f40d2ae19afd49a9fc6cdc2d298eeb3998c585cb14cfe430424ef8247f7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:29:23.978Z",
+  "finding": {
+    "sense_id": "oewn-epistolary__5.00.00.informal.02",
+    "usefulness": "useful",
+    "rationale": "The definition clearly describes a specific literary form (epistolary novel) and a style of communication, which is relevant for an academic vocabulary. The examples further illustrate its use in these contexts.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-epistolary__5.00.00.informal.02",
+    "usefulness": "useful",
+    "rationale": "The definition clearly describes a specific literary form (epistolary novel) and a style of communication, which is relevant for an academic vocabulary. The examples further illustrate its use in these contexts.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 389,
+    "completion_tokens": 112,
+    "reasoning_tokens": 0,
+    "total_tokens": 501,
+    "cost_usd": 0.0003967
+  },
+  "latency_ms": 1062
+}

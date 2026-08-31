@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "occluded|oewn-occluded__5.00.00.combined.00",
+  "fingerprint_key": "b9c71e81029ee1455f3d627e60aba3a9c5413675902925fcc5e3ffecff718b21",
+  "fingerprint": {
+    "input_digest": "26755b382b6c41433d0a9efca3a52b318b0ed425cd2c85d77198ff90138c8e0d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:30:38.215Z",
+  "finding": {
+    "sense_id": "oewn-occluded__5.00.00.combined.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples suggest a specific, technical meaning relevant to scientific or academic contexts, making it useful for a professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-occluded__5.00.00.combined.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples suggest a specific, technical meaning relevant to scientific or academic contexts, making it useful for a professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 383,
+    "completion_tokens": 87,
+    "reasoning_tokens": 0,
+    "total_tokens": 470,
+    "cost_usd": 0.0003324
+  },
+  "latency_ms": 900
+}

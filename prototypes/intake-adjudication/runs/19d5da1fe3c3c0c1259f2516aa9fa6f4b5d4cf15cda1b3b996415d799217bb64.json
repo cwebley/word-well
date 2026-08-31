@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "circumscribe|oewn-circumscribe__2.30.00..",
+  "fingerprint_key": "19d5da1fe3c3c0c1259f2516aa9fa6f4b5d4cf15cda1b3b996415d799217bb64",
+  "fingerprint": {
+    "input_digest": "f325a6ba53f520a82af22264209015327854d2ae83b92cf098684234af36db13",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:28:49.773Z",
+  "finding": {
+    "sense_id": "oewn-circumscribe__2.30.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and examples clearly show this meaning is about restricting or confining within limits, which is a concept relevant to professional and academic contexts. The frequency, while not high, suggests it's not overly obscure.",
+    "evidence_ids": [
+      "E1",
+      "E4",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-circumscribe__2.30.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and examples clearly show this meaning is about restricting or confining within limits, which is a concept relevant to professional and academic contexts. The frequency, while not high, suggests it's not overly obscure.",
+    "evidence_ids": [
+      "E1",
+      "E4",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 4
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 409,
+    "completion_tokens": 104,
+    "reasoning_tokens": 0,
+    "total_tokens": 513,
+    "cost_usd": 0.0003827
+  },
+  "latency_ms": 993
+}

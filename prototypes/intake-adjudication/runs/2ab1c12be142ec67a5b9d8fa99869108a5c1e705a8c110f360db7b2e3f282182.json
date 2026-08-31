@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "flotilla|oewn-flotilla__1.06.01..",
+  "fingerprint_key": "2ab1c12be142ec67a5b9d8fa99869108a5c1e705a8c110f360db7b2e3f282182",
+  "fingerprint": {
+    "input_digest": "f02eb8446032ce2b02e9cbd3ab2d79102e63dc7e69f220873c637f2e3b17d226",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:29:34.316Z",
+  "finding": {
+    "sense_id": "oewn-flotilla__1.06.01..",
+    "usefulness": "not_useful",
+    "rationale": "The definition specifies a very narrow, military-specific meaning (US Navy fleet of small warships) which is unlikely to be encountered frequently by an adult building a general professional and academic vocabulary. The low frequency also supports this.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-flotilla__1.06.01..",
+    "usefulness": "not_useful",
+    "rationale": "The definition specifies a very narrow, military-specific meaning (US Navy fleet of small warships) which is unlikely to be encountered frequently by an adult building a general professional and academic vocabulary. The low frequency also supports this.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 343,
+    "completion_tokens": 113,
+    "reasoning_tokens": 0,
+    "total_tokens": 456,
+    "cost_usd": 0.0003854
+  },
+  "latency_ms": 919
+}
