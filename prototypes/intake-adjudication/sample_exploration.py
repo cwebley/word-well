@@ -35,9 +35,8 @@ import random
 import sqlite3
 import sys
 
-# The band a production run would plausibly cover. Recorded so a later draw can
-# be compared against this one rather than silently sampling a different world.
-ZIPF_MIN, ZIPF_MAX = 1.0, 4.0
+import intake_filters
+
 TARGET = 150
 
 
@@ -49,16 +48,23 @@ def sha256_file(path):
     return h.hexdigest()
 
 
-def already_used(cases_dir):
+def already_used(cases_dir, skip):
     """Every lemma any existing set has touched, so draws never overlap.
 
     Reads whatever is there rather than naming files: a golden set that grows, an
     audit that must stay frozen, and previous exploration draws whose promoted
     cases are now golden. Missing files are fine; an empty exclusion set just
     means this is the first draw.
+
+    `skip` is the file this run is about to write. Without it, redrawing the same
+    number excludes its own previous output and silently produces a different
+    sample — which would make a seeded draw unreproducible, the one property it
+    exists to have.
     """
     used = {}
     for path in sorted(cases_dir.glob("*.json")):
+        if path.name == skip:
+            continue
         try:
             spec = json.loads(path.read_text())
         except (json.JSONDecodeError, OSError):
@@ -81,14 +87,16 @@ def main():
     if not args.pool.exists():
         sys.exit(f"no pool database at {args.pool}")
 
-    used = already_used(args.out)
+    name = f"exploration-draw-{args.draw}"
+    used = already_used(args.out, skip=f"{name}.json")
 
     con = sqlite3.connect(f"file:{args.pool}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
+    # The deterministic filters run first, from their single definition. Draw 1
+    # did not, and paid model prices to be told that `xxi` is a roman numeral and
+    # `vapour` is a British spelling — 8% of that draw.
     rows = [dict(r) for r in con.execute(
-        "SELECT lemma, display, pos, zipf_summed, endorsements, oewn_senses "
-        "FROM lemma WHERE zipf_summed >= ? AND zipf_summed < ? AND oewn_senses > 0 "
-        "ORDER BY lemma", (ZIPF_MIN, ZIPF_MAX))]
+        f"SELECT * FROM lemma WHERE {intake_filters.WHERE} ORDER BY lemma")]
 
     eligible = [r for r in rows if r["lemma"] not in used]
     excluded = len(rows) - len(eligible)
@@ -104,7 +112,6 @@ def main():
 
     assert not ({r["lemma"] for r in sample} & set(used)), "exploration overlaps an existing set"
 
-    name = f"exploration-draw-{args.draw}"
     payload = {
         "set_version": f"exploration/{args.draw}",
         "gate": "audience-usefulness",
@@ -117,7 +124,9 @@ def main():
             "the retention audit rejected would bias the audit upward every cycle.",
         ],
         "sampling": {
-            "population": f"candidate pool headwords with Zipf in [{ZIPF_MIN}, {ZIPF_MAX}) and at least one OEWN sense",
+            "population": "candidate pool headwords that pass the deterministic filters",
+            "filter_version": intake_filters.FILTER_VERSION,
+            "zipf_band": [intake_filters.ZIPF_FLOOR, intake_filters.ZIPF_CEILING],
             "population_size": len(rows),
             "eligible_after_exclusions": len(eligible),
             "excluded_as_already_used": excluded,
@@ -139,9 +148,9 @@ def main():
 
     endorsed = sum(1 for r in sample if r["endorsements"] > 0)
     senses = sum(r["oewn_senses"] for r in sample)
-    print(f"population {len(rows):,} in the Zipf {ZIPF_MIN}-{ZIPF_MAX} band, {excluded} excluded as already used")
+    print(f"population {len(rows):,} passing {intake_filters.FILTER_VERSION}, {excluded} excluded as already used")
     print(f"drew {len(sample)} headwords, {senses} senses, seed {seed}")
-    print(f"  endorsed: {endorsed} ({endorsed / len(sample):.0%})  — the pool itself is {sum(1 for r in rows if r['endorsements'] > 0) / len(rows):.0%}")
+    print(f"  endorsed: {endorsed} ({endorsed / len(sample):.0%})  — the population itself is {sum(1 for r in rows if r['endorsements'] > 0) / len(rows):.0%}")
     zipfs = sorted(r["zipf_summed"] for r in sample)
     print(f"  zipf: min {zipfs[0]}, median {zipfs[len(zipfs) // 2]}, max {zipfs[-1]}")
     print(f"\nwrote {out}")

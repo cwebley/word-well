@@ -16,7 +16,7 @@ import { usefulnessGate } from "./usefulness/gate.ts";
 import { judgeHeadword } from "./usefulness/run.ts";
 import { loadUsefulnessDataset } from "../evals/usefulness-datasets.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v1";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
 const RUNS_DIR = "runs";
 
 async function main() {

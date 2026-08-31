@@ -5,7 +5,7 @@ import { usefulnessGate } from "./gate.ts";
 import { citableEvidenceIds, evidenceItems, readCandidateMeanings } from "./meaning.ts";
 import { renderSubject } from "./prompt.ts";
 
-const subjects = readCandidateMeanings("evidence/usefulness-golden-v1.meanings.jsonl");
+const subjects = readCandidateMeanings("evidence/usefulness-golden-v2.meanings.jsonl");
 const laconic = subjects.find((s) => s.subject_id.startsWith("laconic"))!;
 const pinnate = subjects.find((s) => s.subject_id.startsWith("pinnate"))!;
 

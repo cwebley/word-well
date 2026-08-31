@@ -1,21 +1,29 @@
 {
-  "set_version": "usefulness-golden/1",
+  "set_version": "usefulness-golden/2",
   "gate": "audience-usefulness",
   "issue": 56,
-  "buckets": ["serve", "reject", "borderline"],
+  "buckets": [
+    "serve",
+    "reject",
+    "borderline"
+  ],
   "note": [
-    "The regression trip-wire for the usefulness gate: twelve cases that need no",
-    "deliberation. A thin v1 prompt is expected to pass the six keeps and fail",
-    "several of the rejects; that is the baseline, not a defect.",
+    "The regression trip-wire for the usefulness gate. Version 2 adds three cases",
+    "from exploration draw 1, which is the only pool new cases may come from: the",
+    "retention audit must stay disjoint, and promoting the words it rejects would",
+    "bias it upward every cycle until it detected nothing.",
     "",
-    "Capability cases are added from observed failures, not enumerated here. The",
-    "first three to expect are afterimage (transparent compound, concept worth",
-    "naming), doggedness (redundant with dogged, see #59) and draconian (OEWN",
-    "lacks the useful sense, see #60).",
+    "Version 1's twelve are unchanged. Its six keeps all sat between Zipf 2.12 and",
+    "3.43, so the set contained no rare keep at all \u2014 which is structurally why it",
+    "could not detect the gate's rejection-for-rarity, found only when the audit",
+    "and the exploration draw were run.",
     "",
-    "Endorsement counts are deliberately absent from this file. Endorsement must",
-    "not reach the prompt, and these twelve must be excluded from the retention",
-    "audit sample, which requires words no golden case has touched."
+    "`happy` and `Texan` are both removed before this gate by deterministic",
+    "filters \u2014 the Zipf ceiling and the demonym rule. They stay here as defence in",
+    "depth, so a change to a pool filter cannot silently admit them.",
+    "",
+    "Endorsement counts are deliberately absent. Endorsement must not reach the",
+    "prompt, and these cases must be excluded from the retention audit sample."
   ],
   "cases": [
     {
@@ -89,6 +97,24 @@
       "bucket": "reject",
       "reason": "demonym",
       "why": "Also removed mechanically before this gate runs. Kept here as defence in depth, so a change to the pool filter cannot silently admit demonyms."
+    },
+    {
+      "lemma": "pique",
+      "bucket": "serve",
+      "reason": "rare-but-worth-teaching",
+      "why": "Exploration draw 1 rejected all three senses, on two different bad grounds: the anger sense for low frequency, the verb sense because it 'aligns with the meaning of offend, which is a much more common word'. A fit of pique and piqued my interest are both ordinary professional register. Exercises the rarity floor and the synonym-redundancy inconsistency at once, and its polysemy should have preserved it under the fold."
+    },
+    {
+      "lemma": "muckraking",
+      "bucket": "serve",
+      "reason": "rare-but-worth-teaching",
+      "why": "Zipf 1.92, rejected as 'very rare' and 'not essential'. Names a concept \u2014 the exposure of scandal about public figures \u2014 that no common synonym covers. The rarity floor on a word where redundancy cannot be the excuse."
+    },
+    {
+      "lemma": "punctilious",
+      "bucket": "serve",
+      "reason": "rare-keep-tripwire",
+      "why": "Zipf 1.76, the rarest word in exploration draw 1, and already kept correctly. Included as a trip-wire rather than a capability case: it guards the fix for the rarity floor against over-correcting into keep-everything-rare."
     }
   ]
 }

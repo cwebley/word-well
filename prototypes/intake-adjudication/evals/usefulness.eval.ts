@@ -23,7 +23,7 @@ import type { EvalInput, UsefulnessCase } from "./usefulness-datasets.ts";
 import { usefulnessContractScorers } from "./scorers/usefulness-contract.ts";
 import { usefulnessSemanticScorers } from "./scorers/usefulness-semantic.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v1";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
 const RUNS_DIR = "runs";
 
 const apiKey = requireEnv("OPENROUTER_API_KEY");
@@ -40,7 +40,7 @@ const store = new RunStore(RUNS_DIR);
 Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
   "WordWell audience-usefulness adjudication",
   {
-    // The case set alone is not a distinguishing name: `usefulness-golden-v1`
+    // The case set alone is not a distinguishing name: `usefulness-golden-v2`
     // is the DATASET version, and two runs of it under different prompts would
     // land on the same experiment with no way to tell them apart. What makes a
     // run comparable to another is the configuration, so the name carries it.

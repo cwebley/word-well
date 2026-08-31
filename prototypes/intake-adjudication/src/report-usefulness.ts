@@ -20,7 +20,7 @@ import { deriveHeadwordDisposition } from "./usefulness/policy.ts";
 import type { AdjudicationRecord } from "./store.ts";
 import { loadUsefulnessDataset } from "../evals/usefulness-datasets.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v1";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
 
 const MARK: Record<string, string> = { useful: "+", not_useful: "−", insufficient_evidence: "?" };
 

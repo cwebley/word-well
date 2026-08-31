@@ -82,6 +82,7 @@ async function main() {
 
   console.log("─".repeat(72));
   console.log(`RETENTION RATE  ${rate.toFixed(1)}%   (${kept.length} kept of ${judged} endorsed words)`);
+  console.log("  the frozen number: the same words, every run, comparable to the baseline");
   console.log(`  quarantined ${held.length}, excluded ${dropped.length}`);
   console.log(`  contract failures ${failures}/${meanings.length} meanings, ${reused} records reused`);
   console.log("─".repeat(72));

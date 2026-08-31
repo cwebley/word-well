@@ -98,7 +98,7 @@ export interface LoadedUsefulnessDataset {
 }
 
 export function loadUsefulnessDataset(
-  name = "usefulness-golden-v1",
+  name = "usefulness-golden-v2",
   root = process.cwd(),
 ): LoadedUsefulnessDataset {
   const spec = caseFileSchema.parse(
@@ -152,7 +152,7 @@ export function loadUsefulnessDataset(
 }
 
 /** Every lemma the golden set touches. The retention audit must avoid all of them. */
-export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v1"): Set<string> {
+export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v2"): Set<string> {
   const spec = caseFileSchema.parse(
     JSON.parse(readFileSync(join(root, `cases/${name}.json`), "utf8")),
   );
