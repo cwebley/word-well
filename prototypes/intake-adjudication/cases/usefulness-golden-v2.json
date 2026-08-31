@@ -99,10 +99,10 @@
       "why": "Also removed mechanically before this gate runs. Kept here as defence in depth, so a change to the pool filter cannot silently admit demonyms."
     },
     {
-      "lemma": "pique",
+      "lemma": "inexpedient",
       "bucket": "serve",
       "reason": "rare-but-worth-teaching",
-      "why": "Exploration draw 1 rejected all three senses, on two different bad grounds: the anger sense for low frequency, the verb sense because it 'aligns with the meaning of offend, which is a much more common word'. A fit of pique and piqued my interest are both ordinary professional register. Exercises the rarity floor and the synonym-redundancy inconsistency at once, and its polysemy should have preserved it under the fold."
+      "why": "Zipf 1.3, rejected in exploration draw 1 as 'extremely rare' and 'easily conveyed by more common synonyms'. Both halves of the rarity floor on one word: the frequency argument and the redundancy argument. Replaced `pique`, whose most compelling sense \u2014 arousing interest \u2014 OEWN does not record at all, so a label of serve would have asked the judge to keep a word for a reason its evidence cannot contain. See #60."
     },
     {
       "lemma": "muckraking",
