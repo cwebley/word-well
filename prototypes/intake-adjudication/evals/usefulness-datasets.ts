@@ -50,6 +50,35 @@ const caseFileSchema = z.object({
     .min(1),
 });
 
+/**
+ * What the eval passes as `input`.
+ *
+ * Deliberately small. Passing the whole `HeadwordGroup` put every meaning's
+ * definition and examples into Braintrust's Input column, which then truncated
+ * to `{"display":"p...` on all twelve rows — a table where no column told you
+ * which word you were looking at. The scorers resolve the meanings through
+ * `meaningsOf`.
+ */
+export interface EvalInput {
+  lemma: string;
+  display: string;
+  meaning_count: number;
+}
+
+const groupsByLemma = new Map<string, HeadwordGroup>();
+
+export function evalInputOf(group: HeadwordGroup): EvalInput {
+  groupsByLemma.set(group.headword, group);
+  return { lemma: group.headword, display: group.display, meaning_count: group.meanings.length };
+}
+
+/** The meanings behind an eval input, in the order they were judged. */
+export function meaningsOf(input: EvalInput) {
+  const group = groupsByLemma.get(input.lemma);
+  if (!group) throw new Error(`no loaded group for ${input.lemma}; load the dataset first`);
+  return group.meanings;
+}
+
 export interface UsefulnessCase {
   group: HeadwordGroup;
   expected: {

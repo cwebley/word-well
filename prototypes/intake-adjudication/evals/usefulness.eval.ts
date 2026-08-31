@@ -16,10 +16,10 @@ import { preflight } from "../src/budget.ts";
 import { modelConfigFromEnv, PILOT_BUDGET_USD, requireEnv } from "../src/config.ts";
 import { RunStore } from "../src/store.ts";
 import { usefulnessGate } from "../src/usefulness/gate.ts";
-import type { HeadwordGroup, HeadwordOutcome } from "../src/usefulness/run.ts";
+import type { HeadwordOutcome } from "../src/usefulness/run.ts";
 import { judgeHeadword } from "../src/usefulness/run.ts";
-import { loadUsefulnessDataset } from "./usefulness-datasets.ts";
-import type { UsefulnessCase } from "./usefulness-datasets.ts";
+import { evalInputOf, loadUsefulnessDataset, meaningsOf } from "./usefulness-datasets.ts";
+import type { EvalInput, UsefulnessCase } from "./usefulness-datasets.ts";
 import { usefulnessContractScorers } from "./scorers/usefulness-contract.ts";
 import { usefulnessSemanticScorers } from "./scorers/usefulness-semantic.ts";
 
@@ -37,7 +37,7 @@ const store = new RunStore(RUNS_DIR);
 // The braintrust CLI bundles this file as CJS, so the spend guard cannot run at
 // the top level. It runs inside `data` instead, which is awaited before any task
 // starts: a run that cannot afford itself still makes no calls.
-Eval<HeadwordGroup, HeadwordOutcome, UsefulnessCase["expected"]>(
+Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
   "WordWell audience-usefulness adjudication",
   {
     experimentName: `${CASE_SET} · ${model.model}`,
@@ -66,7 +66,7 @@ Eval<HeadwordGroup, HeadwordOutcome, UsefulnessCase["expected"]>(
       }
 
       return dataset.cases.map(({ group, expected }) => ({
-        input: group,
+        input: evalInputOf(group),
         expected,
         // Prices ride on each case so the experiment carries the numbers the
         // decision was made with, not the ones in force whenever it is reread.
@@ -85,7 +85,12 @@ Eval<HeadwordGroup, HeadwordOutcome, UsefulnessCase["expected"]>(
       }));
     },
 
-    task: async (group, hooks) => {
+    task: async (input, hooks) => {
+      // Without this every row is called "eval" and the table cannot tell you
+      // which word failed.
+      hooks.span.setAttributes({ name: input.display });
+
+      const group = { headword: input.lemma, display: input.display, meanings: meaningsOf(input) };
       const outcome = await judgeHeadword(group, client, model, dataset.manifest, store);
 
       const sum = (pick: (r: HeadwordOutcome["records"][number]) => number | null) =>
@@ -113,6 +118,7 @@ Eval<HeadwordGroup, HeadwordOutcome, UsefulnessCase["expected"]>(
         .map((r) => r.contract_error)
         .filter((error): error is string => error !== null);
       hooks.metadata.disposition = outcome.decision.disposition;
+      hooks.metadata.verdicts = outcome.records.map((r) => r.finding?.usefulness ?? "none");
 
       return outcome;
     },

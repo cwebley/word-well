@@ -53,9 +53,51 @@ export function headwordOf(subject: CandidateMeaning): string {
   return subject.candidate.normalized;
 }
 
-/** Every identifier a finding may legitimately cite. */
+export interface EvidenceItem {
+  /** The label the judge cites: E1, E2, … */
+  id: string;
+  kind: "definition" | "example" | "frequency" | "synonyms" | "part_of_speech" | "missing";
+  text: string;
+}
+
+/**
+ * Every piece of evidence, each with a label the judge can point at.
+ *
+ * Version 1 asked the judge to cite "identifiers from the supplied evidence"
+ * when the only identifier in the whole prompt was the sense id. That is a
+ * question with one possible answer, and the measured result was that the judge
+ * invented identifier-shaped names for the things it actually used — `pinnate`
+ * cited `frequency_Zipf_2.17`, `definition_leaf_shape_featherlike` and
+ * `part_of_speech_a`, all real evidence, none of it nameable.
+ *
+ * Numbering the evidence makes the citation both possible and checkable, and it
+ * buys something version 1 could not answer: *which* evidence drove the verdict.
+ * That is the open question behind the `happy` failure — whether frequency is
+ * being read at all, and in which direction.
+ */
+export function evidenceItems(subject: CandidateMeaning): EvidenceItem[] {
+  const { candidate, meaning } = subject;
+  const items: Omit<EvidenceItem, "id">[] = [
+    { kind: "definition", text: meaning.definition },
+  ];
+  for (const example of meaning.examples) {
+    items.push({ kind: "example", text: example });
+  }
+  if (meaning.synset_members.length > 1) {
+    items.push({ kind: "synonyms", text: meaning.synset_members.join(", ") });
+  }
+  items.push({
+    kind: "frequency",
+    text: candidate.zipf === null ? "MISSING FROM THE EVIDENCE" : String(candidate.zipf),
+  });
+  items.push({ kind: "part_of_speech", text: meaning.pos });
+  for (const marker of subject.missing_evidence) {
+    items.push({ kind: "missing", text: marker });
+  }
+  return items.map((item, i) => ({ ...item, id: `E${i + 1}` }));
+}
+
+/** Every label a finding may legitimately cite. */
 export function citableEvidenceIds(subject: CandidateMeaning): Set<string> {
-  const ids = new Set<string>([subject.meaning.sense_id]);
-  for (const marker of subject.missing_evidence) ids.add(marker);
-  return ids;
+  return new Set(evidenceItems(subject).map((item) => item.id));
 }

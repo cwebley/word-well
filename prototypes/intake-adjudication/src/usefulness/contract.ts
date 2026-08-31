@@ -5,6 +5,20 @@
 // `deriveUsefulness` in policy.ts turns findings into advance / quarantine /
 // exclude from the verdict alone.
 //
+// Version 2 makes two changes, both measured rather than guessed.
+//
+// `evidence_ids` now cites the numbered labels from `evidenceItems`. Under
+// version 1 the only identifier in a prompt was the sense id, so the field asked
+// a question with one possible answer and the judge answered it by inventing
+// names for real evidence. Numbering makes the citation checkable, and makes the
+// field report which evidence actually carried the verdict.
+//
+// `diagnostic_confidence` is gone. It was the one field with no consumer:
+// recorded, never read, structurally unable to reach a decision. Seventeen of
+// nineteen values came back between 0.85 and 1.0, so it had no spread to
+// correlate against either, and two came back as `3` on a scale documented as
+// 0 to 1. Asking a model to rate itself buys nothing you can act on.
+//
 // One schema, two consumers: zod validates what came back, and z.toJSONSchema
 // produces the strict JSON schema sent to the provider.
 //
@@ -14,7 +28,7 @@
 
 import { z } from "zod";
 
-export const CONTRACT_VERSION = "usefulness-finding/1";
+export const CONTRACT_VERSION = "usefulness-finding/2";
 
 export const usefulnessValues = ["useful", "not_useful", "insufficient_evidence"] as const;
 
@@ -33,13 +47,7 @@ export const usefulnessFindingSchema = z.strictObject({
   evidence_ids: z
     .array(z.string())
     .describe(
-      "Identifiers from the supplied evidence that support this verdict. Every value must appear somewhere in the input.",
-    ),
-  diagnostic_confidence: z
-    .number()
-    .nullable()
-    .describe(
-      "Optional self-reported confidence from 0 to 1. Diagnostic only: it does not affect the outcome for this meaning.",
+      "The labels (E1, E2, …) of the evidence items this verdict actually rests on. Use only labels shown in the input.",
     ),
 });
 
