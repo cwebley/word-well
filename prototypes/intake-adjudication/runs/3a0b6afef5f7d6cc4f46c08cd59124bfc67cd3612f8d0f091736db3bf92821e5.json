@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "equivocate|oewn-equivocate__2.32.00..",
+  "fingerprint_key": "3a0b6afef5f7d6cc4f46c08cd59124bfc67cd3612f8d0f091736db3bf92821e5",
+  "fingerprint": {
+    "input_digest": "45a0a1fe1dd2ff7f0d2b744e2a38b2ef9a55852f0cacacf068649eabc730f9a7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "upstream_provider": "coreweave/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:20:32.404Z",
+  "finding": {
+    "sense_id": "oewn-equivocate__2.32.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning 'be deliberately ambiguous or unclear in order to mislead or withhold information' is highly relevant in professional and academic contexts, where precision and honesty in communication are valued. The word is associated with other terms like 'prevaricate' and 'tergiversate', which are commonly used in formal discourse to describe evasive or deceptive language. Its frequency score of 2.121 (on a scale where 7 is commonest) indicates it is not rare, suggesting it appears with sufficient regularity in professional and academic texts to warrant learning. The part of speech (verb) aligns with typical usage in such contexts. Thus, this meaning is useful for adults building a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-equivocate__2.32.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning 'be deliberately ambiguous or unclear in order to mislead or withhold information' is highly relevant in professional and academic contexts, where precision and honesty in communication are valued. The word is associated with other terms like 'prevaricate' and 'tergiversate', which are commonly used in formal discourse to describe evasive or deceptive language. Its frequency score of 2.121 (on a scale where 7 is commonest) indicates it is not rare, suggesting it appears with sufficient regularity in professional and academic texts to warrant learning. The part of speech (verb) aligns with typical usage in such contexts. Thus, this meaning is useful for adults building a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 6
+  },
+  "served_by": "CoreWeave",
+  "usage": {
+    "prompt_tokens": 362,
+    "completion_tokens": 209,
+    "reasoning_tokens": 0,
+    "total_tokens": 571,
+    "cost_usd": 0.0000989
+  },
+  "latency_ms": 4004
+}

@@ -361,3 +361,113 @@ one name.
 
 Next is the model bake-off, on this contract, with the model as the only
 variable.
+
+---
+
+# Stage 3c: model bake-off
+
+## Pre-run record
+
+**Question.** Which model should the usefulness gate run on, given that
+`deepseek-v4-flash` spends three quarters of its completion budget on hidden
+reasoning and answers in eight and a half seconds?
+
+**Changed variable.** The model, and only the model. Contract
+`usefulness-finding/2`, prompt `usefulness-prompt/2`, dataset
+`usefulness-golden/1`, temperature 0, all held constant. Every upstream pinned.
+
+**Candidates.** The incumbent, plus two scale candidates and one quality
+reference. `mistral-small-24b` was excluded despite the cheapest output price:
+it has exactly one upstream, and a single-upstream model is how `morph/bf16`
+denied the stage 3 baseline twice.
+
+**How this is read.** In priority order: contract compliance, then cost and
+latency, then disposition agreement as a tiebreak only. Twelve cases labelled by
+one person cannot rank taste, and any conclusion drawn from a one-case
+difference would be noise.
+
+**Expected spend.** Roughly `$0.025` across three models, gemini most of it.
+
+## Results
+
+Fifty-seven calls, three models, no repairs.
+
+| Model | Upstream | Disposition | Contract failures | Keeps lost | $/call | Latency (med) | Completion tokens |
+|---|---|---|---|---|---|---|---|
+| `google/gemini-2.5-flash` | `google-ai-studio` | 9/12 | 0 | 0 | `$0.000376` | **1,012 ms** | 2,030 |
+| `deepseek/deepseek-v4-flash-0731` | `deepinfra/fp8` | 9/12 | 0 | 0 | `$0.000173` | 8,359 ms | 14,879 |
+| `qwen/qwen3-30b-a3b-instruct-2507` | `coreweave/bf16` | 8/12 | 1 | 0 | **`$0.000098`** | 2,849 ms | 3,944 |
+| `openai/gpt-oss-120b` | `deepinfra/bf16` | 5/12 | **9** | **3** | `$0.000062` | 6,531 ms | 5,269 |
+
+### Finding 1: the same two words fail on every model
+
+`herbivorous` and `happy` are wrong under all four judges. Nothing else is
+consistent — `pinnate` fails on gemini and qwen but not deepseek, `Texan` fails
+on deepseek and qwen but not gemini.
+
+That is much stronger evidence than the baseline could give. Those two are not a
+model weakness; they are the criterion not saying what the owner means. Findings
+3 and 4 are now confirmed across four independent judges, which is close to the
+best evidence available at this scale. Everything else is the noise floor, and
+the 8-versus-9 spread should be read as exactly that.
+
+### Finding 2: `gpt-oss-120b` fails the contract in a way only the identity check catches
+
+Nine of nineteen replies came back with the **verdict in the identifier field**:
+
+```json
+{"sense_id": "useful", "usefulness": "useful", "rationale": "The definition (E1) …"}
+```
+
+The strict JSON schema is fully satisfied — `sense_id` is a string, and a string
+is what was asked for. Nothing about the shape is wrong. Only
+`ContractMeaningIdentity` catches it, and that is the scorer this stage nearly
+retired as redundant on the grounds that the provider guarantees the schema.
+
+The lesson generalises: a schema constrains shape, never meaning. Every field
+whose *content* must correspond to the input needs its own check.
+
+Downstream, those failures became three lost keeps — `ubiquitous`, `equivocate`
+and `laconic` quarantined — because a headword whose meanings produced no valid
+finding cannot be advanced by the fold.
+
+`qwen` failed once, differently and benignly: it truncated
+`oewn-texan__3.01.00..` to `oewn-texan__3.01.00`, dropping the trailing dots.
+
+### Finding 3: contract v2 priced the incumbent out of a full-pool run
+
+The reasoning-token increase measured in stage 3b carries straight into scale.
+Against the Zipf 1-4 band, 75,283 calls:
+
+| Model | Zipf 1-4 |
+|---|---|
+| `qwen3-30b-instruct` | `$7.38` |
+| `deepseek-v4-flash` | `$13.02` |
+| `gemini-2.5-flash` | `$28.31` |
+
+Only qwen fits what is left of the `$10` cap. The incumbent no longer does.
+
+Note the shape of gemini's cost: it emits 107 completion tokens per call against
+deepseek's 783, a 7x concision advantage, and still costs 2.2x more because its
+per-token price is 14x higher.
+
+## Decision
+
+**Switch to `google/gemini-2.5-flash` via `google-ai-studio`, and defer the scale
+choice.**
+
+Cost is not the binding constraint for anything in the near term — the retention
+audit, an exploration draw and several prompt iterations together come to well
+under `$0.50` on any of these models. Iteration speed is. At 1,012 ms a
+nineteen-call run finishes in about twenty seconds rather than three minutes, and
+exploration draws are ten to twenty times that size. Zero contract failures, and
+it is the model stage 2 already validated end to end.
+
+The scale decision is deliberately postponed until the prompt has settled and the
+deterministic filters — #59, the demonym rule, the frequency band — have cut the
+call count. Choosing a production model against a prompt that is still moving
+would be settling the wrong variable first.
+
+**`openai/gpt-oss-120b` is disqualified**, not ranked. A model that puts the
+verdict in the identifier field half the time cannot be trusted with a contract
+whatever it costs.

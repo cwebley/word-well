@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.noxious.00",
+  "fingerprint_key": "369e441f0638bdc4602e43515642d081de69b7e60840b150b1538c6483f7f523",
+  "fingerprint": {
+    "input_digest": "647e305a116a4287f3ee05b6fd92ec4d56c92d0d03a4a824046925ae99f0fe64",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:20:01.113Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.noxious.00",
+    "usefulness": "useful",
+    "rationale": "The meaning ‘exceedingly harmful’ (noxious) is a high‑value academic adjective that appears in scholarly writing, scientific discourse, and professional contexts (e.g., describing harmful effects, toxic substances, detrimental policies). Knowing this term enhances precision and nuance in professional and academic communication.",
+    "evidence_ids": [
+      "E1",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.noxious.00",
+    "usefulness": "useful",
+    "rationale": "The meaning ‘exceedingly harmful’ (noxious) is a high‑value academic adjective that appears in scholarly writing, scientific discourse, and professional contexts (e.g., describing harmful effects, toxic substances, detrimental policies). Knowing this term enhances precision and nuance in professional and academic communication.",
+    "evidence_ids": [
+      "E1",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 393,
+    "completion_tokens": 289,
+    "reasoning_tokens": 160,
+    "total_tokens": 682,
+    "cost_usd": 0.000063671
+  },
+  "latency_ms": 5501
+}

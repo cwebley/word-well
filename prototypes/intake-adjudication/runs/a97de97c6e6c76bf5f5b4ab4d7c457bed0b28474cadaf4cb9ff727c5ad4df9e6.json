@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "dimwit|oewn-dimwit__1.18.00..",
+  "fingerprint_key": "a97de97c6e6c76bf5f5b4ab4d7c457bed0b28474cadaf4cb9ff727c5ad4df9e6",
+  "fingerprint": {
+    "input_digest": "9922a7f3488db853c21a7560ad3b8d0b7a657bac1557eb720c7d64a73e4a075a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "upstream_provider": "coreweave/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:20:31.088Z",
+  "finding": {
+    "sense_id": "oewn-dimwit__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'a stupid incompetent person' is conveyed through derogatory slang terms (e.g., nitwit, doofus), which are informal and pejorative. While the word has a moderate frequency (2.427 on a Zipf scale), its use in professional and academic contexts is highly unlikely due to its insulting and non-precise nature. Such terms are not appropriate for formal discourse, where more neutral or precise vocabulary would be expected. Therefore, learning this meaning would not benefit an adult building a professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-dimwit__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'a stupid incompetent person' is conveyed through derogatory slang terms (e.g., nitwit, doofus), which are informal and pejorative. While the word has a moderate frequency (2.427 on a Zipf scale), its use in professional and academic contexts is highly unlikely due to its insulting and non-precise nature. Such terms are not appropriate for formal discourse, where more neutral or precise vocabulary would be expected. Therefore, learning this meaning would not benefit an adult building a professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "CoreWeave",
+  "usage": {
+    "prompt_tokens": 348,
+    "completion_tokens": 174,
+    "reasoning_tokens": 0,
+    "total_tokens": 522,
+    "cost_usd": 0.000087
+  },
+  "latency_ms": 2679
+}

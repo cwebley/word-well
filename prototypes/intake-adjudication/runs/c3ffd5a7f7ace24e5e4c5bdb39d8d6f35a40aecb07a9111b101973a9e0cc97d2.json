@@ -1,0 +1,60 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "laconic|oewn-laconic__5.00.00.concise.00",
+  "fingerprint_key": "c3ffd5a7f7ace24e5e4c5bdb39d8d6f35a40aecb07a9111b101973a9e0cc97d2",
+  "fingerprint": {
+    "input_digest": "7d896c1164b8d94d1a20ff95a97b1e427e11f1360b4ad7336dc1bb86691d7964",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:54.113Z",
+  "finding": null,
+  "raw": {
+    "sense_id": "useful",
+    "usefulness": "useful",
+    "rationale": "The meaning 'concise' (brief and to the point) is directly relevant to professional and academic communication, where clear, succinct expression is valued. Knowing this sense of 'laconic' helps learners describe and adopt a style of writing or speaking that is efficient and precise.",
+    "evidence_ids": [
+      "E1",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": "subject identity lost: expected oewn-laconic__5.00.00.concise.00, got useful",
+  "decision": null,
+  "effective": null,
+  "policy_context": {
+    "endorsements": 8
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 447,
+    "completion_tokens": 204,
+    "reasoning_tokens": 104,
+    "total_tokens": 651,
+    "cost_usd": 0.000051219
+  },
+  "latency_ms": 5506
+}

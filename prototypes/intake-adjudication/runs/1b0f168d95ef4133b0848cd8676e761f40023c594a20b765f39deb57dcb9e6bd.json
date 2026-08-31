@@ -1,0 +1,61 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "ubiquitous|oewn-ubiquitous__5.00.00.present.02",
+  "fingerprint_key": "1b0f168d95ef4133b0848cd8676e761f40023c594a20b765f39deb57dcb9e6bd",
+  "fingerprint": {
+    "input_digest": "40173c5d3477063a551ec0bae302ceec3c82486b1c8bb6f24c3e9254baa92747",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:53.519Z",
+  "finding": null,
+  "raw": {
+    "sense_id": "useful",
+    "usefulness": "useful",
+    "rationale": "The meaning 'being present everywhere at once' is the core definition of 'ubiquitous' and is commonly used in academic and professional contexts (e.g., describing pervasive technologies, widespread phenomena). Knowing this meaning expands a learner's ability to read and write precisely in scholarly and business discourse.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": "subject identity lost: expected oewn-ubiquitous__5.00.00.present.02, got useful",
+  "decision": null,
+  "effective": null,
+  "policy_context": {
+    "endorsements": 8
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 389,
+    "completion_tokens": 195,
+    "reasoning_tokens": 89,
+    "total_tokens": 584,
+    "cost_usd": 0.000047543
+  },
+  "latency_ms": 4921
+}

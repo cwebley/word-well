@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.harmful.00",
+  "fingerprint_key": "cb96bd29d07e891913a75d1ab7fb26e9df1254b7390916187d4504b47e7b74b5",
+  "fingerprint": {
+    "input_digest": "f1f54374abe76905856465c5358daec2814fa872c72508252a9c7648533b9386",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:55.612Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The definition (E1) shows a nuanced, academic sense of ‘harmful’ that is not captured by more common synonyms. The word appears alongside other formal terms (E4) and, despite being relatively rare (E5), it is the kind of precise vocabulary that benefits professional and academic writing.",
+    "evidence_ids": [
+      "E1",
+      "E4",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The definition (E1) shows a nuanced, academic sense of ‘harmful’ that is not captured by more common synonyms. The word appears alongside other formal terms (E4) and, despite being relatively rare (E5), it is the kind of precise vocabulary that benefits professional and academic writing.",
+    "evidence_ids": [
+      "E1",
+      "E4",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 419,
+    "completion_tokens": 280,
+    "reasoning_tokens": 149,
+    "total_tokens": 699,
+    "cost_usd": 0.000063103
+  },
+  "latency_ms": 7009
+}

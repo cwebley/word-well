@@ -1,0 +1,60 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "texan|oewn-texan__1.18.00..",
+  "fingerprint_key": "abea4d622b9042095ad074bc0ce022eb9e62ef3956cae4a219d1969623a99f48",
+  "fingerprint": {
+    "input_digest": "51851919e3782e0be06d6b3559ef5396e43ac530ff1e133d0a2f321bb20c6ac7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:55.606Z",
+  "finding": null,
+  "raw": {
+    "sense_id": "useful",
+    "usefulness": "useful",
+    "rationale": "The meaning ‘a native or resident of Texas’ is a standard demonym that can appear in academic, professional, and journalistic contexts (e.g., demographics, regional studies, cultural analysis). Knowing this noun helps adults understand and produce texts that reference people from Texas, which is relevant for a well‑rounded professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": "subject identity lost: expected oewn-texan__1.18.00.., got useful",
+  "decision": null,
+  "effective": null,
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 376,
+    "completion_tokens": 281,
+    "reasoning_tokens": 188,
+    "total_tokens": 657,
+    "cost_usd": 0.000061682
+  },
+  "latency_ms": 6985
+}

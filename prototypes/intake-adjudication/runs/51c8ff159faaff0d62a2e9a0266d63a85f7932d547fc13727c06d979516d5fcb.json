@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.harmful.00",
+  "fingerprint_key": "51c8ff159faaff0d62a2e9a0266d63a85f7932d547fc13727c06d979516d5fcb",
+  "fingerprint": {
+    "input_digest": "f1f54374abe76905856465c5358daec2814fa872c72508252a9c7648533b9386",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "upstream_provider": "coreweave/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:20:32.810Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'harmful' as applied to pernicious is supported by evidence showing it describes something that works or spreads in a hidden, injurious way (E1), exemplified by insidious diseases (E2) and subtle poisons (E3). The word is frequently associated with 'insidious' and 'subtle' (E4), reinforcing its connotation of gradual, damaging harm. Its frequency of 2.87 (E5) indicates it is not rare, and as a part of speech 'a' (E6), it is used adjectivally in professional and academic contexts. This meaning is relevant in fields such as medicine, science, and social critique, where describing slow, damaging processes is essential. Thus, it is worth learning for adults building professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'harmful' as applied to pernicious is supported by evidence showing it describes something that works or spreads in a hidden, injurious way (E1), exemplified by insidious diseases (E2) and subtle poisons (E3). The word is frequently associated with 'insidious' and 'subtle' (E4), reinforcing its connotation of gradual, damaging harm. Its frequency of 2.87 (E5) indicates it is not rare, and as a part of speech 'a' (E6), it is used adjectivally in professional and academic contexts. This meaning is relevant in fields such as medicine, science, and social critique, where describing slow, damaging processes is essential. Thus, it is worth learning for adults building professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "CoreWeave",
+  "usage": {
+    "prompt_tokens": 379,
+    "completion_tokens": 245,
+    "reasoning_tokens": 0,
+    "total_tokens": 624,
+    "cost_usd": 0.0001114
+  },
+  "latency_ms": 4413
+}

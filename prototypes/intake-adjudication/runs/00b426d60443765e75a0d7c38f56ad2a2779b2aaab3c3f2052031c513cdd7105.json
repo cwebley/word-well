@@ -1,0 +1,60 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "texan|oewn-texan__3.01.00..",
+  "fingerprint_key": "00b426d60443765e75a0d7c38f56ad2a2779b2aaab3c3f2052031c513cdd7105",
+  "fingerprint": {
+    "input_digest": "b6d148fa792e6150e27011bd0f4eb049c12ca2ff1f54b4590b3d5fcc0135025c",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "upstream_provider": "coreweave/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:20:33.745Z",
+  "finding": null,
+  "raw": {
+    "sense_id": "oewn-texan__3.01.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'of or relating to or characteristic of Texas or its residents' is relevant in professional and academic contexts, particularly in discussions involving U.S. regional studies, politics, sociology, or cultural analysis. The frequency score of 3.18 indicates it is not rare, suggesting regular usage in written and spoken English. As an adjective (part of speech: a), it is commonly used in formal and academic writing to describe attributes, policies, or cultural traits associated with Texas. This makes the meaning valuable for adults building a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": "subject identity lost: expected oewn-texan__3.01.00.., got oewn-texan__3.01.00",
+  "decision": null,
+  "effective": null,
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "CoreWeave",
+  "usage": {
+    "prompt_tokens": 336,
+    "completion_tokens": 173,
+    "reasoning_tokens": 0,
+    "total_tokens": 509,
+    "cost_usd": 0.0000855
+  },
+  "latency_ms": 2771
+}

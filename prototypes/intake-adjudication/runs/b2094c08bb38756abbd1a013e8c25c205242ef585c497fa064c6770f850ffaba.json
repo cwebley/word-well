@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "dimwit|oewn-dimwit__1.18.00..",
+  "fingerprint_key": "b2094c08bb38756abbd1a013e8c25c205242ef585c497fa064c6770f850ffaba",
+  "fingerprint": {
+    "input_digest": "9922a7f3488db853c21a7560ad3b8d0b7a657bac1557eb720c7d64a73e4a075a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:54.564Z",
+  "finding": {
+    "sense_id": "oewn-dimwit__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'a stupid incompetent person' is a colloquial, pejorative term used primarily in informal contexts. It is not a term that would typically appear in professional or academic writing, and its low frequency (Zipf 2.427) further indicates limited relevance for building a professional/academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-dimwit__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'a stupid incompetent person' is a colloquial, pejorative term used primarily in informal contexts. It is not a term that would typically appear in professional or academic writing, and its low frequency (Zipf 2.427) further indicates limited relevance for building a professional/academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 392,
+    "completion_tokens": 223,
+    "reasoning_tokens": 104,
+    "total_tokens": 615,
+    "cost_usd": 0.000052414
+  },
+  "latency_ms": 5950
+}

@@ -1,0 +1,59 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "herbivorous|oewn-herbivorous__3.00.00..",
+  "fingerprint_key": "87ba77a8360e1a3993cafeed5084e38ef8b6a546c52133ec9cb7b9ea9699e7f2",
+  "fingerprint": {
+    "input_digest": "e272986f8b8e93f4a9f50068d839eee68419cc7cacd6341858479650501b3171",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "upstream_provider": "deepinfra/bf16",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:19:54.428Z",
+  "finding": null,
+  "raw": {
+    "sense_id": "useful",
+    "usefulness": "useful",
+    "rationale": "The meaning 'feeding only on plants' is the standard definition of the adjective 'herbivorous', which is relevant in scientific, ecological, and biological contexts that adults may encounter in professional or academic settings.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": "subject identity lost: expected oewn-herbivorous__3.00.00.., got useful",
+  "decision": null,
+  "effective": null,
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 374,
+    "completion_tokens": 217,
+    "reasoning_tokens": 135,
+    "total_tokens": 591,
+    "cost_usd": 0.000050728
+  },
+  "latency_ms": 5812
+}
