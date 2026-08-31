@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "uppercase|oewn-uppercase__3.00.00..",
+  "fingerprint_key": "231f7e657ba22bd6879aa5c4f93824f9143da9a63079a6c369a9d566889fc74d",
+  "fingerprint": {
+    "input_digest": "4209160a009c2715d6d9ed12fa3dbcba05c06c8d4cbdde8de47320c26694ce8f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:45:37.606Z",
+  "finding": {
+    "sense_id": "oewn-uppercase__3.00.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning describes a historical aspect of typography, which is not essential for an adult building a professional or academic vocabulary. The word itself is common, but this specific historical definition is not.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-uppercase__3.00.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning describes a historical aspect of typography, which is not essential for an adult building a professional or academic vocabulary. The word itself is common, but this specific historical definition is not.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 362,
+    "completion_tokens": 98,
+    "reasoning_tokens": 0,
+    "total_tokens": 460,
+    "cost_usd": 0.0003536
+  },
+  "latency_ms": 935
+}

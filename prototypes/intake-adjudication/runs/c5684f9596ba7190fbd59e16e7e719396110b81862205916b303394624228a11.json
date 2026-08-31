@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "clog|oewn-clog__2.35.01..",
+  "fingerprint_key": "c5684f9596ba7190fbd59e16e7e719396110b81862205916b303394624228a11",
+  "fingerprint": {
+    "input_digest": "c95d8101a37edcfd4d4f4f12dd355217703a5e5f5fc2e5b4fc9dc9832030b3ab",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:42:28.197Z",
+  "finding": {
+    "sense_id": "oewn-clog__2.35.01..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest a very specific, somewhat archaic usage related to restraining animals, which is unlikely to be encountered in professional or academic contexts. The low frequency also supports this.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-clog__2.35.01..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest a very specific, somewhat archaic usage related to restraining animals, which is unlikely to be encountered in professional or academic contexts. The low frequency also supports this.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 356,
+    "completion_tokens": 109,
+    "reasoning_tokens": 0,
+    "total_tokens": 465,
+    "cost_usd": 0.0003793
+  },
+  "latency_ms": 836
+}

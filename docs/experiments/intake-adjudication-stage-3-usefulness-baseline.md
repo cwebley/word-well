@@ -597,3 +597,115 @@ synonyms.
 Next is the exploration draw — pool-representative, mostly un-endorsed, disjoint
 from both existing sets — which is where the capability cases for those clauses
 come from.
+
+---
+
+# Stage 3e: exploration draw 1
+
+## Pre-run record
+
+**Question.** What does the gate do on the population it will actually judge, and
+which failures does that population show that the golden twelve and the endorsed
+audit structurally cannot?
+
+**Changed variable.** None. Same configuration as stage 3d. This is a new sample,
+not a new gate.
+
+**Dataset.** `exploration/1` — 150 headwords, 244 meanings, simple random from the
+Zipf 1.0-4.0 band, unlabelled, disjoint from both existing sets. Seeded at
+20260831 and reproducible, but **disposable**: exploration exists to be consumed.
+
+**Why a third pool.** The golden twelve are hand-picked obvious cases. The audit
+is 100% editorially endorsed. But 47,954 of the pool's 50,860 headwords — 94% —
+were never nominated by anyone, and that is the population the gate will spend its
+life judging. The draw matches it: 6% endorsed, against 6% in the band itself.
+
+**What this is for.** New golden cases come from here and nowhere else.
+Promoting a word the retention audit rejected would bias the audit upward every
+cycle until it reported a rising number while detecting nothing.
+
+## Results
+
+244 calls, no contract failures. Spend `$0.0908`.
+
+**Retention 42.7%** — 64 kept of 150, against 88.0% on the endorsed audit. The gap
+is expected and is the point: the audit measures whether good words survive, this
+measures what the gate does with the general population.
+
+### Finding 1: the frequency defect, confirmed on a fresh sample
+
+**81 of 86 rejection rationales invoke frequency.** Kept words average Zipf 2.86,
+dropped 2.15. This is the third independent confirmation — `happy` in the golden
+set, twelve of twelve in the audit, and now 81 of 86 here, on words neither
+earlier set contained.
+
+It is no longer a hypothesis about the prompt. It is the prompt's dominant
+behaviour.
+
+### Finding 2: tier-3 technical terms are kept, at scale
+
+The `herbivorous` failure, no longer a single case. Among the 64 kept:
+
+```text
+hydroxychloroquine   thalassaemia   thorium      naltrexone (dropped)
+anabolism            autosome       anionic      biosynthetic
+```
+
+Domain-technical vocabulary admitted as "academic". Alongside genuinely correct
+keeps — `punctilious`, `bereft`, `panoply`, `putsch`, `braggart`, `revelatory` —
+and some everyday words that arguably should not be there: `autocorrect`,
+`broadcaster`, `feeder`, `lender`, `hose`, `clog`, `tricky`, `mileage`.
+
+### Finding 3: `equivocally` was dropped; `equivocate` is a golden keep
+
+Same root, opposite outcomes, and the difference is frequency. Either the
+criterion should keep both, or #59 should have removed `equivocally` as a
+grammatical derivation before the gate ever saw it. It cannot be right that the
+gate keeps one and drops the other on rarity alone.
+
+### Finding 4: 8% of the draw should never have reached the gate
+
+| Filter | Count | Words |
+|---|---|---|
+| British variant (`f_british`) | 7 | `utilised`, `vapour`, `pedlar`, `internationalise`, `onwards`, `chaperone`, `thalassaemia` |
+| Grammatical derivation, root in pool (#59) | 4 | `alertness`, `concreteness`, `rigorousness`, `easterly` |
+| Spelling variant (`f_variant`) | 3 | `chaperone`, `onwards`, `pedlar` |
+| Roman numeral (`f_roman`) | 1 | `xxi` |
+
+Twelve distinct headwords, 8% of the draw, paid for at model prices to answer a
+question a column already answers. `f_british`, `f_variant` and `f_roman` exist in
+the pool today and are not being applied; #59 is written and unbuilt.
+
+At full-pool scale that 8% is real money and, more importantly, real noise in
+every measurement taken before the filters land.
+
+## Candidate capability cases
+
+Surfaced for the owner to label. **Not labelled here** — the label authority is
+the product owner, and a case labelled by the agent that built the gate is a case
+the gate was tuned to pass.
+
+| Candidate | Currently | Would test |
+|---|---|---|
+| `thalassaemia`, `thorium`, `anabolism`, `autosome` | kept | the tier-3 edge, alongside `herbivorous` |
+| `pique`, `polemics`, `incontrovertibly`, `inexpedient` | dropped | the rarity floor: rare but arguably worth teaching |
+| `broadcaster`, `lender`, `feeder`, `hose`, `tricky` | kept | the tier-1 edge, alongside `happy` |
+| `punctilious`, `bereft`, `panoply`, `putsch` | kept | trip-wire keeps at the rare end the golden set lacks |
+
+The fourth row matters as much as the others. The golden set's six keeps sit
+between Zipf 2.12 and 3.43; it contains no rare keep, which is why it could not
+detect the rarity floor. Adding two or three would close that hole.
+
+## Decision
+
+Prompt v3 now has three confirmed findings and a clear root: version 1 states a
+direction where the criterion is a band, and never says what earns a word its
+place beside its synonyms.
+
+Recommended order before writing it:
+
+1. **Label the candidates above** — the owner's call, and the clauses should be
+   written against cases, not against these findings in the abstract.
+2. **Build the deterministic filters** — #59, plus the three flags already in the
+   pool. 8% of every future measurement is currently noise.
+3. **Then prompt v3**, measured against the golden set and both unlabelled sets.

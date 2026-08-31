@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "alertness|oewn-alertness__1.09.00..",
+  "fingerprint_key": "526adb9b7c7e1325183ead1453bda2af3c4e4b62fb33651f426edaa6f97a59c2",
+  "fingerprint": {
+    "input_digest": "a0bd279cd6a77110657581816c044cac354094cadce215a1d24fadcb419c149a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:41:50.068Z",
+  "finding": {
+    "sense_id": "oewn-alertness__1.09.00..",
+    "usefulness": "useful",
+    "rationale": "The definition describes a valuable cognitive state for professional and academic contexts, and the word is common enough to be encountered regularly.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-alertness__1.09.00..",
+    "usefulness": "useful",
+    "rationale": "The definition describes a valuable cognitive state for professional and academic contexts, and the word is common enough to be encountered regularly.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 385,
+    "completion_tokens": 82,
+    "reasoning_tokens": 0,
+    "total_tokens": 467,
+    "cost_usd": 0.0003205
+  },
+  "latency_ms": 853
+}

@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "brummagem|oewn-brummagem__5.00.00.tasteless.02",
+  "fingerprint_key": "09b304c42ec0bf0aaa98dce87fe1ff7b11319ff8c727c443a494e4e8203b8439",
+  "fingerprint": {
+    "input_digest": "d1ed539c0bfbf9ca11e7f0c519f04eecd276ce1d7558b10644adb9cd1de95e0e",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T02:42:12.863Z",
+  "finding": {
+    "sense_id": "oewn-brummagem__5.00.00.tasteless.02",
+    "usefulness": "not_useful",
+    "rationale": "The word is extremely rare (E3) and the definition (E1) and example (E2) do not suggest a specialized or academic usage that would make it essential for an adult building a professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-brummagem__5.00.00.tasteless.02",
+    "usefulness": "not_useful",
+    "rationale": "The word is extremely rare (E3) and the definition (E1) and example (E2) do not suggest a specialized or academic usage that would make it essential for an adult building a professional vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 351,
+    "completion_tokens": 114,
+    "reasoning_tokens": 0,
+    "total_tokens": 465,
+    "cost_usd": 0.0003903
+  },
+  "latency_ms": 967
+}
