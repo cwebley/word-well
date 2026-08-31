@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "austere|oewn-austere__5.00.00.plain.01",
+  "fingerprint_key": "6d1dbaddbcac807aba1fa46ad0e99c5acd82cedd36019d591d7af6ba9c907ad8",
+  "fingerprint": {
+    "input_digest": "a22cc5f725df2cdd205951edfb99dd209234065a279ff120dd58b0099347db6f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T01:45:21.964Z",
+  "finding": {
+    "sense_id": "oewn-austere__5.00.00.plain.01",
+    "usefulness": "useful",
+    "rationale": "The meaning 'severely simple' is a precise adjective useful in professional and academic writing for describing design, architecture, prose, or living conditions. The example 'a stark interior' and the recorded cluster with 'severe' and 'stark' show it is a real, expressive vocabulary item, not an obscure technicality. Although the frequency is low, it is a recognizable and effective word for adult vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-austere__5.00.00.plain.01",
+    "usefulness": "useful",
+    "rationale": "The meaning 'severely simple' is a precise adjective useful in professional and academic writing for describing design, architecture, prose, or living conditions. The example 'a stark interior' and the recorded cluster with 'severe' and 'stark' show it is a real, expressive vocabulary item, not an obscure technicality. Although the frequency is low, it is a recognizable and effective word for adult vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 8
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 424,
+    "completion_tokens": 448,
+    "reasoning_tokens": 307,
+    "total_tokens": 872,
+    "cost_usd": 0.00011456
+  },
+  "latency_ms": 8572
+}

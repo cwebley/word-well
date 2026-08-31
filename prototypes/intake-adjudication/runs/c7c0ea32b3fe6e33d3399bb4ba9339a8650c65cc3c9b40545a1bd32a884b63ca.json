@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "homegirl|oewn-homegirl__1.18.00..",
+  "fingerprint_key": "c7c0ea32b3fe6e33d3399bb4ba9339a8650c65cc3c9b40545a1bd32a884b63ca",
+  "fingerprint": {
+    "input_digest": "a152b7f0baf9e62664c09bc430e1c71408a01d96c307828368c2cefb81728eed",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T01:45:25.189Z",
+  "finding": {
+    "sense_id": "oewn-homegirl__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning is a slang term referring to a female gang member, with a very low Zipf frequency of 2.145. This is not a meaning that would benefit an adult building a professional or academic vocabulary, as it is both niche and colloquial.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-homegirl__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning is a slang term referring to a female gang member, with a very low Zipf frequency of 2.145. This is not a meaning that would benefit an adult building a professional or academic vocabulary, as it is both niche and colloquial.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 401,
+    "completion_tokens": 222,
+    "reasoning_tokens": 125,
+    "total_tokens": 623,
+    "cost_usd": 0.00007204
+  },
+  "latency_ms": 3223
+}

@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pinnate|oewn-pinnate__5.00.00.compound.00",
+  "fingerprint_key": "3d8e325a2153a985048c7c8521c9e38942daa07ea69662dc65c456985b5f8901",
+  "fingerprint": {
+    "input_digest": "08bf1c256a0b09d8eb5f066463b261df6bc134316d36fa212b57bd466020e659",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T01:46:27.360Z",
+  "finding": {
+    "sense_id": "oewn-pinnate__5.00.00.compound.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition is a specialized botanical term with a very low frequency (Zipf 2.17), indicating it is rare. For adults building general professional and academic vocabulary, this narrow technical meaning is unlikely to be worth learning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pinnate__5.00.00.compound.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition is a specialized botanical term with a very low frequency (Zipf 2.17), indicating it is rare. For adults building general professional and academic vocabulary, this narrow technical meaning is unlikely to be worth learning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 429,
+    "completion_tokens": 269,
+    "reasoning_tokens": 168,
+    "total_tokens": 698,
+    "cost_usd": 0.00008274
+  },
+  "latency_ms": 5808
+}

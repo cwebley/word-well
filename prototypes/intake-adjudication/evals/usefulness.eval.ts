@@ -40,7 +40,17 @@ const store = new RunStore(RUNS_DIR);
 Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
   "WordWell audience-usefulness adjudication",
   {
-    experimentName: `${CASE_SET} · ${model.model}`,
+    // The case set alone is not a distinguishing name: `usefulness-golden-v1`
+    // is the DATASET version, and two runs of it under different prompts would
+    // land on the same experiment with no way to tell them apart. What makes a
+    // run comparable to another is the configuration, so the name carries it.
+    experimentName: [
+      CASE_SET,
+      usefulnessGate.versions.prompt.replace("usefulness-", ""),
+      usefulnessGate.versions.contract.replace("usefulness-", ""),
+      model.model.split("/").pop(),
+      model.upstreamProvider,
+    ].join(" · "),
     metadata: {
       stage: "3 — usefulness baseline",
       case_set: CASE_SET,

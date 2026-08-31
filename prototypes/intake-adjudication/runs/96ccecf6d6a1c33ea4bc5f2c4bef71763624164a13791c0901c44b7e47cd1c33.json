@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.harmful.00",
+  "fingerprint_key": "96ccecf6d6a1c33ea4bc5f2c4bef71763624164a13791c0901c44b7e47cd1c33",
+  "fingerprint": {
+    "input_digest": "f1f54374abe76905856465c5358daec2814fa872c72508252a9c7648533b9386",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T01:42:32.134Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'working or spreading in a hidden and usually injurious way' is a precise, nuanced concept that appears in professional and academic contexts, as shown by the examples (glaucoma, subtle poison) and its grouping with 'insidious' and 'subtle'. Even though the word is rare (Zipf 2.87), knowing this meaning helps an adult understand and express the idea of hidden harm, which is valuable in fields like medicine, policy, and analysis.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "useful",
+    "rationale": "The meaning 'working or spreading in a hidden and usually injurious way' is a precise, nuanced concept that appears in professional and academic contexts, as shown by the examples (glaucoma, subtle poison) and its grouping with 'insidious' and 'subtle'. Even though the word is rare (Zipf 2.87), knowing this meaning helps an adult understand and express the idea of hidden harm, which is valuable in fields like medicine, policy, and analysis.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 371,
+    "completion_tokens": 628,
+    "reasoning_tokens": 505,
+    "total_tokens": 999,
+    "cost_usd": 0.00014272
+  },
+  "latency_ms": 14394
+}

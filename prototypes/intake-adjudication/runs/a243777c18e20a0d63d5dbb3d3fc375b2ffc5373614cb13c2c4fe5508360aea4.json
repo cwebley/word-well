@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "texan|oewn-texan__3.01.00..",
+  "fingerprint_key": "a243777c18e20a0d63d5dbb3d3fc375b2ffc5373614cb13c2c4fe5508360aea4",
+  "fingerprint": {
+    "input_digest": "b6d148fa792e6150e27011bd0f4eb049c12ca2ff1f54b4590b3d5fcc0135025c",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "upstream_provider": "deepinfra/fp8",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/2",
+    "rubric_version": "usefulness-rubric/2",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T01:48:04.762Z",
+  "finding": {
+    "sense_id": "oewn-texan__3.01.00..",
+    "usefulness": "useful",
+    "rationale": "The definition identifies a standard relational adjective for describing something connected to Texas. In professional and academic contexts, such geographic adjectives are commonly needed for precise reference. The part of speech is adjective, and although the frequency is moderate-to-low (Zipf 3.18), this meaning is still clear and relevant for adult vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-texan__3.01.00..",
+    "usefulness": "useful",
+    "rationale": "The definition identifies a standard relational adjective for describing something connected to Texas. In professional and academic contexts, such geographic adjectives are commonly needed for precise reference. The part of speech is adjective, and although the frequency is moderate-to-low (Zipf 3.18), this meaning is still clear and relevant for adult vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "DeepInfra",
+  "usage": {
+    "prompt_tokens": 407,
+    "completion_tokens": 3963,
+    "reasoning_tokens": 3851,
+    "total_tokens": 4370,
+    "cost_usd": 0.0007459
+  },
+  "latency_ms": 89764
+}

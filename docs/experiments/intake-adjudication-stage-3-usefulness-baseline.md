@@ -242,3 +242,122 @@ Open questions for the checkpoint:
 3. Run the retention audit now, at roughly `$0.03` for ~100 words, to get a
    resolution instrument behind the next prompt change? It costs no labelling
    time and the sample is already drawn.
+
+---
+
+# Stage 3b: contract v2
+
+## Pre-run record
+
+**Question.** Does giving every piece of evidence a citable label fix the
+`evidence_ids` field, and what does the judge cite when it can cite honestly?
+
+**Changed variable.** The contract and the evidence rendering, together — they
+cannot be separated, since numbering the evidence is what the new field cites.
+`usefulness-finding/2`, `usefulness-prompt/2`, `usefulness-rubric/2`. **The
+criterion text is byte-identical to version 1.** Model, endpoint, temperature,
+dataset and labels all held constant.
+
+Two changes, both traced to the baseline:
+
+1. **Numbered evidence.** Version 1 asked for "identifiers from the supplied
+   evidence" when the sense id was the only identifier in the prompt. Measured
+   result: the scorer rewarded saying less. `Texan` scored 100% by echoing one
+   id; `pinnate` scored 0% for naming the three things it actually reasoned
+   from — `frequency_Zipf_2.17`, `definition_leaf_shape_featherlike`,
+   `part_of_speech_a`, all real evidence, none of it nameable.
+2. **`diagnostic_confidence` removed.** The one field with no consumer. Seventeen
+   of nineteen values landed between 0.85 and 1.0, and two came back as `3` on a
+   scale documented as 0 to 1.
+
+**Expected spend.** `$0.0184` pessimistic. **Stopping condition.** Nineteen
+calls. No prompt-criterion change in the same run.
+
+## Results
+
+Nineteen calls, no repairs, ledger reconciles.
+
+### The citation field works
+
+**67 of 67 citations legal, against 44% pooled under version 1.** Every one
+points at a label that exists.
+
+The metadata is worth more than the score. Across nineteen calls the judge cited:
+
+| Evidence | Times cited |
+|---|---|
+| example | 20 |
+| definition | 19 |
+| **frequency** | **13** |
+| synonyms | 10 |
+| part of speech | 5 |
+
+Frequency is read in thirteen of nineteen calls. Under version 1 that was
+guesswork; it is now measured, and it is the instrument the `happy` question
+needed.
+
+### The score fell, and the composition is what matters
+
+`HeadwordDisposition` 10/12 -> 9/12. Two verdicts moved, in opposite directions.
+
+**`happy` sense 1 flipped to `not_useful` — an improvement, with no criterion
+change.**
+
+> v1: "a core, everyday sense of a **very frequent** English word... foundational
+> and useful"
+> v2: "a basic, everyday sense of a very common word... **not** a concept an adult
+> building a professional or academic vocabulary would specifically need to learn"
+
+That is the tier-1 reasoning finding 3 said needed a clause. It arrived without
+one, which suggests promoting frequency from a header line to a labelled evidence
+item is what made it usable.
+
+**`Texan`'s adjective sense flipped to `useful` — a regression.** The rationales
+differ in kind, not just verdict. Version 1 reasoned about the category: "such
+vocabulary typically consists of abstract, technical, or cross-disciplinary
+terms". Version 2 walked the list: "The definition identifies... The part of
+speech is adjective, and although the frequency is...".
+
+**Hypothesis, held loosely at n=2:** numbering makes the judge more
+evidence-driven and less holistic. That helps where the evidence is decisive and
+hurts where the call needs a category read the evidence does not state. Not
+believed until a larger set says so.
+
+Mitigating: `Texan` is removed by the deterministic demonym filter before this
+gate. The golden set carries it as defence in depth, so the regression costs less
+than the score implies.
+
+### The fold now demonstrably blocks tier-1 rejection
+
+`happy` is `not_useful, useful, useful, useful` and **still advances**, because
+any `useful` keeps the word. Rejecting a tier-1 word requires every sense to
+flip. This was raised as a hypothetical at the checkpoint and is now observed.
+The owner's call stands — fold as-is for now — but it is a real constraint on
+what a criterion clause can achieve alone.
+
+### Operations
+
+| | v1 | v2 |
+|---|---|---|
+| Cost | `$0.002358` | `$0.003280` (+39%) |
+| Completion tokens | 9,964 | 14,879 |
+| of which reasoning | 7,384 | **12,649** (+71%) |
+| Latency, median | 10,562 ms | 8,359 ms |
+| Legal citations | 44% | **100%** |
+
+More reasoning, more cost, lower wall-clock latency.
+
+## Decision
+
+**No conclusion about v2 being better or worse.** One flip in each direction
+across twelve cases is 8.3% per case; this is the noise the plan warns about, and
+9 against 10 is not a result. What v2 bought is structural and not in dispute:
+citations that work, and visibility into which evidence carries a verdict.
+
+Braintrust experiment names now carry the configuration — case set, prompt
+version, contract version, model, upstream — because `usefulness-golden-v1` is
+the *dataset* version and two runs under different prompts were colliding under
+one name.
+
+Next is the model bake-off, on this contract, with the model as the only
+variable.
