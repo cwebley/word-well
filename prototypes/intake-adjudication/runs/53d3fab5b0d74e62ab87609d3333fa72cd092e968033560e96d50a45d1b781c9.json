@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "mar|oewn-mar__1.07.00..",
+  "fingerprint_key": "53d3fab5b0d74e62ab87609d3333fa72cd092e968033560e96d50a45d1b781c9",
+  "fingerprint": {
+    "input_digest": "a1bacc752b58c308a021041caf965365ddba07a12686a1cc9fcb0ff2e3823054",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:00:25.971Z",
+  "finding": {
+    "sense_id": "oewn-mar__1.07.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest this meaning refers to a physical flaw, which is too specific and not broadly applicable across professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-mar__1.07.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest this meaning refers to a physical flaw, which is too specific and not broadly applicable across professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 400,
+    "completion_tokens": 84,
+    "reasoning_tokens": 0,
+    "total_tokens": 484,
+    "cost_usd": 0.00033
+  },
+  "latency_ms": 1106
+}

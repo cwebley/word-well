@@ -1,0 +1,80 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "noisome|oewn-noisome__5.00.00.unwholesome.00",
+  "fingerprint_key": "aca6cf68c089c435d3f4bdfc72195537eca857e89b06d9e85b6b9be1ca5b6538",
+  "fingerprint": {
+    "input_digest": "335da248e0eb055bedad6fb4afc23b083e6975fe344cc9b494ae9f7be28a2b5a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:17:22.316Z",
+  "finding": {
+    "sense_id": "oewn-noisome__5.00.00.unwholesome.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'causing or able to cause nausea' describes a common physical sensation that most adults would already understand and express using more common synonyms.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-noisome__5.00.00.unwholesome.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'causing or able to cause nausea' describes a common physical sensation that most adults would already understand and express using more common synonyms.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 5
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 480,
+    "completion_tokens": 96,
+    "reasoning_tokens": 0,
+    "total_tokens": 576,
+    "cost_usd": 0.000384
+  },
+  "latency_ms": 916
+}

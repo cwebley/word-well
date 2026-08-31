@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "xxi|oewn-xxi__5.00.00.cardinal.00",
+  "fingerprint_key": "e21e4cb2a89b72aa379e1e01d182a6639278fb2b6a6a87f176e7419d96c972c4",
+  "fingerprint": {
+    "input_digest": "84942115deaacf42cced5cde8088458b5d4df04662f3fa077618c4c8188d676c",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:23:06.683Z",
+  "finding": {
+    "sense_id": "oewn-xxi__5.00.00.cardinal.00",
+    "usefulness": "not_useful",
+    "rationale": "This meaning refers to the number 21, which is ordinary vocabulary an adult already knows. The Roman numeral form is also widely recognized.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-xxi__5.00.00.cardinal.00",
+    "usefulness": "not_useful",
+    "rationale": "This meaning refers to the number 21, which is ordinary vocabulary an adult already knows. The Roman numeral form is also widely recognized.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 436,
+    "completion_tokens": 82,
+    "reasoning_tokens": 0,
+    "total_tokens": 518,
+    "cost_usd": 0.0003358
+  },
+  "latency_ms": 913
+}

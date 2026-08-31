@@ -709,3 +709,122 @@ Recommended order before writing it:
 2. **Build the deterministic filters** — #59, plus the three flags already in the
    pool. 8% of every future measurement is currently noise.
 3. **Then prompt v3**, measured against the golden set and both unlabelled sets.
+
+---
+
+# Stage 3f: prompt v3 to v5
+
+Three prompt versions in one arc, because two of them failed and the third is
+only legible against them.
+
+## Pre-run record
+
+**Question.** Can the criterion be stated so the gate stops rejecting words for
+being rare, without losing what it already gets right?
+
+**Findings behind it.** Three, each confirmed independently: frequency read
+monotonically (`happy`, 12/12 in the audit, 81/86 in exploration), "academic"
+read as "used in an academic discipline" (`herbivorous`, `pinnate`, and six
+technical terms admitted in the draw), and synonym redundancy applied
+inconsistently with the labels (`inexpedient` against `laconic`).
+
+**Deliberately deferred.** The synonym clause. The owner's view is that a synonym
+never makes a word redundant, but the decision was to remove the frequency crutch
+first and see whether the behaviour went with it, rather than write two clauses
+and be unable to attribute either.
+
+**Measured before writing.** Of 164 rejections whose rationale invoked rarity,
+**162 cited the frequency evidence label directly.** That predicted the deletion
+alone would be nearly sufficient and argued against also writing a "rarity is not
+a reason" clause, which would have been a clause added before it was shown to be
+needed.
+
+## Results
+
+| | v2 | v3 | v4 | **v5** |
+|---|---|---|---|---|
+| Golden `HeadwordDisposition` | 10/15 | 10/15 | 14/15 | **13/15** |
+| Golden `NoSilentExclusion` | 13/15 | 10/15 | 14/15 | **15/15** |
+| Retention audit | 88.0% | 43.0% | 51.0% | **93.0%** |
+| Exploration draw 1 | 42.7% | 8.7% | 13.3% | **52.7%** |
+| "already known" rejections | 51 | 272 | 236 | — |
+| rarity rejections | 147 | 2 | 4 | — |
+
+### v3: the frequency deletion worked; the everyday clause did not
+
+Deleting the frequency evidence took rarity reasoning from **147 rejections to
+2**, exactly as the 162-of-164 measurement predicted. That half of v3 is a clean
+success and survives into v5 untouched.
+
+The other half added a clause: *"if a competent adult speaker would already use
+this meaning without being taught, it is not_useful."* Already-known reasoning
+went from 51 to **272**, retention fell to 43.0%, and exploration to 8.7%. The
+golden score did not move — 10/15 both before and after — while every miss
+inverted from admits to silent exclusions. A single score, read alone, would have
+called v3 a draw.
+
+### v4: rewording did not fix it, which is how we learned why
+
+The clause said "meaning". Every teachable word expresses a meaning adults
+already have — that is what a synonym is — so the clause was trivially satisfied
+by almost every good word. Changing it to "word" moved already-known reasoning
+only from 272 to 236, against a baseline of 51.
+
+The golden set rose to 14/15 and **the audit fell to 51.0%**. Fifteen cases said
+best-yet; a hundred said the gate was dropping half of what editors chose,
+including `rescind` (6 endorsements) as *"covered by common words like cancel and
+revoke"*, plus `confound`, `underscore`, `imminent` and `lampoon`.
+
+**The diagnosis is structural, not verbal.** The clause asks a language model
+whether a competent adult would already know a word, of a system that knows every
+word and has no model of what a learner lacks. Under v4, `ubiquitous` was rejected
+without even citing a synonym: *"already well-understood by competent adult
+speakers."* No rewording reaches that.
+
+### v5: removing the clause
+
+Frequency stays deleted, the single-field clause stays, the everyday clause goes.
+
+Retention **93.0%**, five points above the v2 baseline that predates any prompt
+work. Exploration **52.7%**, ten points above. Golden 13/15 with **both misses in
+the admitting direction**, so `NoSilentExclusion` is 15/15 — no word the owner
+wanted is lost, for the first time since the rare cases were added.
+
+What each change bought, separably:
+
+- **Frequency deletion** fixed `inexpedient`, `muckraking` and `punctilious` —
+  the entire rarity floor, and the three cases added for it.
+- **The single-field clause** fixed `pinnate`.
+- **`herbivorous` is unfixed**, and now disputed rather than misread. The judge
+  calls it *"a general biological term, widely applicable across various academic
+  and professional contexts, not limited to a single specialized field."* That is
+  an argument against the label, not a failure to understand the clause.
+- **`happy` is unfixed by design.** At Zipf 5.38 against a 4.0 ceiling it never
+  reaches a prompt; it stays in the golden set as defence in depth.
+
+Seven audit words are still dropped, and they are a coherent group rather than
+noise: `acidulous`, `noisome`, `refulgent`, `sapid`, `plangent`, `venality`,
+`ogle` — mostly sensory adjectives argued to be "simple" or "common concepts".
+
+## Decision
+
+**v5 is the configuration to keep.** It is better than the pre-prompt baseline on
+every instrument and loses nothing the owner asked for.
+
+The arc is the argument for the plan's structure. Golden alone would have called
+v3 a draw and v4 the best run of the project; the retention audit called them a
+45-point and a 37-point collapse. Neither instrument could have done the other's
+job.
+
+Two things carried forward:
+
+1. **The everyday end is the deterministic filter's job.** `chanted` (3.0) and
+   `pout` (3.1) sit inside the band and will get through. A ceiling low enough to
+   catch them would also cut `ubiquitous` (3.42) and `nuance` (3.43). Admitting a
+   few obvious words is the cheaper error.
+2. **If it is attempted again, ask about the word, not about what someone
+   knows.** "Would a general-audience publication use this without explanation" —
+   the owner's suggestion of a YA novel or a teen magazine as the reference point
+   is sharper still, since `happy`, `pout` and `chanted` all clearly belong there
+   while `ubiquitous` and `pernicious` do not. That is a question about register,
+   answerable from evidence, and the model's own competence does not decide it.

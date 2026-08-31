@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "benighted|oewn-benighted__5.00.00.unpunctual.00",
+  "fingerprint_key": "96a1c62ff797e7d3625deda1b1417663f7487f0aac90ce8ea73eabbd014560ad",
+  "fingerprint": {
+    "input_digest": "3f196ea9476cc20c168f56fa6b05569650ea4740e06dfe6428b8466eb48827bc",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:41:29.727Z",
+  "finding": {
+    "sense_id": "oewn-benighted__5.00.00.unpunctual.00",
+    "usefulness": "not_useful",
+    "rationale": "This meaning describes being overtaken by night, which is an ordinary concept that most adults would already understand and express without needing to learn a specific vocabulary word for it.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-benighted__5.00.00.unpunctual.00",
+    "usefulness": "not_useful",
+    "rationale": "This meaning describes being overtaken by night, which is an ordinary concept that most adults would already understand and express without needing to learn a specific vocabulary word for it.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 486,
+    "completion_tokens": 87,
+    "reasoning_tokens": 0,
+    "total_tokens": 573,
+    "cost_usd": 0.0003633
+  },
+  "latency_ms": 922
+}

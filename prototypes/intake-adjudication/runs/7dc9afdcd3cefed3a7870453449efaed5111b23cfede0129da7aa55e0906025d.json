@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "parsimonious|oewn-parsimonious__5.00.00.stingy.00",
+  "fingerprint_key": "7dc9afdcd3cefed3a7870453449efaed5111b23cfede0129da7aa55e0906025d",
+  "fingerprint": {
+    "input_digest": "25a1a3b2faaa206af893c389ae6a9527ab2f83649ea7ff4b6ae5f1beac78cdf3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:00:55.171Z",
+  "finding": {
+    "sense_id": "oewn-parsimonious__5.00.00.stingy.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples clearly indicate a meaning related to being unwilling to spend, which is a concept applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-parsimonious__5.00.00.stingy.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples clearly indicate a meaning related to being unwilling to spend, which is a concept applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 6
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 420,
+    "completion_tokens": 96,
+    "reasoning_tokens": 0,
+    "total_tokens": 516,
+    "cost_usd": 0.000366
+  },
+  "latency_ms": 1048
+}

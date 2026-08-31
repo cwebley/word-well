@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "appropriate|oewn-appropriate__2.31.00..",
+  "fingerprint_key": "35400573b3867daa695de5a30ee3f922d71279127c8e0f39e0e4217a4124939e",
+  "fingerprint": {
+    "input_digest": "114adb5c77b1d01f86bbb7cda09a0e035ef9cda4919c18998c88f0bcefb46d99",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:58:28.322Z",
+  "finding": {
+    "sense_id": "oewn-appropriate__2.31.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and examples show this meaning of 'appropriate' as a verb, which is a high-utility word for professional and academic contexts, referring to the allocation of resources.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-appropriate__2.31.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and examples show this meaning of 'appropriate' as a verb, which is a high-utility word for professional and academic contexts, referring to the allocation of resources.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 417,
+    "completion_tokens": 100,
+    "reasoning_tokens": 0,
+    "total_tokens": 517,
+    "cost_usd": 0.0003751
+  },
+  "latency_ms": 936
+}

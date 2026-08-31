@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "deathblow|oewn-deathblow__1.04.00..",
+  "fingerprint_key": "0fa18ed162aacc95e53add347ecfc47a3fc09fa2664dfd233ccc27e0dce2e406",
+  "fingerprint": {
+    "input_digest": "8e105bdd84adc77998e725446c82b1cbfae55b359f4f9158f31c6ec1441fc08d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:02:48.246Z",
+  "finding": {
+    "sense_id": "oewn-deathblow__1.04.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a very specific and literal meaning related to killing, which is not broadly applicable across professional and academic subjects. The synonym 'coup de grace' further emphasizes this narrow, specialized context.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-deathblow__1.04.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a very specific and literal meaning related to killing, which is not broadly applicable across professional and academic subjects. The synonym 'coup de grace' further emphasizes this narrow, specialized context.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 379,
+    "completion_tokens": 97,
+    "reasoning_tokens": 0,
+    "total_tokens": 476,
+    "cost_usd": 0.0003562
+  },
+  "latency_ms": 1046
+}

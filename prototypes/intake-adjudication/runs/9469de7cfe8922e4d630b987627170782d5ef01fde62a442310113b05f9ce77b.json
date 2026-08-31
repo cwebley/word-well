@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pliant|oewn-pliant__5.00.00.flexible.01",
+  "fingerprint_key": "9469de7cfe8922e4d630b987627170782d5ef01fde62a442310113b05f9ce77b",
+  "fingerprint": {
+    "input_digest": "2333c1615c8f2fbc75100a06d39f9d83f7940035c7eb404d0388852e46660c51",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:17:40.210Z",
+  "finding": {
+    "sense_id": "oewn-pliant__5.00.00.flexible.01",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'capable of being bent or flexed or twisted without breaking' describes a common physical property that most adults would already understand and express with more common synonyms like 'flexible' or 'bendable'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pliant__5.00.00.flexible.01",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'capable of being bent or flexed or twisted without breaking' describes a common physical property that most adults would already understand and express with more common synonyms like 'flexible' or 'bendable'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 461,
+    "completion_tokens": 110,
+    "reasoning_tokens": 0,
+    "total_tokens": 571,
+    "cost_usd": 0.0004133
+  },
+  "latency_ms": 986
+}

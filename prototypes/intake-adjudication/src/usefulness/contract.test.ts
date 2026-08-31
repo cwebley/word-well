@@ -12,18 +12,28 @@ const pinnate = subjects.find((s) => s.subject_id.startsWith("pinnate"))!;
 describe("numbered evidence", () => {
   it("labels every piece of evidence the judge is shown", () => {
     const items = evidenceItems(laconic);
-    expect(items.map((i) => i.id)).toEqual(["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]);
+    expect(items.map((i) => i.id)).toEqual(["E1", "E2", "E3", "E4", "E5", "E6", "E7"]);
     expect(items.map((i) => i.kind)).toEqual([
-      "definition", "example", "example", "example", "example", "synonyms", "frequency", "part_of_speech",
+      "definition", "example", "example", "example", "example", "synonyms", "part_of_speech",
     ]);
   });
 
-  it("gives the frequency a label, which is what version 1 could not", () => {
-    // `pinnate` reasoned from the frequency and had to invent
-    // `frequency_Zipf_2.17` to say so. Now there is a real label for it.
-    const frequency = evidenceItems(pinnate).find((i) => i.kind === "frequency")!;
-    expect(frequency.text).toBe("2.17");
-    expect(citableEvidenceIds(pinnate).has(frequency.id)).toBe(true);
+  it("shows the judge no frequency at all, since usefulness-prompt/3", () => {
+    // The field measured doing more harm than any other: 162 of 164 rejections
+    // invoking rarity cited it directly. "Too common" is now a deterministic
+    // filter, and "too rare" was never a reason to reject.
+    for (const subject of subjects) {
+      const rendered = renderSubject(subject);
+      // Widened deliberately: the union no longer contains "frequency", so the
+      // compiler already forbids this. The runtime check stays as the guard for
+      // anyone who re-adds the kind without re-reading why it went.
+      expect(evidenceItems(subject).map((i) => i.kind as string)).not.toContain("frequency");
+      expect(rendered).not.toContain("Zipf");
+      expect(rendered).not.toContain("frequency");
+    }
+    // The number is still on the record — the deterministic filter and every
+    // report read it. It simply never reaches a prompt.
+    expect(pinnate.candidate.zipf).toBe(2.17);
   });
 
   it("renders every label into the prompt, so a citation is always checkable", () => {

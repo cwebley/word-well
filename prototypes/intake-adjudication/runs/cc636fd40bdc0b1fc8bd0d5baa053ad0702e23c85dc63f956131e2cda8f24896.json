@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "equivocally|oewn-equivocally__4.02.00..",
+  "fingerprint_key": "cc636fd40bdc0b1fc8bd0d5baa053ad0702e23c85dc63f956131e2cda8f24896",
+  "fingerprint": {
+    "input_digest": "c258c611b83f1ea84f589fcc672828d61db2e4dc13d41edb5beb6aa06fa7bbb6",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:03:11.589Z",
+  "finding": {
+    "sense_id": "oewn-equivocally__4.02.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and example clearly indicate that 'equivocally' means 'in an ambiguous manner,' which is a high-utility concept for professional and academic communication.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-equivocally__4.02.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and example clearly indicate that 'equivocally' means 'in an ambiguous manner,' which is a high-utility concept for professional and academic communication.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 386,
+    "completion_tokens": 87,
+    "reasoning_tokens": 0,
+    "total_tokens": 473,
+    "cost_usd": 0.0003333
+  },
+  "latency_ms": 903
+}

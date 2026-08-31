@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "gratis|oewn-gratis__5.00.00.unpaid.00",
+  "fingerprint_key": "52e214b9c38ff26e02b2c98085e5c774cb1ca686360801e8f71984f4bfde4af4",
+  "fingerprint": {
+    "input_digest": "2a359a2d0cd3d674922aa0cc664f891930d1736a288e3ba5181c7129214902de",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:42:36.320Z",
+  "finding": {
+    "sense_id": "oewn-gratis__5.00.00.unpaid.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'costing nothing' is already covered by common words like 'free' or 'complimentary', which an adult speaker would already know.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-gratis__5.00.00.unpaid.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'costing nothing' is already covered by common words like 'free' or 'complimentary', which an adult speaker would already know.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 488,
+    "completion_tokens": 92,
+    "reasoning_tokens": 0,
+    "total_tokens": 580,
+    "cost_usd": 0.0003764
+  },
+  "latency_ms": 808
+}

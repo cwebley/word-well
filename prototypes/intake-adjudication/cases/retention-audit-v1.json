@@ -995,5 +995,6 @@
       "endorsements": 1,
       "oewn_senses": 2
     }
-  ]
+  ],
+  "role": "audit"
 }

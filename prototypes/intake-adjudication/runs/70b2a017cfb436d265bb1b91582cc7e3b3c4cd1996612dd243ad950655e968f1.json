@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "haphazard|oewn-haphazard__5.00.00.careless.00",
+  "fingerprint_key": "70b2a017cfb436d265bb1b91582cc7e3b3c4cd1996612dd243ad950655e968f1",
+  "fingerprint": {
+    "input_digest": "951216fe3996fd4bce1da3491bf8f85513d1f7683b65ce98c15a27f9e1a77cd8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:16:42.509Z",
+  "finding": {
+    "sense_id": "oewn-haphazard__5.00.00.careless.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'marked by great carelessness' is part of ordinary vocabulary that a competent adult speaker would already know. The examples and synonyms reinforce this common understanding.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-haphazard__5.00.00.careless.00",
+    "usefulness": "not_useful",
+    "rationale": "The meaning 'marked by great carelessness' is part of ordinary vocabulary that a competent adult speaker would already know. The examples and synonyms reinforce this common understanding.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 478,
+    "completion_tokens": 101,
+    "reasoning_tokens": 0,
+    "total_tokens": 579,
+    "cost_usd": 0.0003959
+  },
+  "latency_ms": 1048
+}

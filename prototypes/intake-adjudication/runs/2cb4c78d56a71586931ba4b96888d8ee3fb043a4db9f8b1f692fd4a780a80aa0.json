@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "haphazard|oewn-haphazard__5.00.00.careless.00",
+  "fingerprint_key": "2cb4c78d56a71586931ba4b96888d8ee3fb043a4db9f8b1f692fd4a780a80aa0",
+  "fingerprint": {
+    "input_digest": "951216fe3996fd4bce1da3491bf8f85513d1f7683b65ce98c15a27f9e1a77cd8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:59:56.607Z",
+  "finding": {
+    "sense_id": "oewn-haphazard__5.00.00.careless.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples indicate this meaning of 'haphazard' describes a general lack of care or order, which is applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-haphazard__5.00.00.careless.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples indicate this meaning of 'haphazard' describes a general lack of care or order, which is applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 428,
+    "completion_tokens": 94,
+    "reasoning_tokens": 0,
+    "total_tokens": 522,
+    "cost_usd": 0.0003634
+  },
+  "latency_ms": 1408
+}

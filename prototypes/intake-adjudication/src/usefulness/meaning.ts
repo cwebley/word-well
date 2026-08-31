@@ -56,7 +56,7 @@ export function headwordOf(subject: CandidateMeaning): string {
 export interface EvidenceItem {
   /** The label the judge cites: E1, E2, … */
   id: string;
-  kind: "definition" | "example" | "frequency" | "synonyms" | "part_of_speech" | "missing";
+  kind: "definition" | "example" | "synonyms" | "part_of_speech" | "missing";
   text: string;
 }
 
@@ -86,10 +86,24 @@ export function evidenceItems(subject: CandidateMeaning): EvidenceItem[] {
   if (meaning.synset_members.length > 1) {
     items.push({ kind: "synonyms", text: meaning.synset_members.join(", ") });
   }
-  items.push({
-    kind: "frequency",
-    text: candidate.zipf === null ? "MISSING FROM THE EVIDENCE" : String(candidate.zipf),
-  });
+  // Frequency is deliberately absent since usefulness-prompt/3.
+  //
+  // It was measured doing more harm than any other single field. Of 164
+  // rejections whose rationale invoked rarity, 162 cited this label directly:
+  // 12 of 12 in the retention audit, 81 of 86 in exploration draw 1, and `happy`
+  // in the golden set. The judge read it monotonically — common counted for,
+  // rare counted against — when the criterion is a band, and at the low end
+  // rarity is closer to the point than to a defect. `beneficence`, `noisome`
+  // and `refulgent` are exactly what this product teaches, and all were dropped
+  // for being rare.
+  //
+  // Removing it worked: rarity reasoning fell from 147 rejections to 2. The band
+  // is now a deterministic filter, `intake_filters.py`, which answers "too
+  // common" for free and more reliably.
+  //
+  // The prompt says nothing about rarity either. Removing the evidence was
+  // sufficient on its own, and a clause added before it is shown to be needed is
+  // a clause nobody will dare delete.
   items.push({ kind: "part_of_speech", text: meaning.pos });
   for (const marker of subject.missing_evidence) {
     items.push({ kind: "missing", text: marker });

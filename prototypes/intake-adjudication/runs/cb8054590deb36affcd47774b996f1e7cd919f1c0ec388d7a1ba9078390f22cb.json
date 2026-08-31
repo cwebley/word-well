@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "deposition|oewn-deposition__1.04.01..",
+  "fingerprint_key": "cb8054590deb36affcd47774b996f1e7cd919f1c0ec388d7a1ba9078390f22cb",
+  "fingerprint": {
+    "input_digest": "155a301c991d3e8abea974782908370d11dca572b3f01f283174c327414d9402",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:59:19.770Z",
+  "finding": {
+    "sense_id": "oewn-deposition__1.04.01..",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The definition is too vague to determine its usefulness. It could refer to a general act or a specific, technical one.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-deposition__1.04.01..",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The definition is too vague to determine its usefulness. It could refer to a general act or a specific, technical one.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning"
+  },
+  "effective": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 371,
+    "completion_tokens": 69,
+    "reasoning_tokens": 0,
+    "total_tokens": 440,
+    "cost_usd": 0.0002838
+  },
+  "latency_ms": 745
+}

@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "slander|oewn-slander__2.32.00..",
+  "fingerprint_key": "e807d84a06388d4ba8c53e2c2d4e4cefb5438a0147f1a0ded640aa9d2f84f570",
+  "fingerprint": {
+    "input_digest": "d50e0c6748e80659179af548e2ef3de1e249bbdfe6944c6294c7e52769286fa4",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:44:05.209Z",
+  "finding": {
+    "sense_id": "oewn-slander__2.32.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided for \"slander\" is a common verb that most competent adult speakers would already know and use. It does not represent a high-utility word for building a professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-slander__2.32.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided for \"slander\" is a common verb that most competent adult speakers would already know and use. It does not represent a high-utility word for building a professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 525,
+    "completion_tokens": 89,
+    "reasoning_tokens": 0,
+    "total_tokens": 614,
+    "cost_usd": 0.00038
+  },
+  "latency_ms": 796
+}

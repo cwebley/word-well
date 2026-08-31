@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "solarization|oewn-solarization__1.07.00..",
+  "fingerprint_key": "9eabf93ecc804e7d404c0940a4abd9fac626d2814751115ba109c211d39f1845",
+  "fingerprint": {
+    "input_digest": "64cd2578bdf7852653d55dbdbde35b4958b379d0d16c72021ea093aae8ddc4b4",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:22:23.266Z",
+  "finding": {
+    "sense_id": "oewn-solarization__1.07.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition 'exposure to the rays of the sun' describes an ordinary concept that a competent adult speaker would already understand without needing to learn a specific word for it.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-solarization__1.07.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition 'exposure to the rays of the sun' describes an ordinary concept that a competent adult speaker would already understand without needing to learn a specific word for it.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 426,
+    "completion_tokens": 90,
+    "reasoning_tokens": 0,
+    "total_tokens": 516,
+    "cost_usd": 0.0003528
+  },
+  "latency_ms": 822
+}

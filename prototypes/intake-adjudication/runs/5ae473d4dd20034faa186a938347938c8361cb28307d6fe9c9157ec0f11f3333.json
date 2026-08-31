@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "marxist|oewn-marxist__1.18.00..",
+  "fingerprint_key": "5ae473d4dd20034faa186a938347938c8361cb28307d6fe9c9157ec0f11f3333",
+  "fingerprint": {
+    "input_digest": "a65237d6e382bc9a1fe48951da6d05fd54b59b15eee969cc656081c5caf35913",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:46:20.168Z",
+  "finding": {
+    "sense_id": "oewn-marxist__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word \"Marxist\" is a common term that most competent adult speakers would already know, making it not useful for a professional and academic vocabulary builder.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-marxist__1.18.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word \"Marxist\" is a common term that most competent adult speakers would already know, making it not useful for a professional and academic vocabulary builder.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 449,
+    "completion_tokens": 81,
+    "reasoning_tokens": 0,
+    "total_tokens": 530,
+    "cost_usd": 0.0003372
+  },
+  "latency_ms": 843
+}

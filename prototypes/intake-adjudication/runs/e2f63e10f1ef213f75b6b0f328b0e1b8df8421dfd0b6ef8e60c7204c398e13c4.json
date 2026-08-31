@@ -1,0 +1,68 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pernicious|oewn-pernicious__5.00.00.harmful.00",
+  "fingerprint_key": "e2f63e10f1ef213f75b6b0f328b0e1b8df8421dfd0b6ef8e60c7204c398e13c4",
+  "fingerprint": {
+    "input_digest": "f1f54374abe76905856465c5358daec2814fa872c72508252a9c7648533b9386",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:40:51.671Z",
+  "finding": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The provided evidence is for 'insidious', not 'pernicious'. There is no definition or example for 'pernicious' to judge its usefulness.",
+    "evidence_ids": []
+  },
+  "raw": {
+    "sense_id": "oewn-pernicious__5.00.00.harmful.00",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The provided evidence is for 'insidious', not 'pernicious'. There is no definition or example for 'pernicious' to judge its usefulness.",
+    "evidence_ids": []
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning"
+  },
+  "effective": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 11
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 492,
+    "completion_tokens": 79,
+    "reasoning_tokens": 0,
+    "total_tokens": 571,
+    "cost_usd": 0.0003451
+  },
+  "latency_ms": 864
+}

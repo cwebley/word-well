@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "willful|oewn-willful__5.00.00.voluntary.01",
+  "fingerprint_key": "e03fac1748ce8d49842e9587ede40c08983fe998240f14307113b33cf365f1f7",
+  "fingerprint": {
+    "input_digest": "5626d4e4a4c627c04e7c27832eade1c2305e84eb78b60f55ab9d7da05aa9c8cd",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:18:29.491Z",
+  "finding": {
+    "sense_id": "oewn-willful__5.00.00.voluntary.01",
+    "usefulness": "useful",
+    "rationale": "The definition and example suggest a meaning that is not ordinary vocabulary and carries across various professional and academic contexts, indicating it is useful for an adult building such a vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-willful__5.00.00.voluntary.01",
+    "usefulness": "useful",
+    "rationale": "The definition and example suggest a meaning that is not ordinary vocabulary and carries across various professional and academic contexts, indicating it is useful for an adult building such a vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 433,
+    "completion_tokens": 84,
+    "reasoning_tokens": 0,
+    "total_tokens": 517,
+    "cost_usd": 0.0003399
+  },
+  "latency_ms": 887
+}

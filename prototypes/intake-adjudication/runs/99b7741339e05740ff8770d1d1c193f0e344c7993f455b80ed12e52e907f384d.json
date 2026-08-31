@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "unscrupulous|oewn-unscrupulous__3.00.00..",
+  "fingerprint_key": "99b7741339e05740ff8770d1d1c193f0e344c7993f455b80ed12e52e907f384d",
+  "fingerprint": {
+    "input_digest": "c1e0a8fcf00b644698cfcdc4c44e8702aa2a4d2561db517085173ca1c2991ff3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:44:17.676Z",
+  "finding": {
+    "sense_id": "oewn-unscrupulous__3.00.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and example show that 'unscrupulous' describes a lack of moral principles, a concept relevant across many professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-unscrupulous__3.00.00..",
+    "usefulness": "useful",
+    "rationale": "The definition and example show that 'unscrupulous' describes a lack of moral principles, a concept relevant across many professional and academic contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 472,
+    "completion_tokens": 76,
+    "reasoning_tokens": 0,
+    "total_tokens": 548,
+    "cost_usd": 0.0003316
+  },
+  "latency_ms": 819
+}

@@ -38,6 +38,12 @@ async function main() {
 
   console.log(`${CASE_SET} (${set.setVersion}) — UNLABELLED, never tuned toward`);
   console.log(`${set.groups.length} headwords, ${meanings.length} meanings`);
+  if (set.promoted.length) {
+    console.log(
+      `NOTE: ${set.promoted.length} of these are now golden cases (${set.promoted.join(", ")}).` +
+        " They are no longer independent evidence in this run.",
+    );
+  }
   if (set.missing.length) {
     console.log(`${set.missing.length} requested headwords have no evidence: ${set.missing.join(", ")}`);
   }

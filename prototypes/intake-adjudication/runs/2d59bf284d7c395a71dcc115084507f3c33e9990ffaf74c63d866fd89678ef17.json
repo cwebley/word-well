@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "clog|oewn-clog__2.30.00..",
+  "fingerprint_key": "2d59bf284d7c395a71dcc115084507f3c33e9990ffaf74c63d866fd89678ef17",
+  "fingerprint": {
+    "input_digest": "f8f8447b0dfb5c1c732b66bf058c5ed76368d111fd35e9dcac0f44e76a882a17",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:45:03.040Z",
+  "finding": {
+    "sense_id": "oewn-clog__2.30.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning 'impede' is a high-utility concept that applies across many subjects, and 'clog' provides a specific and vivid way to express it.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-clog__2.30.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning 'impede' is a high-utility concept that applies across many subjects, and 'clog' provides a specific and vivid way to express it.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 495,
+    "completion_tokens": 84,
+    "reasoning_tokens": 0,
+    "total_tokens": 579,
+    "cost_usd": 0.0003585
+  },
+  "latency_ms": 955
+}

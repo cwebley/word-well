@@ -10,21 +10,49 @@
 // baseline, not a defect. Every later clause must trace to a case it fixed, and
 // clauses should periodically be removed to check the score holds.
 //
-// What is NOT a rubric clause: the RULES block and the frequency scale. Those
-// are contract plumbing and units on a number — without the scale the Zipf
-// figure is noise, and frequency is the only evidence that separates `happy`
-// from the words worth teaching.
+// Version 5 removes the everyday-vocabulary clause that versions 3 and 4
+// carried. It cannot be made to work by rewording, and the reason is structural:
+// it asked a language model whether a competent adult would already know a word,
+// of a system that knows every word. Version 3 said "meaning", version 4 said
+// "word", and the already-known reasoning barely moved — 272 rejections to 236,
+// against a version 2 baseline of 51. Under version 4 the audit dropped
+// `rescind` (6 endorsements) as "covered by common words like cancel and
+// revoke", along with `confound`, `underscore`, `imminent` and `lampoon`.
+//
+// Retention fell from 88.0% to 51.0% while the golden set rose to 14/15, which
+// is the whole argument for keeping an unlabelled instrument: fifteen cases said
+// the change was the best yet and a hundred said it was dropping half the words
+// editors chose.
+//
+// The everyday end is now the deterministic filter's job alone. `happy` is Zipf
+// 5.38 against a 4.0 ceiling and never reaches a prompt. Words like `chanted`
+// (3.0) and `pout` (3.1) sit inside the band and will get through; a ceiling
+// low enough to catch them would also cut `ubiquitous` (3.42) and `nuance`
+// (3.43). Admitting a few obvious words is the cheaper error, because a wrong
+// admit is visible in the app and a wrong exclude is silent.
+//
+// If this is attempted again, ask about the word rather than about what someone
+// knows — "would a general-audience publication use this without explanation"
+// is answerable from register, and the model's own competence does not decide
+// it.
 
 import type { CandidateMeaning } from "./meaning.ts";
 import { evidenceItems } from "./meaning.ts";
 
-export const PROMPT_VERSION = "usefulness-prompt/2";
-export const RUBRIC_VERSION = "usefulness-rubric/2";
+export const PROMPT_VERSION = "usefulness-prompt/5";
+export const RUBRIC_VERSION = "usefulness-rubric/5";
 
 export const RUBRIC = `You judge one recorded meaning of one English word.
 
-WordWell teaches adults who are building a professional and academic vocabulary.
-Decide whether this meaning is one worth learning for that purpose.
+WordWell teaches adults who are building a professional and academic vocabulary:
+high-utility words that carry across many subjects.
+
+Vocabulary belonging to one field is not that. A term used mainly inside a
+single discipline is not_useful, even when that discipline is an academic one.
+"Academic" describes register that carries across subjects, not whether some
+field uses the word.
+
+Decide whether this meaning is one worth learning.
 
 - useful: an adult building a professional and academic vocabulary would be
   better off knowing this meaning.
@@ -53,8 +81,6 @@ const LABELS: Record<string, string> = {
   // a case behind it, which makes it a deliberate experiment, not a tidy-up to
   // fold into a contract bump.
   synonyms: "recorded alongside",
-  // The scale matters: 1 is a word almost nobody writes, 7 is "the".
-  frequency: "frequency (Zipf, 1 = very rare, 7 = among the commonest words in English)",
   part_of_speech: "part of speech",
   missing: "MISSING FROM THE EVIDENCE, recorded by the extractor",
 };

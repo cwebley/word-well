@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "acidulous|oewn-acidulous__5.00.00.sour.00",
+  "fingerprint_key": "c9ae6d1174e1b46eae5f7a977b0367f5f54e95a934452e1caa83e0ce914005e4",
+  "fingerprint": {
+    "input_digest": "6fd10238fbe5d6c9dc4b44a3be8078bef19e0a632496759afa53117695a3af80",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/5",
+    "rubric_version": "usefulness-rubric/5",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:58:26.481Z",
+  "finding": {
+    "sense_id": "oewn-acidulous__5.00.00.sour.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a simple sensory description, which is not typically considered high-utility for professional or academic vocabulary. The word is also redundant with 'acidic' and 'acid'.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-acidulous__5.00.00.sour.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a simple sensory description, which is not typically considered high-utility for professional or academic vocabulary. The word is also redundant with 'acidic' and 'acid'.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 382,
+    "completion_tokens": 109,
+    "reasoning_tokens": 0,
+    "total_tokens": 491,
+    "cost_usd": 0.0003871
+  },
+  "latency_ms": 1006
+}

@@ -169,16 +169,32 @@ export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v2"
 const unlabelledFileSchema = z.object({
   set_version: z.string(),
   gate: z.literal("audience-usefulness"),
+  /**
+   * Which rule about overlap applies.
+   *
+   * `audit` must never share a word with the golden set: it is a frozen
+   * instrument, and a retention rate measured over words the prompt was tuned on
+   * reads exactly like an honest one. Enforced.
+   *
+   * `exploration` is expected to overlap eventually — promoting its interesting
+   * cases into the golden set is what it is for. Warned, not enforced, because a
+   * promoted word in a re-run is no longer independent evidence and the reader
+   * should know how many there are.
+   */
+  role: z.enum(["audit", "exploration"]),
   sample: z.array(z.object({ lemma: z.string(), display: z.string() })).min(1),
 });
 
 export interface LoadedUnlabelledSet {
   name: string;
   setVersion: string;
+  role: "audit" | "exploration";
   manifest: EvidenceManifest;
   groups: HeadwordGroup[];
   /** Requested headwords the exporter could not materialise. */
   missing: string[];
+  /** Words since promoted into the golden set. Empty for an audit, by rule. */
+  promoted: string[];
 }
 
 export function loadUnlabelledSet(name: string, root = process.cwd()): LoadedUnlabelledSet {
@@ -201,14 +217,11 @@ export function loadUnlabelledSet(name: string, root = process.cwd()): LoadedUnl
   const present = new Set(groups.map((g) => g.headword));
   const missing = spec.sample.map((w) => w.lemma).filter((lemma) => !present.has(lemma));
 
-  // The audit must stay disjoint from every golden case. Checked on load rather
-  // than trusted, because a retention rate measured over words the prompt was
-  // tuned on reads exactly like an honest one.
   const golden = goldenLemmas(root);
-  const overlap = [...present].filter((lemma) => golden.has(lemma));
-  if (overlap.length) {
-    throw new Error(`${name} overlaps the golden set: ${overlap.join(", ")}`);
+  const promoted = [...present].filter((lemma) => golden.has(lemma));
+  if (spec.role === "audit" && promoted.length) {
+    throw new Error(`${name} is an audit and overlaps the golden set: ${promoted.join(", ")}`);
   }
 
-  return { name, setVersion: spec.set_version, manifest, groups, missing };
+  return { name, setVersion: spec.set_version, role: spec.role, manifest, groups, missing, promoted };
 }

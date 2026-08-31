@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "eloquently|oewn-eloquently__4.02.00..",
+  "fingerprint_key": "87c03db1b5c5a051b6ebda623abb7539442d2cc4241aacee3b85aee75056e5e7",
+  "fingerprint": {
+    "input_digest": "2f7fb71cc970d90e9c67c96dc217498e2d292de05de6da6f3965639b26e4a931",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:20:33.198Z",
+  "finding": {
+    "sense_id": "oewn-eloquently__4.02.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition simply refers to the base word 'eloquence', and the example shows a common usage that an adult speaker would already understand. There is no indication of specialized or high-utility academic use.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-eloquently__4.02.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition simply refers to the base word 'eloquence', and the example shows a common usage that an adult speaker would already understand. There is no indication of specialized or high-utility academic use.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 432,
+    "completion_tokens": 91,
+    "reasoning_tokens": 0,
+    "total_tokens": 523,
+    "cost_usd": 0.0003571
+  },
+  "latency_ms": 970
+}

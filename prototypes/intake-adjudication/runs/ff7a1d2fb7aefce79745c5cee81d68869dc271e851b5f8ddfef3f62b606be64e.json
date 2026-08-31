@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "orbiter|oewn-orbiter__1.06.00..",
+  "fingerprint_key": "ff7a1d2fb7aefce79745c5cee81d68869dc271e851b5f8ddfef3f62b606be64e",
+  "fingerprint": {
+    "input_digest": "1220c1469c70356fdeed8f2a66ea54b6f618a5d1c1b43380f0892619eff6d995",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:21:37.767Z",
+  "finding": {
+    "sense_id": "oewn-orbiter__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates this is a specific type of man-made equipment, which is likely too specialized for general professional and academic vocabulary. The synonym \"satellite\" also suggests it's a commonly understood concept.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-orbiter__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates this is a specific type of man-made equipment, which is likely too specialized for general professional and academic vocabulary. The synonym \"satellite\" also suggests it's a commonly understood concept.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 433,
+    "completion_tokens": 90,
+    "reasoning_tokens": 0,
+    "total_tokens": 523,
+    "cost_usd": 0.0003549
+  },
+  "latency_ms": 884
+}

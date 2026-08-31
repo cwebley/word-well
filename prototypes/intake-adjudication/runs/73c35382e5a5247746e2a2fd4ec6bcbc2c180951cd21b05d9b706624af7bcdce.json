@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "underscore|oewn-underscore__2.32.00..",
+  "fingerprint_key": "73c35382e5a5247746e2a2fd4ec6bcbc2c180951cd21b05d9b706624af7bcdce",
+  "fingerprint": {
+    "input_digest": "d72ca2c5faad0c0a90aca47fd4f94b4faa627e8da228d5ae918cdd41af273c92",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/3",
+    "rubric_version": "usefulness-rubric/3",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:18:17.993Z",
+  "finding": {
+    "sense_id": "oewn-underscore__2.32.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided is a common synonym for 'emphasize' or 'underline', which are words an adult speaker would already know and use. It does not represent a high-utility word for professional or academic vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-underscore__2.32.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided is a common synonym for 'emphasize' or 'underline', which are words an adult speaker would already know and use. It does not represent a high-utility word for professional or academic vocabulary building.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 5
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 441,
+    "completion_tokens": 96,
+    "reasoning_tokens": 0,
+    "total_tokens": 537,
+    "cost_usd": 0.0003723
+  },
+  "latency_ms": 986
+}

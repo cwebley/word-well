@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "abeyance|oewn-abeyance__1.26.00..",
+  "fingerprint_key": "5f5de505ffc1d84e246d4a16bff5c8a974f44c88974b651346a17532b767be83",
+  "fingerprint": {
+    "input_digest": "a712b9e0ecda16a8f06f8f640f54ad201ae98a9032e012d9b8104f68907e8683",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:41:12.219Z",
+  "finding": {
+    "sense_id": "oewn-abeyance__1.26.00..",
+    "usefulness": "useful",
+    "rationale": "The definition suggests a word that describes a state of temporary suspension, which is a concept applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-abeyance__1.26.00..",
+    "usefulness": "useful",
+    "rationale": "The definition suggests a word that describes a state of temporary suspension, which is a concept applicable across various professional and academic contexts.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 462,
+    "completion_tokens": 69,
+    "reasoning_tokens": 0,
+    "total_tokens": 531,
+    "cost_usd": 0.0003111
+  },
+  "latency_ms": 863
+}

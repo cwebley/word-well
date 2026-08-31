@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "abridge|oewn-abridge__2.30.01..",
+  "fingerprint_key": "26259a450ef8ad84fd36b3fcd13d3d48376beefee00bef5381cd3c8522cf1c5d",
+  "fingerprint": {
+    "input_digest": "4d5e83c69d88297ee84d1a32ab9340166b86446d8bc670310b9c6d595518b1d7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/4",
+    "rubric_version": "usefulness-rubric/4",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T04:41:14.060Z",
+  "finding": {
+    "sense_id": "oewn-abridge__2.30.01..",
+    "usefulness": "useful",
+    "rationale": "The definition and example show that 'abridge' in this sense means to lessen or curtail, which is a high-utility concept applicable across many subjects and not part of ordinary adult vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-abridge__2.30.01..",
+    "usefulness": "useful",
+    "rationale": "The definition and example show that 'abridge' in this sense means to lessen or curtail, which is a high-utility concept applicable across many subjects and not part of ordinary adult vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 466,
+    "completion_tokens": 85,
+    "reasoning_tokens": 0,
+    "total_tokens": 551,
+    "cost_usd": 0.0003523
+  },
+  "latency_ms": 921
+}
