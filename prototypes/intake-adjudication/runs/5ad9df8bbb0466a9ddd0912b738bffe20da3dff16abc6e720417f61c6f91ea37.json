@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "discerning|oewn-discerning__5.00.00.tactful.00",
+  "fingerprint_key": "5ad9df8bbb0466a9ddd0912b738bffe20da3dff16abc6e720417f61c6f91ea37",
+  "fingerprint": {
+    "input_digest": "61a4aefa0437a98ce8be8d860c7e2af49d15b801299056b64ceb03f0e2747baa",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:15:22.358Z",
+  "finding": {
+    "sense_id": "oewn-discerning__5.00.00.tactful.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition suggests a common, easily understood meaning, and the example 'a discerning editor' does not elevate it to a high-utility academic or professional word.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-discerning__5.00.00.tactful.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition suggests a common, easily understood meaning, and the example 'a discerning editor' does not elevate it to a high-utility academic or professional word.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 456,
+    "completion_tokens": 86,
+    "reasoning_tokens": 0,
+    "total_tokens": 542,
+    "cost_usd": 0.0003518
+  },
+  "latency_ms": 887
+}

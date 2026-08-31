@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "discerning|oewn-discerning__5.00.00.perceptive.00",
+  "fingerprint_key": "a44d47f096f97e333d2f5100aef284723caf760479b094fbe78c259f59b32ac3",
+  "fingerprint": {
+    "input_digest": "03da9fee3067b122092e5a2a0881a78151a59c663d6713d85b43df8e527664e8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:15:21.470Z",
+  "finding": {
+    "sense_id": "oewn-discerning__5.00.00.perceptive.00",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The definition is too brief to determine if this meaning is useful for an adult professional and academic vocabulary. The example provided is for 'apprehensive', not 'discerning', and does not clarify the meaning.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-discerning__5.00.00.perceptive.00",
+    "usefulness": "insufficient_evidence",
+    "rationale": "The definition is too brief to determine if this meaning is useful for an adult professional and academic vocabulary. The example provided is for 'apprehensive', not 'discerning', and does not clarify the meaning.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning"
+  },
+  "effective": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 444,
+    "completion_tokens": 97,
+    "reasoning_tokens": 0,
+    "total_tokens": 541,
+    "cost_usd": 0.0003757
+  },
+  "latency_ms": 952
+}

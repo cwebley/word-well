@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "utilised|oewn-utilised__5.00.00.used.00",
+  "fingerprint_key": "79a8c7ef93e2b334c4560044b47cced11bc572f9dc3a4a30cf11cf780c73d207",
+  "fingerprint": {
+    "input_digest": "2d09ba5d5ce37fd821598e1528aa117ef3be8d0c3900efd4a5f0eed937e4c26a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:21:06.248Z",
+  "finding": {
+    "sense_id": "oewn-utilised__5.00.00.used.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition 'made useful' suggests a common, everyday meaning that would likely be understood by a teenage reader. It does not appear to be a specialized or high-utility academic term.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-utilised__5.00.00.used.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition 'made useful' suggests a common, everyday meaning that would likely be understood by a teenage reader. It does not appear to be a specialized or high-utility academic term.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 432,
+    "completion_tokens": 86,
+    "reasoning_tokens": 0,
+    "total_tokens": 518,
+    "cost_usd": 0.0003446
+  },
+  "latency_ms": 1071
+}

@@ -31,10 +31,27 @@
 // (3.43). Admitting a few obvious words is the cheaper error, because a wrong
 // admit is visible in the app and a wrong exclude is silent.
 //
-// If this is attempted again, ask about the word rather than about what someone
-// knows — "would a general-audience publication use this without explanation"
-// is answerable from register, and the model's own competence does not decide
-// it.
+// Version 6 was the third and last attempt, framing the question as whether a
+// young-adult novel would print the word unglossed — asking where a word lives
+// rather than what a reader knows. It reached v3's numbers to the decimal: 43.0%
+// retention, 8.7% exploration.
+//
+// It failed differently enough to be conclusive. The judge ENGAGED with the
+// framing — 240 of 414 rejections named the YA novel — and still rejected
+// `austere` as "easily understood by a general audience and would likely appear
+// in young adult literature without needing explanation".
+//
+// The reason is in the evidence, not the wording. The only thing the judge is
+// shown about a word is a definition written in deliberately plain language,
+// because that is what a gloss is. `austere` is defined as "severely simple",
+// which reads plainly, so the word looks plain. Every word in the dictionary
+// looks plain by that test.
+//
+// Judging register needs evidence of how a word behaves in prose. Half the
+// meanings carry no examples at all, and the examples that exist are
+// synset-level and often use a different member word. The signal is not there,
+// so no clause can extract it. The everyday end stays the deterministic
+// filter's problem until the evidence changes.
 
 import type { CandidateMeaning } from "./meaning.ts";
 import { evidenceItems } from "./meaning.ts";

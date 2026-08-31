@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "meander|oewn-meander__2.38.00..",
+  "fingerprint_key": "d0b604c60482a828a86cb3f020abccd368ace97ef0d5bd11b37bd2fafcf1e784",
+  "fingerprint": {
+    "input_digest": "8a82b3bc1ff47038904d70e3ed0239324bbdf8ff57b83cd9ba728726259e0d48",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:16:24.035Z",
+  "finding": {
+    "sense_id": "oewn-meander__2.38.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and examples suggest this meaning refers to a common physical movement, easily understood by a teenage reader, making it ordinary vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-meander__2.38.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition and examples suggest this meaning refers to a common physical movement, easily understood by a teenage reader, making it ordinary vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 493,
+    "completion_tokens": 83,
+    "reasoning_tokens": 0,
+    "total_tokens": 576,
+    "cost_usd": 0.0003554
+  },
+  "latency_ms": 881
+}

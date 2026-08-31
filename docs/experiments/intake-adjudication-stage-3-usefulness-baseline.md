@@ -828,3 +828,87 @@ Two things carried forward:
    is sharper still, since `happy`, `pout` and `chanted` all clearly belong there
    while `ubiquitous` and `pernicious` do not. That is a question about register,
    answerable from evidence, and the model's own competence does not decide it.
+
+---
+
+# Stage 3g: v6, the third and last everyday clause
+
+## Pre-run record
+
+**Question.** Does framing the everyday test as a *publication* rather than as a
+reader's knowledge survive where versions 3 and 4 did not?
+
+**Changed variable.** One clause, on the owner's suggestion: *"Picture this word
+in a young-adult novel. If it would appear there and a teenage reader would pass
+over it without needing help, it is not_useful."* Everything else held at v5.
+
+**The bet.** v3 and v4 failed because they asked a language model whether a
+competent adult would already know a word, of a system that knows every word. A
+YA novel is observable: `happy`, `pout` and `chanted` clearly belong in one,
+`ubiquitous` and `pernicious` do not. Register is a property of the word, not of
+the reader, so the model's own competence should not decide it.
+
+**Stated in advance.** If retention collapses the way v3 and v4 did, the
+conclusion is that no clause of this kind survives contact with this judge.
+
+## Results
+
+| | golden | audit | exploration |
+|---|---|---|---|
+| **v5, no clause** | **13/15** | **93.0%** | **52.7%** |
+| v3, "already use this meaning" | 10/15 | 43.0% | 8.7% |
+| v4, "already use this word" | 14/15 | 51.0% | 13.3% |
+| **v6, YA novel** | 11/15 | **43.0%** | **8.7%** |
+
+v6 reached v3's numbers to the decimal. Four golden misses, all `serve ->
+exclude`: `ubiquitous`, `laconic`, `austere`, `inexpedient`.
+
+### The judge engaged with the framing and still failed
+
+This is what makes the result conclusive rather than another rewording. **240 of
+414 rejections named the young-adult novel explicitly.** The clause was
+understood and applied.
+
+> `austere`: "easily understood by a general audience and would likely appear in
+> young adult literature without needing explanation"
+> `ubiquitous`: "a common, easily understood concept... 'omnipresent' points to a
+> word a young adult would likely already know"
+
+### The reason is the evidence, not the wording
+
+The only thing the judge is shown about a word is **a definition written in
+deliberately plain language**, because that is what a gloss is. `austere` is
+defined as "severely simple", which reads plainly, so the word looks plain.
+
+Every word in the dictionary passes that test. The judge is reading the
+definition's register as the word's register, and no phrasing of the clause
+separates those two things when the definition is the only evidence.
+
+Judging register needs evidence of how a word behaves in prose. Half the meanings
+across all three sets carry **no examples at all**, and 61% of the examples that
+do exist name a different synset member rather than the word being judged. The
+signal is not in the evidence, so no clause can extract it.
+
+## Decision
+
+**Reverted to v5, which stands as the configuration to keep.**
+
+Three attempts is enough. The everyday end belongs to the deterministic filter
+until the evidence changes, and the honest statement of the limitation is:
+
+- `happy` (Zipf 5.38) never reaches the judge; the 4.0 ceiling removes it.
+- `chanted` (3.0) and `pout` (3.1) will get through. A ceiling low enough to
+  catch them also cuts `ubiquitous` (3.42) and `nuance` (3.43).
+- Admitting a few obvious words is the cheaper error. A wrong admit is visible in
+  the app; a wrong exclude is silent.
+
+**What would change this** is better evidence, not a better prompt — a corpus
+example showing the word in real use, or a register signal that is sense-scoped
+rather than headword-scoped. That is #57 and #60 territory, and this run is
+evidence for both.
+
+A defect found while reverting: `npm run report` selected the newest record per
+subject rather than the one matching the checked-out configuration, so after the
+revert it displayed the abandoned v6 results. A report that does not match the
+code is worse than no report. It now filters on prompt and contract version and
+prints both.

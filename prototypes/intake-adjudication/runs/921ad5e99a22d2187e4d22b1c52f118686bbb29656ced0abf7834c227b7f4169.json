@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "earthy|oewn-earthy__3.01.00..",
+  "fingerprint_key": "921ad5e99a22d2187e4d22b1c52f118686bbb29656ced0abf7834c227b7f4169",
+  "fingerprint": {
+    "input_digest": "a6dee89e8b31eb7ba8f5bb1726b885d2110cad55579025aa6b9776bf0cd673f3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:18:35.723Z",
+  "finding": {
+    "sense_id": "oewn-earthy__3.01.00..",
+    "usefulness": "not_useful",
+    "rationale": "This meaning describes something resembling earth, which is an ordinary concept easily understood by a teenage reader. It does not represent high-utility professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-earthy__3.01.00..",
+    "usefulness": "not_useful",
+    "rationale": "This meaning describes something resembling earth, which is an ordinary concept easily understood by a teenage reader. It does not represent high-utility professional or academic vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 452,
+    "completion_tokens": 84,
+    "reasoning_tokens": 0,
+    "total_tokens": 536,
+    "cost_usd": 0.0003456
+  },
+  "latency_ms": 937
+}

@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "tenpin|oewn-tenpin__1.06.00..",
+  "fingerprint_key": "a76fe938fb6614daaecf0e20da61d65f83abccf0122606454a11368d784e1d53",
+  "fingerprint": {
+    "input_digest": "ca3d7f513d04c174fa2fddd4f282b134bab51955f5316377a312ca2d61372f77",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:20:48.227Z",
+  "finding": {
+    "sense_id": "oewn-tenpin__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates this is an ordinary vocabulary word, referring to a common object in a popular sport. It is unlikely to be unknown to a teenage reader.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-tenpin__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates this is an ordinary vocabulary word, referring to a common object in a popular sport. It is unlikely to be unknown to a teenage reader.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 424,
+    "completion_tokens": 76,
+    "reasoning_tokens": 0,
+    "total_tokens": 500,
+    "cost_usd": 0.0003172
+  },
+  "latency_ms": 1096
+}

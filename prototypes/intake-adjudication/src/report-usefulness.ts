@@ -16,6 +16,7 @@ import { join } from "node:path";
 
 import { RUNS_DIR } from "./config.ts";
 import type { UsefulnessFinding } from "./usefulness/contract.ts";
+import { usefulnessGate } from "./usefulness/gate.ts";
 import { deriveHeadwordDisposition } from "./usefulness/policy.ts";
 import type { AdjudicationRecord } from "./store.ts";
 import { loadUsefulnessDataset } from "../evals/usefulness-datasets.ts";
@@ -32,8 +33,18 @@ function loadRecords(): Map<string, AdjudicationRecord<UsefulnessFinding>> {
       readFileSync(join(RUNS_DIR, name), "utf-8"),
     ) as AdjudicationRecord<UsefulnessFinding>;
     if (record.gate !== "audience-usefulness") continue;
-    // Several runs of the same subject can coexist under different
-    // fingerprints. The newest wins, so the table reflects the latest run.
+    // Only the configuration currently checked out.
+    //
+    // Taking the newest record instead was wrong in a way that matters: after
+    // reverting a failed prompt version, the report showed the version that had
+    // just been abandoned, because its records were the most recent on disk. A
+    // report that does not match the code is worse than no report.
+    if (
+      record.fingerprint.prompt_version !== usefulnessGate.versions.prompt ||
+      record.fingerprint.contract_version !== usefulnessGate.versions.contract
+    ) {
+      continue;
+    }
     const existing = records.get(record.claim_id);
     if (!existing || record.recorded_at > existing.recorded_at) {
       records.set(record.claim_id, record);
@@ -46,7 +57,8 @@ function main() {
   const dataset = loadUsefulnessDataset(CASE_SET);
   const records = loadRecords();
 
-  console.log(`${CASE_SET} (${dataset.setVersion})\n`);
+  console.log(`${CASE_SET} (${dataset.setVersion})`);
+  console.log(`${usefulnessGate.versions.prompt}, ${usefulnessGate.versions.contract}\n`);
   console.log("word          label   gate       ok  senses  verdicts");
   console.log("─".repeat(72));
 

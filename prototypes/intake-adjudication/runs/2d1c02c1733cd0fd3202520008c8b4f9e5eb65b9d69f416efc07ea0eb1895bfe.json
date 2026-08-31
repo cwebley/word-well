@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "chaperone|oewn-chaperone__2.38.00..",
+  "fingerprint_key": "2d1c02c1733cd0fd3202520008c8b4f9e5eb65b9d69f416efc07ea0eb1895bfe",
+  "fingerprint": {
+    "input_digest": "6521fa03a48a6974070c3cc1cc4050ed3a197a461b8b71b1e8be0cd8eca86b5c",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:18:10.944Z",
+  "finding": {
+    "sense_id": "oewn-chaperone__2.38.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a common, everyday action that would likely be understood by a teenage reader, making it ordinary vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-chaperone__2.38.00..",
+    "usefulness": "not_useful",
+    "rationale": "The definition indicates a common, everyday action that would likely be understood by a teenage reader, making it ordinary vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 432,
+    "completion_tokens": 69,
+    "reasoning_tokens": 0,
+    "total_tokens": 501,
+    "cost_usd": 0.0003021
+  },
+  "latency_ms": 820
+}

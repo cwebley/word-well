@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "shrewd|oewn-shrewd__5.00.00.smart.00",
+  "fingerprint_key": "87387956f769d283f4bafaf022a456f58ff5a2bbe13a5fc6a322b2aa6f31c1bf",
+  "fingerprint": {
+    "input_digest": "ec504646900d2e2aa7534fc2afdc6bdadc4cd2c152bebd7e3e22125d8c72a1f2",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:17:14.443Z",
+  "finding": {
+    "sense_id": "oewn-shrewd__5.00.00.smart.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition and examples suggest a word that describes practical intelligence, which is common enough to be understood by a young adult. It does not appear to be a specialized term.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-shrewd__5.00.00.smart.00",
+    "usefulness": "not_useful",
+    "rationale": "The definition and examples suggest a word that describes practical intelligence, which is common enough to be understood by a young adult. It does not appear to be a specialized term.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 491,
+    "completion_tokens": 96,
+    "reasoning_tokens": 0,
+    "total_tokens": 587,
+    "cost_usd": 0.0003873
+  },
+  "latency_ms": 986
+}

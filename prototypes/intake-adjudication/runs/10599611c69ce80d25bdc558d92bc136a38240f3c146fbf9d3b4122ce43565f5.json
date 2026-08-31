@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "austere|oewn-austere__5.00.00.plain.01",
+  "fingerprint_key": "10599611c69ce80d25bdc558d92bc136a38240f3c146fbf9d3b4122ce43565f5",
+  "fingerprint": {
+    "input_digest": "a22cc5f725df2cdd205951edfb99dd209234065a279ff120dd58b0099347db6f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/6",
+    "rubric_version": "usefulness-rubric/6",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T05:14:07.539Z",
+  "finding": {
+    "sense_id": "oewn-austere__5.00.00.plain.01",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest a meaning that is easily understood by a general audience and would likely appear in young adult literature without needing explanation.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-austere__5.00.00.plain.01",
+    "usefulness": "not_useful",
+    "rationale": "The definition and example suggest a meaning that is easily understood by a general audience and would likely appear in young adult literature without needing explanation.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 8
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 444,
+    "completion_tokens": 80,
+    "reasoning_tokens": 0,
+    "total_tokens": 524,
+    "cost_usd": 0.0003332
+  },
+  "latency_ms": 931
+}
