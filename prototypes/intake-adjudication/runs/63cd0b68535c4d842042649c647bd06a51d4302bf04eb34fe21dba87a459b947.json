@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "panoply|oewn-panoply__1.14.00..",
+  "fingerprint_key": "63cd0b68535c4d842042649c647bd06a51d4302bf04eb34fe21dba87a459b947",
+  "fingerprint": {
+    "input_digest": "283dc57599cbfe61a56da048ec382ee5ec209df4e3d563d1bd9519f6598e5d53",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:50:58.933Z",
+  "finding": {
+    "sense_id": "oewn-panoply__1.14.00..",
+    "exam_level": "college",
+    "rationale": "The word 'panoply' refers to a complete and impressive array, which is a concept that would likely be encountered and tested at the college level as general vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-panoply__1.14.00..",
+    "exam_level": "college",
+    "rationale": "The word 'panoply' refers to a complete and impressive array, which is a concept that would likely be encountered and tested at the college level as general vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 503,
+    "completion_tokens": 79,
+    "reasoning_tokens": 0,
+    "total_tokens": 582,
+    "cost_usd": 0.0003484
+  },
+  "latency_ms": 818
+}

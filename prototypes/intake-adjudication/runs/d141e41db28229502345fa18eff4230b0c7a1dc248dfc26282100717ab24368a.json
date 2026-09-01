@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "debatable|oewn-debatable__5.00.00.controversial.00",
+  "fingerprint_key": "d141e41db28229502345fa18eff4230b0c7a1dc248dfc26282100717ab24368a",
+  "fingerprint": {
+    "input_digest": "89b455203ee4244fc7dcf23a6129f414cf8cf3d26917cbfb497ebd67367af36f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:04:44.175Z",
+  "finding": {
+    "sense_id": "oewn-debatable__5.00.00.controversial.00",
+    "usefulness": "useful",
+    "rationale": "The definition indicates a general concept of being open to argument, which is a high-utility concept across many subjects. The example and synonyms further support its general applicability.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-debatable__5.00.00.controversial.00",
+    "usefulness": "useful",
+    "rationale": "The definition indicates a general concept of being open to argument, which is a high-utility concept across many subjects. The example and synonyms further support its general applicability.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 475,
+    "completion_tokens": 90,
+    "reasoning_tokens": 0,
+    "total_tokens": 565,
+    "cost_usd": 0.0003675
+  },
+  "latency_ms": 921
+}

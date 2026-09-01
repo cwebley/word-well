@@ -5,7 +5,7 @@
 // start when the estimate would breach the pilot cap. Run it before
 // `npm run eval:usefulness` so the first paid call is a deliberate one.
 //
-//   npm run usefulness            # 19 meanings across 12 headwords, or reuse
+//   npm run usefulness            # current golden set, or reuse
 //   npm run usefulness -- --dry   # estimate and budget only, no calls
 
 import { createClient } from "./adjudicate.ts";
@@ -16,7 +16,7 @@ import { usefulnessGate } from "./usefulness/gate.ts";
 import { judgeHeadword } from "./usefulness/run.ts";
 import { loadUsefulnessDataset } from "../evals/usefulness-datasets.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v3";
 const RUNS_DIR = "runs";
 
 async function main() {
@@ -68,7 +68,7 @@ async function main() {
     );
     for (const record of outcome.records) {
       const verdict = record.finding
-        ? `${record.finding.usefulness}: ${record.finding.rationale}`
+        ? `${record.finding.exam_level}: ${record.finding.rationale}`
         : `CONTRACT FAILURE: ${record.contract_error}`;
       console.log(`    ${record.claim_id.split("|")[1]}  ${verdict}`);
     }

@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "inexpedient|oewn-inexpedient__5.00.00.impolitic.00",
+  "fingerprint_key": "a814afbea8c9c9e6d1a26dc00906a296fa4db1578eb5a545d05f636e5a59101c",
+  "fingerprint": {
+    "input_digest": "5cbf7dc0e7e68e228f48e5eece16b842e306f0a3ab5ae4b5c925936880e29b76",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:25:39.475Z",
+  "finding": {
+    "sense_id": "oewn-inexpedient__5.00.00.impolitic.00",
+    "exam_level": "college",
+    "rationale": "The word 'inexpedient' is a relatively uncommon adjective that implies a nuanced understanding of appropriateness and purpose, making it suitable for a college-level vocabulary test. It is not a specialist term.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-inexpedient__5.00.00.impolitic.00",
+    "exam_level": "college",
+    "rationale": "The word 'inexpedient' is a relatively uncommon adjective that implies a nuanced understanding of appropriateness and purpose, making it suitable for a college-level vocabulary test. It is not a specialist term.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 509,
+    "completion_tokens": 101,
+    "reasoning_tokens": 0,
+    "total_tokens": 610,
+    "cost_usd": 0.0004052
+  },
+  "latency_ms": 904
+}

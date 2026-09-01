@@ -1,0 +1,80 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "usurp|oewn-usurp__2.41.00..",
+  "fingerprint_key": "cfea60ecc1fce3b60ca9186c8b6d8c360a6bfcfd520e797e7508a6e43bcaf066",
+  "fingerprint": {
+    "input_digest": "f3a0deaf0797b0e75d21a514d0c7f83ecd3a40d3c3df3cdad404d70cd93a0c1e",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:33:41.653Z",
+  "finding": {
+    "sense_id": "oewn-usurp__2.41.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'take the place of' is a common and general concept, and 'usurp' in this sense is widely understood by educated adults. While it can sound formal, it doesn't add significant expressive precision over more common synonyms.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-usurp__2.41.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'take the place of' is a common and general concept, and 'usurp' in this sense is widely understood by educated adults. While it can sound formal, it doesn't add significant expressive precision over more common synonyms.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 636,
+    "completion_tokens": 114,
+    "reasoning_tokens": 0,
+    "total_tokens": 750,
+    "cost_usd": 0.00032892
+  },
+  "latency_ms": 1018
+}

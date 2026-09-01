@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "guzzling|oewn-guzzling__1.04.00..",
+  "fingerprint_key": "6ae58575e8b0a3ef8ecc966f8b6229e7463647adaac1711c1ab078ae6a9f3480",
+  "fingerprint": {
+    "input_digest": "4a97ff4a45a48f535e49c0788fd057d469f9ed60b33bcf4e920888faa23224d9",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:35:13.898Z",
+  "finding": {
+    "sense_id": "oewn-guzzling__1.04.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'guzzling' for the act of drinking large mouthfuls rapidly is a common and transparent term. It is a straightforward gerund form of 'guzzle' and offers little new precision for an educated adult.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-guzzling__1.04.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'guzzling' for the act of drinking large mouthfuls rapidly is a common and transparent term. It is a straightforward gerund form of 'guzzle' and offers little new precision for an educated adult.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 635,
+    "completion_tokens": 107,
+    "reasoning_tokens": 0,
+    "total_tokens": 742,
+    "cost_usd": 0.00031112
+  },
+  "latency_ms": 1052
+}

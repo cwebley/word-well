@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "stark|oewn-stark__5.00.00.inhospitable.00",
+  "fingerprint_key": "1380621130443b97c21699e6acb2b0bde3aa1c519a1eebc296273887c27ec12d",
+  "fingerprint": {
+    "input_digest": "2f1d4ad5bdc868e3542a5b56e78665af8861c9f0b41d757c6e43531dea5a521d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:03:23.713Z",
+  "finding": {
+    "sense_id": "oewn-stark__5.00.00.inhospitable.00",
+    "usefulness": "useful",
+    "rationale": "The meaning describes a general characteristic of a landscape, which is applicable across various subjects and is not tied to a specific discipline.",
+    "evidence_ids": [
+      "E1",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-stark__5.00.00.inhospitable.00",
+    "usefulness": "useful",
+    "rationale": "The meaning describes a general characteristic of a landscape, which is applicable across various subjects and is not tied to a specific discipline.",
+    "evidence_ids": [
+      "E1",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 523,
+    "completion_tokens": 78,
+    "reasoning_tokens": 0,
+    "total_tokens": 601,
+    "cost_usd": 0.0003519
+  },
+  "latency_ms": 824
+}

@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "drench|oewn-drench__2.43.00..",
+  "fingerprint_key": "09983f9f1bbe94a784efbf31fadcbbb427c462d9d4f5f4b84f5a20cb74bba8e4",
+  "fingerprint": {
+    "input_digest": "37801141da4e98f6e718ba586920e7c8316e7515d10760d71e41834f38d551e2",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:42.646Z",
+  "finding": {
+    "sense_id": "oewn-drench__2.43.00..",
+    "exam_level": "middle_school",
+    "rationale": "The word 'drench' is a common verb meaning to wet thoroughly, and its usage is familiar enough to be tested as general vocabulary in middle school.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-drench__2.43.00..",
+    "exam_level": "middle_school",
+    "rationale": "The word 'drench' is a common verb meaning to wet thoroughly, and its usage is familiar enough to be tested as general vocabulary in middle school.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 534,
+    "completion_tokens": 81,
+    "reasoning_tokens": 0,
+    "total_tokens": 615,
+    "cost_usd": 0.0003627
+  },
+  "latency_ms": 816
+}

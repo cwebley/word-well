@@ -5,9 +5,11 @@
 // `deriveHeadwordDisposition` folds a headword's meanings together.
 
 import type { DispositionResult } from "../disposition.ts";
-import type { Usefulness, UsefulnessFinding } from "./contract.ts";
+import type { ExamLevel, UsefulnessFinding } from "./contract.ts";
 
-export const POLICY_VERSION = "usefulness-policy/1";
+export const POLICY_VERSION = "usefulness-policy/2";
+
+export type Usefulness = "useful" | "not_useful" | "insufficient_evidence";
 
 /**
  * One meaning's disposition, from the verdict field and nothing else.
@@ -29,6 +31,26 @@ export function deriveUsefulness(usefulness: Usefulness): DispositionResult {
         reason: "the evidence cannot settle whether this meaning is worth learning",
       };
   }
+}
+
+/** Maps the recorded exam category to the gate's internal usefulness verdict. */
+export function usefulnessOfExamLevel(level: ExamLevel): Usefulness {
+  switch (level) {
+    case "high_school":
+    case "college":
+    case "postgraduate":
+      return "useful";
+    case "ordinary":
+    case "middle_school":
+    case "specialist_subject":
+      return "not_useful";
+    case "insufficient_evidence":
+      return "insufficient_evidence";
+  }
+}
+
+export function deriveExamLevel(level: ExamLevel): DispositionResult {
+  return deriveUsefulness(usefulnessOfExamLevel(level));
 }
 
 /**
@@ -68,5 +90,5 @@ export function deriveHeadwordDisposition(verdicts: Usefulness[]): DispositionRe
 
 /** Reads the one policy-relevant field off a finding, and only that one. */
 export function verdictOf(finding: UsefulnessFinding): Usefulness {
-  return finding.usefulness;
+  return usefulnessOfExamLevel(finding.exam_level);
 }

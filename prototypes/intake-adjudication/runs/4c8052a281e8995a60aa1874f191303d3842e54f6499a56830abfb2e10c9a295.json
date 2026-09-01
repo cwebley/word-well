@@ -1,0 +1,80 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "appropriate|oewn-appropriate__5.00.01.fit.02",
+  "fingerprint_key": "4c8052a281e8995a60aa1874f191303d3842e54f6499a56830abfb2e10c9a295",
+  "fingerprint": {
+    "input_digest": "d27f31b41adfc197f31c4a1e46348feca85a00fde254ec25ccc3ff78e8fdcdb7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:30:17.633Z",
+  "finding": {
+    "sense_id": "oewn-appropriate__5.00.01.fit.02",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'appropriate' in this meaning is very common and widely understood by educated adults. It is a general vocabulary word and offers little new expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-appropriate__5.00.01.fit.02",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'appropriate' in this meaning is very common and widely understood by educated adults. It is a general vocabulary word and offers little new expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 670,
+    "completion_tokens": 99,
+    "reasoning_tokens": 0,
+    "total_tokens": 769,
+    "cost_usd": 0.0004485
+  },
+  "latency_ms": 1016
+}

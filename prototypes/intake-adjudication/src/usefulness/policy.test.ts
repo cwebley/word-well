@@ -1,19 +1,25 @@
 import { describe, expect, it } from "vitest";
 
 import { usefulnessGate } from "./gate.ts";
-import { deriveHeadwordDisposition, deriveUsefulness } from "./policy.ts";
+import { deriveExamLevel, deriveHeadwordDisposition } from "./policy.ts";
 
 describe("one meaning's disposition", () => {
-  it("advances a meaning worth learning", () => {
-    expect(deriveUsefulness("useful").disposition).toBe("advance");
-  });
+  it.each(["high_school", "college", "postgraduate"] as const)(
+    "advances a %s general-vocabulary word",
+    (level) => {
+      expect(deriveExamLevel(level).disposition).toBe("advance");
+    },
+  );
 
-  it("excludes one that is not", () => {
-    expect(deriveUsefulness("not_useful").disposition).toBe("exclude");
-  });
+  it.each(["ordinary", "middle_school", "specialist_subject"] as const)(
+    "excludes a %s word",
+    (level) => {
+      expect(deriveExamLevel(level).disposition).toBe("exclude");
+    },
+  );
 
-  it("quarantines rather than guessing when the evidence cannot settle it", () => {
-    expect(deriveUsefulness("insufficient_evidence").disposition).toBe("quarantine");
+  it("quarantines rather than guessing when the evidence cannot settle the level", () => {
+    expect(deriveExamLevel("insufficient_evidence").disposition).toBe("quarantine");
   });
 });
 

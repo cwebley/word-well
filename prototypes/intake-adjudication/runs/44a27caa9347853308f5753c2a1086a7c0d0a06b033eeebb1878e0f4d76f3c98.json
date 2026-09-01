@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "incontrovertibly|oewn-incontrovertibly__4.02.00..",
+  "fingerprint_key": "44a27caa9347853308f5753c2a1086a7c0d0a06b033eeebb1878e0f4d76f3c98",
+  "fingerprint": {
+    "input_digest": "9d6a86dd14acc11666a7fb57e5350aef7ab6dfce9ad99b91eb919b7328e1dcd3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:50:22.343Z",
+  "finding": {
+    "sense_id": "oewn-incontrovertibly__4.02.00..",
+    "exam_level": "college",
+    "rationale": "The word 'incontrovertibly' is a sophisticated adverb meaning 'in an obvious and provable manner.' It is a high-utility word suitable for a college-level general vocabulary exam.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-incontrovertibly__4.02.00..",
+    "exam_level": "college",
+    "rationale": "The word 'incontrovertibly' is a sophisticated adverb meaning 'in an obvious and provable manner.' It is a high-utility word suitable for a college-level general vocabulary exam.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 536,
+    "completion_tokens": 87,
+    "reasoning_tokens": 0,
+    "total_tokens": 623,
+    "cost_usd": 0.0003783
+  },
+  "latency_ms": 919
+}

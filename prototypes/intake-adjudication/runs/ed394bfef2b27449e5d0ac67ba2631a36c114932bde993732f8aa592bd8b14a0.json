@@ -1,0 +1,84 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pliant|oewn-pliant__5.00.00.formed.00",
+  "fingerprint_key": "ed394bfef2b27449e5d0ac67ba2631a36c114932bde993732f8aa592bd8b14a0",
+  "fingerprint": {
+    "input_digest": "d9107b7a8c5142e75ad4bea8a680fd54817d7f6e01b5c8653066dc17ed3d274e",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:34.850Z",
+  "finding": {
+    "sense_id": "oewn-pliant__5.00.00.formed.00",
+    "exam_level": "high_school",
+    "rationale": "The definition and examples suggest a word describing materials that can be easily shaped, which is a concept that would likely be encountered in a high school general vocabulary context. The synonyms also support this level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pliant__5.00.00.formed.00",
+    "exam_level": "high_school",
+    "rationale": "The definition and examples suggest a word describing materials that can be easily shaped, which is a concept that would likely be encountered in a high school general vocabulary context. The synonyms also support this level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 574,
+    "completion_tokens": 113,
+    "reasoning_tokens": 0,
+    "total_tokens": 687,
+    "cost_usd": 0.0004547
+  },
+  "latency_ms": 949
+}

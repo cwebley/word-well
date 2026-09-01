@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "muckraking|oewn-muckraking__1.10.00..",
+  "fingerprint_key": "3507d892335276bf0c3d70e93cf960b8c6375eb8c79c45fdb1947f26103ac5b4",
+  "fingerprint": {
+    "input_digest": "45fa5081891ab57b8e559322c8ec6bd40c10113f9430b014221e6491768bf83b",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:25:40.263Z",
+  "finding": {
+    "sense_id": "oewn-muckraking__1.10.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'muckraking' describes a specific type of investigative journalism, which is a concept that would likely be introduced and tested at the high school level as part of general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-muckraking__1.10.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'muckraking' describes a specific type of investigative journalism, which is a concept that would likely be introduced and tested at the high school level as part of general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 493,
+    "completion_tokens": 90,
+    "reasoning_tokens": 0,
+    "total_tokens": 583,
+    "cost_usd": 0.0003729
+  },
+  "latency_ms": 787
+}

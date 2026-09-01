@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "circumscribe|oewn-circumscribe__2.35.01..",
+  "fingerprint_key": "de36bdd6656c30bca7c2cbcb6af145137adbee9c4dd2449713ccfe178bc168b4",
+  "fingerprint": {
+    "input_digest": "f53b464549d6c35923e26a3a23fe11808bd639e000d7b6d47f7cda621332696b",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:30:50.631Z",
+  "finding": {
+    "sense_id": "oewn-circumscribe__2.35.01..",
+    "familiarity": "less_common",
+    "scope": "specialist_subject",
+    "learning_value": "high",
+    "rationale": "This meaning of 'circumscribe' is specific to geometry, making it a specialist term. While not unknown, it's precise enough to offer high learning value for those encountering it in a mathematical context.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-circumscribe__2.35.01..",
+    "familiarity": "less_common",
+    "scope": "specialist_subject",
+    "learning_value": "high",
+    "rationale": "This meaning of 'circumscribe' is specific to geometry, making it a specialist term. While not unknown, it's precise enough to offer high learning value for those encountering it in a mathematical context.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 4
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 628,
+    "completion_tokens": 107,
+    "reasoning_tokens": 0,
+    "total_tokens": 735,
+    "cost_usd": 0.0004559
+  },
+  "latency_ms": 948
+}

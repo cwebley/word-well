@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "eloquently|oewn-eloquently__4.02.00..",
+  "fingerprint_key": "ddfea6c328da4718d3361a4ed6a367f27140d3002945f17c9e2681de4ad1e39d",
+  "fingerprint": {
+    "input_digest": "2f7fb71cc970d90e9c67c96dc217498e2d292de05de6da6f3965639b26e4a931",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:30:28.376Z",
+  "finding": {
+    "sense_id": "oewn-eloquently__4.02.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'eloquently' implies a sophisticated manner of expression, suggesting a vocabulary level beyond middle school. It is a high-utility word that would be tested as general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-eloquently__4.02.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'eloquently' implies a sophisticated manner of expression, suggesting a vocabulary level beyond middle school. It is a high-utility word that would be tested as general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 506,
+    "completion_tokens": 92,
+    "reasoning_tokens": 0,
+    "total_tokens": 598,
+    "cost_usd": 0.0003818
+  },
+  "latency_ms": 930
+}

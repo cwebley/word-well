@@ -17,13 +17,21 @@ import { join } from "node:path";
 import { RUNS_DIR } from "./config.ts";
 import type { UsefulnessFinding } from "./usefulness/contract.ts";
 import { usefulnessGate } from "./usefulness/gate.ts";
-import { deriveHeadwordDisposition } from "./usefulness/policy.ts";
+import { deriveHeadwordDisposition, verdictOf } from "./usefulness/policy.ts";
 import type { AdjudicationRecord } from "./store.ts";
 import { loadUsefulnessDataset } from "../evals/usefulness-datasets.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v3";
 
-const MARK: Record<string, string> = { useful: "+", not_useful: "−", insufficient_evidence: "?" };
+const MARK: Record<string, string> = {
+  ordinary: "O",
+  middle_school: "M",
+  high_school: "H",
+  college: "C",
+  postgraduate: "P",
+  specialist_subject: "S",
+  insufficient_evidence: "?",
+};
 
 function loadRecords(): Map<string, AdjudicationRecord<UsefulnessFinding>> {
   const records = new Map<string, AdjudicationRecord<UsefulnessFinding>>();
@@ -41,7 +49,9 @@ function loadRecords(): Map<string, AdjudicationRecord<UsefulnessFinding>> {
     // report that does not match the code is worse than no report.
     if (
       record.fingerprint.prompt_version !== usefulnessGate.versions.prompt ||
-      record.fingerprint.contract_version !== usefulnessGate.versions.contract
+      record.fingerprint.contract_version !== usefulnessGate.versions.contract ||
+      record.fingerprint.rubric_version !== usefulnessGate.versions.rubric ||
+      record.fingerprint.policy_version !== usefulnessGate.versions.policy
     ) {
       continue;
     }
@@ -59,7 +69,7 @@ function main() {
 
   console.log(`${CASE_SET} (${dataset.setVersion})`);
   console.log(`${usefulnessGate.versions.prompt}, ${usefulnessGate.versions.contract}\n`);
-  console.log("word          label   gate       ok  senses  verdicts");
+  console.log("word          label   gate       ok  senses  exam levels");
   console.log("─".repeat(72));
 
   let agreed = 0;
@@ -73,8 +83,22 @@ function main() {
       console.log(`${group.display.padEnd(13)} ${expected.bucket.padEnd(7)} (not run under the current configuration)`);
       continue;
     }
-    const verdicts = found.map((r) => r!.finding?.usefulness).filter((v) => v !== undefined);
-    const decision = deriveHeadwordDisposition(verdicts);
+    group.meanings.forEach((meaning, index) => {
+      if (found[index]!.fingerprint.input_digest !== meaning.input_digest) {
+        throw new Error(`input digest mismatch for ${meaning.subject_id}`);
+      }
+    });
+    const verdicts = found
+      .map((r) => (r!.finding ? verdictOf(r!.finding) : undefined))
+      .filter((v) => v !== undefined);
+    const contractFailures = found.filter((r) => r!.finding === null).length;
+    const decision =
+      contractFailures > 0 && !verdicts.includes("useful")
+        ? {
+            disposition: "quarantine" as const,
+            reason: `${contractFailures} of ${found.length} meanings produced no valid finding`,
+          }
+        : deriveHeadwordDisposition(verdicts);
     const hit = decision.disposition === expected.disposition;
     if (hit) agreed += 1;
     else misses.push(`${group.display} (${expected.bucket}, ${expected.reason}) -> ${decision.disposition}`);
@@ -86,14 +110,14 @@ function main() {
         decision.disposition.padEnd(10),
         (hit ? " ✓" : " ✗").padEnd(3),
         String(group.meanings.length).padEnd(7),
-        found.map((r) => MARK[r!.finding?.usefulness ?? ""] ?? "!").join(" "),
+        found.map((r) => MARK[r!.finding?.exam_level ?? ""] ?? "!").join(" "),
       ].join(" "),
     );
   }
 
   console.log("─".repeat(72));
   const scored = dataset.cases.length - missing;
-  console.log(`${agreed}/${scored} matched the label   (+ useful, − not_useful, ? undecided, ! no finding)`);
+  console.log(`${agreed}/${scored} matched the label   (O ordinary, M middle school, H high school, C college, P postgraduate, S specialist, ? undecided, ! no finding)`);
   for (const miss of misses) console.log(`  miss: ${miss}`);
   if (missing) console.log(`\n${missing} headwords have no record for this configuration; run npm run usefulness`);
 

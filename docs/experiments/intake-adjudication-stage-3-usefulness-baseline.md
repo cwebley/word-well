@@ -912,3 +912,410 @@ subject rather than the one matching the checked-out configuration, so after the
 revert it displayed the abandoned v6 results. A report that does not match the
 code is worse than no report. It now filters on prompt and contract version and
 prints both.
+
+---
+
+# Stage 3h: graded vocabulary-exam framing
+
+## Pre-run record
+
+**Question.** Can a graded vocabulary-exam category separate ordinary words
+from test-worthy vocabulary where the three comprehension framings could not?
+
+**Changed variable.** One clause added to v5:
+
+> Which general vocabulary exam would test this word for the meaning shown?
+>
+> - none — too ordinary to test: not_useful
+> - high school, college, or postgraduate — a test-worthy vocabulary word: useful
+>
+> Judge the word's difficulty tier, not whether its plain-language definition is
+> easy to understand. A specialist subject exam does not count as a general
+> vocabulary exam.
+
+Everything else remains at v5.
+
+**The bet.** Versions 3, 4 and 6 asked about comprehension. The judge answered
+from the deliberately plain definition, so even `austere` looked ordinary. An
+exam tier is a category the model may know directly: "GRE word" is a familiar
+class in a way "would a teenager need help" is not. The graded form also gives
+the ordinary end an explicit rung instead of asking the judge to locate a
+threshold.
+
+**The contamination trap.** Endorsements come from GRE, test-prep and
+word-of-the-day lists. They are almost an answer key for this framing. Do not
+inspect endorsement counts to tune the clause, and do not validate individual
+verdicts against them. Run the frozen audit unchanged and read only movement in
+its retention rate. Tuning toward endorsement would permanently consume that
+instrument.
+
+**Stated in advance.** If rejection rationales cite the exam framing and still
+drop `ubiquitous`, `austere` or `laconic`, this is the fourth instance of the
+same failure: the evidence does not distinguish a plain gloss from an ordinary
+word. Stop prompt work and take #62 to the owner checkpoint. If rationales ignore
+the exam framing, that is a different failure and one wording revision remains
+plausible.
+
+## Results
+
+| | golden | `NoSilentExclusion` | audit | exploration |
+|---|---:|---:|---:|---:|
+| **v5** | **13/15** | **15/15** | **93.0%** | **52.7%** |
+| **v7, exam tiers** | **13/15** | **15/15** | 90.0% | 31.3% |
+
+The run cost `$0.1689`: ledger spend moved from `$0.9340` to `$1.1029`.
+Subtracting the known `$0.0039` of fabricated entries leaves `$1.0990` true
+spend and `$8.90` of the pilot cap.
+
+### The stopping rule did not fire
+
+`ubiquitous`, `austere` and `laconic` all remained useful. The judge used the
+new framing: 85 of 264 `not_useful` findings explicitly mentioned an exam or a
+word being test-worthy. The remaining rejections were mostly decided by the
+existing single-discipline clause, where mentioning an exam would add nothing.
+
+This is not v6 again. The judge did not mistake the plain glosses of the three
+tripwire words for ordinary vocabulary.
+
+### Golden stayed level, but `happy` moved inside the headword
+
+The two misses remain `happy` and `herbivorous`. The owner confirmed that
+`herbivorous` remains a reject and wants the gate to improve on it. V7 still
+calls it a broadly applicable biological term.
+
+Three of `happy`'s four meanings changed to `not_useful` as too common or basic.
+The headword still advances because the "well expressed and to the point" sense
+is useful. This is a correct application of the current one-useful-meaning policy,
+not evidence that the exam clause ignored ordinary vocabulary.
+
+### The unlabelled sets expose the trade
+
+Audit retention fell three points. V7 rescued two v5 exclusions, `noisome` and
+`venality`, but newly excluded five words: `beneficence`, `grouse`, `intentional`,
+`ire` and `reconnoiter`. The other five exclusions were unchanged. This list is
+for reading the kind of movement, not for tuning individual verdicts; the audit
+remains unlabelled.
+
+Exploration retention fell 21.4 points, from 79 to 47 headwords. Much of the new
+movement is the intended everyday end: `autocorrect`, `busily`, `chaperone`,
+`drench`, `fingertip`, `keycard`, `mileage`, `nestle`, `spatter`, `teaspoon` and
+`toaster` now fall. The same clause also removes plausible teaching candidates
+such as `concur`, `eloquently` and `irreversibly`. Without labels, the 31.3% rate
+cannot say whether that exchange is good.
+
+## Owner checkpoint
+
+No configuration decision is recorded yet. V7 is checked out so its persisted
+reports and exact prompt remain inspectable. V5 remains the frozen configuration
+to beat.
+
+The decision is narrower than the one anticipated before the run. The exam
+category can distinguish the three tripwire words from ordinary vocabulary, but
+it buys that selectivity with five new audit exclusions and still does not reject
+`herbivorous`. Because wrong exclusions are silent, keep v7 only if that observed
+movement matches the owner's intended boundary. Otherwise revert to v5 and take
+the evidence problem to #62.
+
+---
+
+# Stage 3i: record the graded exam level
+
+## Pre-run record
+
+**Correction to stage 3h.** V7 did not implement the owner's graded experiment.
+The prompt named high-school, college and postgraduate levels, but the response
+contract collapsed all three into `useful`. The persisted result could not show
+which level the judge chose. V7 tested binary exam framing, not a graded
+classification.
+
+**Question.** When the judge must record the earliest plausible exam level, can
+the gate separate ordinary and middle-school vocabulary from words worth a
+WordWell lesson without losing the useful end?
+
+**Changed classification.** The model now returns one category per source
+meaning:
+
+| category | policy result |
+|---|---|
+| `ordinary` | exclude |
+| `middle_school` | exclude |
+| `high_school` | advance |
+| `college` | advance |
+| `postgraduate` | advance |
+| `specialist_subject` | exclude |
+| `insufficient_evidence` | quarantine |
+
+The model no longer returns `useful` or `not_useful`. Deterministic policy derives
+that internal verdict from the recorded exam category, so the finding cannot
+contradict the category and every persisted record preserves the chosen level.
+
+**Prompt boundary.** Choose the earliest plausible level for the word itself.
+A plain definition does not make a word ordinary, and a meaning that carries
+across subjects does not by itself make the word test-worthy. Vocabulary that
+belongs on an exam inside one discipline receives `specialist_subject`, not a
+general exam level.
+
+**New golden case.** `clog` moves from exploration draw 1 into golden set v3 as
+a reject at the owner's request. The word is ordinary even where its source
+meaning is the broadly applicable idea of hindrance or obstruction. Its nine
+source meanings make the headword fold visible: one category at high school or
+above will preserve it. The run must print every selected level.
+
+Adding a labelled case changes the golden denominator as well as correcting the
+contract. Report both scores: the original fifteen cases for comparison with v5
+and v7, then all sixteen including `clog`. Audit and exploration remain the same
+frozen sets. Exploration draw 1 will warn that four words have now been promoted;
+those four are no longer independent evidence in that run.
+
+**Contamination rule.** Exam categories make the endorsement trap more direct,
+not less. Do not use nomination provenance or endorsement counts to judge or tune
+individual outcomes. The retention audit remains unlabelled and reports movement
+only.
+
+## Results
+
+| | original golden 15 | full golden | `NoSilentExclusion` | audit | exploration |
+|---|---:|---:|---:|---:|---:|
+| v5 | **13/15** | n/a | **15/15** | 93.0% | 52.7% |
+| v7, binary exam framing | **13/15** | n/a | **15/15** | 90.0% | 31.3% |
+| **v8, recorded exam level** | **13/15** | **13/16** | **16/16** | **94.0%** | **44.0%** |
+
+V8 cost `$0.1815`: ledger spend moved from `$1.1029` to `$1.2844`.
+Subtracting the known `$0.0039` of fabricated entries leaves `$1.2805` true
+spend and `$8.72` of the pilot cap.
+
+### The level is now observable
+
+The original fifteen cases did not move. The useful tripwires received general
+exam levels: `ubiquitous`, `equivocate`, `nuance`, `laconic`, `austere` and
+`muckraking` were high school; `inexpedient` was high school and college;
+`pernicious` and `punctilious` were college.
+
+The two disputed rejects show the boundary directly:
+
+- `herbivorous`: `high_school`. The judge explicitly calls it a common scientific
+  term tested as general vocabulary rather than a specialist-subject term.
+- `happy`: three meanings `ordinary`, but "well expressed and to the point" is
+  `high_school`, so the one-useful-meaning fold preserves the headword.
+
+`clog` also misses its new reject label. Across nine source meanings the judge
+returned three `ordinary`, two `middle_school`, two `high_school` and two
+`specialist_subject` categories. The
+two high-school calls are "fill to excess so that function is impaired" and the
+general verb "impede". Either one preserves the headword under the existing fold.
+The model did exactly what the new contract was meant to reveal; the remaining
+disagreement is where the owner places those meanings on the exam scale.
+
+### The unlabelled instruments improved relative to v7
+
+Audit retention rose from v7's 90.0% to 94.0%, one point above v5. Six headwords
+were excluded: `comply`, `frank`, `intentional`, `mar`, `mocking` and `underscore`.
+The audit remains unlabelled, so this is movement to inspect, not six errors to
+correct.
+
+Exploration retention rose from v7's 31.3% to 44.0%, while remaining 8.7 points
+more selective than v5. It kept 66, excluded 83 and quarantined `ruggedly`.
+Four promoted golden words are no longer independent evidence in this draw.
+
+## Owner checkpoint
+
+V8 fixes the observability defect and lands between the two prior prompts on
+pool selectivity while preserving the audit. It does not yet match the owner's
+boundary on `clog` or `herbivorous`. Keep the recorded level regardless of the
+next prompt decision; it provides information the binary field discarded.
+
+---
+
+# Stage 3j: permit vocabulary-level knowledge explicitly
+
+## Pre-run record
+
+**Defect in v8.** The graded experiment depends on the model's general language
+knowledge of which words belong at which exam level. The inherited closed-book
+rule simultaneously prohibited all knowledge outside the supplied definition.
+The model returned levels, but the central instruction contradicted the evidence
+rule. V8 is diagnostic, not a configuration to freeze.
+
+**Changed variable.** Meaning remains evidence-bound: the judge cannot invent an
+unshown meaning or factual claim. Exam level may use general language knowledge
+about the difficulty or familiarity of the word itself. The stale instruction
+that called single-discipline vocabulary `not_useful` now names the contract's
+actual `specialist_subject` category. Categories, deterministic mapping, golden
+v3, model and all three evaluation sets remain unchanged.
+
+**Question.** Does removing the contradiction change the recorded levels or the
+trade between ordinary-word rejection and nominated-word retention?
+
+## Results
+
+| | original golden 15 | full golden | `NoSilentExclusion` | audit | exploration |
+|---|---:|---:|---:|---:|---:|
+| v8, contradictory evidence rule | **13/15** | **13/16** | **16/16** | 94.0% | 44.0% |
+| **v9, vocabulary knowledge permitted** | **13/15** | **13/16** | **16/16** | **97.0%** | **48.7%** |
+
+V9 cost `$0.1863`: ledger spend moved from `$1.2844` to `$1.4707`.
+Subtracting the known `$0.0039` of fabricated entries leaves `$1.4668` true
+spend and `$8.53` of the pilot cap.
+
+### The corrected rule did not move the labelled boundary
+
+The original golden score and all three misses stayed fixed. `herbivorous`
+remains `high_school`. Three of `happy`'s four meanings are `ordinary`, but the
+"well expressed and to the point" meaning remains `high_school`, so the
+headword advances.
+
+`clog` still advances. Its nine meanings moved from three `ordinary`, two
+`middle_school`, two `high_school` and two `specialist_subject` in v8 to three
+`middle_school`, four `high_school` and two `specialist_subject` in v9. Allowing
+language knowledge made this disputed word less likely to be rejected, not
+more. The contract now records the disagreement cleanly; prompt wording has not
+resolved it.
+
+### Both unlabelled rates rose
+
+Audit retention rose three points to 97.0%. Only `comply`, `frank` and
+`intentional` were excluded; v8's exclusions of `mar`, `mocking` and
+`underscore` returned to the kept set. The audit remains unlabelled, so this is
+movement to inspect rather than an accuracy gain.
+
+Exploration retention rose from 44.0% to 48.7%: 73 headwords advanced and 77
+were excluded, with no quarantines or contract failures. Across its 244 source
+meanings the judge chose 45 `ordinary`, 49 `middle_school`, 72 `high_school`,
+20 `college` and 58 `specialist_subject`; it chose neither `postgraduate` nor
+`insufficient_evidence`. Four promoted golden words remain non-independent in
+this draw.
+
+The interactive report at
+`prototypes/intake-adjudication/reports/usefulness-prompt-9-exploration-draw-1.html`
+shows all 150 headwords, their Zipf values, dispositions, source meanings,
+recorded levels, rationales and cited evidence.
+
+## Owner checkpoint
+
+V9 is the valid version of the graded experiment because its evidence rule no
+longer contradicts the classification task. It preserves more nominated words
+than v8 and remains more selective on exploration than v5, but it does not
+improve the owner's labelled boundary. `clog`, `herbivorous` and the surviving
+meaning of `happy` are now explicit policy or evidence disagreements rather
+than hidden binary verdicts. Further prompt wording is unlikely to settle them.
+
+---
+
+# Stage 3k: replace exam level with teaching value
+
+## Pre-run record
+
+**Defect in v9.** Exam level answers whether a word could plausibly be tested,
+not whether an adult would be glad to learn it. The exploration report made the
+gap concrete: the judge described one `chaperone` meaning as common enough for
+middle school and another as high-school vocabulary. The one-useful-meaning fold
+then kept the headword. `cadaver`, `clog`, `eloquently`, `feeder`, `menstruation`,
+`mileage`, `mimic`, `orbiter`, `perfectionist`, `rigorousness`, `unarguably` and
+`unmeasured` expose the same problem in different forms.
+
+**Changed classification.** Prompt 10 removes exam levels and records three
+properties per source meaning:
+
+| property | values |
+|---|---|
+| familiarity | `common`, `less_common`, `uncommon`, `unknown` |
+| scope | `general`, `specialist_subject`, `sensitive_body_or_medical`, `unknown` |
+| learning value | `high`, `low`, `unknown` |
+
+Deterministic policy advances only a `general`, non-`common`, `high`-value
+meaning. Any `unknown` quarantines it. A `common`, specialist, sensitive/body,
+medical or low-value meaning is excluded. The headword fold remains unchanged:
+one advancing meaning preserves the word.
+
+**Learning-value test.** A high-value word gives a well-read adult useful
+precision or a worthwhile concept, is pleasant to discover, and has a natural
+use in conversation or writing. Merely appearing in high-school, AP English,
+college or graduate text is not enough. Transparent inflections, derivatives
+and prefixed forms normally have low value unless they add a non-obvious meaning
+or useful precision.
+
+**Owner reject probe.** The thirteen words named above are now an owner-labelled
+reject slice in `cases/usefulness-owner-reject-probe-v1.json`. Every word already
+belongs to frozen exploration draw 1, so the slice reuses that exact evidence.
+It neither changes the 150-word exploration denominator nor causes duplicate
+model calls. This probe is tuned evidence and must not be presented as a second
+holdout.
+
+**Question.** Can the new properties preserve the original golden serve words
+while rejecting the thirteen low-payoff words? Report the golden score, probe
+score, frozen audit retention and unchanged 150-word exploration retention.
+Inspect which property rejects each probe word; the aggregate score alone cannot
+show whether the prompt learned the intended distinction.
+
+**Stopping rule.** Do not adopt prompt 10 merely for rejecting all thirteen. If
+it silently excludes a golden serve word or sharply lowers the unlabelled audit,
+the stricter policy has bought visible tidiness with the more expensive error.
+
+## Results
+
+| | golden | owner reject probe | audit | exploration |
+|---|---:|---:|---:|---:|
+| v9, recorded exam level | **13/16** | n/a | **97.0%** | **48.7%** |
+| **v10, teaching properties** | 11/16 | **13/13** | 45.0% | 13.3% |
+
+V10 cost `$0.1646`: ledger spend moved from `$1.4707` to `$1.6353`.
+Subtracting the known `$0.0039` of fabricated entries leaves `$1.6314` true
+spend and `$8.37` of the pilot cap. The golden run cost `$0.0139`, the probe
+added `$0.0091` after reusing `clog`, the audit cost `$0.0746`, and exploration
+cost `$0.0671` after reusing 38 records from the earlier runs.
+
+### The probe succeeds for the intended reasons
+
+All thirteen owner rejects were excluded. `chaperone`, `cadaver`, `eloquently`,
+`feeder`, `mileage`, `mimic`, `perfectionist`, `rigorousness` and `unarguably`
+were common, general and low value in every meaning. `menstruation` was common,
+sensitive/body/medical and low value; `orbiter` was common, specialist and low
+value. `clog` had a mix of common and less-common findings, but every meaning
+was low value. One figurative meaning of `unmeasured` was uncommon and high
+value, but specialist scope still excluded it; its other meaning was common and
+low value.
+
+The result therefore is not a hidden keyword rule or an aggregate accident. The
+new fields expose the distinctions the owner wanted the judge to make.
+
+### The stopping rule fires decisively
+
+Golden accuracy fell from 13/16 to 11/16. V10 fixes the prior misses on `clog`
+and `herbivorous`, but newly excludes five serve cases: `ubiquitous`, `nuance`,
+`inexpedient` and `muckraking` were classified as low value, while the same
+policy still preserves one less-common, high-value meaning of `happy`.
+
+The larger failure appears on the frozen audit. Retention fell 52 points, from
+97 of 100 nominated words to 45. There were no quarantines or contract failures:
+the prompt confidently excludes the other 55. Its rationales apply "already
+familiar" and "low payoff" to plausible teaching candidates including
+`abridge`, `audacious`, `banal`, `collude`, `poignant` and `presumptuous`. The
+audit remains unlabelled, so those individual outcomes are examples of the
+movement rather than new labels. The aggregate collapse is nevertheless far
+beyond the predeclared stopping boundary.
+
+Exploration moves in the same direction. V10 keeps 20 of 150 headwords, down
+from v9's 73, with no quarantines or contract failures. The requested owner
+rejects fall, but so does most of the candidate pool. The interactive report at
+`prototypes/intake-adjudication/reports/usefulness-prompt-10-exploration-draw-1.html`
+contains all 150 headwords and 244 source meanings, with filters for each of the
+three recorded properties.
+
+## Decision
+
+Reject v10 as the active usefulness configuration. Its schema is more
+observable and its owner probe is perfect, but the prompt-policy pair is much
+too restrictive: it buys 13 visible reject corrections at the cost of five
+golden misses and a 52-point audit collapse. Keep the persisted run and report
+as negative experimental evidence. V9 remains the best measured configuration
+from this series; any next iteration needs a different boundary or policy, not
+another clause that intensifies the same teaching-value test.
+
+The post-run code review found a second, independent reason not to adopt it.
+Issue #56 requires this gate to judge usefulness without asking morphology or
+sensitive-language questions. V10 made body/medical scope a direct model field
+and used inflection, derivation and prefix transparency in its learning-value
+test. Those concerns belong to other gates even if they correlate with the
+owner's rejects here. The checked-out prompt, contract and policy have therefore
+been restored to v9; the v10 records and generated report remain inspectable as
+historical evidence.

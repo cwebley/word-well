@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "bias|oewn-bias__5.00.00.oblique.00",
+  "fingerprint_key": "50bd5e907202aaf1176458409e0211d1e9be44f585431283d23a58f68ea4c909",
+  "fingerprint": {
+    "input_digest": "9961fafcc6eb4fa4b1ad22986e27dbb6dabafd2f76646bf9d7212ed220a975bc",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:45:53.060Z",
+  "finding": {
+    "sense_id": "oewn-bias__5.00.00.oblique.00",
+    "exam_level": "specialist_subject",
+    "rationale": "The meaning 'slanting diagonally across the grain of a fabric' is highly specific to the field of sewing or textiles, making it a specialist subject term rather than general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-bias__5.00.00.oblique.00",
+    "exam_level": "specialist_subject",
+    "rationale": "The meaning 'slanting diagonally across the grain of a fabric' is highly specific to the field of sewing or textiles, making it a specialist subject term rather than general vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 522,
+    "completion_tokens": 109,
+    "reasoning_tokens": 0,
+    "total_tokens": 631,
+    "cost_usd": 0.0004291
+  },
+  "latency_ms": 1018
+}

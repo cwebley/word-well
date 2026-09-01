@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "poignant|oewn-poignant__5.00.00.painful.00",
+  "fingerprint_key": "7cb9201093df628e667bf8a40b963f9d8d4bdc3a0a7147e552587cb7afd1e968",
+  "fingerprint": {
+    "input_digest": "e4f0e5a0016039ad36ee0fe54dfa680c7f87a378e555998b1a47b9415fee616d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:37.472Z",
+  "finding": {
+    "sense_id": "oewn-poignant__5.00.00.painful.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'poignant' describes a specific type of emotional distress that is more nuanced than basic emotions, making it suitable for a high school general vocabulary test. The definition and example support this level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-poignant__5.00.00.painful.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'poignant' describes a specific type of emotional distress that is more nuanced than basic emotions, making it suitable for a high school general vocabulary test. The definition and example support this level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 4
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 500,
+    "completion_tokens": 95,
+    "reasoning_tokens": 0,
+    "total_tokens": 595,
+    "cost_usd": 0.0003875
+  },
+  "latency_ms": 990
+}

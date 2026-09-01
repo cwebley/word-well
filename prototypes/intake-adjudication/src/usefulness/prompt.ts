@@ -31,7 +31,7 @@
 // (3.43). Admitting a few obvious words is the cheaper error, because a wrong
 // admit is visible in the app and a wrong exclude is silent.
 //
-// Version 6 was the third and last attempt, framing the question as whether a
+// Version 6 was the third attempt, framing the question as whether a
 // young-adult novel would print the word unglossed — asking where a word lives
 // rather than what a reader knows. It reached v3's numbers to the decimal: 43.0%
 // retention, 8.7% exploration.
@@ -52,12 +52,32 @@
 // synset-level and often use a different member word. The signal is not there,
 // so no clause can extract it. The everyday end stays the deterministic
 // filter's problem until the evidence changes.
-
+//
+// Version 7 tests one final cheap framing before changing the evidence. It asks
+// which tier of general vocabulary exam would test the word. Unlike the YA
+// clause, this asks for a difficulty category that the model may know directly
+// rather than asking it to infer comprehension from a plain-language gloss.
+// Endorsements cannot validate this framing: they come from GRE, test-prep and
+// word-of-the-day lists, so tuning toward them would consume the retention audit.
+//
+// Version 8 corrects the experiment: version 7 named three useful exam levels
+// but collapsed them into one binary field, so it never recorded which level the
+// judge chose. Version 8 requires the earliest level explicitly and adds middle
+// school below the keep threshold. It also gives specialist vocabulary its own
+// category instead of forcing it onto a general-exam scale where it does not
+// belong.
+//
+// Version 9 removes a contradiction inherited from earlier prompts. "Closed
+// book" prohibited all knowledge outside the supplied evidence, while the exam
+// classification deliberately relies on the model's general knowledge of a
+// word's difficulty. Meaning remains evidence-bound; exam level may use general
+// language knowledge about the word itself.
+//
 import type { CandidateMeaning } from "./meaning.ts";
 import { evidenceItems } from "./meaning.ts";
 
-export const PROMPT_VERSION = "usefulness-prompt/5";
-export const RUBRIC_VERSION = "usefulness-rubric/5";
+export const PROMPT_VERSION = "usefulness-prompt/9";
+export const RUBRIC_VERSION = "usefulness-rubric/9";
 
 export const RUBRIC = `You judge one recorded meaning of one English word.
 
@@ -65,22 +85,33 @@ WordWell teaches adults who are building a professional and academic vocabulary:
 high-utility words that carry across many subjects.
 
 Vocabulary belonging to one field is not that. A term used mainly inside a
-single discipline is not_useful, even when that discipline is an academic one.
-"Academic" describes register that carries across subjects, not whether some
-field uses the word.
+single discipline is specialist_subject, even when that discipline is an
+academic one. "Academic" describes register that carries across subjects, not
+whether some field uses the word.
 
-Decide whether this meaning is one worth learning.
+Choose the earliest exam level at which the word itself would plausibly be
+tested for the meaning shown:
 
-- useful: an adult building a professional and academic vocabulary would be
-  better off knowing this meaning.
-- not_useful: they would not.
-- insufficient_evidence: the supplied evidence is missing or incomplete, so the
-  question cannot be settled. Not a way to avoid a hard call.
+- ordinary: too basic even for a middle-school general vocabulary test
+- middle_school: plausibly tested as general vocabulary in middle school
+- high_school: first plausibly tested as general vocabulary in high school
+- college: first plausibly tested as general vocabulary at college level
+- postgraduate: first plausibly tested as general vocabulary at postgraduate level
+- specialist_subject: belongs on an exam inside one discipline rather than a
+  general vocabulary exam
+- insufficient_evidence: missing or incomplete supplied evidence prevents a
+  decision; not a way to avoid a hard call
+
+Judge the word's difficulty, not whether its plain-language definition is easy
+to understand. A word is not test-worthy merely because its meaning is useful
+across subjects. Choose the earliest plausible level, not the most advanced one
+where the word could still appear.
 
 RULES
 
-- Closed book. Judge only on the evidence supplied below. Do not use anything you
-  know about this word that is not in the evidence.
+- Use the supplied evidence to identify the meaning. Do not introduce an unshown
+  meaning or factual claim. You may use general language knowledge about the
+  difficulty or familiarity of the word itself when choosing an exam level.
 - You are judging the one meaning shown, not the word's other meanings.
 - Every piece of evidence carries a label: E1, E2, and so on. In evidence_ids,
   list the labels your verdict actually rests on. Use only labels shown below.

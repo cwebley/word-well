@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "balk|oewn-balk__1.09.00..",
+  "fingerprint_key": "5d059eaf69101169faf9e0e897b070e3cb0c73bc41665dc302ec2ae3f784d7ac",
+  "fingerprint": {
+    "input_digest": "89569fb2b45660310f1fe4beb0441df076f8622e620eac4ced5a7a805733f0c7",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:07.797Z",
+  "finding": {
+    "sense_id": "oewn-balk__1.09.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'balk' as a noun meaning an immaterial interference or delay is a less common usage than its verb form, making it suitable for a high school general vocabulary test. It is more advanced than 'hindrance' or 'impediment'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-balk__1.09.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'balk' as a noun meaning an immaterial interference or delay is a less common usage than its verb form, making it suitable for a high school general vocabulary test. It is more advanced than 'hindrance' or 'impediment'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 532,
+    "completion_tokens": 105,
+    "reasoning_tokens": 0,
+    "total_tokens": 637,
+    "cost_usd": 0.0004221
+  },
+  "latency_ms": 989
+}

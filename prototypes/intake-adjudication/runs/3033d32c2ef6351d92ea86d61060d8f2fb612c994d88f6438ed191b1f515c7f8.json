@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "perfume|oewn-perfume__1.06.00..",
+  "fingerprint_key": "3033d32c2ef6351d92ea86d61060d8f2fb612c994d88f6438ed191b1f515c7f8",
+  "fingerprint": {
+    "input_digest": "9905e6207e75d148baef1f632fd4c4e41590b5487bc2cc331cace8a461791694",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:31:38.706Z",
+  "finding": {
+    "sense_id": "oewn-perfume__1.06.00..",
+    "exam_level": "ordinary",
+    "rationale": "The word 'perfume' as a noun referring to a fragrant toiletry is a common, everyday word that would be understood by most children.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-perfume__1.06.00..",
+    "exam_level": "ordinary",
+    "rationale": "The word 'perfume' as a noun referring to a fragrant toiletry is a common, everyday word that would be understood by most children.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 503,
+    "completion_tokens": 77,
+    "reasoning_tokens": 0,
+    "total_tokens": 580,
+    "cost_usd": 0.0003434
+  },
+  "latency_ms": 862
+}

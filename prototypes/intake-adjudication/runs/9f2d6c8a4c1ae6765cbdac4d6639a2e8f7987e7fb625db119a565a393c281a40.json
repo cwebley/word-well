@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "audacious|oewn-audacious__5.00.00.unashamed.00",
+  "fingerprint_key": "9f2d6c8a4c1ae6765cbdac4d6639a2e8f7987e7fb625db119a565a393c281a40",
+  "fingerprint": {
+    "input_digest": "5c437536fce1c6044699c4ef450d14a4d96ec6d20bed5fcd41c6a86c7c8b7d57",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:45:42.448Z",
+  "finding": {
+    "sense_id": "oewn-audacious__5.00.00.unashamed.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'audacious' is a relatively common adjective that describes a bold or daring quality, often with a hint of impudence or disregard for convention. It is a word that would be encountered and tested as general vocabulary in a high school setting.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E9"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-audacious__5.00.00.unashamed.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'audacious' is a relatively common adjective that describes a bold or daring quality, often with a hint of impudence or disregard for convention. It is a word that would be encountered and tested as general vocabulary in a high school setting.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E9"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 8
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 625,
+    "completion_tokens": 110,
+    "reasoning_tokens": 0,
+    "total_tokens": 735,
+    "cost_usd": 0.0004625
+  },
+  "latency_ms": 945
+}

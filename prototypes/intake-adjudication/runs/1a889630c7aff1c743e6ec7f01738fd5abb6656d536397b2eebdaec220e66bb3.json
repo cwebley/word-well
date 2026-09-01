@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "bereft|oewn-bereft__5.00.00.unloved.00",
+  "fingerprint_key": "1a889630c7aff1c743e6ec7f01738fd5abb6656d536397b2eebdaec220e66bb3",
+  "fingerprint": {
+    "input_digest": "474f3fd99ab80dca92e82d028d7b48a0844b026f77722eac08389c02670273ff",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:29:45.969Z",
+  "finding": {
+    "sense_id": "oewn-bereft__5.00.00.unloved.00",
+    "exam_level": "specialist_subject",
+    "rationale": "The meaning 'unhappy in love; suffering from unrequited love' is highly specific and not a general vocabulary term. It is more akin to a literary or psychological term.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-bereft__5.00.00.unloved.00",
+    "exam_level": "specialist_subject",
+    "rationale": "The meaning 'unhappy in love; suffering from unrequited love' is highly specific and not a general vocabulary term. It is more akin to a literary or psychological term.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 512,
+    "completion_tokens": 92,
+    "reasoning_tokens": 0,
+    "total_tokens": 604,
+    "cost_usd": 0.0003836
+  },
+  "latency_ms": 920
+}

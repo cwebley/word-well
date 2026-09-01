@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "dumbfounded|oewn-dumbfounded__5.00.00.surprised.00",
+  "fingerprint_key": "632f74383b4bf88b3cc9106d00e4eeb08c69138746a78b0bdf0acc2496758955",
+  "fingerprint": {
+    "input_digest": "c48cfdf4c8d81229e08396f115efd2110273529f68f6fadca344a45d784208bc",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:43.510Z",
+  "finding": {
+    "sense_id": "oewn-dumbfounded__5.00.00.surprised.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'dumbfounded' describes being struck dumb with astonishment and surprise, a concept that is generally understood by high school students and is a useful general vocabulary term.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-dumbfounded__5.00.00.surprised.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'dumbfounded' describes being struck dumb with astonishment and surprise, a concept that is generally understood by high school students and is a useful general vocabulary term.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 594,
+    "completion_tokens": 88,
+    "reasoning_tokens": 0,
+    "total_tokens": 682,
+    "cost_usd": 0.0003982
+  },
+  "latency_ms": 864
+}

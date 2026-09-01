@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "lacing|oewn-lacing__1.13.00..",
+  "fingerprint_key": "b543cc356cd544e113ceec4abb97e1c29c48dfb256ee5620a6b485afa61adc19",
+  "fingerprint": {
+    "input_digest": "83473955da1cb4e55cbebbcbb6332c3a381852aa6de3c6b44eb7c3542953914a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:50:34.870Z",
+  "finding": {
+    "sense_id": "oewn-lacing__1.13.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'lacing' in this sense refers to a small amount of liquor added to food or drink, which is a specific usage that would likely be encountered and tested at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-lacing__1.13.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'lacing' in this sense refers to a small amount of liquor added to food or drink, which is a specific usage that would likely be encountered and tested at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 507,
+    "completion_tokens": 90,
+    "reasoning_tokens": 0,
+    "total_tokens": 597,
+    "cost_usd": 0.0003771
+  },
+  "latency_ms": 919
+}

@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "anthropomorphize|oewn-anthropomorphize__2.31.00..",
+  "fingerprint_key": "f6259bad69a77d9f7ca26e1cc2039759137e9ea97c231c65b9b33eb60593af9a",
+  "fingerprint": {
+    "input_digest": "d61fbc28ab14cdb8f2248ce038e135cb0a400349ed75e3012da17819c21b8653",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:34:10.093Z",
+  "finding": {
+    "sense_id": "oewn-anthropomorphize__2.31.00..",
+    "familiarity": "less_common",
+    "scope": "general",
+    "learning_value": "high",
+    "rationale": "While many educated adults might recognize the root 'anthropo-', the full verb 'anthropomorphize' is less common and offers a precise way to describe attributing human characteristics to non-human entities, a concept useful in various contexts.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-anthropomorphize__2.31.00..",
+    "familiarity": "less_common",
+    "scope": "general",
+    "learning_value": "high",
+    "rationale": "While many educated adults might recognize the root 'anthropo-', the full verb 'anthropomorphize' is less common and offers a precise way to describe attributing human characteristics to non-human entities, a concept useful in various contexts.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 631,
+    "completion_tokens": 107,
+    "reasoning_tokens": 0,
+    "total_tokens": 738,
+    "cost_usd": 0.00031046
+  },
+  "latency_ms": 1010
+}

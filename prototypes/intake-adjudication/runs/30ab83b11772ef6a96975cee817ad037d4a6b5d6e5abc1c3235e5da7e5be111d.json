@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "canon|oewn-canon__1.10.00..",
+  "fingerprint_key": "30ab83b11772ef6a96975cee817ad037d4a6b5d6e5abc1c3235e5da7e5be111d",
+  "fingerprint": {
+    "input_digest": "801eb0b0119a3d0e667f81b6310f7fc3be5f966105d8b0b1dd4bdbcf0cb2fef3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:26:30.291Z",
+  "finding": {
+    "sense_id": "oewn-canon__1.10.00..",
+    "exam_level": "college",
+    "rationale": "The definition describes a 'body of rules or principles generally established as valid and fundamental in a field of art or philosophy,' which suggests a more abstract and specialized understanding of 'rule' than typically tested before college. The examples also point to more advanced contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-canon__1.10.00..",
+    "exam_level": "college",
+    "rationale": "The definition describes a 'body of rules or principles generally established as valid and fundamental in a field of art or philosophy,' which suggests a more abstract and specialized understanding of 'rule' than typically tested before college. The examples also point to more advanced contexts.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 521,
+    "completion_tokens": 102,
+    "reasoning_tokens": 0,
+    "total_tokens": 623,
+    "cost_usd": 0.0004113
+  },
+  "latency_ms": 1629
+}

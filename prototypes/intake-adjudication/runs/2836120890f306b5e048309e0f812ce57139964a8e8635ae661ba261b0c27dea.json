@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "qualm|oewn-qualm__1.12.00..",
+  "fingerprint_key": "2836120890f306b5e048309e0f812ce57139964a8e8635ae661ba261b0c27dea",
+  "fingerprint": {
+    "input_digest": "42f972ffa11239c5fc21af3965a70e4a4b82b3557ba64b53cf4c767c83dbd5b8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:48:07.290Z",
+  "finding": {
+    "sense_id": "oewn-qualm__1.12.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'qualm' refers to a feeling of uneasiness, often related to ethical concerns. While the concept is understandable, the word itself is not typically encountered until high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-qualm__1.12.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'qualm' refers to a feeling of uneasiness, often related to ethical concerns. While the concept is understandable, the word itself is not typically encountered until high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 531,
+    "completion_tokens": 91,
+    "reasoning_tokens": 0,
+    "total_tokens": 622,
+    "cost_usd": 0.0003868
+  },
+  "latency_ms": 850
+}

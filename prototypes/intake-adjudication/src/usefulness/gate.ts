@@ -14,7 +14,7 @@ import type { UsefulnessFinding } from "./contract.ts";
 import { CONTRACT_VERSION, usefulnessFindingSchema, usefulnessJsonSchema } from "./contract.ts";
 import type { CandidateMeaning } from "./meaning.ts";
 import { buildMessages, PROMPT_VERSION, RUBRIC_VERSION } from "./prompt.ts";
-import { deriveUsefulness, POLICY_VERSION, verdictOf } from "./policy.ts";
+import { deriveExamLevel, POLICY_VERSION } from "./policy.ts";
 
 export const usefulnessGate: Gate<CandidateMeaning, UsefulnessFinding> = {
   name: "audience-usefulness",
@@ -39,12 +39,12 @@ export const usefulnessGate: Gate<CandidateMeaning, UsefulnessFinding> = {
       CONTRACT_VERSION,
     ),
 
-  decide: (finding) => deriveUsefulness(verdictOf(finding)),
+  decide: (finding) => deriveExamLevel(finding.exam_level),
 
   policyContext: (subject) => ({ endorsements: subject.policy_context.endorsements }),
 };
 
 /** How a usefulness finding reads in `runs/`, for a human, not a machine. */
 export function summariseFinding(finding: UsefulnessFinding): string {
-  return `${finding.usefulness} — ${finding.rationale}`;
+  return `${finding.exam_level} - ${finding.rationale}`;
 }

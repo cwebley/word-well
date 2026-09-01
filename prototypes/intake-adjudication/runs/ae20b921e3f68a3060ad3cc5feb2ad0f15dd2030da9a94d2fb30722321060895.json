@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "exuberant|oewn-exuberant__5.00.00.spirited.00",
+  "fingerprint_key": "ae20b921e3f68a3060ad3cc5feb2ad0f15dd2030da9a94d2fb30722321060895",
+  "fingerprint": {
+    "input_digest": "67aa367448eeb9fbe234d41c14eacc68b437eea63654817996064e6975afba28",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:01:36.510Z",
+  "finding": {
+    "sense_id": "oewn-exuberant__5.00.00.spirited.00",
+    "usefulness": "useful",
+    "rationale": "The definition suggests a word that describes a general human quality, making it broadly applicable across various subjects and useful for a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-exuberant__5.00.00.spirited.00",
+    "usefulness": "useful",
+    "rationale": "The definition suggests a word that describes a general human quality, making it broadly applicable across various subjects and useful for a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 461,
+    "completion_tokens": 76,
+    "reasoning_tokens": 0,
+    "total_tokens": 537,
+    "cost_usd": 0.0003283
+  },
+  "latency_ms": 876
+}

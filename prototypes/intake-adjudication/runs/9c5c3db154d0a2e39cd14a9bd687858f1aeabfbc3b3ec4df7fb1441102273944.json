@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "reformation|oewn-reformation__1.26.00..",
+  "fingerprint_key": "9c5c3db154d0a2e39cd14a9bd687858f1aeabfbc3b3ec4df7fb1441102273944",
+  "fingerprint": {
+    "input_digest": "215165296c3e1fa757742e25eb07074693e6fe71b876aa662d5005af01f4b54d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:36:21.628Z",
+  "finding": {
+    "sense_id": "oewn-reformation__1.26.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "This meaning of 'reformation' is a common and general concept, widely understood by educated adults. While it can appear in advanced texts, it is not a word that adds significant expressive precision or names a novel concept for this audience.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-reformation__1.26.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "This meaning of 'reformation' is a common and general concept, widely understood by educated adults. While it can appear in advanced texts, it is not a word that adds significant expressive precision or names a novel concept for this audience.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 643,
+    "completion_tokens": 108,
+    "reasoning_tokens": 0,
+    "total_tokens": 751,
+    "cost_usd": 0.0004629
+  },
+  "latency_ms": 1128
+}

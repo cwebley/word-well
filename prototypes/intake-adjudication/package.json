@@ -17,6 +17,7 @@
     "usefulness": "dotenv -e .env.local -- tsx src/usefulness-cli.ts",
     "eval:usefulness": "dotenv -e .env.local -- braintrust eval evals/usefulness.eval.ts",
     "report": "tsx src/report-usefulness.ts",
+    "report:html": "tsx src/report-exam-html.ts",
     "audit": "dotenv -e .env.local -- tsx src/audit-cli.ts"
   },
   "dependencies": {

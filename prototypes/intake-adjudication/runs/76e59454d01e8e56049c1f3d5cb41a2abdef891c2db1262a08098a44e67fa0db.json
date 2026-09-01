@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "parsimonious|oewn-parsimonious__5.00.00.stingy.00",
+  "fingerprint_key": "76e59454d01e8e56049c1f3d5cb41a2abdef891c2db1262a08098a44e67fa0db",
+  "fingerprint": {
+    "input_digest": "25a1a3b2faaa206af893c389ae6a9527ab2f83649ea7ff4b6ae5f1beac78cdf3",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:27.436Z",
+  "finding": {
+    "sense_id": "oewn-parsimonious__5.00.00.stingy.00",
+    "exam_level": "college",
+    "rationale": "The word 'parsimonious' is a sophisticated synonym for 'stingy' or 'unwilling to spend,' making it suitable for a college-level general vocabulary test. Its usage implies a higher register than high school.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-parsimonious__5.00.00.stingy.00",
+    "exam_level": "college",
+    "rationale": "The word 'parsimonious' is a sophisticated synonym for 'stingy' or 'unwilling to spend,' making it suitable for a college-level general vocabulary test. Its usage implies a higher register than high school.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 6
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 544,
+    "completion_tokens": 102,
+    "reasoning_tokens": 0,
+    "total_tokens": 646,
+    "cost_usd": 0.0004182
+  },
+  "latency_ms": 936
+}

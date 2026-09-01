@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "rosewood|oewn-rosewood__1.20.00..",
+  "fingerprint_key": "37f3841736b65714f02c7d1b858e7c170d60d9ae2becc76ae9952c1a065623dd",
+  "fingerprint": {
+    "input_digest": "96e84e3ee395d8827ce8cf5ee51c81500e92ce972ee10ba88402c06d2b27dd1a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:51:34.044Z",
+  "finding": {
+    "sense_id": "oewn-rosewood__1.20.00..",
+    "exam_level": "specialist_subject",
+    "rationale": "The definition describes a specific genus of trees and their wood, which is highly specialized knowledge. This term is unlikely to appear on a general vocabulary exam.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-rosewood__1.20.00..",
+    "exam_level": "specialist_subject",
+    "rationale": "The definition describes a specific genus of trees and their wood, which is highly specialized knowledge. This term is unlikely to appear on a general vocabulary exam.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 544,
+    "completion_tokens": 77,
+    "reasoning_tokens": 0,
+    "total_tokens": 621,
+    "cost_usd": 0.0003557
+  },
+  "latency_ms": 804
+}

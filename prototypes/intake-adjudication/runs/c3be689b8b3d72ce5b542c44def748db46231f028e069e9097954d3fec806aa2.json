@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "arresting|oewn-arresting__5.00.00.impressive.00",
+  "fingerprint_key": "c3be689b8b3d72ce5b542c44def748db46231f028e069e9097954d3fec806aa2",
+  "fingerprint": {
+    "input_digest": "2c9323c96e2c0d1a3e356fb20d13f3c203a2813947a3c4a883d08b50d19860d4",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:00:28.074Z",
+  "finding": {
+    "sense_id": "oewn-arresting__5.00.00.impressive.00",
+    "usefulness": "useful",
+    "rationale": "The definition 'commanding attention' and the examples provided suggest a word that is generally applicable across various contexts, making it useful for a broad vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-arresting__5.00.00.impressive.00",
+    "usefulness": "useful",
+    "rationale": "The definition 'commanding attention' and the examples provided suggest a word that is generally applicable across various contexts, making it useful for a broad vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 496,
+    "completion_tokens": 86,
+    "reasoning_tokens": 0,
+    "total_tokens": 582,
+    "cost_usd": 0.0003638
+  },
+  "latency_ms": 840
+}

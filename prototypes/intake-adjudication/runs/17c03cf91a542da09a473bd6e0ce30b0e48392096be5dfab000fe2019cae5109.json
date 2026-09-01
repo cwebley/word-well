@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "pique|oewn-pique__2.37.00..",
+  "fingerprint_key": "17c03cf91a542da09a473bd6e0ce30b0e48392096be5dfab000fe2019cae5109",
+  "fingerprint": {
+    "input_digest": "f3762d23406df2fa81e15d3bb3e2ef4b82770d646112d201dc9dfc16b68643e8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:36:10.921Z",
+  "finding": {
+    "sense_id": "oewn-pique__2.37.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'cause to feel resentment or indignation' is very common and well-understood, making deliberate teaching unnecessary for an educated adult.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-pique__2.37.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'cause to feel resentment or indignation' is very common and well-understood, making deliberate teaching unnecessary for an educated adult.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 640,
+    "completion_tokens": 88,
+    "reasoning_tokens": 0,
+    "total_tokens": 728,
+    "cost_usd": 0.00026458
+  },
+  "latency_ms": 1028
+}

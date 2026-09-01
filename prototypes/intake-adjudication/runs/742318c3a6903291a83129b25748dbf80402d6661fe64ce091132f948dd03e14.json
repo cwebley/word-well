@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "coextensive|oewn-coextensive__5.00.00.commensurate.00",
+  "fingerprint_key": "742318c3a6903291a83129b25748dbf80402d6661fe64ce091132f948dd03e14",
+  "fingerprint": {
+    "input_digest": "b1f5ed263330951b730ab41a9acdc5cab3673f55d87f0f5ffc0b19792cba4657",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:28.505Z",
+  "finding": {
+    "sense_id": "oewn-coextensive__5.00.00.commensurate.00",
+    "exam_level": "college",
+    "rationale": "The word 'coextensive' is a relatively uncommon adjective that describes something of equal extent, scope, or duration. It is more likely to be encountered and tested at a college level due to its formal nature and specific meaning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-coextensive__5.00.00.commensurate.00",
+    "exam_level": "college",
+    "rationale": "The word 'coextensive' is a relatively uncommon adjective that describes something of equal extent, scope, or duration. It is more likely to be encountered and tested at a college level due to its formal nature and specific meaning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 528,
+    "completion_tokens": 99,
+    "reasoning_tokens": 0,
+    "total_tokens": 627,
+    "cost_usd": 0.0004059
+  },
+  "latency_ms": 910
+}

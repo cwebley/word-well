@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "slander|oewn-slander__1.10.00..",
+  "fingerprint_key": "5d9499fe388872ba02fd4c000eb69359cae56254c3e5180e0887b338dc750849",
+  "fingerprint": {
+    "input_digest": "4f4277377d27bf5626e2bb5c6000fd85616777f57ada64a96a1da02b9c18a013",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:59.414Z",
+  "finding": {
+    "sense_id": "oewn-slander__1.10.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'slander' refers to a specific type of defamation and is a common enough concept to be tested as general vocabulary, likely first appearing at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-slander__1.10.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'slander' refers to a specific type of defamation and is a common enough concept to be tested as general vocabulary, likely first appearing at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 2
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 490,
+    "completion_tokens": 85,
+    "reasoning_tokens": 0,
+    "total_tokens": 575,
+    "cost_usd": 0.0003595
+  },
+  "latency_ms": 848
+}

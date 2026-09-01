@@ -1,0 +1,80 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "irreversibly|oewn-irreversibly__4.02.00..",
+  "fingerprint_key": "41097dc385371b0668f63948a5cc15cd0a96e7face21ba42491702f77869005e",
+  "fingerprint": {
+    "input_digest": "4d13eb9a4ddc750a6a3f42c832c56a9f7fb75b5b8d740541b3f8d452d90f10c8",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:35:30.213Z",
+  "finding": {
+    "sense_id": "oewn-irreversibly__4.02.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'irreversibly' is a common adverb derived transparently from 'irreversible', which most educated adults already know. It adds little new expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-irreversibly__4.02.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'irreversibly' is a common adverb derived transparently from 'irreversible', which most educated adults already know. It adds little new expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 628,
+    "completion_tokens": 99,
+    "reasoning_tokens": 0,
+    "total_tokens": 727,
+    "cost_usd": 0.00028983
+  },
+  "latency_ms": 878
+}

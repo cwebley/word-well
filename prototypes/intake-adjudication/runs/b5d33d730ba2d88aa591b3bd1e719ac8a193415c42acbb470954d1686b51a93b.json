@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "deathblow|oewn-deathblow__1.04.00..",
+  "fingerprint_key": "b5d33d730ba2d88aa591b3bd1e719ac8a193415c42acbb470954d1686b51a93b",
+  "fingerprint": {
+    "input_digest": "8e105bdd84adc77998e725446c82b1cbfae55b359f4f9158f31c6ec1441fc08d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:04:41.593Z",
+  "finding": {
+    "sense_id": "oewn-deathblow__1.04.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided is too ordinary and easily understood from its component words to be considered a useful vocabulary word for an adult building a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-deathblow__1.04.00..",
+    "usefulness": "not_useful",
+    "rationale": "The meaning provided is too ordinary and easily understood from its component words to be considered a useful vocabulary word for an adult building a professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 459,
+    "completion_tokens": 75,
+    "reasoning_tokens": 0,
+    "total_tokens": 534,
+    "cost_usd": 0.0003252
+  },
+  "latency_ms": 937
+}

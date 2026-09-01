@@ -1,0 +1,80 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "serpentine|oewn-serpentine__5.00.00.curved.00",
+  "fingerprint_key": "0b2296a8b83a0d333bd80f08b80b4252f738c1a2080e24a9f124ac1d5f07394f",
+  "fingerprint": {
+    "input_digest": "5438f0dbc0e02bc73b261cedd59ac4a0a86fa9c0bf53d95eb05990ff3188318e",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:51:39.282Z",
+  "finding": {
+    "sense_id": "oewn-serpentine__5.00.00.curved.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'serpentine' meaning 'resembling a serpent in form' is a descriptive adjective that is not overly common but is certainly encountered in general reading by high school. It is more advanced than typical middle school vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-serpentine__5.00.00.curved.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'serpentine' meaning 'resembling a serpent in form' is a descriptive adjective that is not overly common but is certainly encountered in general reading by high school. It is more advanced than typical middle school vocabulary.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 544,
+    "completion_tokens": 112,
+    "reasoning_tokens": 0,
+    "total_tokens": 656,
+    "cost_usd": 0.0004432
+  },
+  "latency_ms": 1026
+}

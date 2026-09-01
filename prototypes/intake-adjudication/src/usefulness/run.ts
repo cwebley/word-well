@@ -19,6 +19,7 @@ import type { UsefulnessFinding } from "./contract.ts";
 import { usefulnessGate } from "./gate.ts";
 import type { CandidateMeaning } from "./meaning.ts";
 import { deriveHeadwordDisposition } from "./policy.ts";
+import { verdictOf } from "./policy.ts";
 
 export interface HeadwordGroup {
   headword: string;
@@ -84,7 +85,7 @@ export async function judgeHeadword(
   // silently read as `not_useful`: that would turn a broken reply into a silent
   // exclusion, which is the failure direction this gate can least afford.
   const verdicts = records
-    .map((record) => record.finding?.usefulness)
+    .map((record) => (record.finding ? verdictOf(record.finding) : undefined))
     .filter((verdict): verdict is NonNullable<typeof verdict> => verdict !== undefined);
 
   const contractFailures = records.length - verdicts.length;

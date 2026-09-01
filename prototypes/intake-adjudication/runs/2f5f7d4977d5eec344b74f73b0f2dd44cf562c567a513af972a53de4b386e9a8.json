@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "perfume|oewn-perfume__2.29.00..",
+  "fingerprint_key": "2f5f7d4977d5eec344b74f73b0f2dd44cf562c567a513af972a53de4b386e9a8",
+  "fingerprint": {
+    "input_digest": "2e8e1955db290c89bdf7ef8578ddefd1144c8004a6711e7bf9f76309145a30fb",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:31:40.675Z",
+  "finding": {
+    "sense_id": "oewn-perfume__2.29.00..",
+    "exam_level": "ordinary",
+    "rationale": "The verb 'perfume' meaning 'to apply perfume to' is a very common and basic action, easily understood and used by middle schoolers and younger. It is too fundamental for a general vocabulary test at middle school level or higher.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-perfume__2.29.00..",
+    "exam_level": "ordinary",
+    "rationale": "The verb 'perfume' meaning 'to apply perfume to' is a very common and basic action, easily understood and used by middle schoolers and younger. It is too fundamental for a general vocabulary test at middle school level or higher.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 507,
+    "completion_tokens": 100,
+    "reasoning_tokens": 0,
+    "total_tokens": 607,
+    "cost_usd": 0.0004021
+  },
+  "latency_ms": 1065
+}

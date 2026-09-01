@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "kagura|oewn-kagura__1.04.01..",
+  "fingerprint_key": "d0a6b18115a3628da0d1558091bb074d8e1028fbeab2e7982e520d6d78795db8",
+  "fingerprint": {
+    "input_digest": "03a26196a31646aa56ebc520ecae0b382c514e15079e888c711ddde561c776dd",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:35:33.964Z",
+  "finding": {
+    "sense_id": "oewn-kagura__1.04.01..",
+    "familiarity": "uncommon",
+    "scope": "specialist_subject",
+    "learning_value": "high",
+    "rationale": "This word refers to a specific type of Japanese dance with religious and cultural significance, making it uncommon for a general educated adult audience. It has high learning value for those interested in Japanese culture or performing arts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-kagura__1.04.01..",
+    "familiarity": "uncommon",
+    "scope": "specialist_subject",
+    "learning_value": "high",
+    "rationale": "This word refers to a specific type of Japanese dance with religious and cultural significance, making it uncommon for a general educated adult audience. It has high learning value for those interested in Japanese culture or performing arts.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 663,
+    "completion_tokens": 106,
+    "reasoning_tokens": 0,
+    "total_tokens": 769,
+    "cost_usd": 0.00031405
+  },
+  "latency_ms": 901
+}

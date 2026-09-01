@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "clog|oewn-clog__2.30.03..",
+  "fingerprint_key": "f8eb5a86ca32813b906e18619b531dce211a0ff0a0b298279d9e4cf3e79d23a0",
+  "fingerprint": {
+    "input_digest": "523acd823bac5e793cebde4633db3a450221e3020e999661f493433c6dfa97ee",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:29:23.859Z",
+  "finding": {
+    "sense_id": "oewn-clog__2.30.03..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'coalesce or unite in a mass' is very common, especially in the context of blood clotting. The word 'clog' itself is also common, and this meaning is transparent.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-clog__2.30.03..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The meaning 'coalesce or unite in a mass' is very common, especially in the context of blood clotting. The word 'clog' itself is also common, and this meaning is transparent.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 636,
+    "completion_tokens": 111,
+    "reasoning_tokens": 0,
+    "total_tokens": 747,
+    "cost_usd": 0.0004683
+  },
+  "latency_ms": 1002
+}

@@ -37,6 +37,8 @@ export const bucketDisposition: Record<Bucket, Disposition> = {
 const caseFileSchema = z.object({
   set_version: z.string(),
   gate: z.literal("audience-usefulness"),
+  /** Allows an owner-labelled probe to reuse a frozen set's exact evidence. */
+  evidence_set: z.string().optional(),
   cases: z
     .array(
       z.object({
@@ -98,18 +100,19 @@ export interface LoadedUsefulnessDataset {
 }
 
 export function loadUsefulnessDataset(
-  name = "usefulness-golden-v2",
+  name = "usefulness-golden-v3",
   root = process.cwd(),
 ): LoadedUsefulnessDataset {
   const spec = caseFileSchema.parse(
     JSON.parse(readFileSync(join(root, `cases/${name}.json`), "utf8")),
   );
+  const evidenceName = spec.evidence_set ?? name;
   const groups = new Map(
-    groupByHeadword(readCandidateMeanings(join(root, `evidence/${name}.meanings.jsonl`))).map(
+    groupByHeadword(readCandidateMeanings(join(root, `evidence/${evidenceName}.meanings.jsonl`))).map(
       (group) => [group.headword, group],
     ),
   );
-  const manifest = readManifest(join(root, `evidence/${name}.manifest.json`));
+  const manifest = readManifest(join(root, `evidence/${evidenceName}.manifest.json`));
 
   const seen = new Set<string>();
   const cases = spec.cases.map((entry) => {
@@ -144,15 +147,17 @@ export function loadUsefulnessDataset(
     };
   });
 
-  for (const headword of groups.keys()) {
-    if (!seen.has(headword)) throw new Error(`evidence for ${headword} has no case entry`);
+  if (evidenceName === name) {
+    for (const headword of groups.keys()) {
+      if (!seen.has(headword)) throw new Error(`evidence for ${headword} has no case entry`);
+    }
   }
 
   return { name, setVersion: spec.set_version, manifest, cases };
 }
 
 /** Every lemma the golden set touches. The retention audit must avoid all of them. */
-export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v2"): Set<string> {
+export function goldenLemmas(root = process.cwd(), name = "usefulness-golden-v3"): Set<string> {
   const spec = caseFileSchema.parse(
     JSON.parse(readFileSync(join(root, `cases/${name}.json`), "utf8")),
   );

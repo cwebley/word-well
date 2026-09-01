@@ -71,3 +71,28 @@ describe("the golden set", () => {
     expect(partsOfSpeech.size).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe("the owner reject probe", () => {
+  it("scores the named exploration words without changing the frozen draw", () => {
+    const probe = loadUsefulnessDataset("usefulness-owner-reject-probe-v1");
+
+    expect(probe.cases).toHaveLength(13);
+    expect(probe.cases.every((entry) => entry.expected.bucket === "reject")).toBe(true);
+    expect(probe.manifest.case_set).toBe("exploration-draw-1");
+    expect(probe.cases.map((entry) => entry.expected.lemma)).toEqual([
+      "chaperone",
+      "cadaver",
+      "clog",
+      "eloquently",
+      "feeder",
+      "menstruation",
+      "mileage",
+      "mimic",
+      "orbiter",
+      "perfectionist",
+      "rigorousness",
+      "unarguably",
+      "unmeasured",
+    ]);
+  });
+});

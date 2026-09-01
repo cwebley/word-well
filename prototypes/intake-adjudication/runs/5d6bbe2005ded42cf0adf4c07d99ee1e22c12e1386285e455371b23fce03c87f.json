@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "flotilla|oewn-flotilla__1.06.01..",
+  "fingerprint_key": "5d6bbe2005ded42cf0adf4c07d99ee1e22c12e1386285e455371b23fce03c87f",
+  "fingerprint": {
+    "input_digest": "f02eb8446032ce2b02e9cbd3ab2d79102e63dc7e69f220873c637f2e3b17d226",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:31:34.961Z",
+  "finding": {
+    "sense_id": "oewn-flotilla__1.06.01..",
+    "familiarity": "less_common",
+    "scope": "specialist_subject",
+    "learning_value": "low",
+    "rationale": "While 'flotilla' is generally recognizable, this specific meaning refers to a very particular US Navy fleet structure, making it specialist and of low learning value for a general audience.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-flotilla__1.06.01..",
+    "familiarity": "less_common",
+    "scope": "specialist_subject",
+    "learning_value": "low",
+    "rationale": "While 'flotilla' is generally recognizable, this specific meaning refers to a very particular US Navy fleet structure, making it specialist and of low learning value for a general audience.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 624,
+    "completion_tokens": 99,
+    "reasoning_tokens": 0,
+    "total_tokens": 723,
+    "cost_usd": 0.00028917
+  },
+  "latency_ms": 1058
+}

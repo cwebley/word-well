@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "stagnant|oewn-stagnant__5.00.00.undynamic.00",
+  "fingerprint_key": "51f1be971af64cf851b2ff2a0a8c857752b32f8d22f1cd619bfb175250e62ba3",
+  "fingerprint": {
+    "input_digest": "f5d4d688825d7f1392106261bff4a43853d4f2a586d6d857de90db2f4cda4081",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:36:52.652Z",
+  "finding": {
+    "sense_id": "oewn-stagnant__5.00.00.undynamic.00",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'stagnant' in this meaning is widely known and used by educated adults to describe something not growing or changing. It is a common adjective with a clear and direct meaning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-stagnant__5.00.00.undynamic.00",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "The word 'stagnant' in this meaning is widely known and used by educated adults to describe something not growing or changing. It is a common adjective with a clear and direct meaning.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 636,
+    "completion_tokens": 105,
+    "reasoning_tokens": 0,
+    "total_tokens": 741,
+    "cost_usd": 0.00030642
+  },
+  "latency_ms": 1076
+}

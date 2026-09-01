@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "spatter|oewn-spatter__1.11.00..",
+  "fingerprint_key": "0750427c628ad08b13b2df702db11fe898976cd756c9b4c4cf587e21650c1b50",
+  "fingerprint": {
+    "input_digest": "682a66ca330b029b39bfa9114e99e9cddcf0a268192a3d5560be8c99cb6b2bfa",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:32:24.350Z",
+  "finding": {
+    "sense_id": "oewn-spatter__1.11.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'spatter' as a noun referring to a noise, particularly of gunfire, is not an everyday word but is understandable in context and likely to appear in general vocabulary at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-spatter__1.11.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'spatter' as a noun referring to a noise, particularly of gunfire, is not an everyday word but is understandable in context and likely to appear in general vocabulary at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 531,
+    "completion_tokens": 95,
+    "reasoning_tokens": 0,
+    "total_tokens": 626,
+    "cost_usd": 0.0003968
+  },
+  "latency_ms": 1015
+}

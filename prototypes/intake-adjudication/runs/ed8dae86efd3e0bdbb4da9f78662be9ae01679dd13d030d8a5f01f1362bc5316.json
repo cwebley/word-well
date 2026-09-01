@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "perfectionist|oewn-perfectionist__1.18.00..",
+  "fingerprint_key": "ed8dae86efd3e0bdbb4da9f78662be9ae01679dd13d030d8a5f01f1362bc5316",
+  "fingerprint": {
+    "input_digest": "92af7e830ff2f1f74ccd227df998fad3a050a5fdb5d6fe1308b4f9981e510ccc",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:31:37.844Z",
+  "finding": {
+    "sense_id": "oewn-perfectionist__1.18.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'perfectionist' describes a common personality trait and is widely understood, making it suitable for a high school general vocabulary test.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-perfectionist__1.18.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'perfectionist' describes a common personality trait and is widely understood, making it suitable for a high school general vocabulary test.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 496,
+    "completion_tokens": 79,
+    "reasoning_tokens": 0,
+    "total_tokens": 575,
+    "cost_usd": 0.0003463
+  },
+  "latency_ms": 836
+}

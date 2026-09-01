@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "stark|oewn-stark__5.00.00.immoderate.00",
+  "fingerprint_key": "12c0887b03801799a2c72b47241a6c92fb78031bb166eb461576b05974387c7f",
+  "fingerprint": {
+    "input_digest": "13ea25d1fb194277fc8d01e5f1db9e332c415f6c3b49cbdaf37612e173db1a4f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:03:22.889Z",
+  "finding": {
+    "sense_id": "oewn-stark__5.00.00.immoderate.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples show this meaning of 'stark' is a high-utility adjective, applicable across many subjects.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-stark__5.00.00.immoderate.00",
+    "usefulness": "useful",
+    "rationale": "The definition and examples show this meaning of 'stark' is a high-utility adjective, applicable across many subjects.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 464,
+    "completion_tokens": 95,
+    "reasoning_tokens": 0,
+    "total_tokens": 559,
+    "cost_usd": 0.0003767
+  },
+  "latency_ms": 886
+}

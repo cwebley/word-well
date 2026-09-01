@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "clomiphene|oewn-clomiphene__1.06.00..",
+  "fingerprint_key": "0db4a9938aa7b76249b1a9a1f8a914cd74fe4f7451ee2e9820e978c2aceefebf",
+  "fingerprint": {
+    "input_digest": "11daed63e06ec6fe89ed4db04722cbc2411f5ec8bb0ddf1c014758aaff7285fa",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:04:34.937Z",
+  "finding": {
+    "sense_id": "oewn-clomiphene__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word 'clomiphene' refers to a specific fertility drug, making it a specialized term rather than a high-utility word for general professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-clomiphene__1.06.00..",
+    "usefulness": "not_useful",
+    "rationale": "The word 'clomiphene' refers to a specific fertility drug, making it a specialized term rather than a high-utility word for general professional and academic vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 484,
+    "completion_tokens": 81,
+    "reasoning_tokens": 0,
+    "total_tokens": 565,
+    "cost_usd": 0.0003477
+  },
+  "latency_ms": 996
+}

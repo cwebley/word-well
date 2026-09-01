@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "stark|oewn-stark__5.00.00.inhospitable.00",
+  "fingerprint_key": "8c92352863b07ee5649a1af585fe613cfd3cd6993598bbc609493a685f2e0124",
+  "fingerprint": {
+    "input_digest": "2f1d4ad5bdc868e3542a5b56e78665af8861c9f0b41d757c6e43531dea5a521d",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:29:03.296Z",
+  "finding": {
+    "sense_id": "oewn-stark__5.00.00.inhospitable.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'stark' in this sense describes a landscape as bare or desolate, which is a common descriptive adjective. While not overly complex, it's a step above basic vocabulary and would likely be encountered and tested in a high school context.",
+    "evidence_ids": [
+      "E1",
+      "E6",
+      "E7",
+      "E8"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-stark__5.00.00.inhospitable.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'stark' in this sense describes a landscape as bare or desolate, which is a common descriptive adjective. While not overly complex, it's a step above basic vocabulary and would likely be encountered and tested in a high school context.",
+    "evidence_ids": [
+      "E1",
+      "E6",
+      "E7",
+      "E8"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 567,
+    "completion_tokens": 114,
+    "reasoning_tokens": 0,
+    "total_tokens": 681,
+    "cost_usd": 0.0004551
+  },
+  "latency_ms": 1050
+}

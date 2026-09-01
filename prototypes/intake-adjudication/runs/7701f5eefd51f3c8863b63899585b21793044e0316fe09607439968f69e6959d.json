@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "introspect|oewn-introspect__2.31.00..",
+  "fingerprint_key": "7701f5eefd51f3c8863b63899585b21793044e0316fe09607439968f69e6959d",
+  "fingerprint": {
+    "input_digest": "82fc53c8d17faf9a3ab90ffb73609c42f8e4bbf5015bf27b1beb1fac7fd46048",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:50:25.194Z",
+  "finding": {
+    "sense_id": "oewn-introspect__2.31.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'introspect' describes a common human activity but is not typically encountered or tested until high school, as it is a more formal and specific term than 'think' or 'reflect'.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-introspect__2.31.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'introspect' describes a common human activity but is not typically encountered or tested until high school, as it is a more formal and specific term than 'think' or 'reflect'.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 506,
+    "completion_tokens": 109,
+    "reasoning_tokens": 0,
+    "total_tokens": 615,
+    "cost_usd": 0.0004243
+  },
+  "latency_ms": 958
+}

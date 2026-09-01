@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "unarguably|oewn-unarguably__4.02.00..",
+  "fingerprint_key": "c96b3cb95bdf185089d532d10dadb8641d36bb9f4cda3a32db795537d5d86870",
+  "fingerprint": {
+    "input_digest": "9fed2881ef25d023ead2e6c8ce40279cf0cbb01511f3c4c3ee4e31a1f46fda8f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:52:09.064Z",
+  "finding": {
+    "sense_id": "oewn-unarguably__4.02.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'unarguably' is a straightforward adverbial form of 'unarguable,' which means 'not open to argument.' While the concept is simple, the word itself is not typically encountered until high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-unarguably__4.02.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'unarguably' is a straightforward adverbial form of 'unarguable,' which means 'not open to argument.' While the concept is simple, the word itself is not typically encountered until high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 564,
+    "completion_tokens": 99,
+    "reasoning_tokens": 0,
+    "total_tokens": 663,
+    "cost_usd": 0.0004167
+  },
+  "latency_ms": 999
+}

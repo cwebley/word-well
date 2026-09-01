@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "lender|oewn-lender__1.18.00..",
+  "fingerprint_key": "75bc885cb4efbcc185576f4a69f7925e1e9b02ed527f20e496014967d448b1e3",
+  "fingerprint": {
+    "input_digest": "b6a580388a4d3ba5d887c78c91a4c3faab7b856652d21409d9c8e011b1ee8a42",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:05:44.057Z",
+  "finding": {
+    "sense_id": "oewn-lender__1.18.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning describes a common financial role, relevant to general business and economic understanding, making it useful for a broad academic and professional vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-lender__1.18.00..",
+    "usefulness": "useful",
+    "rationale": "The meaning describes a common financial role, relevant to general business and economic understanding, making it useful for a broad academic and professional vocabulary.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 457,
+    "completion_tokens": 81,
+    "reasoning_tokens": 0,
+    "total_tokens": 538,
+    "cost_usd": 0.0003396
+  },
+  "latency_ms": 1026
+}

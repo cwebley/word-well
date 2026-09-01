@@ -1,0 +1,117 @@
+{
+  "set_version": "usefulness-golden/3",
+  "gate": "audience-usefulness",
+  "issue": 56,
+  "buckets": [
+    "serve",
+    "reject",
+    "borderline"
+  ],
+  "note": [
+    "Version 3 preserves all fifteen version 2 labels and adds clog from",
+    "exploration draw 1 as an everyday-word reject. The recorded figurative",
+    "meaning makes it a direct test of whether the graded exam prompt distinguishes",
+    "a broadly applicable meaning from a word worth testing as vocabulary.",
+    "",
+    "The retention audit remains disjoint and unlabelled. Endorsement counts remain",
+    "absent from this file and from the prompt."
+  ],
+  "cases": [
+    {
+      "lemma": "ubiquitous",
+      "bucket": "serve",
+      "reason": "core-tier-2",
+      "why": "High-utility cross-domain adjective. If the gate rejects this, the gate is broken."
+    },
+    {
+      "lemma": "pernicious",
+      "bucket": "serve",
+      "reason": "core-tier-2",
+      "why": "Precise negative adjective with no everyday substitute; carries a sense harmful does not."
+    },
+    {
+      "lemma": "equivocate",
+      "bucket": "serve",
+      "reason": "core-tier-2",
+      "why": "Verb, for part-of-speech spread. The tier-2 band skews adjectival and the set should not."
+    },
+    {
+      "lemma": "nuance",
+      "bucket": "serve",
+      "reason": "core-tier-2",
+      "why": "Noun, for part-of-speech spread. Common in professional writing."
+    },
+    {
+      "lemma": "laconic",
+      "bucket": "serve",
+      "reason": "eponym-with-general-sense",
+      "why": "Derived from Laconia but OEWN carries only the general sense. Deliberate contrast with draconian, where the general sense is missing and the gate should fail for evidence reasons rather than taste."
+    },
+    {
+      "lemma": "austere",
+      "bucket": "serve",
+      "reason": "core-tier-2",
+      "why": "Semantically adjacent to spartan, which survives the demonym filter on its figurative senses. Both should be servable."
+    },
+    {
+      "lemma": "homegirl",
+      "bucket": "reject",
+      "reason": "register-slang",
+      "why": "Informal and dated slang. Product owner's canonical example of a word that will never belong."
+    },
+    {
+      "lemma": "dimwit",
+      "bucket": "reject",
+      "reason": "register-derogatory",
+      "why": "Informal and derogatory; Wiktionary labels it so. Transparent, and the concept needs no new word."
+    },
+    {
+      "lemma": "herbivorous",
+      "bucket": "reject",
+      "reason": "encyclopedic-fact",
+      "why": "A fact to look up, not vocabulary that expands expressive range. Knowing it changes no sentence the learner would write."
+    },
+    {
+      "lemma": "happy",
+      "bucket": "reject",
+      "reason": "tier-1-everyday",
+      "why": "Zipf 5.4. Every adult learner already has it. The gate must reject on being too common, not only on being too obscure."
+    },
+    {
+      "lemma": "pinnate",
+      "bucket": "reject",
+      "reason": "tier-3-domain-technical",
+      "why": "Botany and zoology only. Tier 3 by the Beck/McKeown split: domain-specific rather than cross-domain."
+    },
+    {
+      "lemma": "Texan",
+      "bucket": "reject",
+      "reason": "demonym",
+      "why": "Also removed mechanically before this gate runs. Kept here as defence in depth, so a change to the pool filter cannot silently admit demonyms."
+    },
+    {
+      "lemma": "inexpedient",
+      "bucket": "serve",
+      "reason": "rare-but-worth-teaching",
+      "why": "Zipf 1.3, rejected in exploration draw 1 as 'extremely rare' and 'easily conveyed by more common synonyms'. Both halves of the rarity floor on one word: the frequency argument and the redundancy argument. Replaced pique, whose most compelling sense, arousing interest, OEWN does not record at all, so a label of serve would have asked the judge to keep a word for a reason its evidence cannot contain. See #60."
+    },
+    {
+      "lemma": "muckraking",
+      "bucket": "serve",
+      "reason": "rare-but-worth-teaching",
+      "why": "Zipf 1.92, rejected as 'very rare' and 'not essential'. Names a concept, the exposure of scandal about public figures, that no common synonym covers. The rarity floor on a word where redundancy cannot be the excuse."
+    },
+    {
+      "lemma": "punctilious",
+      "bucket": "serve",
+      "reason": "rare-keep-tripwire",
+      "why": "Zipf 1.76, the rarest word in exploration draw 1, and already kept correctly. Included as a trip-wire rather than a capability case: it guards the fix for the rarity floor against over-correcting into keep-everything-rare."
+    },
+    {
+      "lemma": "clog",
+      "bucket": "reject",
+      "reason": "middle-school-or-below",
+      "why": "An ordinary word even when used figuratively for hindrance or obstruction. Broad applicability does not make the word suitable for a WordWell lesson."
+    }
+  ]
+}

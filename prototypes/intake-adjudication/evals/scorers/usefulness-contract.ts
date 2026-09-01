@@ -18,7 +18,7 @@
 
 import type { EvalScorer } from "braintrust";
 
-import { usefulnessFindingSchema, usefulnessValues } from "../../src/usefulness/contract.ts";
+import { examLevelValues, usefulnessFindingSchema } from "../../src/usefulness/contract.ts";
 import { citableEvidenceIds, evidenceItems } from "../../src/usefulness/meaning.ts";
 import type { HeadwordOutcome } from "../../src/usefulness/run.ts";
 import type { EvalInput, UsefulnessCase } from "../usefulness-datasets.ts";
@@ -74,8 +74,8 @@ export const contractValidScorer: Scorer = ({ output }) => {
       problems.push(`meaning[${i}]: ${parsed.error.issues.map((x) => x.path.join(".")).join(", ")}`);
       continue;
     }
-    if (!usefulnessValues.includes(parsed.data.usefulness)) {
-      problems.push(`meaning[${i}]: verdict outside the enum`);
+    if (!examLevelValues.includes(parsed.data.exam_level)) {
+      problems.push(`meaning[${i}]: exam level outside the enum`);
     }
     const invented: string[] = [];
     hasDispositionKey(record.raw, invented);

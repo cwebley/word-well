@@ -1,0 +1,72 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "iniquity|oewn-iniquity__1.04.01..",
+  "fingerprint_key": "e96b5b60970e7e783b7852490ff1a9323e5888b8cc8ef173ef44d6f9a35d468f",
+  "fingerprint": {
+    "input_digest": "566855c6024d1df528638f8130535ae98a072418f71f9fe7bffd577dd2da5465",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/7",
+    "rubric_version": "usefulness-rubric/7",
+    "contract_version": "usefulness-finding/2",
+    "policy_version": "usefulness-policy/1"
+  },
+  "recorded_at": "2026-08-31T17:02:05.227Z",
+  "finding": {
+    "sense_id": "oewn-iniquity__1.04.01..",
+    "usefulness": "useful",
+    "rationale": "The definition 'an unjust act' is a high-utility concept, and the word 'iniquity' is a test-worthy vocabulary word for general academic and professional use.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-iniquity__1.04.01..",
+    "usefulness": "useful",
+    "rationale": "The definition 'an unjust act' is a high-utility concept, and the word 'iniquity' is a test-worthy vocabulary word for general academic and professional use.",
+    "evidence_ids": [
+      "E1"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 458,
+    "completion_tokens": 89,
+    "reasoning_tokens": 0,
+    "total_tokens": 547,
+    "cost_usd": 0.0003599
+  },
+  "latency_ms": 1061
+}

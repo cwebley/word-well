@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "tantalizing|oewn-tantalizing__5.00.01.inviting.00",
+  "fingerprint_key": "098eed696f6b6e1cca40df62d508f9e3ea2788637293412021abb62eaf30b583",
+  "fingerprint": {
+    "input_digest": "cd3010c6e25b53a1aeb7f78b78de651585b2cf8da36c195329986d8d24f7b44f",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:29:07.263Z",
+  "finding": {
+    "sense_id": "oewn-tantalizing__5.00.01.inviting.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'tantalizing' is a common adjective that describes something very pleasantly inviting. It is likely to be encountered and tested as general vocabulary by high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-tantalizing__5.00.01.inviting.00",
+    "exam_level": "high_school",
+    "rationale": "The word 'tantalizing' is a common adjective that describes something very pleasantly inviting. It is likely to be encountered and tested as general vocabulary by high school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 526,
+    "completion_tokens": 93,
+    "reasoning_tokens": 0,
+    "total_tokens": 619,
+    "cost_usd": 0.0003903
+  },
+  "latency_ms": 897
+}

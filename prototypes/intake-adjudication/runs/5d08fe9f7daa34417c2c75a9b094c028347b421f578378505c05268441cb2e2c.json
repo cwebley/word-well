@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "reshuffle|oewn-reshuffle__1.04.01..",
+  "fingerprint_key": "5d08fe9f7daa34417c2c75a9b094c028347b421f578378505c05268441cb2e2c",
+  "fingerprint": {
+    "input_digest": "2b48ec5360360ef7c7200c6062e2fd998d6e9c7c0b6bd35afc143b131117abf9",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:51:23.250Z",
+  "finding": {
+    "sense_id": "oewn-reshuffle__1.04.01..",
+    "exam_level": "high_school",
+    "rationale": "The word 'reshuffle' as a noun meaning 'a redistribution of something' is a common enough term, especially in contexts like government or teams, to be tested at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-reshuffle__1.04.01..",
+    "exam_level": "high_school",
+    "rationale": "The word 'reshuffle' as a noun meaning 'a redistribution of something' is a common enough term, especially in contexts like government or teams, to be tested at the high school level.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 517,
+    "completion_tokens": 112,
+    "reasoning_tokens": 0,
+    "total_tokens": 629,
+    "cost_usd": 0.0004351
+  },
+  "latency_ms": 883
+}

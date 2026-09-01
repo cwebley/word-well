@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "parvenu|oewn-parvenu__5.00.00.new.00",
+  "fingerprint_key": "78999de835645e8abf5b10f40b662861ca30c9be973f56ea5724cba34118540b",
+  "fingerprint": {
+    "input_digest": "d1cc8f4c0cc3ffe488329e10b70a13b3fcf80a379ef734e1ec3a4f7ee0ff60a1",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:47:53.898Z",
+  "finding": {
+    "sense_id": "oewn-parvenu__5.00.00.new.00",
+    "exam_level": "college",
+    "rationale": "The word \"parvenu\" itself, meaning a person of newly acquired wealth or power who is not yet accepted by the social class associated with it, is a college-level vocabulary word. The adjective form, \"of or characteristic of a parvenu,\" shares the same difficulty.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-parvenu__5.00.00.new.00",
+    "exam_level": "college",
+    "rationale": "The word \"parvenu\" itself, meaning a person of newly acquired wealth or power who is not yet accepted by the social class associated with it, is a college-level vocabulary word. The adjective form, \"of or characteristic of a parvenu,\" shares the same difficulty.",
+    "evidence_ids": [
+      "E1",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 522,
+    "completion_tokens": 108,
+    "reasoning_tokens": 0,
+    "total_tokens": 630,
+    "cost_usd": 0.0004266
+  },
+  "latency_ms": 922
+}

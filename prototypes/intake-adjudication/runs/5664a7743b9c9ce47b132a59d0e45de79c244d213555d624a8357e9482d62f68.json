@@ -1,0 +1,78 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "grouse|oewn-grouse__1.13.00..",
+  "fingerprint_key": "5664a7743b9c9ce47b132a59d0e45de79c244d213555d624a8357e9482d62f68",
+  "fingerprint": {
+    "input_digest": "cd770aad54f4ea0f7fee5af913ba8dcb597658286ab12f88e2369587a3f26feb",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/10",
+    "rubric_version": "usefulness-rubric/10",
+    "contract_version": "usefulness-finding/4",
+    "policy_version": "usefulness-policy/3"
+  },
+  "recorded_at": "2026-09-01T15:31:46.052Z",
+  "finding": {
+    "sense_id": "oewn-grouse__1.13.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "This meaning refers to the flesh of the bird, which is a common and transparent extension of the more familiar meaning of 'grouse' as the bird itself. It does not add significant expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-grouse__1.13.00..",
+    "familiarity": "common",
+    "scope": "general",
+    "learning_value": "low",
+    "rationale": "This meaning refers to the flesh of the bird, which is a common and transparent extension of the more familiar meaning of 'grouse' as the bird itself. It does not add significant expressive precision.",
+    "evidence_ids": [
+      "E1",
+      "E2"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 632,
+    "completion_tokens": 101,
+    "reasoning_tokens": 0,
+    "total_tokens": 733,
+    "cost_usd": 0.00029576
+  },
+  "latency_ms": 1084
+}

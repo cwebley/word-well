@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "earthy|oewn-earthy__5.00.00.natural.01",
+  "fingerprint_key": "0713159e94667ceeea69d967d1f7666d24ef05cc39e5e242691e7e622056fa56",
+  "fingerprint": {
+    "input_digest": "ab0aa16226d1e71dd5dbf411d68743300e8e93c320a40107e48cbe25f56d307c",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:46.164Z",
+  "finding": {
+    "sense_id": "oewn-earthy__5.00.00.natural.01",
+    "exam_level": "middle_school",
+    "rationale": "The meaning 'natural' or 'suggestive of nature' for 'earthy' is a common and easily understood usage, likely encountered and tested as general vocabulary by middle school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-earthy__5.00.00.natural.01",
+    "exam_level": "middle_school",
+    "rationale": "The meaning 'natural' or 'suggestive of nature' for 'earthy' is a common and easily understood usage, likely encountered and tested as general vocabulary by middle school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 539,
+    "completion_tokens": 94,
+    "reasoning_tokens": 0,
+    "total_tokens": 633,
+    "cost_usd": 0.0003967
+  },
+  "latency_ms": 852
+}

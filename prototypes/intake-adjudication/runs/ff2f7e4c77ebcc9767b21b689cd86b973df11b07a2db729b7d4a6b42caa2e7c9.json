@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "curb|oewn-curb__1.04.00..",
+  "fingerprint_key": "ff2f7e4c77ebcc9767b21b689cd86b973df11b07a2db729b7d4a6b42caa2e7c9",
+  "fingerprint": {
+    "input_digest": "9faf507291417fc55afefb157709f5d8e3746239c2af1e2f64373de78701c656",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:46:13.119Z",
+  "finding": {
+    "sense_id": "oewn-curb__1.04.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'curb' as a noun meaning 'the act of restraining or limiting' is a common and useful word, but its use in this abstract sense is more sophisticated than what would typically be tested in middle school.",
+    "evidence_ids": [
+      "E1",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-curb__1.04.00..",
+    "exam_level": "high_school",
+    "rationale": "The word 'curb' as a noun meaning 'the act of restraining or limiting' is a common and useful word, but its use in this abstract sense is more sophisticated than what would typically be tested in middle school.",
+    "evidence_ids": [
+      "E1",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 537,
+    "completion_tokens": 95,
+    "reasoning_tokens": 0,
+    "total_tokens": 632,
+    "cost_usd": 0.0003986
+  },
+  "latency_ms": 904
+}

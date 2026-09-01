@@ -30,7 +30,7 @@ export const headwordDispositionScorer: Scorer = ({ output, expected }) => {
       actual: output.decision.disposition,
       bucket: expected.bucket,
       reason: output.decision.reason,
-      verdicts: output.records.map((r) => r.finding?.usefulness ?? "none"),
+      exam_levels: output.records.map((r) => r.finding?.exam_level ?? "none"),
     },
   };
 };

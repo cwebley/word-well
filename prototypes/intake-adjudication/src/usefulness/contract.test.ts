@@ -5,7 +5,7 @@ import { usefulnessGate } from "./gate.ts";
 import { citableEvidenceIds, evidenceItems, readCandidateMeanings } from "./meaning.ts";
 import { renderSubject } from "./prompt.ts";
 
-const subjects = readCandidateMeanings("evidence/usefulness-golden-v2.meanings.jsonl");
+const subjects = readCandidateMeanings("evidence/usefulness-golden-v3.meanings.jsonl");
 const laconic = subjects.find((s) => s.subject_id.startsWith("laconic"))!;
 const pinnate = subjects.find((s) => s.subject_id.startsWith("pinnate"))!;
 
@@ -54,19 +54,28 @@ describe("numbered evidence", () => {
 });
 
 describe("the usefulness contract", () => {
-  it("no longer asks the model to rate itself", () => {
+  it("records the exam level behind usefulness instead of a serving verdict", () => {
     expect(Object.keys(usefulnessFindingSchema.shape)).toEqual([
       "sense_id",
-      "usefulness",
+      "exam_level",
       "rationale",
       "evidence_ids",
     ]);
+
+    expect(
+      usefulnessFindingSchema.safeParse({
+        sense_id: laconic.meaning.sense_id,
+        exam_level: "high_school",
+        rationale: "because",
+        evidence_ids: ["E1"],
+      }).success,
+    ).toBe(true);
   });
 
   it("rejects a reply carrying a disposition the model invented", () => {
     const withDisposition = JSON.stringify({
       sense_id: laconic.meaning.sense_id,
-      usefulness: "useful",
+      exam_level: "high_school",
       rationale: "because",
       evidence_ids: ["E1"],
       disposition: "advance",
@@ -77,7 +86,7 @@ describe("the usefulness contract", () => {
   it("rejects a reply about a different meaning", () => {
     const wrongSense = JSON.stringify({
       sense_id: "oewn-somethingelse__1.00.00..",
-      usefulness: "useful",
+      exam_level: "high_school",
       rationale: "because",
       evidence_ids: ["E1"],
     });

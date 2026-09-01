@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "mocking|oewn-mocking__5.00.00.disrespectful.00",
+  "fingerprint_key": "e25759ffac5e915376704cd3d0f91923de66a81664ead0cf629cd520a3cc953e",
+  "fingerprint": {
+    "input_digest": "590ecab87ca61345c2afb40101529a336e47dd85032920c44bc3b4f2b696a2ab",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:11.484Z",
+  "finding": {
+    "sense_id": "oewn-mocking__5.00.00.disrespectful.00",
+    "exam_level": "middle_school",
+    "rationale": "The word 'mocking' is a common adjective used to describe behavior or expressions of ridicule, making it suitable for a middle school general vocabulary test. The definition and examples provided are straightforward.",
+    "evidence_ids": [
+      "E1",
+      "E4"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-mocking__5.00.00.disrespectful.00",
+    "exam_level": "middle_school",
+    "rationale": "The word 'mocking' is a common adjective used to describe behavior or expressions of ridicule, making it suitable for a middle school general vocabulary test. The definition and examples provided are straightforward.",
+    "evidence_ids": [
+      "E1",
+      "E4"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 565,
+    "completion_tokens": 94,
+    "reasoning_tokens": 0,
+    "total_tokens": 659,
+    "cost_usd": 0.0004045
+  },
+  "latency_ms": 950
+}

@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "intractable|oewn-intractable__3.00.00..",
+  "fingerprint_key": "b2663c9e8818d6d78d8d29938c54acae7651fab1555be6c46b791b29641e162e",
+  "fingerprint": {
+    "input_digest": "db5d99aa2885b386a9b8163a65f4bb1182b1ee07bcf2b1de3e5306a893bbd672",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:47:13.028Z",
+  "finding": {
+    "sense_id": "oewn-intractable__3.00.00..",
+    "exam_level": "college",
+    "rationale": "The word 'intractable' is a relatively uncommon adjective meaning 'difficult to manage or mold.' It is suitable for a college-level general vocabulary exam.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-intractable__3.00.00..",
+    "exam_level": "college",
+    "rationale": "The word 'intractable' is a relatively uncommon adjective meaning 'difficult to manage or mold.' It is suitable for a college-level general vocabulary exam.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 3
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 545,
+    "completion_tokens": 95,
+    "reasoning_tokens": 0,
+    "total_tokens": 640,
+    "cost_usd": 0.000401
+  },
+  "latency_ms": 806
+}

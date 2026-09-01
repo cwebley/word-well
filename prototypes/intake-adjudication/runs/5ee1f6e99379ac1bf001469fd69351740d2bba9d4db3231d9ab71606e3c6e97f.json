@@ -1,0 +1,74 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "noisome|oewn-noisome__5.00.00.unwholesome.00",
+  "fingerprint_key": "5ee1f6e99379ac1bf001469fd69351740d2bba9d4db3231d9ab71606e3c6e97f",
+  "fingerprint": {
+    "input_digest": "335da248e0eb055bedad6fb4afc23b083e6975fe344cc9b494ae9f7be28a2b5a",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:28:16.200Z",
+  "finding": {
+    "sense_id": "oewn-noisome__5.00.00.unwholesome.00",
+    "exam_level": "college",
+    "rationale": "The word 'noisome' is not commonly used in everyday language, suggesting it would be encountered at a higher academic level. Its synonyms like 'nauseating' and 'sickening' are more common, but 'noisome' itself is less frequent.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-noisome__5.00.00.unwholesome.00",
+    "exam_level": "college",
+    "rationale": "The word 'noisome' is not commonly used in everyday language, suggesting it would be encountered at a higher academic level. Its synonyms like 'nauseating' and 'sickening' are more common, but 'noisome' itself is less frequent.",
+    "evidence_ids": [
+      "E1",
+      "E5"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "advance",
+    "reason": "this meaning is worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 5
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 554,
+    "completion_tokens": 107,
+    "reasoning_tokens": 0,
+    "total_tokens": 661,
+    "cost_usd": 0.0004337
+  },
+  "latency_ms": 956
+}

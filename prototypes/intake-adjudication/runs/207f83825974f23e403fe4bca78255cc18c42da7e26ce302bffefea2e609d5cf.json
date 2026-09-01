@@ -1,0 +1,76 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "feeder|oewn-feeder__1.06.01..",
+  "fingerprint_key": "207f83825974f23e403fe4bca78255cc18c42da7e26ce302bffefea2e609d5cf",
+  "fingerprint": {
+    "input_digest": "655745b998dbb5bc941f59d0645ee52771e745b7a74dcb9cd72f60edff3bf8bb",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/9",
+    "rubric_version": "usefulness-rubric/9",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:49:59.952Z",
+  "finding": {
+    "sense_id": "oewn-feeder__1.06.01..",
+    "exam_level": "ordinary",
+    "rationale": "The word \"feeder\" in the sense of a device for feeding wild birds is a common, everyday term that would be familiar to most people well before middle school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-feeder__1.06.01..",
+    "exam_level": "ordinary",
+    "rationale": "The word \"feeder\" in the sense of a device for feeding wild birds is a common, everyday term that would be familiar to most people well before middle school.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience"
+  },
+  "effective": {
+    "disposition": "exclude",
+    "reason": "this meaning is not worth learning for the audience",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 0
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 520,
+    "completion_tokens": 86,
+    "reasoning_tokens": 0,
+    "total_tokens": 606,
+    "cost_usd": 0.000371
+  },
+  "latency_ms": 829
+}

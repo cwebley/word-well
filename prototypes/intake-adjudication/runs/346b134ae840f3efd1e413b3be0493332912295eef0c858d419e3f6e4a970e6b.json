@@ -1,0 +1,82 @@
+{
+  "gate": "audience-usefulness",
+  "claim_id": "voluminous|oewn-voluminous__5.00.00.crooked.01",
+  "fingerprint_key": "346b134ae840f3efd1e413b3be0493332912295eef0c858d419e3f6e4a970e6b",
+  "fingerprint": {
+    "input_digest": "e401b6767fdc2d90481bb3d02ca99bbfc164779991db5756f786f748b8653855",
+    "sources": {
+      "candidate_pool": {
+        "path": "pool.sqlite",
+        "sha256": "a54bb48e144d07108e6f72a0a3f2336b1d8e846e40c958522d969164cd456aa1"
+      },
+      "oewn": {
+        "release": "oewn:2025",
+        "retrieved_via": "wn 1.1.1"
+      },
+      "wordfreq": {
+        "version": "3.1.1",
+        "wordlist": "large"
+      }
+    },
+    "extraction_version": "usefulness-evidence/1",
+    "deterministic_rules_sha256": "c5ed5fd4b167c2c2188867f5a6f58db81de96609a2fd60e07ccdb3681b0da01f",
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash",
+    "upstream_provider": "google-ai-studio",
+    "temperature": 0,
+    "seed": null,
+    "prompt_version": "usefulness-prompt/8",
+    "rubric_version": "usefulness-rubric/8",
+    "contract_version": "usefulness-finding/3",
+    "policy_version": "usefulness-policy/2"
+  },
+  "recorded_at": "2026-09-01T03:29:21.518Z",
+  "finding": {
+    "sense_id": "oewn-voluminous__5.00.00.crooked.01",
+    "exam_level": "insufficient_evidence",
+    "rationale": "The provided evidence defines 'voluminous' as 'marked by repeated turns and bends' and gives examples of winding roads, but 'voluminous' itself is not used in the examples, nor is there any other evidence to support this meaning for the word 'voluminous'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "raw": {
+    "sense_id": "oewn-voluminous__5.00.00.crooked.01",
+    "exam_level": "insufficient_evidence",
+    "rationale": "The provided evidence defines 'voluminous' as 'marked by repeated turns and bends' and gives examples of winding roads, but 'voluminous' itself is not used in the examples, nor is there any other evidence to support this meaning for the word 'voluminous'.",
+    "evidence_ids": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ]
+  },
+  "contract_error": null,
+  "decision": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning"
+  },
+  "effective": {
+    "disposition": "quarantine",
+    "reason": "the evidence cannot settle whether this meaning is worth learning",
+    "overridden": false
+  },
+  "policy_context": {
+    "endorsements": 1
+  },
+  "served_by": "Google AI Studio",
+  "usage": {
+    "prompt_tokens": 553,
+    "completion_tokens": 127,
+    "reasoning_tokens": 0,
+    "total_tokens": 680,
+    "cost_usd": 0.0004834
+  },
+  "latency_ms": 1046
+}

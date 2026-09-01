@@ -1,8 +1,8 @@
 // Stage 3: the audience-usefulness gate's baseline run.
 //
-// Twelve headwords, nineteen meanings, one cheap model, a prompt close to one
-// sentence. This is not trying to find out whether the model is good at the
-// question — twelve cases labelled by one person cannot answer that. It is
+// A small owner-labelled golden set, one cheap model, and a versioned prompt.
+// This is not trying to find out whether the model is generally good at the
+// question: a small set labelled by one person cannot answer that. It is
 // establishing the baseline the prompt gets improved against, and finding out
 // which rejects a thin prompt lets through.
 //
@@ -23,7 +23,7 @@ import type { EvalInput, UsefulnessCase } from "./usefulness-datasets.ts";
 import { usefulnessContractScorers } from "./scorers/usefulness-contract.ts";
 import { usefulnessSemanticScorers } from "./scorers/usefulness-semantic.ts";
 
-const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v2";
+const CASE_SET = process.env.CASE_SET ?? "usefulness-golden-v3";
 const RUNS_DIR = "runs";
 
 const apiKey = requireEnv("OPENROUTER_API_KEY");
@@ -40,7 +40,7 @@ const store = new RunStore(RUNS_DIR);
 Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
   "WordWell audience-usefulness adjudication",
   {
-    // The case set alone is not a distinguishing name: `usefulness-golden-v2`
+    // The case set alone is not a distinguishing name: `usefulness-golden-v3`
     // is the DATASET version, and two runs of it under different prompts would
     // land on the same experiment with no way to tell them apart. What makes a
     // run comparable to another is the configuration, so the name carries it.
@@ -52,7 +52,7 @@ Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
       model.upstreamProvider,
     ].join(" · "),
     metadata: {
-      stage: "3 — usefulness baseline",
+      stage: "3 - usefulness prompt iteration",
       case_set: CASE_SET,
       set_version: dataset.setVersion,
       issue: "https://github.com/cwebley/word-well/issues/56",
@@ -128,7 +128,7 @@ Eval<EvalInput, HeadwordOutcome, UsefulnessCase["expected"]>(
         .map((r) => r.contract_error)
         .filter((error): error is string => error !== null);
       hooks.metadata.disposition = outcome.decision.disposition;
-      hooks.metadata.verdicts = outcome.records.map((r) => r.finding?.usefulness ?? "none");
+      hooks.metadata.exam_levels = outcome.records.map((r) => r.finding?.exam_level ?? "none");
 
       return outcome;
     },
