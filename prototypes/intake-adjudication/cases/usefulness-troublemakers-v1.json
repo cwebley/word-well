@@ -1,0 +1,30 @@
+{
+  "set_version": "usefulness-troublemakers/1",
+  "gate": "audience-usefulness",
+  "evidence_set": "exploration-draw-1",
+  "note": [
+    "Human-labelled diagnostic boundary cases.",
+    "Not part of the primary golden score.",
+    "Use to check whether the prompt distinguishes unusual-but-rewarding words from obvious formations."
+  ],
+  "cases": [
+    {
+      "lemma": "brummagem",
+      "bucket": "serve",
+      "reason": "uncommon-but-rewarding",
+      "why": "An evocative and precise word for something showy but cheap or shoddy. Its rarity and historical flavor make it interesting rather than useless."
+    },
+    {
+      "lemma": "deathless",
+      "bucket": "reject",
+      "reason": "uncommon-but-transparent",
+      "why": "An obvious formation from death. It is mostly a poetic synonym for immortal or undying and does not reward deliberate study."
+    },
+    {
+      "lemma": "inexpedient",
+      "bucket": "serve",
+      "reason": "uncommon-but-precise",
+      "why": "Although formed from expedient, it is a useful and established word for something impractical or inadvisable."
+    }
+  ]
+}

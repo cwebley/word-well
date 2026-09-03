@@ -190,6 +190,16 @@ const unlabelledFileSchema = z.object({
   sample: z.array(z.object({ lemma: z.string(), display: z.string() })).min(1),
 });
 
+export function usefulnessCaseSetRole(
+  name: string,
+  root = process.cwd(),
+): "labelled" | "unlabelled" {
+  const contents: unknown = JSON.parse(readFileSync(join(root, `cases/${name}.json`), "utf8"));
+  if (caseFileSchema.safeParse(contents).success) return "labelled";
+  if (unlabelledFileSchema.safeParse(contents).success) return "unlabelled";
+  throw new Error(`${name} is not a valid usefulness case set`);
+}
+
 export interface LoadedUnlabelledSet {
   name: string;
   setVersion: string;

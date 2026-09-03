@@ -9,7 +9,11 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { goldenLemmas, loadUsefulnessDataset } from "./usefulness-datasets.ts";
+import {
+  goldenLemmas,
+  loadUsefulnessDataset,
+  usefulnessCaseSetRole,
+} from "./usefulness-datasets.ts";
 
 const audit = JSON.parse(readFileSync("cases/retention-audit-v1.json", "utf8")) as {
   set_version: string;
@@ -94,5 +98,42 @@ describe("the owner reject probe", () => {
       "unarguably",
       "unmeasured",
     ]);
+  });
+});
+
+describe("the usefulness troublemakers", () => {
+  it("loads the owner labels against exploration draw 1 evidence", () => {
+    const dataset = loadUsefulnessDataset("usefulness-troublemakers-v1");
+
+    expect(dataset.manifest.case_set).toBe("exploration-draw-1");
+    expect(dataset.cases.map(({ expected }) => expected)).toEqual([
+      {
+        lemma: "brummagem",
+        bucket: "serve",
+        disposition: "advance",
+        reason: "uncommon-but-rewarding",
+        why: "An evocative and precise word for something showy but cheap or shoddy. Its rarity and historical flavor make it interesting rather than useless.",
+      },
+      {
+        lemma: "deathless",
+        bucket: "reject",
+        disposition: "exclude",
+        reason: "uncommon-but-transparent",
+        why: "An obvious formation from death. It is mostly a poetic synonym for immortal or undying and does not reward deliberate study.",
+      },
+      {
+        lemma: "inexpedient",
+        bucket: "serve",
+        disposition: "advance",
+        reason: "uncommon-but-precise",
+        why: "Although formed from expedient, it is a useful and established word for something impractical or inadvisable.",
+      },
+    ]);
+  });
+
+  it("lets the experiment distinguish labelled slices from unlabelled instruments", () => {
+    expect(usefulnessCaseSetRole("usefulness-troublemakers-v1")).toBe("labelled");
+    expect(usefulnessCaseSetRole("retention-audit-v1")).toBe("unlabelled");
+    expect(usefulnessCaseSetRole("exploration-draw-1")).toBe("unlabelled");
   });
 });
