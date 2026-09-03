@@ -6,6 +6,11 @@ candidate-pool findings in
 not the production intake design. The candidate intake ADR remains #47 and
 follows the experiments described here.
 
+V15's sensitive behavioural evaluation is a privacy exception to the ordinary
+committed-dataset approach below. See
+`docs/plans/intake-adjudication-v15-behavioral-evaluation.md` for the private,
+versioned artifact and manual-now, CI-later workflow.
+
 ## Revision, 2026-08-30: morphology is no longer the selection gate
 
 **Read this before acting on anything below it.** Stage 2 changed the plan's

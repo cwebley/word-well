@@ -75,8 +75,8 @@ takes two fields and `verdictOf` is the only way to produce them, so
 | `sample_retention_audit.py` | draws the 100-word unlabelled retention audit, seeded and reproducible |
 | `src/usefulness/` | the usefulness gate: subject, contract, prompt, policy, fan-out runner |
 | `cases/*.claims.json` | which claims to materialise, and why those |
-| `evidence/*.claims.jsonl` | the fixed evidence a judge sees. Committed, so a run is reproducible |
-| `evidence/*.manifest.json` | pinned source releases, digests, and per-claim input digests |
+| `evidence/*.claims.jsonl` | the fixed evidence a judge sees. Generated locally from pinned source data |
+| `evidence/*.manifest.json` | local manifests containing pinned source releases, digests, and per-claim input digests |
 | `labels/*.labels.jsonl` | expected verdicts, each carrying its `label_status` |
 | `src/contract.ts` | the output contract; one zod schema serves both the validator and the provider's strict JSON schema |
 | `src/prompt.ts` | versioned rubric and claim rendering |
@@ -84,7 +84,7 @@ takes two fields and `verdictOf` is the only way to produce them, so
 | `src/policy.ts` | versioned deterministic policy, plus the endorsement override |
 | `src/review-cli.ts` | generates the dependency-free local calibration review page |
 | `src/fingerprint.ts` | the config fingerprint that keys persistence |
-| `src/store.ts` | one JSON record per fingerprint, under `runs/` |
+| `src/store.ts` | one local JSON record per fingerprint, under ignored `runs/` |
 | `src/budget.ts` | spend guard against the $10 pilot cap |
 | `evals/contract.eval.ts` | the Braintrust experiment |
 | `evals/scorers/` | contract, semantic and policy scorers, all deterministic |
