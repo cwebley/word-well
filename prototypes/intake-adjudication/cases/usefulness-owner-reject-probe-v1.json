@@ -1,0 +1,91 @@
+{
+  "set_version": "usefulness-owner-reject-probe/1",
+  "gate": "audience-usefulness",
+  "evidence_set": "exploration-draw-1",
+  "issue": 56,
+  "note": [
+    "Thirteen owner-labelled rejects selected after reviewing prompt 9's exploration report.",
+    "They remain part of exploration draw 1; this file defines a scored slice without",
+    "changing that frozen 150-headword sample or duplicating its evidence."
+  ],
+  "cases": [
+    {
+      "lemma": "chaperone",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "The noun and verb are familiar and mundane. A plausible school-test appearance does not make either meaning worth a WordWell lesson."
+    },
+    {
+      "lemma": "cadaver",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "Familiar body and death vocabulary with little reason for an adult learner to practise using it."
+    },
+    {
+      "lemma": "clog",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "An ordinary word even where its meaning is broadly applicable."
+    },
+    {
+      "lemma": "eloquently",
+      "bucket": "reject",
+      "reason": "transparent-derivative",
+      "why": "A transparent adverb from eloquent, not a rewarding lesson of its own."
+    },
+    {
+      "lemma": "feeder",
+      "bucket": "reject",
+      "reason": "mundane-or-narrow",
+      "why": "Its ordinary meanings are mundane and the branch-into-a-main-stream meaning is narrow, not an interesting word of the day."
+    },
+    {
+      "lemma": "menstruation",
+      "bucket": "reject",
+      "reason": "sensitive-body-vocabulary",
+      "why": "Body and reproductive vocabulary is outside the desired lesson pool."
+    },
+    {
+      "lemma": "mileage",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "A familiar practical word that adds too little expressive value for deliberate study."
+    },
+    {
+      "lemma": "mimic",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "Already familiar to the target audience and unlikely to feel rewarding as a lesson."
+    },
+    {
+      "lemma": "orbiter",
+      "bucket": "reject",
+      "reason": "transparent-or-narrow",
+      "why": "A transparent derivative whose recorded meanings are ordinary or narrow."
+    },
+    {
+      "lemma": "perfectionist",
+      "bucket": "reject",
+      "reason": "common-low-payoff",
+      "why": "A familiar word adults already use, with little new expressive payoff."
+    },
+    {
+      "lemma": "rigorousness",
+      "bucket": "reject",
+      "reason": "transparent-derivative",
+      "why": "A transparent noun derived from rigorous, not a compelling lesson word."
+    },
+    {
+      "lemma": "unarguably",
+      "bucket": "reject",
+      "reason": "transparent-derivative",
+      "why": "A transparent prefixed adverb whose meaning does not reward deliberate study."
+    },
+    {
+      "lemma": "unmeasured",
+      "bucket": "reject",
+      "reason": "transparent-derivative",
+      "why": "A transparent prefixed form with no surprising meaning or useful precision."
+    }
+  ]
+}

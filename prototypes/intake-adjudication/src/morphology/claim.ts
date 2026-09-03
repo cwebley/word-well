@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 
-import { readJsonl } from "./jsonl.ts";
+import { readJsonl } from "../jsonl.ts";
 
 export const sourceMeaningSchema = z.object({
   sense_id: z.string(),

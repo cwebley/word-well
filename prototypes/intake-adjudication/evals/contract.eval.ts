@@ -14,7 +14,9 @@ import { Eval } from "braintrust";
 
 import { adjudicate, createClient } from "../src/adjudicate.ts";
 import { preflight } from "../src/budget.ts";
-import type { Claim } from "../src/claim.ts";
+import type { Claim } from "../src/morphology/claim.ts";
+import type { Finding } from "../src/morphology/contract.ts";
+import { morphologyGate } from "../src/morphology/gate.ts";
 import { modelConfigFromEnv, PILOT_BUDGET_USD, requireEnv } from "../src/config.ts";
 import type { AdjudicationRecord } from "../src/store.ts";
 import { RunStore } from "../src/store.ts";
@@ -39,7 +41,7 @@ const store = new RunStore(RUNS_DIR);
 // The braintrust CLI bundles this file as CJS, so the spend guard cannot run at
 // the top level. It runs inside `data` instead, which is awaited before any task
 // starts: a run that cannot afford itself still makes no calls.
-Eval<Claim, AdjudicationRecord, ExpectedLabel>("WordWell morphology adjudication", {
+Eval<Claim, AdjudicationRecord<Finding>, ExpectedLabel>("WordWell morphology adjudication", {
   experimentName: `${CASE_SET} · ${model.model}`,
   metadata: {
     stage: CASE_SET === "prompt-smoke" ? "2 — prompt smoke test" : "1 — contract test",
@@ -54,7 +56,7 @@ Eval<Claim, AdjudicationRecord, ExpectedLabel>("WordWell morphology adjudication
   },
 
   data: async () => {
-    const { price, check: budget } = await preflight(claims, model, apiKey);
+    const { price, check: budget } = await preflight(claims, morphologyGate, model, apiKey);
     if (!budget.allowed) {
       throw new Error(
         `estimate $${budget.estimate.toFixed(4)} exceeds the $${budget.remaining.toFixed(4)} left of the $${PILOT_BUDGET_USD} pilot cap`,
@@ -83,7 +85,7 @@ Eval<Claim, AdjudicationRecord, ExpectedLabel>("WordWell morphology adjudication
   },
 
   task: async (claim, hooks) => {
-    const { record, reused } = await adjudicate(claim, client, model, manifest, store);
+    const { record, reused } = await adjudicate(claim, morphologyGate, client, model, manifest, store);
 
     // Token, cost and latency come from the provider's own accounting rather
     // than an estimate, so the full-pool projection later is built on measured

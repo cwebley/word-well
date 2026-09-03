@@ -9,11 +9,12 @@
 
 import type { EvalScorer } from "braintrust";
 
-import type { Claim } from "../../src/claim.ts";
+import type { Claim } from "../../src/morphology/claim.ts";
+import type { Finding } from "../../src/morphology/contract.ts";
 import type { AdjudicationRecord } from "../../src/store.ts";
 import type { ExpectedLabel } from "../types.ts";
 
-type Scorer = EvalScorer<Claim, AdjudicationRecord, ExpectedLabel>;
+type Scorer = EvalScorer<Claim, AdjudicationRecord<Finding>, ExpectedLabel>;
 
 export const analysisSupportScorer: Scorer = ({ output, expected }) => {
   if (!expected) return null;

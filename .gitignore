@@ -25,3 +25,16 @@ prototypes/intake-adjudication/review/
 prototypes/intake-adjudication/*.progress.json
 /*.progress.json
 prototypes/intake-adjudication/*.validated.labels.jsonl
+
+# Per-call adjudication records and risk-stress cohort. Risk-stress contains
+# slur lemmas pulled from Wiktionary's offensive categories; per-call records
+# may quote model rationales that reproduce slur text. Both must stay local.
+prototypes/intake-adjudication/runs/
+prototypes/intake-adjudication/cases/risk-stress-cohort-*.json
+prototypes/intake-adjudication/cases/risk-cohort-*.json
+prototypes/intake-adjudication/reports/risk-stress-human-review.html
+prototypes/intake-adjudication/evidence/
+prototypes/intake-adjudication/*.sqlite
+prototypes/intake-adjudication/reports/*.html
+prototypes/content-pipeline-source-shapes/runs/
+prototypes/content-pipeline-source-shapes/out/

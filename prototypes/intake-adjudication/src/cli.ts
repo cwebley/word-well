@@ -19,8 +19,10 @@ import { writeFileSync } from "node:fs";
 import { adjudicate, createClient } from "./adjudicate.ts";
 import { describeBudget, preflight, spentSoFar } from "./budget.ts";
 import { modelConfigFromEnv, PILOT_BUDGET_USD, requireEnv } from "./config.ts";
+import { morphologyGate, summariseFinding } from "./morphology/gate.ts";
 import { RunStore, summarise } from "./store.ts";
 import { loadDataset, loadReviewClaims } from "../evals/datasets.ts";
+import type { Finding } from "./morphology/contract.ts";
 import type { AdjudicationRecord } from "./store.ts";
 
 const CASE_SET = process.env.CASE_SET ?? "contract-test";
@@ -36,7 +38,7 @@ async function main() {
   const dataset = review ? null : loadDataset(CASE_SET);
   const claims = review?.claims ?? dataset!.cases.map(({ claim }) => claim);
   const manifest = review?.manifest ?? dataset!.manifest;
-  const { price, check } = await preflight(claims, model, apiKey);
+  const { price, check } = await preflight(claims, morphologyGate, model, apiKey);
 
   console.log(`${claims.length} claims in ${CASE_SET}`);
   console.log(describeBudget(check, model, PILOT_BUDGET_USD));
@@ -60,18 +62,18 @@ async function main() {
   if (fresh) console.log("--fresh: ignoring persisted records, storing nothing\n");
 
   let failures = 0;
-  const records: AdjudicationRecord[] = [];
+  const records: AdjudicationRecord<Finding>[] = [];
   for (const claim of claims) {
-    const { record, reused } = await adjudicate(claim, client, model, manifest, store);
+    const { record, reused } = await adjudicate(claim, morphologyGate, client, model, manifest, store);
     records.push(record);
     if (record.contract_error) failures += 1;
-    console.log(`${reused ? "reused " : "called "}${summarise(record)}\n`);
+    console.log(`${reused ? "reused " : "called "}${summarise(record, summariseFinding)}\n`);
   }
 
   if (review) {
     const members = new Map(review.members.map((member) => [member.claim_id, member]));
     const labels = records
-      .filter((record) => record.finding && record.morphology && record.effective)
+      .filter((record) => record.finding && record.decision && record.effective)
       .map((record) => {
         const member = members.get(record.claim_id)!;
         return {
@@ -80,9 +82,9 @@ async function main() {
           slice: "provisional model suggestion",
           analysis_support: record.finding!.analysis_support,
           meanings: record.finding!.meanings,
-          morphology_disposition: record.morphology!.disposition,
+          morphology_disposition: record.decision!.disposition,
           effective_disposition: record.effective!.disposition,
-          endorsements: record.endorsements,
+          endorsements: record.policy_context.endorsements,
           note: record.finding!.meanings.map((meaning) => meaning.rationale).join(" "),
           input_digest: member.input_digest,
           partition: member.partition,

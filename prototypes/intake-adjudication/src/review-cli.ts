@@ -3,8 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { Claim } from "./claim.ts";
-import { RUBRIC, RUBRIC_VERSION } from "./prompt.ts";
+import type { Claim } from "./morphology/claim.ts";
+import { RUBRIC, RUBRIC_VERSION } from "./morphology/prompt.ts";
 
 interface PartitionMember {
   claim_id: string;

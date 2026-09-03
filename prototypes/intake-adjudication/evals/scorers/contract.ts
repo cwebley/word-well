@@ -7,17 +7,18 @@
 
 import type { EvalScorer } from "braintrust";
 
-import type { Claim } from "../../src/claim.ts";
-import { candidateSourceMeaningIds, citableEvidenceIds } from "../../src/claim.ts";
+import type { Claim } from "../../src/morphology/claim.ts";
+import { candidateSourceMeaningIds, citableEvidenceIds } from "../../src/morphology/claim.ts";
+import type { Finding } from "../../src/morphology/contract.ts";
 import {
   analysisSupportValues,
   findingSchema,
   predictabilityValues,
-} from "../../src/contract.ts";
+} from "../../src/morphology/contract.ts";
 import type { AdjudicationRecord } from "../../src/store.ts";
 import type { ExpectedLabel } from "../types.ts";
 
-type Scorer = EvalScorer<Claim, AdjudicationRecord, ExpectedLabel>;
+type Scorer = EvalScorer<Claim, AdjudicationRecord<Finding>, ExpectedLabel>;
 
 function asObject(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)

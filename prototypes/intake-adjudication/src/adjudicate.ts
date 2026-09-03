@@ -1,8 +1,10 @@
-// The adjudication runner. One claim in, one structured finding out.
+// The adjudication runner. One subject in, one structured finding out.
 //
-// This is the shared core: the Braintrust eval and any later workflow prototype
-// both call `adjudicate`, so an experiment can never end up measuring a
-// duplicate copy of the prompt or the contract.
+// This is the shared core: every gate's CLI and every gate's eval call
+// `adjudicate`, so an experiment can never end up measuring a duplicate copy of
+// a prompt or a contract. What varies between gates arrives as a `Gate` — what
+// to send, how to read the reply, how policy decides — and everything that
+// costs money or must not drift stays here.
 //
 // Baseline behaviour on failure is deliberate. Transport failures (timeouts,
 // 5xx, rate limits) are retried by the SDK, because they say nothing about the
@@ -15,13 +17,10 @@ import { wrapOpenAI } from "braintrust";
 
 import { recordSpend } from "./budget.ts";
 import { OPENROUTER_BASE_URL, RUNS_DIR } from "./config.ts";
-import type { Claim } from "./claim.ts";
-import type { Finding } from "./contract.ts";
-import { CONTRACT_VERSION, findingJsonSchema, findingSchema } from "./contract.ts";
+import type { Gate } from "./gate.ts";
+import { unchanged } from "./gate.ts";
 import type { ConfigFingerprint, EvidenceManifest, ModelConfig } from "./fingerprint.ts";
 import { buildFingerprint, fingerprintKey } from "./fingerprint.ts";
-import { applyEndorsement, deriveMorphologyDisposition, verdictOf } from "./policy.ts";
-import { buildMessages } from "./prompt.ts";
 import type { AdjudicationRecord, RunStore, Usage } from "./store.ts";
 
 export function createClient(apiKey: string): OpenAI {
@@ -48,35 +47,36 @@ interface OpenRouterExtras {
   usage?: { include: boolean };
 }
 
-export interface AdjudicationOutcome {
-  record: AdjudicationRecord;
+export interface AdjudicationOutcome<TFinding> {
+  record: AdjudicationRecord<TFinding>;
   reused: boolean;
 }
 
-export async function adjudicate(
-  claim: Claim,
+export async function adjudicate<TSubject, TFinding>(
+  subject: TSubject,
+  gate: Gate<TSubject, TFinding>,
   client: OpenAI,
   model: ModelConfig,
   manifest: EvidenceManifest,
   store?: RunStore,
   runsDir: string = RUNS_DIR,
-): Promise<AdjudicationOutcome> {
-  const fingerprint = buildFingerprint(claim.input_digest, manifest, model);
+): Promise<AdjudicationOutcome<TFinding>> {
+  const fingerprint = buildFingerprint(gate.inputDigest(subject), manifest, model, gate.versions);
 
   const stored = store?.get(fingerprint);
-  if (stored) return { record: stored, reused: true };
+  if (stored) return { record: stored as AdjudicationRecord<TFinding>, reused: true };
 
   const body: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming & OpenRouterExtras = {
     model: model.model,
-    messages: buildMessages(claim),
+    messages: gate.buildMessages(subject),
     temperature: model.temperature,
     ...(model.seed === null ? {} : { seed: model.seed }),
     response_format: {
       type: "json_schema",
       json_schema: {
-        name: "morphology_finding",
+        name: `${gate.name.replace(/-/g, "_")}_finding`,
         strict: true,
-        schema: findingJsonSchema as Record<string, unknown>,
+        schema: gate.jsonSchema,
       },
     },
     usage: { include: true },
@@ -95,7 +95,7 @@ export async function adjudicate(
   const completion = await client.chat.completions.create(body);
   const latencyMs = Date.now() - startedAt;
 
-  const record = buildRecord(claim, fingerprint, completion, latencyMs);
+  const record = buildRecord(subject, gate, fingerprint, completion, latencyMs);
   store?.put(record);
   // Logged even when nothing is persisted, so the cap sees every paid call.
   // The directory is injectable for the same reason the store is: a test that
@@ -110,65 +110,39 @@ export async function adjudicate(
   return { record, reused: false };
 }
 
-function buildRecord(
-  claim: Claim,
+function buildRecord<TSubject, TFinding>(
+  subject: TSubject,
+  gate: Gate<TSubject, TFinding>,
   fingerprint: ConfigFingerprint,
   completion: OpenAI.Chat.ChatCompletion,
   latencyMs: number,
-): AdjudicationRecord {
+): AdjudicationRecord<TFinding> {
   const content = completion.choices[0]?.message.content ?? "";
-  const { raw, finding, error } = parseFinding(content, claim.claim_id);
+  const { raw, finding, error } = gate.parse(content, subject);
 
-  const morphology = finding ? deriveMorphologyDisposition(verdictOf(finding)) : null;
-  const effective = morphology
-    ? applyEndorsement(morphology, claim.policy_context.endorsements)
+  // The model's own view of what should happen never gets here: `decide` is
+  // handed the finding, and each gate's contract forbids a disposition field.
+  const decision = finding ? gate.decide(finding) : null;
+  const effective = decision
+    ? (gate.applyContext?.(decision, subject) ?? unchanged(decision))
     : null;
 
   return {
-    claim_id: claim.claim_id,
+    gate: gate.name,
+    claim_id: gate.subjectId(subject),
     fingerprint_key: fingerprintKey(fingerprint),
     fingerprint,
     recorded_at: new Date().toISOString(),
     finding,
     raw,
     contract_error: error,
-    morphology,
+    decision,
     effective,
-    endorsements: claim.policy_context.endorsements,
+    policy_context: gate.policyContext(subject),
     served_by: (completion as { provider?: string }).provider ?? null,
     usage: readUsage(completion),
     latency_ms: latencyMs,
   };
-}
-
-export function parseFinding(
-  content: string,
-  expectedClaimId: string,
-): { raw: unknown; finding: Finding | null; error: string | null } {
-  let raw: unknown;
-  try {
-    raw = JSON.parse(content);
-  } catch {
-    return { raw: content, finding: null, error: `output was not JSON (${CONTRACT_VERSION})` };
-  }
-
-  const parsed = findingSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { raw, finding: null, error: parsed.error.issues.map(issueLine).join("; ") };
-  }
-  if (parsed.data.claim_id !== expectedClaimId) {
-    return {
-      raw,
-      finding: null,
-      error: `claim identity lost: expected ${expectedClaimId}, got ${parsed.data.claim_id}`,
-    };
-  }
-  return { raw, finding: parsed.data, error: null };
-}
-
-function issueLine(issue: { path: PropertyKey[]; message: string }): string {
-  const path = issue.path.map(String).join(".");
-  return path ? `${path}: ${issue.message}` : issue.message;
 }
 
 interface OpenRouterUsage {

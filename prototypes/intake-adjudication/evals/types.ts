@@ -8,8 +8,8 @@ import { z } from "zod";
 
 import { readJsonl } from "../src/jsonl.ts";
 
-import { predictabilityValues, analysisSupportValues } from "../src/contract.ts";
-import { dispositions } from "../src/policy.ts";
+import { predictabilityValues, analysisSupportValues } from "../src/morphology/contract.ts";
+import { dispositions } from "../src/disposition.ts";
 
 export const expectedLabelSchema = z.object({
   claim_id: z.string(),

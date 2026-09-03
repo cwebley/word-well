@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import { z } from "zod";
 
-import { readClaims } from "./claim.ts";
-import { analysisSupportValues, predictabilityValues } from "./contract.ts";
-import { applyEndorsement, deriveMorphologyDisposition } from "./policy.ts";
-import { RUBRIC_VERSION } from "./prompt.ts";
+import { readClaims } from "./morphology/claim.ts";
+import { analysisSupportValues, predictabilityValues } from "./morphology/contract.ts";
+import { applyEndorsement, deriveMorphologyDisposition } from "./morphology/policy.ts";
+import { RUBRIC_VERSION } from "./morphology/prompt.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 

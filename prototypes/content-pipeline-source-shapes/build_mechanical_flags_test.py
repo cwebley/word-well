@@ -5,6 +5,7 @@ from build_mechanical_flags import (
     RARE_SINGULAR_ZIPF,
     display_shift,
     is_place_adjective,
+    lemma_redundancy,
 )
 
 
@@ -82,6 +83,68 @@ class PlaceAdjectiveTest(unittest.TestCase):
     def test_requires_a_proper_noun_not_merely_a_relational_gloss(self):
         self.assertFalse(
             is_place_adjective(FakeSynset("a", "of or relating to the study of birds"))
+        )
+
+
+def pool_row(lemma, **overrides):
+    base = {
+        "lemma": lemma,
+        "pos": "n",
+        "f_transparent": 0,
+        "f_derived": 0,
+        "f_derived_soft": 0,
+    }
+    base.update(overrides)
+    return base
+
+
+class LemmaRedundancyTest(unittest.TestCase):
+    def test_flags_a_direct_grammatical_derivation_and_names_its_root(self):
+        flag = lemma_redundancy(
+            pool_row("tightness", f_derived=1, derived_root="tight"),
+            {"tight": pool_row("tight")},
+        )
+        self.assertEqual(
+            flag, {"prefer": "tight", "reason": "grammatical_derivation"}
+        )
+
+    def test_keeps_a_meaning_bearing_derivation(self):
+        self.assertIsNone(
+            lemma_redundancy(
+                pool_row("mercurial", derived_root="mercury"),
+                {"mercury": pool_row("mercury")},
+            )
+        )
+
+    def test_keeps_a_derivation_whose_root_is_already_derived(self):
+        self.assertIsNone(
+            lemma_redundancy(
+                pool_row("fruitfulness", f_derived=1, derived_root="fruitful"),
+                {"fruitful": pool_row("fruitful")},
+            )
+        )
+
+    def test_keeps_non_grammatical_suffixes(self):
+        self.assertIsNone(
+            lemma_redundancy(
+                pool_row("zesty", f_derived=1, derived_root="zest"),
+                {"zest": pool_row("zest")},
+            )
+        )
+
+    def test_keeps_an_adjectival_ly_derivation(self):
+        self.assertIsNone(
+            lemma_redundancy(
+                pool_row("costly", pos="a", f_derived=1, derived_root="cost"),
+                {"cost": pool_row("cost")},
+            )
+        )
+
+    def test_requires_the_root_to_be_in_the_pool(self):
+        self.assertIsNone(
+            lemma_redundancy(
+                pool_row("tightness", f_derived=1, derived_root="tight"), {}
+            )
         )
 
 

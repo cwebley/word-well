@@ -5,16 +5,18 @@ import { join } from "node:path";
 import type OpenAI from "openai";
 import { describe, expect, it, vi } from "vitest";
 
-import { adjudicate, parseFinding } from "./adjudicate.ts";
-import type { Claim } from "./claim.ts";
-import { readClaims } from "./claim.ts";
+import { adjudicate } from "./adjudicate.ts";
 import type { EvidenceManifest, ModelConfig } from "./fingerprint.ts";
 import { readManifest } from "./fingerprint.ts";
+import type { Claim } from "./morphology/claim.ts";
+import { readClaims } from "./morphology/claim.ts";
+import type { Finding } from "./morphology/contract.ts";
+import { morphologyGate } from "./morphology/gate.ts";
 import type { AdjudicationRecord } from "./store.ts";
 
-const claims = readClaims("evidence/contract-test.claims.jsonl");
+const claims: Claim[] = readClaims("evidence/contract-test.claims.jsonl");
 const manifest: EvidenceManifest = readManifest("evidence/contract-test.manifest.json");
-const claim = claims.find((c) => c.claim_id.startsWith("rebut")) as Claim;
+const claim = claims.find((c: Claim) => c.claim_id.startsWith("rebut")) as Claim;
 
 const model: ModelConfig = {
   provider: "openrouter",
@@ -29,7 +31,7 @@ const validFinding = (claimId: string) => ({
   analysis_support: "unsupported",
   analysis_rationale: "the root is an adverb",
   analysis_evidence_ids: ["oewn-but__4.02.01.."],
-  meanings: claim.candidate.source_meanings.map((m) => ({
+  meanings: claim.candidate.source_meanings.map((m: Claim["candidate"]["source_meanings"][number]) => ({
     sense_ids: [m.sense_id],
     predictability: "insufficient_evidence",
     evidence_ids: [],
@@ -51,7 +53,10 @@ function stubClient(content: string) {
   return { client: { chat: { completions: { create } } } as unknown as OpenAI, create };
 }
 
-describe("parseFinding", () => {
+const parseFinding = (content: string, expectedId: string) =>
+  morphologyGate.parse(content, { ...claim, claim_id: expectedId });
+
+describe("the morphology gate's contract parsing", () => {
   it("accepts output that satisfies the contract", () => {
     const result = parseFinding(JSON.stringify(validFinding(claim.claim_id)), claim.claim_id);
     expect(result.error).toBeNull();
@@ -75,19 +80,19 @@ describe("parseFinding", () => {
   it("rejects an answer attached to the wrong claim", () => {
     const result = parseFinding(JSON.stringify(validFinding("someone-else")), claim.claim_id);
     expect(result.finding).toBeNull();
-    expect(result.error).toContain("claim identity lost");
+    expect(result.error).toContain("subject identity lost");
   });
 });
 
 describe("adjudicate", () => {
   it("does not retry or repair output that violates the contract", async () => {
     const { client, create } = stubClient("not json at all");
-    const { record } = await adjudicate(claim, client, model, manifest, undefined, ledgerDir);
+    const { record } = await adjudicate(claim, morphologyGate, client, model, manifest, undefined, ledgerDir);
 
     expect(create).toHaveBeenCalledTimes(1);
     expect(record.contract_error).toContain("not JSON");
     expect(record.finding).toBeNull();
-    expect(record.morphology).toBeNull();
+    expect(record.decision).toBeNull();
     // The failure still carries its cost and latency, so a model that fails
     // cheaply is not mistaken for one that costs nothing.
     expect(record.usage.cost_usd).toBe(0.0001);
@@ -95,24 +100,24 @@ describe("adjudicate", () => {
 
   it("derives a disposition from a valid finding", async () => {
     const { client } = stubClient(JSON.stringify(validFinding(claim.claim_id)));
-    const { record } = await adjudicate(claim, client, model, manifest, undefined, ledgerDir);
+    const { record } = await adjudicate(claim, morphologyGate, client, model, manifest, undefined, ledgerDir);
 
-    expect(record.morphology?.disposition).toBe("advance");
+    expect(record.decision?.disposition).toBe("advance");
     expect(record.effective?.disposition).toBe("advance");
   });
 
   it("reuses a persisted record instead of paying for the same question twice", async () => {
     const { client, create } = stubClient(JSON.stringify(validFinding(claim.claim_id)));
-    let saved: AdjudicationRecord | null = null;
+    let saved: AdjudicationRecord<Finding> | null = null;
     const store = {
       get: () => saved,
-      put: (record: AdjudicationRecord) => {
+      put: (record: AdjudicationRecord<Finding>) => {
         saved = record;
       },
     };
 
-    const first = await adjudicate(claim, client, model, manifest, store as never, ledgerDir);
-    const second = await adjudicate(claim, client, model, manifest, store as never, ledgerDir);
+    const first = await adjudicate(claim, morphologyGate, client, model, manifest, store as never, ledgerDir);
+    const second = await adjudicate(claim, morphologyGate, client, model, manifest, store as never, ledgerDir);
 
     expect(first.reused).toBe(false);
     expect(second.reused).toBe(true);

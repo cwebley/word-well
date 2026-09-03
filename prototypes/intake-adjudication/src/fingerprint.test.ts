@@ -1,7 +1,11 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { buildFingerprint, canonicalJson, fingerprintKey, readManifest } from "./fingerprint.ts";
-import type { EvidenceManifest, ModelConfig } from "./fingerprint.ts";
+import type { ConfigFingerprint, EvidenceManifest, ModelConfig } from "./fingerprint.ts";
+import { morphologyGate } from "./morphology/gate.ts";
 
 const manifest: EvidenceManifest = readManifest("evidence/contract-test.manifest.json");
 const model: ModelConfig = {
@@ -13,7 +17,7 @@ const model: ModelConfig = {
 };
 
 const key = (m: EvidenceManifest = manifest, c: ModelConfig = model, digest = "abc") =>
-  fingerprintKey(buildFingerprint(digest, m, c));
+  fingerprintKey(buildFingerprint(digest, m, c, morphologyGate.versions));
 
 describe("config fingerprint", () => {
   it("does not depend on key order", () => {
@@ -55,5 +59,32 @@ describe("config fingerprint", () => {
 
   it("changes when the extractor changes under an identical prompt", () => {
     expect(key({ ...manifest, extraction_version: "intake-evidence/2" })).not.toBe(key());
+  });
+});
+
+// The guard that makes gate-parameterising the fingerprint safe.
+//
+// Every committed run record carries both the fingerprint it was keyed under and
+// the key itself. If a refactor adds, removes or renames a field, or changes how
+// the hash is taken, these stop agreeing and every persisted answer silently
+// becomes unreachable — the store would miss, and the pilot budget would pay
+// again for questions already answered.
+describe("committed run records", () => {
+  const records = readdirSync("runs")
+    .filter((name) => name.endsWith(".json"))
+    .map((name) => ({
+      name,
+      record: JSON.parse(readFileSync(join("runs", name), "utf-8")) as {
+        fingerprint: ConfigFingerprint;
+        fingerprint_key: string;
+      },
+    }));
+
+  it("has records to check", () => {
+    expect(records.length).toBeGreaterThan(0);
+  });
+
+  it.each(records)("$name still keys to its stored fingerprint", ({ record }) => {
+    expect(fingerprintKey(record.fingerprint)).toBe(record.fingerprint_key);
   });
 });
