@@ -1,4 +1,5 @@
-"""Mechanical pool flags: demonyms, eponym-only glosses, and display-form shifts.
+"""Mechanical pool flags: demonyms, eponym-only glosses, display-form shifts,
+and grammatical lemma redundancy.
 
 Standalone by design. This does NOT touch `export_evidence.py`, because bumping
 `intake-evidence/*` would change every `input_digest` and invalidate the frozen
@@ -6,7 +7,7 @@ calibration partitions, their labels, and every persisted run fingerprint. It
 reads the pool and OEWN and writes its own artefact; fold it into the exporter
 whenever the evidence version next bumps for another reason.
 
-Three flags, and they are deliberately not equally trusted:
+Four flags, and they are deliberately not equally trusted:
 
   demonym            structural, safe to act on. Walks OEWN's hypernym chain to
                      `inhabitant` / `native` / `denizen`. Applied per SENSE, not
@@ -28,6 +29,10 @@ Three flags, and they are deliberately not equally trusted:
                      candidates are proper-noun contamination in the frequency
                      data (`wale`/Wales, `oiler`/Oilers, `tetri`/Tetris), which
                      the available evidence cannot detect.
+
+  lemma_redundant    a safe deferral for direct grammatical derivatives whose
+                     standalone root is also in the pool. Meaning-bearing
+                     derivations and derivatives of derived roots remain.
 """
 
 from __future__ import annotations
@@ -50,6 +55,8 @@ PROPER_NOUN = re.compile(r"\b[A-Z][a-z]{2,}")
 # makes the plural the real lexical unit rather than merely the commoner one.
 RARE_SINGULAR_ZIPF = 2.0
 DOMINANT_SHARE_MIN = 0.90
+GRAMMATICAL_SUFFIXES = ("ness", "ity", "ly")
+MEANING_BEARING_SUFFIXES = ("ist", "ism", "ish", "ful")
 
 
 def walks_to_people(synset, depth: int = 12) -> bool:
@@ -117,6 +124,36 @@ def display_shift(row: sqlite3.Row) -> dict | None:
     }
 
 
+def lemma_redundancy(row: dict, pool: dict[str, dict]) -> dict | None:
+    """Prefer a direct grammatical derivative's standalone root.
+
+    A root that is itself derived is not a safe deferral target: `fruitful` is
+    already a meaning-bearing step away from `fruit`, so `fruitfulness` is not
+    redundant with the root lemma.
+    """
+    if not row["f_derived"] or not row["derived_root"]:
+        return None
+    suffix = next(
+        (suffix for suffix in GRAMMATICAL_SUFFIXES if row["lemma"].endswith(suffix)),
+        None,
+    )
+    if suffix is None:
+        return None
+    if suffix in ("ness", "ity") and row["pos"] != "n":
+        return None
+    if suffix == "ly" and row["pos"] != "r":
+        return None
+
+    root = pool.get(row["derived_root"])
+    if root is None:
+        return None
+    if root["f_transparent"] or root["f_derived"] or root["f_derived_soft"]:
+        return None
+    if root["lemma"].endswith(MEANING_BEARING_SUFFIXES):
+        return None
+    return {"prefer": root["lemma"], "reason": "grammatical_derivation"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pool", type=Path, default=Path("pool.sqlite"))
@@ -132,14 +169,22 @@ def main() -> None:
     connection.row_factory = sqlite3.Row
     query = (
         "SELECT lemma, display, pos, zipf_own, zipf_summed, dominant_form, "
-        "dominant_share, oewn_senses, endorsements FROM lemma ORDER BY lemma"
+        "dominant_share, oewn_senses, endorsements, f_transparent, f_derived, "
+        "f_derived_soft, derived_root FROM lemma ORDER BY lemma"
     )
-    if args.limit:
-        query += f" LIMIT {args.limit}"
 
-    counts = {"demonym": 0, "eponym_gloss_only": 0, "display_shift": 0, "rows": 0}
+    counts = {
+        "demonym": 0,
+        "eponym_gloss_only": 0,
+        "display_shift": 0,
+        "lemma_redundant": 0,
+        "rows": 0,
+    }
+    pool_rows = list(connection.execute(query))
+    rows = pool_rows[: args.limit] if args.limit else pool_rows
+    pool = {row["lemma"]: dict(row) for row in pool_rows}
     with args.out.open("w") as handle:
-        for row in connection.execute(query):
+        for row in rows:
             counts["rows"] += 1
             senses = classify_senses(row["lemma"], lexicon)
             flags: dict[str, object] = {}
@@ -162,6 +207,11 @@ def main() -> None:
                 flags["display_shift"] = shift
                 counts["display_shift"] += 1
 
+            redundancy = lemma_redundancy(row, pool)
+            if redundancy:
+                flags["lemma_redundant"] = redundancy
+                counts["lemma_redundant"] += 1
+
             if not flags:
                 continue
             handle.write(
@@ -181,6 +231,7 @@ def main() -> None:
     print(f"  demonym (safe to act on)      : {counts['demonym']}")
     print(f"  eponym_gloss_only (marker)    : {counts['eponym_gloss_only']}")
     print(f"  display_shift (needs review)  : {counts['display_shift']}")
+    print(f"  lemma_redundant (safe defer)   : {counts['lemma_redundant']}")
 
 
 if __name__ == "__main__":
