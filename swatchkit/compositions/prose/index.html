@@ -1,0 +1,366 @@
+<article class="wrapper prose flow">
+  <h1>Prose content and global styles kitchen sink</h1>
+  <p>We start with a paragraph of text that features various HTML tags, used in flow content. Account for <em>emphasis</em>, <strong>strong</strong> and <small>small</small> text. Don't forget to account for abbreviations too, using the <abbr title="abbreviation">abbr</abbr> (<code>&lt;abbr&gt;</code>) element. Lastly you can define <del>deleted text</del>
+    <ins>inserted text</ins>.</p>
+  <p>If you are referencing keyboard keys, make sure you use the <code>&lt;kbd&gt;</code> element like this: <kbd>shift</kbd>. Like we have already in these paragraphs, if you are referencing code, use the <code>&lt;code&gt;</code> element. Don't forget the <code>&lt;samp&gt;</code> element either. An example for that element is this: <samp>Press F1 to continue</samp>. </p>
+  <p>Use the <code>&lt;var&gt;</code> element to reference a variable like this: The volume of a box is <var>l</var> × <var>w</var> × <var>h</var>, where <var>l</var> represents the length, <var>w</var> the width and <var>h</var> the height of the box.</p>
+  <p>If you want an inline quote, use the <code>&lt;q&gt;</code> element <q>quoted text</q>. Lastly don't forget the subscript (<code>&lt;sub&gt;</code>) (H<sub>2</sub>O) and superscript (<code>&lt;sup&gt;</code>) (E = MC<sup>2</sup>), and of course, <a href="https://example.com">link elements</a>. </p>
+  <h2>Blockquote styles are the context for this heading level 2 which is long for testing leading and balance</h2>
+  <blockquote>
+    <p>Sed posuere consectetur est at lobortis. Nullam id dolor id nibh ultricies vehicula ut id elit. Cras mattis consectetur purus sit amet fermentum.</p>
+  </blockquote>
+  <blockquote cite="https://www.huxley.net/bnw/four.html">
+    <q>Words can be like X-rays, if you use them properly—they'll go through anything. You read and you're pierced.</q>
+    <footer>Aldous Huxley, <cite>Brave New World</cite>
+    </footer>
+  </blockquote>
+  <p>Make sure you only use a cite if the quote source can be linked to.</p>
+  <hr>
+  <p>Just a quick paragraph to follow the horizontal rule. A bit of Lipsum? Sure thing: Nulla vitae elit libero, a pharetra augue. Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>
+  <h2>Details and summary</h2>
+  <details>
+    <summary>Toggle the details element</summary>
+    <p>Previously hidden content until the details element is in its <code>open</code> state.
+  </p></details>
+    <h2>Tables</h2>
+    <table>
+      <caption>A nice caption for this table</caption>
+      <tbody>
+        <tr>
+          <th>Person</th>
+          <th>Number</th>
+          <th>Third Column</th>
+        </tr>
+        <tr>
+          <td>Someone Lastname</td>
+          <td>900</td>
+          <td>Nullam quis risus eget urna mollis ornare vel eu leo.</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="#">Person Name</a>
+          </td>
+          <td>1200</td>
+          <td>Vestibulum id ligula porta felis euismod semper. Donec ullamcorper nulla non metus auctor fringilla.</td>
+        </tr>
+        <tr>
+          <td>Another Person</td>
+          <td>1500</td>
+          <td>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Nullam id dolor id nibh ultricies vehicula ut id elit.</td>
+        </tr>
+        <tr>
+          <td>Last One</td>
+          <td>2800</td>
+          <td>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Sometimes, a table has column headers</p>
+    <table>
+      <caption>A nice caption for this table</caption>
+      <tbody>
+        <tr>
+          <th></th>
+          <th>Person</th>
+          <th>Number</th>
+          <th>Third Column</th>
+        </tr>
+        <tr>
+          <th>This column's heading</th>
+          <td>Someone Lastname</td>
+          <td>900</td>
+          <td>Nullam quis risus eget urna mollis ornare vel eu leo.</td>
+        </tr>
+        <tr>
+          <th>Another column heading</th>
+          <td>
+            <a href="#">Person Name</a>
+          </td>
+          <td>1200</td>
+          <td>Vestibulum id ligula porta felis euismod semper. Donec ullamcorper nulla non metus auctor fringilla.</td>
+        </tr>
+        <tr>
+          <th>Code in tables should have more paired back styles</th>
+          <td>Another Person</td>
+          <td>
+            <code>1500</code>
+          </td>
+          <td>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Nullam id dolor id nibh ultricies vehicula ut id elit.</td>
+        </tr>
+        <tr>
+          <th>Last column header</th>
+          <td>Last One</td>
+          <td>2800</td>
+          <td>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Description lists time</h2>
+    <p>Just a quick paragraph to introduce heading level 3 too.</p>
+    <h3>Description lists are under-used, but extremely useful</h3>
+    <dl>
+      <dt>A description list term</dt>
+      <dd>A description list detail</dd>
+      <dt>Another term</dt>
+      <dd>A slightly longer details element to work with.</dd>
+    </dl>
+    <h3>Sometimes description lists have multiple details</h3>
+    <dl>
+      <dt>This term introduces two details</dt>
+      <dd>This is the first one</dd>
+      <dd>This is the second one, which is a bit longer</dd>
+    </dl>
+    <h2>Lists, glorious lists</h2>
+    <p>Lists in various forms.</p>
+    <h3>A simple undordered list</h3>
+    <ul>
+      <li>List item one</li>
+      <li>List item two</li>
+      <li>List item three, which is a longer item to make sure our marker styles work well for mult-line list items</li>
+      <li>List item four</li>
+    </ul>
+    <h3>Moving on to a nested undordered list</h3>
+    <ul>
+      <li>Unordered List item one <ul>
+          <li>Nested list item <ul>
+              <li>Level 3, item one</li>
+              <li>Level 3, item two</li>
+              <li>Level 3, item three</li>
+              <li>Level 3, item four</li>
+            </ul>
+          </li>
+          <li>List item two</li>
+          <li>List item three</li>
+          <li>List item four</li>
+        </ul>
+      </li>
+      <li>List item two</li>
+      <li>List item three</li>
+      <li>List item four</li>
+    </ul>
+    <h3>Order, numbered lists are next</h3>
+    <ol>
+      <li>List item one</li>
+      <li>List item two</li>
+      <li>List item three, which is a longer item to make sure our marker styles work well for mult-line list items</li>
+      <li>List item four</li>
+    </ol>
+    <h3>Moving on to a nested undordered list</h3>
+    <ol>
+      <li>Ordered List item one <ol>
+          <li>Nested list item <ol>
+              <li>Level 3, item one</li>
+              <li>Level 3, item two</li>
+              <li>Level 3, item three</li>
+              <li>Level 3, item four</li>
+            </ol>
+          </li>
+          <li>List item two</li>
+          <li>List item three</li>
+          <li>List item four</li>
+        </ol>
+      </li>
+      <li>List item two</li>
+      <li>List item three</li>
+      <li>List item four</li>
+    </ol>
+    <h3>A mix of both</h3>
+    <ul>
+      <li>Unordered List item one <ol>
+          <li>Nested ordered list item <ul>
+              <li>Level 3, item one</li>
+              <li>Level 3, item two</li>
+              <li>Level 3, item three</li>
+              <li>Level 3, item four</li>
+            </ul>
+          </li>
+          <li>List item two</li>
+          <li>List item three</li>
+          <li>List item four</li>
+        </ol>
+      </li>
+      <li>List item two</li>
+      <li>List item three</li>
+      <li>List item four</li>
+    </ul>
+    <h2>Preformatted text / blocks of code styles follow on next</h2>
+    <pre><code>.context-alert {
+  position: absolute;
+  inset: auto 0 calc(100% + 0.5em) 0;
+  padding: 0.25em;
+   background: var(--color-action);
+   color: var(--color-on-action);
+  font-weight: var(--font-bold);
+  text-align: center;
+  transition: opacity var(--transition-fade) 200ms,
+    transform var(--transition-bounce-fast) 200ms;
+}</code></pre>
+    <h2>Forms</h2>
+    <form>
+      <div>
+        <label for="input-email">Email address with placeholder</label>
+        <input type="email" id="input-email" placeholder="E.G name@domain.com">
+      </div>
+      <div>
+        <label for="input-number">Number</label>
+        <input type="number" id="input-number">
+      </div>
+      <div>
+        <label for="input-password">Password</label>
+        <input type="password" id="input-password">
+      </div>
+      <div>
+        <label for="input-search">Search</label>
+        <input type="search" id="input-search">
+      </div>
+      <div>
+        <label for="input-tel">Telephone number</label>
+        <input type="tel" id="input-tel">
+      </div>
+      <div>
+        <label for="input-text">Text</label>
+        <input type="text" id="input-text">
+      </div>
+      <div>
+        <label for="input-url">Url with placeholder</label>
+        <input type="url" id="input-url" placeholder="https://example.com">
+      </div>
+      <div>
+        <label for="input-color">Color</label>
+        <input type="color" id="input-color" value="#ff00ff">
+      </div>
+      <div>
+        <label for="input-date">Date</label>
+        <input type="date" id="input-date">
+      </div>
+      <div>
+        <label for="input-date-time-local">Date and time</label>
+        <input type="datetime-local" id="input-date-time-local">
+      </div>
+      <div>
+        <label for="input-month">Month</label>
+        <input type="month" id="input-month">
+      </div>
+      <div>
+        <label for="input-week">Week</label>
+        <input type="week" id="input-week">
+      </div>
+      <div>
+        <label for="input-time">Time</label>
+        <input type="time" id="input-time">
+      </div>
+      <div>
+        <label for="input-select">Example select</label>
+        <select id="input-select">
+          <option>Option number 1</option>
+          <option>Option number 2</option>
+          <option>Option number 3</option>
+          <option>Option number 4</option>
+          <option>Option number 5</option>
+        </select>
+      </div>
+      <div>
+        <label for="input-multi-select">Example multiple select</label>
+        <select multiple id="input-multi-select">
+          <option>Option number 1</option>
+          <option>Option number 2</option>
+          <option>Option number 3</option>
+          <option>Option number 4</option>
+          <option>Option number 5</option>
+        </select>
+      </div>
+      <div>
+        <label for="input-datalist">Example datalist</label>
+        <input list="datalist-list-element" id="input-datalist">
+        <datalist id="datalist-list-element">
+          <option>Option number 1</option>
+          <option>Option number 2</option>
+          <option>Option number 3</option>
+          <option>Option number 4</option>
+          <option>Option number 5</option>
+        </datalist>
+      </div>
+      <div>
+        <label for="input-textarea">Example textarea</label>
+        <textarea id="input-textarea" rows="3"></textarea>
+      </div>
+      <div>
+        <label for="input-textarea-no-rows">Example textarea with no rows attribute</label>
+        <textarea id="input-textarea-no-rows"></textarea>
+      </div>
+      <div>
+        <label for="input-file">File input</label>
+        <input type="file" id="input-file">
+      </div>
+      <div>
+        <label for="input-disabled">A disabled input</label>
+        <input type="text" id="input-disabled" disabled>
+      </div>
+      <div>
+        <label for="input-readonly">A readonly input</label>
+        <input type="text" id="input-readonly" readonly value="Some readonly text">
+      </div>
+      <fieldset>
+        <legend>I am a legend element for radio inputs</legend>
+        <label for="radio-1">
+          <input type="radio" name="input-radios" id="radio-1" value="option-1" checked>
+          <span>We put the label text in a span because we can use <code>:has()</code> to style radios and checkboxes with flexbox</span>
+        </label>
+        <label for="radio-2">
+          <input type="radio" name="input-radios" id="radio-2" value="option-2">
+          <span>
+              The second option should de-select option 1 
+            </span>
+        </label>
+        <label for="radio-3">
+          <input type="radio" name="input-radios" id="radio-3" value="option3" disabled>
+          <span>This one is disabled and can't be selected</span>
+        </label>
+      </fieldset>
+      <fieldset>
+        <legend>I am also a legend but this time for checkboxes</legend>
+        <label for="input-checkbox">
+          <input type="checkbox" id="input-checkbox">
+          <span>Checkbox number one</span>
+        </label>
+        <label for="input-checkbox-1">
+          <input type="checkbox" id="input-checkbox-1">
+          <span>Checkbox number two has a longer label to make sure our CSS is top notch</span>
+        </label>
+        <label for="input-checkbox-2">
+          <input type="checkbox" id="input-checkbox-2" disabled>
+          <span>Checkbox number three is disabled and cant't be checked</span>
+        </label>
+      </fieldset>
+    </form>
+    <p>Where are buttons? Good question. Not here because we don't tend to style up default buttons and instead opt to treat them as components with a <code>.button</code> class.</p>
+    <h2>Images, figures, pictures and videos</h2>
+    <p>Under no circumstances should you have an image without an <code>alt</code> attribute. At a minimum, it should be an empty value like this one. That should only be used for purely decorative images though. </p>
+    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY4MjA3NzQ4Mg&ixlib=rb-4.0.3&q=80&w=1080" alt="Abstract liquid oil painting texture">
+    <h3>An image in a figure with a caption</h3>
+    <figure>
+      <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=4470&q=80" alt="Foggy mountains with a moody atmosphere">
+      <figcaption>Nature's moody atmosphere. By <a href="https://unsplash.com/@v2osk">v2osk</a>
+      </figcaption>
+    </figure>
+    <h3>A picture element</h3>
+    <picture>
+      <source srcset="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=1500&q=80" media="(min-width: 1500px)">
+      <source srcset="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" media="(orientation: portrait)">
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=500&q=80" alt="Modern minimalistic architecture">
+    </picture>
+    <h3>A video element</h3>
+    <video controls src="https://assets.codepen.io/174183/flower.mp4"></video>
+    <h3>An SVG with an image role and alternative text</h3>
+    <svg role="img" aria-label="a black spiral" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 331.27 316.68" width="500" height="500">
+      <path fill="#000" d="M182.4,339.4a152.15,152.15,0,0,1-53.8-9.9A155.78,155.78,0,0,1,28.7,188.4,159.57,159.57,0,0,1,72.4,73.9,165,165,0,0,1,251,33.7a169,169,0,0,1,94,89,173,173,0,0,1,14.9,65.4l-10,.3A160.63,160.63,0,0,0,299.8,75.9a158.8,158.8,0,0,0-52.3-32.8,156.72,156.72,0,0,0-60.2-10.2A153.62,153.62,0,0,0,79.8,81a153,153,0,0,0-31.3,49.9,150.15,150.15,0,0,0-9.7,57.4,147.9,147.9,0,0,0,12.9,56.1,145.82,145.82,0,0,0,33,46.2,144,144,0,0,0,47.6,29.7,141.53,141.53,0,0,0,108-3.2,139.62,139.62,0,0,0,43.9-31.4,138.19,138.19,0,0,0,28.2-45.2,135.22,135.22,0,0,0,8.6-51.9v-.3a133.79,133.79,0,0,0-11.8-50.4,130.65,130.65,0,0,0-72.8-68.1A127,127,0,0,0,139.5,73a124.84,124.84,0,0,0-39.2,28.3,122.5,122.5,0,0,0-25,40.5,119,119,0,0,0,3.2,91.3A117.52,117.52,0,0,0,105.2,270a116.09,116.09,0,0,0,38.2,23.5,112.41,112.41,0,0,0,85.8-3.2,109.78,109.78,0,0,0,34.5-25.1,108.34,108.34,0,0,0,21.9-35.8,104.88,104.88,0,0,0,6.4-40.8v-.2a102.95,102.95,0,0,0-33.2-71.5A98.37,98.37,0,0,0,150.6,99.8a96.58,96.58,0,0,0-29.8,22A94.57,94.57,0,0,0,102,152.9a90.45,90.45,0,0,0,3.1,69.1,88.84,88.84,0,0,0,20.4,27.5,86.82,86.82,0,0,0,28.7,17.2,83.27,83.27,0,0,0,63.6-3.2,78.84,78.84,0,0,0,25.1-18.8,79.77,79.77,0,0,0,15.7-26.4,76.75,76.75,0,0,0,4.2-29.7v-.2a75.91,75.91,0,0,0-7.3-28.2,74.17,74.17,0,0,0-17.2-22.8,72,72,0,0,0-24-14.1,68.73,68.73,0,0,0-52.5,3.2,65.22,65.22,0,0,0-20.4,15.7,63.75,63.75,0,0,0-12.5,21.7,61.63,61.63,0,0,0-3.1,24.1,59.53,59.53,0,0,0,6.2,22.8,57.9,57.9,0,0,0,14.1,18.1,57.22,57.22,0,0,0,19.3,11,55.31,55.31,0,0,0,21.4,2.6,52,52,0,0,0,35.8-18.1,48.88,48.88,0,0,0,11.5-35.6v-.3a47.14,47.14,0,0,0-5-17,44.33,44.33,0,0,0-10.9-13.4,42.4,42.4,0,0,0-14.6-7.9,40,40,0,0,0-15.8-1.5,37.19,37.19,0,0,0-14.5,4.5,35.59,35.59,0,0,0-11.1,9.3,34.65,34.65,0,0,0-6.3,12.2,33.45,33.45,0,0,0-1,13,30,30,0,0,0,3.9,11.7,30.94,30.94,0,0,0,7.7,8.8,28,28,0,0,0,9.8,4.8,25.44,25.44,0,0,0,10.3.5,25,25,0,0,0,8.9-3.2,23.63,23.63,0,0,0,6.5-6.1,21.32,21.32,0,0,0,3.3-7.4,18.94,18.94,0,0,0,0-7.5l-.1-.3a15.54,15.54,0,0,0-6.9-10,12.22,12.22,0,0,0-5.1-1.8,10.07,10.07,0,0,0-4.5.5,8.27,8.27,0,0,0-3.3,2.1,6.64,6.64,0,0,0-1.7,3l-.1.3a4.09,4.09,0,0,0,.5,3.2,3.27,3.27,0,0,0,1.1,1.1,1.94,1.94,0,0,0,1.2.3h.2l.3-1a.27.27,0,0,1-.2-.1.85.85,0,0,1-.4-.5,2.47,2.47,0,0,1-.1-2l.1-.2a5.09,5.09,0,0,1,1.3-2.2,6.19,6.19,0,0,1,2.5-1.5,7.92,7.92,0,0,1,3.4-.4,10.08,10.08,0,0,1,4,1.4,13.29,13.29,0,0,1,5.8,8.4l.1.3a17.27,17.27,0,0,1-.1,6.8,19.64,19.64,0,0,1-3,6.7,21.56,21.56,0,0,1-5.7,5.3,23,23,0,0,1-8,2.9,23.68,23.68,0,0,1-9.4-.5,26.35,26.35,0,0,1-8.9-4.4,28.49,28.49,0,0,1-6.9-7.9,28,28,0,0,1-3.5-10.6,30.83,30.83,0,0,1,.9-11.9,32.29,32.29,0,0,1,5.8-11.1,33.86,33.86,0,0,1,10.1-8.5,35.73,35.73,0,0,1,13.3-4.1,38.16,38.16,0,0,1,14.6,1.4A40.76,40.76,0,0,1,218,160a42.75,42.75,0,0,1,9.9,12.3,44.81,44.81,0,0,1,4.6,15.7v.3a46.77,46.77,0,0,1-10.6,33,49.75,49.75,0,0,1-14.9,11.7,51.77,51.77,0,0,1-18.5,5,53.57,53.57,0,0,1-19.8-2.5,55.5,55.5,0,0,1-17.8-9.8,57.67,57.67,0,0,1-13-15,55.93,55.93,0,0,1-5.7-21.1,58.25,58.25,0,0,1,2.9-22.5,61.24,61.24,0,0,1,11.7-19.9,63.38,63.38,0,0,1,19.2-14.5,65.76,65.76,0,0,1,50.3-3.1,68.31,68.31,0,0,1,22.1,13,70.3,70.3,0,0,1,15.9,21,72.75,72.75,0,0,1,6.7,26.2v.2a74.37,74.37,0,0,1-3.9,27.8,77.32,77.32,0,0,1-14.7,24.5,79.18,79.18,0,0,1-23.3,17.6,81.08,81.08,0,0,1-30.2,7.5,82,82,0,0,1-30.9-4.2A85.33,85.33,0,0,1,138,232.7,87.41,87.41,0,0,1,119,209.4a84.72,84.72,0,0,1-5.6-32.5,87.92,87.92,0,0,1,5.6-31.9,90.63,90.63,0,0,1,17.5-27.1,93.39,93.39,0,0,1,27.8-19.9,95.56,95.56,0,0,1,73.1-3,98.74,98.74,0,0,1,31.6,20.3,101.34,101.34,0,0,1,20.7,30.8,99.61,99.61,0,0,1,7.6,37.7v.2a102.34,102.34,0,0,1-6,37.9,105.49,105.49,0,0,1-20.4,33.1,108.17,108.17,0,0,1-32.2,23,111,111,0,0,1-84.1,3,113.81,113.81,0,0,1-35.7-22.2,116.45,116.45,0,0,1-23.8-33.8,113.63,113.63,0,0,1-6.3-43.6,118,118,0,0,1,7.2-39.3A121.45,121.45,0,0,1,116,107a124.37,124.37,0,0,1,37.5-24.3,127,127,0,0,1,97.1-1.3,130.6,130.6,0,0,1,40.6,26.1,133.66,133.66,0,0,1,26.9,38.8,131.35,131.35,0,0,1,9.1,48.9v.3a133,133,0,0,1-8.1,48.5,136.27,136.27,0,0,1-26.7,41.2A139.28,139.28,0,0,1,252,311.6a141.53,141.53,0,0,1-52.4,9.4,139.47,139.47,0,0,1-52.1-10,142.52,142.52,0,0,1-44.7-27.7,145.58,145.58,0,0,1-30.3-41.7,143.05,143.05,0,0,1-11-53.2,148,148,0,0,1,9.2-52.4A151.64,151.64,0,0,1,99.2,92.3a155,155,0,0,1,43.9-29.7A158.3,158.3,0,0,1,204.8,52a155.54,155.54,0,0,1,61.5,12.5,159,159,0,0,1,50.7,34.4,162.54,162.54,0,0,1,33.4,50.8,160.73,160.73,0,0,1,9.9,58.7h0Z" transform="translate(-28.65 -23.02)"/>
+    </svg>
+    <h2>All of the headings</h2>
+    <p>We tend to only specifically style up headings up to level 4 in terms of leading and balance because if you're getting into 5 and 6, you probably want to be simplifying your content. We'll add them here though to double check they look OK.</p>
+    <h1>Sed posuere consectetur est at lobortis.</h1>
+    <h2>Sed posuere consectetur est at lobortis.</h2>
+    <h3>Sed posuere consectetur est at lobortis.</h3>
+    <h4>Sed posuere consectetur est at lobortis.</h4>
+    <h5>Sed posuere consectetur est at lobortis.</h5>
+    <h6>Sed posuere consectetur est at lobortis.</h6>
+  </article>

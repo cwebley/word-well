@@ -1,0 +1,163 @@
+.card {
+  --flow-space: var(--space-s);
+  max-width: 42rem;
+  padding: var(--space-l);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-l);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.card-title {
+  font-family: var(--font-reading);
+  font-weight: 440;
+  font-size: var(--step-4);
+  line-height: var(--leading-flat);
+}
+
+.card-body {
+  font-size: var(--step-0);
+  line-height: var(--leading-standard);
+}
+
+.card-footer {
+  --flow-space: var(--space-m);
+}
+
+.word-lesson {
+  margin-block-start: calc(var(--space-m) * -1);
+}
+.lesson-label,
+.status-label {
+  color: var(--color-support);
+  font-size: var(--step--1);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.lesson-pronunciation {
+  color: var(--color-link);
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+  margin-block-start: var(--space-m);
+}
+.word-lesson-body {
+  display: grid;
+  gap: var(--space-2xl-4xl);
+  margin-inline: auto;
+  max-inline-size: 72rem;
+}
+.word-lesson-meanings,
+.word-lesson-meaning {
+  display: grid;
+  gap: var(--space-2xl-4xl);
+}
+.word-lesson-definition > p:last-child {
+  font-family: var(--font-reading);
+  font-size: var(--step-5);
+  font-weight: 460;
+  letter-spacing: -0.04em;
+  line-height: var(--leading-flat);
+  max-inline-size: 26ch;
+}
+.word-lesson-examples {
+  display: grid;
+  gap: var(--space-s);
+}
+.word-lesson-examples ol {
+  border-block: var(--stroke-solid);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.word-lesson-examples li {
+  border-block-end: var(--stroke-solid);
+  font-family: var(--font-reading);
+  font-size: var(--step-3);
+  font-style: italic;
+  line-height: var(--leading-fine);
+  padding-block: var(--space-m);
+}
+.word-lesson-examples li:last-child {
+  border-block-end: 0;
+}
+.lesson-guidance {
+  display: grid;
+  gap: var(--space-m);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+.lesson-guidance > div {
+  border-block-start: 0.4rem solid var(--guidance-cue);
+  display: grid;
+  gap: var(--space-s);
+  padding: var(--space-m) var(--space-s);
+}
+.lesson-guidance-use {
+  --guidance-cue: var(--color-support);
+}
+.lesson-guidance-avoid {
+  --guidance-cue: var(--color-avoid);
+}
+.lesson-guidance dt {
+  color: var(--guidance-cue);
+  font-size: var(--step--1);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.lesson-guidance dd {
+  font-family: var(--font-reading);
+  font-size: var(--step-3);
+  letter-spacing: -0.025em;
+  line-height: var(--leading-fine);
+  margin: 0;
+}
+.word-lesson-etymology {
+  background: color-mix(
+    in oklab,
+    var(--color-wood-light) 18%,
+    var(--color-surface)
+  );
+  border-inline-start: 0.35rem solid var(--color-wood-light);
+  display: grid;
+  gap: var(--space-s);
+  padding: var(--space-m);
+}
+.word-lesson-etymology > p:last-child {
+  max-inline-size: 62ch;
+}
+.word-lesson-footer {
+  border-block-start: var(--stroke-solid);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  justify-content: space-between;
+  padding-block-start: var(--space-m);
+}
+.word-feedback {
+  --flow-space: var(--space-xs);
+}
+.word-feedback > p {
+  color: var(--color-support);
+  font-size: var(--step--1);
+  margin: 0;
+}
+.word-feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.status {
+  border-inline-start: 0.3rem solid var(--color-link);
+  padding: var(--space-s) var(--space-m);
+  background: var(--color-surface-raised);
+}
+.status p {
+  margin: 0;
+}
+@container (max-width: 48rem) {
+  .lesson-guidance {
+    grid-template-columns: 1fr;
+  }
+}

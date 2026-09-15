@@ -1,0 +1,50 @@
+/*
+  SWITCHER
+  Lays out items horizontally until there is insufficient space, then stacks them.
+  Switches to a full vertical stack when there are 5 or more items.
+
+  Credit: Adapted from Every Layout (The Switcher)
+  Docs:   https://every-layout.dev/layouts/switcher/
+
+  CUSTOM PROPERTIES:
+  --gutter: Space between items (default: --space-l)
+  --switcher-target-container-width: Container breakpoint width (default: 40rem)
+  --switcher-vertical-alignment: Vertical alignment (default: flex-start)
+*/
+
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter, var(--space-l));
+  align-items: var(--switcher-vertical-alignment, stretch);
+}
+
+/* The Flexbox Holy Albatross: subtracting 100% (the container width) from the
+   threshold produces either a large negative or large positive number when
+   multiplied by 999. A negative flex-basis is invalid and treated as 0, so
+   flex-grow takes over and items share the row. A positive flex-basis forces
+   each item to its own row. The result: a hard switch between horizontal and
+   vertical with no in-between states, and no media queries needed. */
+.switcher > * {
+  flex-grow: 1;
+  flex-basis: calc(
+    (var(--switcher-target-container-width, 40rem) - 100%) * 999
+  );
+}
+
+/* Quantity query: if there are 5 or more items, make ALL of them full width.
+   Above the container threshold, all items lay out horizontally — but with too
+   many items they'd become too narrow. This forces a clean vertical stack instead.
+
+   :nth-last-child(n+5) selects any item that has 4+ items after it — meaning
+   we're in a group of 5+. The sibling combinator (~) then catches everything else.
+
+   This can also be written using :has():
+   .switcher:has(> :nth-child(5)) > * { flex-basis: 100%; }
+
+   Both are equivalent. The :has() version reads as "if .switcher has a 5th
+   child, make all children full width." */
+.switcher > :nth-last-child(n + 5),
+.switcher > :nth-last-child(n + 5) ~ * {
+  flex-basis: 100%;
+}

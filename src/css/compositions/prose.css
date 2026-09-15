@@ -1,0 +1,89 @@
+/**
+ * Prose Swatch
+ * 
+ * A CUBE CSS "Block" designed to optimize the reading experience for long-form content.
+ * It manages spacing, line length, and typography for a comfortable rhythm.
+ * 
+ * Usage: <article class="prose flow">...</article>
+ */
+
+.prose {
+  /* Increase flow spacing for better reading rhythm */
+  --flow-space: var(--space-l);
+}
+
+/**
+ * Prevent large headings from breaking layout on small screens.
+ * hyphenation and break-word handling ensures text wraps gracefully.
+ */
+.prose :is(h1, h2, h3) {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/**
+ * Constrain line length for optimal readability (measure).
+ * text-wrap: pretty prevents orphans and awkward breaks.
+ */
+.prose :is(p, li, dl, figcaption, blockquote) {
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+/**
+ * Reduce spacing after headings to visually group them with their content.
+ */
+.prose :is(h1, h2, h3, h4) + *:not([class]) {
+  --flow-space: var(--space-m);
+}
+
+/**
+ * Add more breathing room around heavy elements like figures and tables.
+ */
+.prose :is(figure, table),
+.prose :is(figure, table) + * {
+  --flow-space: var(--space-2xl);
+}
+
+/**
+ * Add extra space before headings to clearly separate sections.
+ */
+.prose * + :is(h1, h2, h3, h4):not([class]) {
+  --flow-space: var(--space-xl);
+}
+
+/**
+ * Tighter spacing for list items to keep lists cohesive.
+ */
+.prose :is(ul, ol):not([class]) li + li,
+.prose :is(ul, ol):not([class]) li > :is(ol, ul) {
+  --flow-space: var(--space-xs);
+}
+
+/**
+ * Horizontal rules act as major section breaks, so give them plenty of space.
+ */
+.prose hr {
+  --flow-space: var(--space-2xl);
+}
+
+/**
+ * Add a border to media elements to prevent them from blending into the background,
+ * especially in light mode.
+ */
+.prose :is(img, picture, video) {
+  border: var(--stroke-solid);
+}
+
+/**
+ * On larger screens, relax the aggressive wrapping rules for headings.
+ * 47.5em matches 760px, the default 'viewport-mid' token. 
+ * Preferring em here to catch the case where a user adjusts their browser default font size.
+ * Note: CSS variables cannot be used in media queries in standard CSS.
+ */
+@media (min-width: 47.5em) {
+  .prose :is(h1, h2, h3) {
+    overflow-wrap: unset;
+    hyphens: unset;
+  }
+}

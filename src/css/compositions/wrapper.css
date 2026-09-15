@@ -1,0 +1,14 @@
+/* 
+  WRAPPER
+  
+  Credit: More or less, adapted from Every Layout (The Center)
+  Docs:   https://every-layout.dev/layouts/center/
+*/
+
+.wrapper {
+  margin-inline: auto;
+  max-inline-size: var(--wrapper-max-width, 1360px);
+  padding-inline-start: var(--gutter);
+  padding-inline-end: var(--gutter);
+  position: relative;
+}

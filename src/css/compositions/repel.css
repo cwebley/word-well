@@ -1,0 +1,23 @@
+/*
+  REPEL
+  Pushes items away from each other where space allows, stacking on small viewports.
+
+  Credit: Adapted from Every Layout (The Cluster)
+  Docs:   https://every-layout.dev/layouts/cluster/
+
+  CUSTOM PROPERTIES:
+  --gutter: Space between items (default: --space-m)
+  --repel-vertical-alignment: Vertical alignment (default: center)
+*/
+
+.repel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: var(--repel-vertical-alignment, center);
+  gap: var(--gutter, var(--space-m));
+}
+
+.repel[data-nowrap] {
+  flex-wrap: nowrap;
+}

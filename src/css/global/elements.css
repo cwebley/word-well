@@ -1,0 +1,609 @@
+/**
+ * SwatchKit Global Styles
+ *
+ * Sensible defaults for HTML elements that make content look good
+ * without requiring component-specific CSS. Writing CSS "high up"
+ * reduces repetition and provides a solid foundation.
+ * This file is yours to edit.
+ *
+ * Variable references use the default token names from global/tokens.css.
+ * If you rename tokens, update the var() references below to match.
+ *
+ * Based on Andy Bell's Complete CSS course methodology.
+ */
+
+/* ==========================================================================
+   BODY & TYPOGRAPHY
+   ========================================================================== */
+
+/**
+ * Base body styles using design tokens.
+ * font-size-adjust: from-font makes elements like <code> render in better
+ * proportion relative to your base font.
+ */
+body {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--step-1);
+  font-family: var(--font-base);
+  line-height: var(--leading-standard);
+  font-size-adjust: from-font;
+  margin: 0;
+}
+
+/**
+ * Headings get a tighter line-height to prevent awkward gaps when they
+ * wrap to multiple lines. text-wrap: balance creates more even line lengths.
+ */
+:is(h1, h2, h3, h4) {
+  line-height: var(--leading-fine);
+  text-wrap: balance;
+}
+
+/**
+ * Heading sizes step down the typography scale.
+ * max-width in ch units (width of "0" character) limits line length
+ * for readability - especially important for large headings.
+ */
+h1 {
+  font-size: var(--step-6);
+  max-width: 20ch;
+}
+
+h2 {
+  font-size: var(--step-5);
+  max-width: 35ch;
+}
+
+h3 {
+  font-size: var(--step-4);
+  max-width: 35ch;
+}
+
+/**
+ * h4-h6 share the same size - the hierarchy is established
+ * through context rather than size at this point.
+ */
+:is(h4, h5, h6) {
+  font-size: var(--step-3);
+}
+
+/* ==========================================================================
+   INLINE TEXT ELEMENTS
+   ========================================================================== */
+
+/**
+ * <small> uses the base step for legal text, captions, etc.
+ */
+small {
+  font-size: var(--step-0);
+}
+
+/**
+ * <ins> creates a highlight style - useful for marking additions
+ * or drawing attention to text.
+ */
+ins {
+  text-decoration: none;
+  background: var(--color-support);
+  color: var(--color-on-action);
+  padding-inline: 0.3em;
+}
+
+/**
+ * Code-like elements get monospace font and consistent padding.
+ * box-decoration-break: clone ensures background/padding carry over
+ * nicely when the element breaks across multiple lines.
+ */
+:is(code, kbd, samp) {
+  font-family: var(--font-mono);
+  padding: 0.2em 0.2em 0.05em 0.2em;
+  hyphens: none;
+  tab-size: 2;
+  text-align: left;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  box-decoration-break: clone;
+}
+
+/**
+ * Fallback for browsers that don't support font-size-adjust.
+ * Monospace fonts (especially system ones) tend to render either
+ * too large or too small - 0.8em is a sensible middle ground.
+ */
+@supports not (font-size-adjust: from-font) {
+  :is(code, kbd, samp) {
+    font-size: 0.8em;
+  }
+}
+
+/**
+ * Code blocks (<pre> with <code>) become horizontally scrollable
+ * instead of wrapping, which preserves formatting.
+ */
+pre:has(code) {
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/**
+ * Reset inline code styles when inside a <pre> block.
+ */
+pre code {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/**
+ * <kbd> (keyboard input) gets a subtle border to look like a key.
+ */
+kbd {
+  border: 1px solid;
+  padding-block-end: 0.1em;
+}
+
+/**
+ * <var> (variable) - remove italic default, use medium weight instead.
+ */
+var {
+  font-style: normal;
+  font-weight: var(--weight-medium);
+}
+
+/**
+ * <q> (inline quote) - italic provides visual distinction.
+ */
+q {
+  font-style: italic;
+}
+
+/* ==========================================================================
+   LISTS
+   ========================================================================== */
+
+/**
+ * Lists without classes are "content" lists and get nice default styling.
+ * The 1.7ch padding keeps disc markers aligned with the text's left edge
+ * rather than outdented.
+ */
+ul:not([class]) {
+  padding-inline-start: 1.7ch;
+  list-style-type: disc;
+}
+
+ul:not([class]) > li {
+  padding-inline-start: var(--space-xs);
+}
+
+/**
+ * Vertical spacing for list items within standard lists.
+ */
+:is(ol, ul):not([class]) li + * {
+  margin-block-start: var(--flow-space, var(--space-xs));
+}
+
+/**
+ * Marker sizing uses relative units so they scale with text.
+ * lh (line-height) units work well for disc markers;
+ * em units work well for numbers.
+ */
+ul ::marker {
+  font-size: 0.8lh;
+}
+
+ol ::marker {
+  font-size: 1em;
+  font-weight: var(--weight-bold);
+}
+
+/**
+ * Lists with explicit roles and classes are presumed to be styled
+ * separately (navigation, tabs, etc.), so remove default spacing.
+ */
+[role="list"][class],
+[role="tablist"][class] {
+  margin-block: 0;
+  padding: 0;
+}
+
+/**
+ * Definition lists: <dt> terms are emphasized, <dd> descriptions
+ * are indented. Spacing handles the rhythm between terms and definitions.
+ */
+dt {
+  font-weight: var(--weight-medium);
+}
+
+dt + dd {
+  margin-block-start: var(--space-xs);
+}
+
+dd + dt {
+  margin-block-start: var(--space-s);
+}
+
+/**
+ * The 1.5ch indent is relative to character width,
+ * creating a natural visual hierarchy.
+ */
+dd {
+  margin-inline-start: 1.5ch;
+}
+
+/* ==========================================================================
+   BLOCKQUOTES
+   ========================================================================== */
+
+/**
+ * Remove default inline margin, apply a distinct color.
+ */
+blockquote {
+  margin-inline: 0;
+  color: var(--color-text-muted);
+}
+
+/**
+ * Footer in a blockquote typically contains attribution.
+ * Smaller text and different color separates it from the quote.
+ */
+blockquote footer {
+  margin-block-start: var(--space-s);
+  color: var(--color-link);
+  font-size: var(--step-0);
+}
+
+/**
+ * Remove italic from <q> inside blockquotes since the
+ * blockquote itself provides context.
+ */
+blockquote q {
+  font-style: normal;
+}
+
+/* ==========================================================================
+   MEDIA
+   ========================================================================== */
+
+/**
+ * Video embeds (native and from YouTube/Vimeo) get sensible defaults:
+ * full width, 16:9 aspect ratio, auto height.
+ */
+:is(video, iframe[src*="youtube"], iframe[src*="vimeo"]) {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+/**
+ * Responsive images: max-width prevents blowout on small screens,
+ * display: block removes the annoying bottom space from inline display.
+ */
+img,
+picture {
+  height: auto;
+  max-width: 100%;
+  display: block;
+}
+
+picture {
+  width: max-content;
+}
+
+/**
+ * Figcaption gets a touch of padding and monospace for a technical feel.
+ */
+figcaption {
+  padding-block-start: 0.5em;
+  font-size: var(--step-0);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   TABLES
+   ========================================================================== */
+
+/**
+ * Tables get consistent borders using the --stroke variable.
+ * border-collapse merges adjacent borders for a cleaner look.
+ */
+table {
+  border: var(--stroke);
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-fine);
+  background: rgb(0 0 0 / 2%);
+}
+
+thead th {
+  padding-block: var(--space-s);
+}
+
+td,
+th {
+  padding: var(--space-xs) var(--space-s);
+}
+
+/**
+ * Border logic: when there are multiple <th> elements, add bottom border.
+ * When there's only one <th> (row header), add right border instead.
+ */
+th:not(:only-of-type) {
+  border-block-end: var(--stroke);
+}
+
+th:only-of-type {
+  border-inline-end: var(--stroke);
+}
+
+/**
+ * Sibling cells get a left border to create the grid effect.
+ */
+:is(th, td) ~ :is(th, td) {
+  border-inline-start: var(--stroke);
+}
+
+/**
+ * Rows after the first get a top border.
+ */
+tr + tr :is(th, td) {
+  border-block-start: var(--stroke);
+}
+
+/**
+ * Caption at the bottom with some breathing room.
+ */
+caption {
+  caption-side: bottom;
+  margin-block-start: var(--space-s);
+}
+
+/* ==========================================================================
+   LINKS & INTERACTIVE
+   ========================================================================== */
+
+/**
+ * Links without classes (content links) get subtle underline treatment.
+ * Targeting only classless links means component styles like .button
+ * won't be affected.
+ */
+a:not([class]):hover {
+  text-underline-offset: 0.2lh;
+}
+
+/**
+ * Links in headings need thinner underlines - browsers default to
+ * unnecessarily thick ones for large text.
+ */
+:is(h1, h2, h3, h4) a:not([class]) {
+  text-decoration-thickness: 0.1ex;
+  text-underline-offset: 0.2ex;
+}
+
+:is(h1, h2, h3, h4) a:not([class]):hover {
+  text-underline-offset: 0.3ex;
+}
+
+/**
+ * Focus styles: :focus-visible shows outlines only for keyboard navigation,
+ * not for mouse/touch interactions. This is the modern best practice.
+ */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-color, currentColor);
+  outline-offset: var(--focus-offset, 0.2lh);
+}
+
+/**
+ * Firefox doesn't outline inline elements fully unless they're inline-block,
+ * which causes layout issues. This vendor-prefix detection reduces the
+ * focus offset to compensate.
+ */
+@supports (-moz-appearance: none) {
+  :root {
+    --focus-offset: 0.08em;
+  }
+}
+
+/**
+ * When navigating to an anchor (#section), add scroll margin so the
+ * target doesn't slam against the top of the viewport.
+ * Using 5ex provides a modest cushion (approx 2-3 lines) without being huge.
+ */
+:target {
+  scroll-margin-block: 5ex;
+}
+
+/**
+ * Text selection with high contrast for users who select text
+ * to improve readability (common for those with astigmatism).
+ */
+::selection {
+  color: var(--color-on-action);
+  background: var(--color-action);
+}
+
+/* ==========================================================================
+   MISCELLANEOUS ELEMENTS
+   ========================================================================== */
+
+/**
+ * Horizontal rules: remove all borders, add just the top one.
+ * Uses --flow-space if in a .flow context, otherwise falls back to --space-xl.
+ */
+hr {
+  border: none;
+  border-block-start: var(--hr-stroke, var(--stroke));
+  margin-block: var(--flow-space, var(--space-xl));
+}
+
+/**
+ * SVGs without classes get a sensible default size: auto width,
+ * height based on line-height so they sit nicely with text.
+ */
+svg:not([class]) {
+  width: auto;
+  height: 1lh;
+}
+
+/**
+ * Prevent SVGs from shrinking in flex containers.
+ */
+svg {
+  flex-shrink: 0;
+}
+
+/**
+ * SVGs with role="img" and explicit dimensions are treated as images.
+ * Light background ensures dark SVGs don't vanish on dark backgrounds.
+ * revert allows the width/height attributes to take control.
+ */
+svg[role="img"][width][height] {
+  width: revert;
+  height: revert;
+  background: var(--color-surface);
+  padding: var(--space-xs);
+}
+
+/* ==========================================================================
+   FORMS
+   ========================================================================== */
+
+/**
+ * Form spacing using the "lobotomized owl" selector.
+ * Uses --flow-space for consistency with .flow composition.
+ * This prevents forms from needing class="flow" on every element.
+ */
+form > * + * {
+  margin-top: var(--flow-space, 1rem);
+}
+
+/**
+ * accent-color customizes checkboxes, radio buttons, and range inputs
+ * to match your brand instead of the browser's default blue.
+ */
+:is(input, select, textarea) {
+  accent-color: var(--color-action);
+}
+
+/**
+ * Text inputs, selects, and textareas get consistent styling.
+ * em units for padding let it scale with text size.
+ * width: 100% lets the container determine the size.
+ */
+:is(
+  input:not([type="checkbox"], [type="radio"], [type="color"]),
+  select,
+  textarea
+) {
+  padding: 0.5em 0.8em;
+  border-radius: var(--radius-s);
+  border: var(--stroke-solid);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  width: 100%;
+
+  &::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+  }
+}
+
+/**
+ * Labels get medium weight and tighter line-height.
+ * The ::after trick creates a line break, allowing the label
+ * to remain inline while visually separating from the input.
+ */
+label {
+  line-height: var(--leading-fine);
+  font-weight: var(--weight-medium);
+}
+
+label::after {
+  content: "\A";
+  white-space: pre;
+}
+
+/**
+ * Labels wrapping checkboxes/radios get flex layout.
+ * baseline alignment keeps the control aligned with the first line
+ * of text (better than center if text wraps).
+ */
+label:has(input) {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  font-weight: var(--weight-regular);
+}
+
+/**
+ * Tighter spacing between consecutive checkbox/radio labels.
+ */
+label:has(input) + label:has(input) {
+  --flow-space: var(--space-s-m);
+}
+
+/**
+ * Optical adjustment: baseline-aligned controls look slightly off,
+ * so nudge them up a tiny bit.
+ */
+label:has(input) input {
+  transform: translateY(-0.1ex);
+}
+
+/**
+ * Disabled inputs get a muted background and not-allowed cursor.
+ * The cursor also applies to text following the disabled input.
+ */
+input:disabled {
+  background: var(--color-stone);
+}
+
+input:disabled,
+label input:disabled + * {
+  cursor: not-allowed;
+}
+
+/**
+ * Fieldset and legend get consistent border and padding.
+ */
+fieldset {
+  border: var(--stroke);
+  padding: var(--space-s);
+}
+
+legend {
+  font-weight: var(--weight-medium);
+  padding-inline: var(--space-xs);
+}
+
+/* ==========================================================================
+   DETAILS & SUMMARY
+   ========================================================================== */
+
+/**
+ * Summary gets bold weight and pointer cursor.
+ * Pointer cursor signals that the element is interactive.
+ */
+summary {
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+/**
+ * When details is open, add space between summary and content.
+ */
+details[open] summary {
+  margin-block-end: var(--space-s);
+}

@@ -1,0 +1,43 @@
+<!-- @swatchkit generated-token-doc -->
+<div class="font-stack">
+  <div style="font-family: var(--font-base); margin-bottom: 2rem;">
+    <strong>font-base</strong> <code class="token-value" data-var="--font-base">var(--font-base)</code>
+    <p>The quick brown fox jumps over the lazy dog.</p>
+  </div>
+  <div style="font-family: var(--font-reading); margin-bottom: 2rem;">
+    <strong>font-reading</strong> <code class="token-value" data-var="--font-reading">var(--font-reading)</code>
+    <p>The quick brown fox jumps over the lazy dog.</p>
+  </div>
+  <div style="font-family: var(--font-mono); margin-bottom: 2rem;">
+    <strong>font-mono</strong> <code class="token-value" data-var="--font-mono">var(--font-mono)</code>
+    <p>The quick brown fox jumps over the lazy dog.</p>
+  </div>
+</div>
+<script>
+(function() {
+  var elements = document.querySelectorAll('.token-value');
+  if (!elements.length) return;
+  elements.forEach(function(el) {
+    var prop = el.getAttribute('data-var');
+    var computed = getComputedStyle(el).getPropertyValue(prop).trim();
+    if (computed) {
+      el.innerHTML += ' <span style="opacity:0.5;font-family:monospace;font-size:0.8em">(' + computed + ')</span>';
+    } else {
+      var temp = document.createElement('div');
+      temp.style.fontSize = '16px';
+      temp.style.lineHeight = 'var(' + prop + ')';
+      document.body.appendChild(temp);
+      var computedPx = getComputedStyle(temp).lineHeight;
+      document.body.removeChild(temp);
+      var displayValue = computedPx;
+      if (computedPx.endsWith('px')) {
+        var ratio = Math.round((parseFloat(computedPx) / 16) * 100) / 100;
+        displayValue = String(ratio);
+      }
+      if (displayValue) {
+        el.innerHTML += ' <span style="opacity:0.5;font-family:monospace;font-size:0.8em">(' + displayValue + ')</span>';
+      }
+    }
+  });
+})();
+</script>

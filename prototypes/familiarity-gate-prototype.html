@@ -1,0 +1,175 @@
+<!doctype html>
+<!-- PROTOTYPE ONLY: Three familiarity-gate hierarchies, switchable with ?variant=. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordWell familiarity gate prototype</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Literata:opsz,wght@7..72,200..900&display=swap");
+
+      :root {
+        --ink: oklch(25% 0.035 205);
+        --paper: oklch(98% 0.012 165);
+        --stone: oklch(91% 0.015 200);
+        --water: oklch(45% 0.075 205);
+        --moss: oklch(45% 0.075 145);
+        --wood: oklch(45% 0.075 45);
+        --wood-light: oklch(62% 0.09 45);
+        --line: color-mix(in oklab, var(--water), transparent 55%);
+        --sans: "Instrument Sans", sans-serif;
+        --serif: Literata, Georgia, serif;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--stone); color: var(--ink); font-family: var(--sans); }
+      button { font: inherit; }
+      .app { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-block-size: 100dvh; }
+      .rail { background: var(--water); color: var(--paper); padding: 2rem; }
+      .rail h2 { font-family: var(--serif); font-size: 2rem; font-weight: 520; letter-spacing: -.04em; margin: 0 0 4rem; }
+      .rail nav { display: grid; gap: .45rem; }
+      .rail a { color: inherit; padding: .7rem .8rem; text-decoration: none; }
+      .rail a:first-child { border-inline-start: .3rem solid var(--wood-light); background: color-mix(in oklab, var(--water) 65%, var(--paper)); }
+      main { min-inline-size: 0; }
+      .eyebrow { color: var(--moss); font-size: .8rem; font-weight: 700; letter-spacing: .13em; margin: 0; text-transform: uppercase; }
+      .word { font-family: var(--serif); font-size: clamp(6rem, 15vw, 11.65rem); font-variation-settings: "opsz" 72, "wght" 440; font-weight: 440; letter-spacing: -.08em; line-height: .76; margin: 0; }
+      .question { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 460; letter-spacing: -.045em; line-height: 1; margin: 0; }
+      .support { font-size: clamp(1.1rem, 2vw, 1.5rem); line-height: 1.4; margin: 0; max-inline-size: 45rem; }
+      .ladder { border-block: 1px solid var(--line); display: grid; margin: 0; max-inline-size: 52rem; padding: 0; }
+      .ladder button { appearance: none; background: transparent; border: 0; border-block-end: 1px solid var(--line); color: inherit; cursor: pointer; font-family: var(--serif); font-size: clamp(1.45rem, 3vw, 2.3rem); padding: 1.1rem 1.5rem; text-align: start; transition: background .15s ease; }
+      .ladder button:last-child { border-block-end: 0; }
+      .ladder button:hover, .ladder button:focus-visible { background: color-mix(in oklab, var(--wood-light) 20%, transparent); outline: none; box-shadow: inset .35rem 0 var(--wood-light); }
+      .variant { display: none; }
+      body[data-variant="masthead"] .masthead, body[data-variant="margin"] .margin, body[data-variant="threshold"] .threshold, body[data-variant="hybrid"] .hybrid { display: block; }
+
+      /* A: the word is an editorial masthead; the rule explicitly begins a new task. */
+      .masthead { padding: clamp(3rem, 8vw, 7rem); }
+      .masthead .word { margin-block: clamp(3rem, 10vw, 8rem) clamp(4rem, 12vw, 9rem); }
+      .masthead .gate { border-block-start: 2px solid var(--water); display: grid; gap: clamp(1.5rem, 4vw, 3rem); max-inline-size: 58rem; padding-block-start: clamp(2rem, 5vw, 4rem); }
+      .masthead .gate .eyebrow { color: var(--water); }
+
+      /* B: the word is a dictionary margin, not part of the question's heading stack. */
+      .margin { display: grid; grid-template-columns: minmax(17rem, .8fr) minmax(22rem, 1.2fr); min-block-size: 100dvh; }
+      .margin .word-panel { align-content: center; background: var(--paper); border-inline-end: 1px solid var(--line); display: grid; padding: clamp(2rem, 5vw, 5rem); }
+      .margin .word-panel .eyebrow { margin-block-end: 2rem; }
+      .margin .word-panel .word { color: var(--water); font-size: clamp(5rem, 11vw, 10rem); }
+      .margin .gate { align-content: center; display: grid; gap: clamp(1.5rem, 3vw, 2.75rem); padding: clamp(3rem, 7vw, 7rem); }
+
+      /* C: the word is a threshold to cross; the task lives on a separate quiet surface. */
+      .threshold { display: grid; grid-template-rows: minmax(16rem, 38dvh) 1fr; min-block-size: 100dvh; }
+      .threshold .word-panel { align-content: end; background: var(--water); color: var(--paper); display: grid; padding: clamp(2rem, 7vw, 7rem); }
+      .threshold .word-panel .eyebrow { color: color-mix(in oklab, var(--paper) 72%, var(--moss)); margin-block-end: 2rem; }
+      .threshold .word-panel .word { color: inherit; }
+      .threshold .gate { display: grid; gap: clamp(1.5rem, 4vw, 3rem); padding: clamp(3rem, 7vw, 7rem); }
+      .threshold .gate .question { max-inline-size: 48rem; }
+
+      /* D: the masthead sequence, with a colored threshold between word and task. */
+      .hybrid { padding: clamp(3rem, 8vw, 7rem); }
+      .hybrid .word-panel { background: var(--water); color: var(--paper); margin-block: clamp(3rem, 8vw, 7rem) clamp(4rem, 10vw, 8rem); padding: clamp(2rem, 6vw, 5rem); }
+      .hybrid .word-panel .eyebrow { color: color-mix(in oklab, var(--paper) 72%, var(--moss)); margin-block-end: 2rem; }
+      .hybrid .word-panel .word { color: inherit; }
+      .hybrid .gate { border-block-start: 2px solid var(--water); display: grid; gap: clamp(1.5rem, 4vw, 3rem); max-inline-size: 58rem; padding-block-start: clamp(2rem, 5vw, 4rem); }
+      .hybrid .gate .eyebrow { color: var(--water); }
+
+      .switcher { align-items: center; background: oklch(18% 0.02 205); border-radius: 99rem; box-shadow: 0 1rem 2rem oklch(0% 0 0 / 25%); color: white; display: flex; gap: .75rem; inset-block-end: 1rem; inset-inline-start: 50%; padding: .45rem; position: fixed; transform: translateX(-50%); z-index: 2; }
+      .switcher button { background: var(--paper); border: 0; border-radius: 50%; color: var(--ink); cursor: pointer; font-size: 1.2rem; block-size: 2.2rem; inline-size: 2.2rem; }
+      .switcher output { min-inline-size: 12rem; font-size: .8rem; text-align: center; }
+
+      @media (max-width: 50rem) {
+        .app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+        .rail { display: none; }
+        .margin { grid-template-columns: 1fr; }
+        .margin .word-panel { border-block-end: 1px solid var(--line); border-inline-end: 0; min-block-size: 34dvh; }
+        .margin .gate { min-block-size: 66dvh; }
+      }
+    </style>
+  </head>
+  <body data-variant="masthead">
+    <div class="app">
+      <aside class="rail">
+        <h2>WordWell</h2>
+        <nav aria-label="Primary navigation"><a href="#">Today</a><a href="#">Practice</a><a href="#">History</a><a href="#">Profile</a></nav>
+      </aside>
+      <main>
+        <section class="variant masthead">
+          <p class="eyebrow">Today's word</p>
+          <p class="word">candid</p>
+          <div class="gate">
+            <p class="eyebrow">Before we begin</p>
+            <h1 class="question">How familiar is this word?</h1>
+            <p class="support">Your answer sets the starting point for practice. It is not a test.</p>
+            <div class="ladder"><button>Completely new to me</button><button>I think I've heard of it</button><button>Familiar, but I don't use it</button><button>I use it all the time</button></div>
+          </div>
+        </section>
+
+        <section class="variant margin">
+          <div class="word-panel"><p class="eyebrow">Today's word</p><p class="word">candid</p></div>
+          <div class="gate">
+            <p class="eyebrow">Before we begin</p>
+            <h1 class="question">How familiar is this word?</h1>
+            <p class="support">Your answer sets the starting point for practice. It is not a test.</p>
+            <div class="ladder"><button>Completely new to me</button><button>I think I've heard of it</button><button>Familiar, but I don't use it</button><button>I use it all the time</button></div>
+          </div>
+        </section>
+
+        <section class="variant threshold">
+          <div class="word-panel"><p class="eyebrow">Today's word</p><p class="word">candid</p></div>
+          <div class="gate">
+            <p class="eyebrow">Before we begin</p>
+            <h1 class="question">How familiar is this word?</h1>
+            <p class="support">Your answer sets the starting point for practice. It is not a test.</p>
+            <div class="ladder"><button>Completely new to me</button><button>I think I've heard of it</button><button>Familiar, but I don't use it</button><button>I use it all the time</button></div>
+          </div>
+        </section>
+
+        <section class="variant hybrid">
+          <div class="word-panel"><p class="eyebrow">Today's word</p><p class="word">candid</p></div>
+          <div class="gate">
+            <p class="eyebrow">Before we begin</p>
+            <h1 class="question">How familiar is this word?</h1>
+            <p class="support">Your answer sets the starting point for practice. It is not a test.</p>
+            <div class="ladder"><button>Completely new to me</button><button>I think I've heard of it</button><button>Familiar, but I don't use it</button><button>I use it all the time</button></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="switcher" aria-label="Prototype variant switcher">
+      <button type="button" id="previous" aria-label="Previous variant">&larr;</button>
+      <output id="variant-label"></output>
+      <button type="button" id="next" aria-label="Next variant">&rarr;</button>
+    </div>
+    <script>
+      const variants = [
+        ["masthead", "A: Editorial break"],
+        ["margin", "B: Dictionary margin"],
+        ["threshold", "C: Word as threshold"],
+        ["hybrid", "D: Editorial threshold"],
+      ];
+      const params = new URLSearchParams(location.search);
+      let index = Math.max(0, variants.findIndex(([key]) => key === params.get("variant")));
+
+      function render() {
+        const [key, label] = variants[index];
+        document.body.dataset.variant = key;
+        document.querySelector("#variant-label").textContent = label;
+        const url = new URL(location.href);
+        url.searchParams.set("variant", key);
+        history.replaceState(null, "", url);
+      }
+
+      function switchVariant(step) {
+        index = (index + step + variants.length) % variants.length;
+        render();
+      }
+
+      document.querySelector("#previous").addEventListener("click", () => switchVariant(-1));
+      document.querySelector("#next").addEventListener("click", () => switchVariant(1));
+      document.addEventListener("keydown", (event) => {
+        if (event.target.matches("button, input, textarea, [contenteditable]")) return;
+        if (event.key === "ArrowLeft") switchVariant(-1);
+        if (event.key === "ArrowRight") switchVariant(1);
+      });
+      render();
+    </script>
+  </body>
+</html>

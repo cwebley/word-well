@@ -1,0 +1,10 @@
+/* 
+  FLOW
+  Adds vertical rhythm between direct siblings.
+  
+  Credit: Adapted from Every Layout (The Stack)
+  Docs:   https://every-layout.dev/layouts/stack/
+*/
+.flow > * + * {
+  margin-block-start: var(--flow-space, 1em);
+}

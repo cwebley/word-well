@@ -1,0 +1,58 @@
+/**
+ * SwatchKit Variables
+ *
+ * Utility custom properties that extend your design tokens.
+ * These provide consistent values for layouts, interactions, and UI details.
+ * This file is yours to edit — add your own variables here freely.
+ *
+ * Variable references use the default token names from global/tokens.css.
+ * If you have renamed any tokens, update the var() references below to match.
+ *
+ * Based on Andy Bell's Complete CSS course methodology.
+ */
+
+:root {
+  /**
+   * Gutter: Used by all layout compositions for consistent spacing.
+   * Assigns a fluid spacing token so gutters scale with viewport.
+   */
+  --gutter: var(--space-m-l);
+
+  /**
+   * Measure: Maximum line length for optimal readability.
+   * 65 characters is widely considered ideal for body text.
+   */
+  --measure: 65ch;
+
+  /**
+   * Transitions: Specific timing for different interaction types.
+   * Movement should be snappy and linear; fades need time to be visible;
+   * bounce adds playful emphasis for special interactions.
+   */
+  --transition-base: 250ms ease;
+  --transition-movement: 200ms linear;
+  --transition-fade: 300ms ease;
+  --transition-bounce: cubic-bezier(0.5, 0.05, 0.2, 1.5);
+
+  /**
+   * Strokes: Consistent border values throughout the UI.
+   * Having both dashed and solid variants covers most use cases.
+   */
+  --stroke-width: 1px;
+  --stroke: var(--stroke-width) dashed var(--color-border);
+  --stroke-solid: var(--stroke-width) solid var(--color-border);
+
+  /**
+   * Border Radius: Using rem (not em) prevents radius from varying
+   * based on element font-size, keeping corners consistent site-wide.
+   */
+  --radius-s: 0.2rem;
+  --radius-m: 0.5rem;
+  --radius-l: 1.25rem;
+
+  /**
+   * Uppercase Kerning: Uppercase text looks squished without extra
+   * letter-spacing. This variable fixes that consistently site-wide.
+   */
+  --uppercase-kerning: 0.04ch;
+}

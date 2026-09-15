@@ -1,0 +1,91 @@
+<!-- @swatchkit generated-token-doc -->
+<div class="flow">
+  <div style="line-height: var(--leading-micro)">
+    <div class="meta">
+      <code>var(--leading-micro)</code>
+      <code>.line-height:leading-micro</code>
+      <span class="token-value" data-var="--leading-micro"></span>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+
+  <div style="line-height: var(--leading-flat)">
+    <div class="meta">
+      <code>var(--leading-flat)</code>
+      <code>.line-height:leading-flat</code>
+      <span class="token-value" data-var="--leading-flat"></span>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+
+  <div style="line-height: var(--leading-fine)">
+    <div class="meta">
+      <code>var(--leading-fine)</code>
+      <code>.line-height:leading-fine</code>
+      <span class="token-value" data-var="--leading-fine"></span>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+
+  <div style="line-height: var(--leading-standard)">
+    <div class="meta">
+      <code>var(--leading-standard)</code>
+      <code>.line-height:leading-standard</code>
+      <span class="token-value" data-var="--leading-standard"></span>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+
+  <div style="line-height: var(--leading-loose)">
+    <div class="meta">
+      <code>var(--leading-loose)</code>
+      <code>.line-height:leading-loose</code>
+      <span class="token-value" data-var="--leading-loose"></span>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </div>
+</div>
+
+<style>
+  .meta {
+    font-family: monospace;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    background: #eee;
+    padding: 0.25rem 0.5rem;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  .token-value {
+    color: #666;
+    margin-left: 0.5rem;
+  }
+</style>
+<script>
+(function() {
+  var elements = document.querySelectorAll('.token-value');
+  if (!elements.length) return;
+  elements.forEach(function(el) {
+    var prop = el.getAttribute('data-var');
+    var computed = getComputedStyle(el).getPropertyValue(prop).trim();
+    if (computed) {
+      el.innerHTML += ' <span style="opacity:0.5;font-family:monospace;font-size:0.8em">(' + computed + ')</span>';
+    } else {
+      var temp = document.createElement('div');
+      temp.style.fontSize = '16px';
+      temp.style.lineHeight = 'var(' + prop + ')';
+      document.body.appendChild(temp);
+      var computedPx = getComputedStyle(temp).lineHeight;
+      document.body.removeChild(temp);
+      var displayValue = computedPx;
+      if (computedPx.endsWith('px')) {
+        var ratio = Math.round((parseFloat(computedPx) / 16) * 100) / 100;
+        displayValue = String(ratio);
+      }
+      if (displayValue) {
+        el.innerHTML += ' <span style="opacity:0.5;font-family:monospace;font-size:0.8em">(' + displayValue + ')</span>';
+      }
+    }
+  });
+})();
+</script>

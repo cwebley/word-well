@@ -1,0 +1,44 @@
+/* 
+  SIDEBAR
+  Layout with a flexible main content area and a fixed-width sidebar.
+  
+  Credit: Adapted from Every Layout (The Sidebar)
+  Docs:   https://every-layout.dev/layouts/sidebar/
+
+  CUSTOM PROPERTIES:
+  --gutter: Space between sidebar and content (default: --space-s-l)
+  --sidebar-target-width: Target width of sidebar (default: 20rem)
+  --sidebar-content-min-width: Min width of content before stacking (default: 50%)
+*/
+
+.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter, var(--space-s-l));
+}
+
+.sidebar:not([data-direction]) > :first-child {
+  flex-basis: var(--sidebar-target-width, 20rem);
+  flex-grow: 1;
+}
+
+.sidebar:not([data-direction]) > :last-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-width: var(--sidebar-content-min-width, 50%);
+}
+
+.sidebar[data-reversed] {
+  flex-direction: row-reverse;
+}
+
+.sidebar[data-direction="rtl"] > :last-child {
+  flex-basis: var(--sidebar-target-width, 20rem);
+  flex-grow: 1;
+}
+
+.sidebar[data-direction="rtl"] > :first-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-width: var(--sidebar-content-min-width, 50%);
+}

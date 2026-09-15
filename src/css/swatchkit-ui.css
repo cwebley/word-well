@@ -1,0 +1,37 @@
+/* SwatchKit UI Styles */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(preview) {
+  display: none;
+}
+
+::view-transition-new(preview) {
+  animation: none;
+}
+
+:root {
+  --sidebar-target-width: 25rem;
+  --sidebar-content-min-width: 66%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+.nav-container {
+  container: nav-container / inline-size;
+  outline: var(--stroke);
+}
+.swatchkit-ui nav {
+  @container (width < 75vi) {
+    position: sticky;
+    height: 100vh;
+    top: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}

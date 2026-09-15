@@ -1,0 +1,145 @@
+.navigation-rail {
+  position: relative;
+  display: flex;
+  /* height: fit-content; */
+  flex-direction: column;
+  /* padding-block: var(--space-l); */
+  background: var(--color-water);
+  color: var(--color-on-water);
+}
+
+.navigation-wordmark {
+  display: block;
+  line-height: 2;
+  color: inherit;
+  font-family: var(--font-reading);
+  font-size: var(--step-4);
+  text-fit: grow;
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  margin-inline: var(--space-l);
+}
+
+.navigation {
+  display: grid;
+  gap: var(--space-xs);
+  margin-block: var(--space-2xl) auto;
+}
+
+.navigation-link {
+  position: relative;
+  border-radius: 0;
+  color: inherit;
+  padding: var(--space-xs) var(--space-s);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.navigation-link:not([aria-current="page"]):hover {
+  background: color-mix(in oklab, var(--color-water-soft) 25%, transparent);
+}
+
+.navigation-link[aria-current="page"] {
+  background: color-mix(in oklab, var(--color-water-soft) 45%, transparent);
+}
+
+.navigation-link[aria-current="page"]:hover {
+  background: color-mix(in oklab, var(--color-water-soft) 70%, transparent);
+}
+
+.navigation-link[aria-current="page"]::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 0.5rem;
+  background: var(--color-wood-light);
+  view-transition-name: navigation-active-edge;
+  content: "";
+}
+
+.learning-sync-status:empty {
+  display: none;
+}
+
+.learning-sync-status:not(:empty) {
+  margin: var(--space-s);
+}
+
+.sync-status {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+  border-inline-start: 0.3rem solid var(--color-wood-light);
+  border-top-right-radius: var(--radius-m);
+  border-bottom-right-radius: var(--radius-m);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: var(--step--1);
+}
+
+.sync-status p {
+  margin: 0;
+}
+
+.sync-status .button {
+  justify-self: start;
+}
+
+.button.busy,
+.button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+@container app-shell (width < 50rem) {
+  .navigation-wordmark {
+    display: none;
+  }
+
+  .navigation {
+    display: flex;
+    gap: 0;
+    margin-block: 0;
+  }
+  .navigation-link {
+    flex: 1;
+    padding: var(--space-m) var(--space-l);
+    text-align: center;
+  }
+  .navigation-link[aria-current="page"]::before {
+    height: 0.3rem;
+    width: unset;
+    inset-block-start: unset;
+    inset-block-end: 0;
+    inset-inline: 0;
+  }
+
+  .learning-sync-status:not(:empty) {
+    position: absolute;
+    z-index: 1;
+    inset-inline-start: var(--space-s);
+    inset-block-end: 100%;
+    margin: 0;
+  }
+
+  .sync-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-xs) var(--space-s);
+    box-shadow: 0 -0.4rem 1rem
+      color-mix(in oklab, var(--color-text), transparent 85%);
+  }
+
+  .sync-status-detail {
+    display: none;
+  }
+}
+
+::view-transition-group(navigation-active-edge) {
+  animation-duration: 220ms;
+  animation-timing-function: var(--transition-bounce);
+}

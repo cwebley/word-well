@@ -1,0 +1,38 @@
+/*
+  SwatchKit Preview Styles
+
+  Applied only to swatch preview pages (the iframe content and full-screen view).
+  Not loaded by the main SwatchKit UI.
+
+  The grid background makes it immediately obvious what is — and isn't — part
+  of the swatch, rather than blending into a plain white page.
+*/
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(preview) {
+  display: none;
+}
+
+::view-transition-new(preview) {
+  animation: none;
+}
+
+body {
+  min-height: 100vh;
+  view-transition-name: preview;
+  background-image:
+    repeating-linear-gradient(
+      to left,
+      #0000 0 31px,
+      oklch(72% 0.15 220 / 0.05) 31px 32px
+    ),
+    repeating-linear-gradient(
+      to top,
+      #0000 0 31px,
+      oklch(72% 0.15 220 / 0.05) 31px 32px
+    ),
+    linear-gradient(white, white);
+}

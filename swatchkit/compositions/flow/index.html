@@ -1,0 +1,14 @@
+<div class="flow demo-flow">
+  <p>First child — no margin above.</p>
+  <p>Second child — flow space above.</p>
+  <p>Third child — flow space above.</p>
+  <p style="--flow-space: var(--space-xl)">This child has extra space above via <code>--flow-space: var(--space-xl)</code>.</p>
+</div>
+
+<style>
+  .demo-flow {
+    background: var(--color-surface-raised);
+    padding: var(--space-m);
+    outline: 1px dashed var(--color-border);
+  }
+</style>
