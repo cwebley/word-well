@@ -111,8 +111,12 @@ live tutor in the learner's daily experience.
   the incorrect practice sentence is clearly wrong for the intended reason.
 - Deterministic gates enforce required fields, schema validity, length bounds,
   prohibited claims, source presence where required, and duplicate protection.
-- Qualifying records publish automatically. Failed or low-confidence records are
-  quarantined with evaluator feedback for regeneration or inspection.
+- Usefulness and appropriateness decide candidate eligibility before lesson
+  planning. Appropriateness judges the headword as a whole and accepts or
+  rejects it, without per-meaning judgments or quarantine.
+- Qualifying lesson drafts publish automatically. Failed or low-confidence
+  lesson drafts are quarantined with evaluator feedback for regeneration or
+  inspection.
 - Learner feedback feeds a later aggregate regeneration/review workflow.
 - Build and validate an evaluation set before trusting generated content at
   scale.

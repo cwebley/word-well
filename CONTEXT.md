@@ -114,11 +114,12 @@ in the app while a wrong exclude is silent and permanent.
 _Avoid_: Usefulness score, interest filter, teaching value
 
 **Appropriateness gate**:
-The judgment pass deciding whether a candidate is fit to serve, run only on
-candidates the Usefulness gate advanced. It folds toward rejecting: any
-disqualifying meaning rejects the whole candidate. The two gates ask different
-questions and fold in opposite directions on purpose, so they share no rubric,
-policy, or labels.
+The headword-level judgment deciding whether a candidate advanced by the
+Usefulness gate is fit to serve, with acceptance or rejection of the whole
+candidate rather than separate judgments of its meanings or quarantine.
+It rejects offensive or derogatory usage, sexually explicit usage, profanity,
+and vulgar bodily usage, including plausible connotations in those categories;
+neutral medical or anatomical subject matter alone does not disqualify a word.
 _Avoid_: Safety gate, content filter, moderation
 
 **Config fingerprint**:
