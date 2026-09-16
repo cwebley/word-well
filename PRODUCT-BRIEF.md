@@ -83,9 +83,10 @@ strong feedback can nominate an item for content regeneration/review.
   register, and usefulness signals. Word-of-the-day and test-preparation lists
   are first-class nomination sources. A nomination is a reason to consider a
   word, never a reason to publish it, and no list is the product boundary.
-- Reject archaic and impractical vocabulary outright. Judge a word on its most
-  useful meaning rather than on its headword, so a rare word with a live
-  figurative meaning stays eligible.
+- Reject archaic and impractical vocabulary outright. Judge the headword as a
+  whole, from the meanings an educated adult would ordinarily encounter, rather
+  than rescuing a mundane word with a niche, archaic, regional, or technical
+  sense. Selecting which meanings a lesson publishes comes later.
 - Treat performative vocabulary as band-relative rather than a blanket reject.
   `Build foundations` excludes it, `Stretch my vocabulary` admits little of it,
   and `Challenge me` admits Latinate and literary words the other bands would

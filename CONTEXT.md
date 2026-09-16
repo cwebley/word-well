@@ -105,6 +105,22 @@ that does not hold, and because no rule separates a derivation that teaches
 something new from one that does not.
 _Avoid_: Cleanup, moderation, review
 
+**Usefulness gate**:
+The judgment pass deciding whether a headword rewards deliberate study, from the
+headword and its recorded parts of speech alone. It reports familiarity, scope,
+and learning value; deterministic policy, never the model, turns those into
+advance or exclude. It folds toward admitting, because a wrong admit is visible
+in the app while a wrong exclude is silent and permanent.
+_Avoid_: Usefulness score, interest filter, teaching value
+
+**Appropriateness gate**:
+The judgment pass deciding whether a candidate is fit to serve, run only on
+candidates the Usefulness gate advanced. It folds toward rejecting: any
+disqualifying meaning rejects the whole candidate. The two gates ask different
+questions and fold in opposite directions on purpose, so they share no rubric,
+policy, or labels.
+_Avoid_: Safety gate, content filter, moderation
+
 **Config fingerprint**:
 The identifier for one reproducible pipeline configuration, derived from the
 pinned source releases, the extraction version, and the model, prompt,
@@ -207,9 +223,11 @@ _Avoid_: Level, skill score, ability
 A published word lesson eligible for delivery because it may be unfamiliar yet
 useful to a degree-educated adult in reading, writing, conversation, or precise
 thought. Test-prep and advanced school vocabulary are valuable sources of such
-candidates, not automatic inclusions. Eligibility is judged on a word's most
-useful meaning rather than on its headword alone, so a rare word with a live
-figurative meaning can qualify.
+candidates, not automatic inclusions. Eligibility is judged on the headword as a
+whole, from the meanings an educated adult would ordinarily encounter, rather
+than on a niche, archaic, regional, or technical sense that would rescue an
+otherwise mundane word. Which meanings a published lesson carries is a later
+decision, made by the lesson planner.
 
 **Starting band**:
 The learner's initial position on the rating scale, chosen at sign-up and
