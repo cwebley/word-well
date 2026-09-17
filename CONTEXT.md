@@ -18,17 +18,18 @@ demonstrated in context.
 _Avoid_: Sense, definition (when referring to the concept rather than its learner-facing wording)
 
 **Source meaning**:
-One unit of meaning as a pinned source records it, with its own source
-identifier, definition text, and part of speech, before WordWell's scope
-review. Sources divide meaning more finely than a learner needs, so several
-source meanings may merge into one published meaning and others may be
-excluded.
+One unit of meaning as a pinned source records it, identified within that source
+version and carrying its definition text and recorded part of speech, before
+WordWell's scope review. Sources divide meaning more finely than a learner needs,
+so several source meanings may merge into one published meaning and others may
+be excluded.
 _Avoid_: Sense, source sense, synset
 
 **Published meaning**:
 A source-backed meaning included in a learner-facing WordWell lesson after
-scope review. Excluded source meanings remain pipeline evidence and are not
-shown to learners.
+scope review, whose identity survives reordering or wording changes when its
+defining source meanings and part of speech stay the same. Splitting or merging
+published meanings creates new identities with recorded predecessors.
 _Avoid_: Learner sense, accepted sense
 
 **Practice item**:
@@ -44,6 +45,12 @@ The learner-facing content of a Word lesson apart from its Practice items: the
 published meanings and everything presented with them. It is redrafted as a
 whole.
 _Avoid_: Lesson content, lesson prose
+
+**Lesson plan**:
+The source-backed selection and grouping of source meanings, with authored
+definitions and assigned evidence, that determines what the Lesson body will
+teach. It constrains the lesson writer but does not itself authorize publication.
+_Avoid_: Published lesson, editorial approval
 
 **Synonym contrast**:
 What a synonym carries more of, and less of, than the headword in one published
@@ -83,26 +90,22 @@ backs a published claim.
 _Avoid_: Candidate source, suggestion, referral
 
 **Candidate pool**:
-The deduplicated set of headwords eligible for consideration, derived from a
-pinned frequency list resolved to source lemmas, with each intake filter
-recorded as an attribute rather than applied as a deletion. It is not a
-publication queue: membership means a word may be considered, never that it
-will be delivered.
+The deduplicated set of candidate headwords derived from a pinned frequency list
+resolved to source lemmas, retaining intake outcomes and unresolved prerequisites
+rather than deleting records. Membership means a word may be considered, not
+that it is ready for model processing or learner delivery.
 _Avoid_: Word list, corpus, dictionary
 
 **Endorsement**:
-A count of how many independent editorial sources nominated a headword. It is
-evidence about a word's interest, used as a ranking prior and to override
-mechanical intake filters that only guess at word formation. It never overrides
-a factual filter such as spelling variant or register.
+A count of how many independent editorial sources nominated a headword, used as
+evidence of interest for ranking and independent evaluation. It never bypasses
+factual intake exclusions or either candidate gate.
 _Avoid_: Vote, score, popularity
 
 **Intake adjudication**:
-A judgment pass over headwords that mechanical intake filters flagged but could
-not decide, recording a verdict per word as data alongside the mechanical
-attributes. It exists because affix and compound rules invent word formation
-that does not hold, and because no rule separates a derivation that teaches
-something new from one that does not.
+Recorded judgment of candidate eligibility where deterministic source evidence
+alone does not settle it. Word-formation attributes, missing synonyms, and broad
+topic labels do not by themselves establish that a headword is unsuitable.
 _Avoid_: Cleanup, moderation, review
 
 **Usefulness gate**:
@@ -123,11 +126,9 @@ neutral medical or anatomical subject matter alone does not disqualify a word.
 _Avoid_: Safety gate, content filter, moderation
 
 **Config fingerprint**:
-The identifier for one reproducible pipeline configuration, derived from the
-pinned source releases, the extraction version, and the model, prompt,
-evaluator, rubric, and deterministic rule versions. It keys idempotent job
-runs, records what produced a record, defines when a published record is
-stale, and gates which configurations may publish.
+The identity of a pipeline stage's evidence and effective configuration, used to
+distinguish reusable results from work requiring a fresh judgment. Current intake
+and gate authorization remain separate requirements for reusing a result.
 _Avoid_: Run id, pipeline version, build hash
 
 **Evaluation set**:

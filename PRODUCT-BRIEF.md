@@ -83,6 +83,9 @@ strong feedback can nominate an item for content regeneration/review.
   register, and usefulness signals. Word-of-the-day and test-preparation lists
   are first-class nomination sources. A nomination is a reason to consider a
   word, never a reason to publish it, and no list is the product boundary.
+- Candidate frequency measures the headword itself, without adding its inflected
+  or related forms. Missing frequency remains an unresolved prerequisite rather
+  than an invented score or a usefulness rejection.
 - Reject archaic and impractical vocabulary outright. Judge the headword as a
   whole, from the meanings an educated adult would ordinarily encounter, rather
   than rescuing a mundane word with a niche, archaic, regional, or technical
@@ -106,17 +109,35 @@ live tutor in the learner's daily experience.
 - Definitions, etymology, usage-frequency/register labels, and factual claims
   must be grounded in a source. Natural examples and practical coaching may be
   generated.
+- OEWN supplies the lesson meaning inventory and source-backed synonym and
+  contrast candidates. The planner groups source meanings and writes grounded
+  definitions; the writer adds material around that plan. Wiktionary supplies
+  intake labels and supplemental evidence, including etymology and word-family
+  candidates, without adding its complete definition inventory to the planner.
+- Retain source licenses, attribution, links, and contributions to published
+  fields. The publication license for source-derived lesson text remains to be
+  decided against a concrete lesson.
 - Specialized generation and evaluation stages should cover grounding,
   factuality, naturalness, practical usefulness, duplicate examples, and whether
   the incorrect practice sentence is clearly wrong for the intended reason.
 - Deterministic gates enforce required fields, schema validity, length bounds,
   prohibited claims, source presence where required, and duplicate protection.
+- Intake filters have explicit, inspectable configuration and retain their
+  outcomes and source evidence. Compounds, derivatives, missing synonyms, and
+  broad topic labels do not automatically exclude a candidate. Endorsement does
+  not bypass factual exclusions or either candidate gate.
 - Usefulness and appropriateness decide candidate eligibility before lesson
   planning. Appropriateness judges the headword as a whole and accepts or
   rejects it, without per-meaning judgments or quarantine.
 - Qualifying lesson drafts publish automatically. Failed or low-confidence
   lesson drafts are quarantined with evaluator feedback for regeneration or
   inspection.
+- Retain stage history and reuse unchanged valid work while checking current gate
+  permission. A failed fresh attempt does not erase an earlier valid result;
+  existing published content remains available until a replacement passes.
+- Publish an explicit set of learner-facing fields. Raw inputs, model replies,
+  rejection rationales, and other private pipeline records remain inaccessible
+  to the learner API.
 - Learner feedback feeds a later aggregate regeneration/review workflow.
 - Build and validate an evaluation set before trusting generated content at
   scale.
