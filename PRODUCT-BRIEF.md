@@ -115,8 +115,12 @@ live tutor in the learner's daily experience.
   intake labels and supplemental evidence, including etymology and word-family
   candidates, without adding its complete definition inventory to the planner.
 - Retain source licenses, attribution, links, and contributions to published
-  fields. The publication license for source-derived lesson text remains to be
-  decided against a concrete lesson.
+  fields. Publish WordWell's contributions and the assembled lesson under
+  CC BY-SA 4.0, preserving upstream licenses and notices. Show Sources and license
+  information with the lesson and retain it offline. Separately sourced
+  quotations are excluded from generation inputs and publication in the first
+  milestone; dictionary examples covered by the selected source license remain
+  eligible, with their source contribution retained.
 - Specialized generation and evaluation stages should cover grounding,
   factuality, naturalness, practical usefulness, duplicate examples, and whether
   the incorrect practice sentence is clearly wrong for the intended reason.
@@ -129,9 +133,20 @@ live tutor in the learner's daily experience.
 - Usefulness and appropriateness decide candidate eligibility before lesson
   planning. Appropriateness judges the headword as a whole and accepts or
   rejects it, without per-meaning judgments or quarantine.
-- Qualifying lesson drafts publish automatically. Failed or low-confidence
-  lesson drafts are quarantined with evaluator feedback for regeneration or
-  inspection.
+- The first milestone requires human approval of each complete lesson after
+  deterministic checks, for an initial batch of about ten words. Approval binds
+  to the exact content, supporting evidence, attribution, and applicable check
+  requirements. Failed or unapproved drafts remain quarantined for inspection.
+  Automatic publication at scale is a later decision.
+- Planner and writer keep the newer lesson prototype's compact prompts and use
+  GPT Luna. Separate, versioned golden evaluations exercise the shared stage
+  implementations with three fresh trials per case, deterministic contract
+  checks, and human quality comparison. Prompt changes follow observed failures
+  and evaluation evidence; this milestone adds no LLM judge.
+- Practice items are independent of the lesson body. The first milestone
+  publishes with an empty bank, which reading and Practice views must tolerate.
+  Existing prototype content is disposable; start fresh rather than convert it
+  into approved lessons or Practice items.
 - Retain stage history and reuse unchanged valid work while checking current gate
   permission. A failed fresh attempt does not erase an earlier valid result;
   existing published content remains available until a replacement passes.
@@ -141,6 +156,10 @@ live tutor in the learner's daily experience.
 - Learner feedback feeds a later aggregate regeneration/review workflow.
 - Build and validate an evaluation set before trusting generated content at
   scale.
+
+The [approved planner/writer contract](https://github.com/cwebley/word-well/issues/10#issuecomment-5733461061)
+records the first milestone's stage boundaries, publication checks, and
+evaluation acceptance.
 
 ## Identity, Privacy, And Data
 
