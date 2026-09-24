@@ -46,9 +46,8 @@ Catalogue eligibility, word rating, and learner mastery are separate concepts.
 - Usefulness decides whether a word belongs anywhere in WordWell. Its inclusion
   prediction is separate from the word rating used to match eligible words to
   learners.
-- Repetition prevention for predictable forms starts with best-effort catalogue
-  grouping before lesson planning. Clear supporting forms share a main lesson;
-  uncertain relationships and already-published lessons may remain separate.
+- The first version has no grouping of predictable forms. Every candidate is
+  planned as its own lesson, and occasional redundant lessons are accepted.
 - Word rating estimates prior understanding. The initial estimate may combine
   direct word frequency with Jev familiarity measurements; the mapping requires
   separate calibration. Learner familiarity responses then refine it. Learning
@@ -155,39 +154,17 @@ live tutor in the learner's daily experience.
   must accept a candidate before it is planned as its own lesson. Appropriateness judges the
   headword as a whole and accepts or rejects it, without per-meaning judgments or
   quarantine.
-- Source-backed relationships identify possible groups before lesson planning.
-  The first version covers only a verb and an agent noun naming someone who
-  performs that action. Jev assesses whether the noun's ordinary meanings are
-  clear from the verb and predictable formation; a derivation link alone does not
-  authorize grouping. An additional distinct ordinary meaning preserves the noun
-  as an independent candidate.
-- The [approved provisional Jev grouping rule](https://github.com/cwebley/word-well/issues/1#issuecomment-5818941996)
-  requires a mean supporting-form probability of at least 0.90 across three valid
-  trials, using the frozen evaluated question and evidence format. Lower scores,
-  incomplete assessments, and failed assessments leave candidates separate.
-  Jev runs through OpenRouter's v1 System One route, subject to the parity and
-  data-retention checks in the [route amendment](https://github.com/cwebley/word-well/issues/1#issuecomment-5819922435).
-- When a pair passes that rule, the verb's gate outcome decides the noun's fate:
-  - Verb eligible: the verb is the main lesson, and the noun is taught inside it
-    as a supporting form. The noun must pass appropriateness but needs no
-    usefulness pass of its own. Candidate processing order does not choose the
-    main word, and both source records are retained.
-  - Verb excluded as too familiar, by the frequency ceiling or the usefulness
-    gate's too-basic reason: the noun is discarded, with that reason recorded.
-    A predictable form of a word everyone knows teaches nothing new.
-  - Verb excluded for any other reason: the noun remains a separate candidate
-    and runs both gates like any other word.
-- Gate outcomes therefore record why a word was excluded, distinguishing too
-  familiar from archaic, inappropriate, too narrow, and other reasons.
-- A base found in OEWN or Wiktionary but absent from the candidate pool enters
-  as an ordinary candidate and runs intake and the gates. A noun with no
-  source-linked base has no pair.
-- Activation awaits the source-pair and planner contracts, including actual
-  meaning coverage and recovery when the preferred verb lesson fails.
-- This grouping is automatic and best-effort, without ongoing owner review of
-  pairs. Missing some redundant lessons is acceptable. Existing published lessons
-  stay unchanged when later candidates reveal a missed relationship; both lessons
-  may remain.
+- Both gates use Jev through OpenRouter's v1 System One route, subject to the
+  parity and data-retention checks in the [route amendment](https://github.com/cwebley/word-well/issues/1#issuecomment-5819922435)
+  and to passing their evals. A gate averages three Jev trials before deciding.
+  Each gate sits behind an adapter, so a different model can replace Jev and run
+  the same eval.
+- The usefulness gate leans toward excluding. A wrong admit spends a learner's
+  daily word on a word not worth studying, so precision on admitted words is its
+  primary measure, with a recall floor. See the [usefulness eval design](https://github.com/cwebley/word-well/issues/11#issuecomment-5823939569).
+- The first version does not group a verb and its agent noun into one lesson.
+  Every word is its own candidate. The [grouping decision](https://github.com/cwebley/word-well/issues/1#issuecomment-5823937201)
+  parks the evaluated grouping rule for a later version.
 - The first milestone requires human approval of each complete lesson after
   deterministic checks, for an initial batch of about ten words. Approval binds
   to the exact content, supporting evidence, attribution, and applicable check
@@ -196,8 +173,9 @@ live tutor in the learner's daily experience.
 - Planner and writer keep the newer lesson prototype's compact prompts and use
   GPT Luna. Separate, versioned golden evaluations exercise the shared stage
   implementations with three fresh trials per case, deterministic contract
-  checks, and human quality comparison. Prompt changes follow observed failures
-  and evaluation evidence; this milestone adds no LLM judge.
+  checks, and human quality comparison: the owner reads every trial and scores
+  it 1 to 5 for comparison, with no threshold. Prompt changes follow observed
+  failures and evaluation evidence; this milestone adds no LLM judge.
 - Practice items are independent of the lesson body. The first milestone
   publishes with an empty bank, which reading and Practice views must tolerate.
   Existing prototype content is disposable; start fresh rather than convert it
@@ -214,7 +192,7 @@ live tutor in the learner's daily experience.
 
 The [approved planner/writer contract](https://github.com/cwebley/word-well/issues/10#issuecomment-5733461061)
 records the first milestone's stage boundaries, publication checks, and
-evaluation acceptance.
+evaluation acceptance. [docs/evals.md](docs/evals.md) describes each stage's eval.
 
 ## Identity, Privacy, And Data
 

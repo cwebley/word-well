@@ -48,3 +48,6 @@ prototypes/intake-adjudication/*.sqlite
 prototypes/intake-adjudication/reports/*.html
 prototypes/content-pipeline-source-shapes/runs/
 prototypes/content-pipeline-source-shapes/out/
+
+# Owner review exports hold private labels; copies live in ~/wordwell-private
+wordwell-*-review-*.json

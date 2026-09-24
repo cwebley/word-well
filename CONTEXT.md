@@ -74,7 +74,8 @@ _Avoid_: Related words, derived forms, word forms
 A source-linked word taught briefly inside another headword's Word lesson,
 because its ordinary meanings are clear from that headword and predictable word
 formation. It is not planned as a Word lesson of its own. Membership in a Word
-family alone does not make a word a Supporting form.
+family alone does not make a word a Supporting form. The first version has no
+Supporting forms: every candidate is planned as its own Word lesson.
 _Avoid_: Learning-equivalent form, duplicate, variant
 
 **Unavailable lesson**:
@@ -127,9 +128,8 @@ The judgment pass deciding whether an appropriate headword rewards deliberate
 study anywhere in WordWell, separately from its placement on the rating scale.
 Its assessment uses the headword and recorded parts of speech alone and reports
 familiarity, meaning obviousness, scope, and learning value; deterministic policy,
-never the model, turns those into advance or exclude. It folds toward admitting,
-because a wrong admit is visible in the app while a wrong exclude is silent and
-permanent.
+never the model, turns those into advance or exclude. It leans toward excluding,
+because a wrong admit spends a learner's daily word on a word not worth studying.
 _Avoid_: Usefulness score, interest filter, teaching value
 
 **Appropriateness gate**:
@@ -141,6 +141,12 @@ and vulgar bodily usage, including plausible connotations in those categories;
 neutral medical or anatomical subject matter alone does not disqualify a word.
 _Avoid_: Safety gate, content filter, moderation
 
+**Promotion**:
+The owner's recorded decision that a stage configuration runs in production. It
+requires evaluation evidence meeting the stage's pass bar and never happens
+automatically.
+_Avoid_: Auto-switch, rollout
+
 **Config fingerprint**:
 The identity of a pipeline stage's evidence and effective configuration, used to
 distinguish reusable results from work requiring a fresh judgment. Current intake
@@ -148,19 +154,19 @@ and gate authorization remain separate requirements for reusing a result.
 _Avoid_: Run id, pipeline version, build hash
 
 **Evaluation set**:
-A versioned, hand-curated collection of complete word lessons, including
-per-meaning cases, used to judge content quality before publication.
-_Avoid_: Test suite, benchmark (when referring to the WordWell content set)
+A frozen, versioned collection of one pipeline stage's inputs with owner-approved
+expected outcomes, split into development cases and held-out cases never used
+for tuning. Expected outcomes never enter a model input.
+_Avoid_: Test suite, benchmark, golden data (when meaning the whole set)
 
 **Content evaluation**:
-An assessment of a word lesson's grounding, factuality, meaning coverage,
-naturalness, practical usefulness, duplicate protection, and contextual-practice
-discrimination.
+An assessment of planner or writer output: deterministic contract checks on every
+trial, plus the owner's reading and comparative score for grounding, factuality,
+meaning coverage, naturalness, and practical usefulness.
 
 **Quarantined record**:
 A generated vocabulary record withheld from learner publication because a
-deterministic gate, quality threshold, evaluator disagreement, or required
-human review was not cleared.
+deterministic check or required human review was not cleared.
 
 **Passkey**:
 A cryptographic authenticator held by a learner's device or password manager
