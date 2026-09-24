@@ -41,8 +41,18 @@ when it sounds wrong, and give the learner a lightweight way to retain it.
 
 ## Personalization And Retention
 
-Word difficulty and learner mastery are separate concepts.
+Catalogue eligibility, word rating, and learner mastery are separate concepts.
 
+- Usefulness decides whether a word belongs anywhere in WordWell. Its inclusion
+  prediction is separate from the word rating used to match eligible words to
+  learners.
+- Repetition prevention for predictable forms starts with best-effort catalogue
+  grouping before lesson planning. Clear supporting forms share a main lesson;
+  uncertain relationships and already-published lessons may remain separate.
+- Word rating estimates prior understanding. The initial estimate may combine
+  direct word frequency with Jev familiarity measurements; the mapping requires
+  separate calibration. Learner familiarity responses then refine it. Learning
+  payoff and difficulty of accurate use are not the rating's target.
 - Word difficulty is an editorial estimate based on frequency, register,
   usage/meaning complexity, and a practical-use rubric.
 - Learner mastery is estimated from the selected starting band, familiarity,
@@ -86,6 +96,12 @@ strong feedback can nominate an item for content regeneration/review.
 - Candidate frequency measures the headword itself, without adding its inflected
   or related forms. Missing frequency remains an unresolved prerequisite rather
   than an invented score or a usefulness rejection.
+- Before weighing other usefulness, exclude a headword whose ordinary meaning
+  would be immediately clear to a degree-educated adult unfamiliar with it,
+  from the word itself without a definition or explanatory context. Require
+  accurate understanding, not a rough guess or recognition of the category.
+  Rarity and expressive potential cannot override this too-basic exclusion;
+  compound or derivative status alone does not establish it.
 - Reject archaic and impractical vocabulary outright. Judge the headword as a
   whole, from the meanings an educated adult would ordinarily encounter, rather
   than rescuing a mundane word with a niche, archaic, regional, or technical
@@ -109,6 +125,11 @@ live tutor in the learner's daily experience.
 - Definitions, etymology, usage-frequency/register labels, and factual claims
   must be grounded in a source. Natural examples and practical coaching may be
   generated.
+- Each published meaning has three examples: one demonstrates the meaning
+  directly, one shows a natural figurative use where it works, and the third
+  serves the strongest remaining teaching purpose. Use another direct example
+  when a figurative use would be forced. A creative analogy can illustrate a
+  source-backed meaning without becoming a separate established meaning.
 - OEWN supplies the lesson meaning inventory and source-backed synonym and
   contrast candidates. The planner groups source meanings and writes grounded
   definitions; the writer adds material around that plan. Wiktionary supplies
@@ -130,9 +151,43 @@ live tutor in the learner's daily experience.
   outcomes and source evidence. Compounds, derivatives, missing synonyms, and
   broad topic labels do not automatically exclude a candidate. Endorsement does
   not bypass factual exclusions or either candidate gate.
-- Usefulness and appropriateness decide candidate eligibility before lesson
-  planning. Appropriateness judges the headword as a whole and accepts or
-  rejects it, without per-meaning judgments or quarantine.
+- After deterministic intake, appropriateness runs before usefulness. Both gates
+  must accept a candidate before it is planned as its own lesson. Appropriateness judges the
+  headword as a whole and accepts or rejects it, without per-meaning judgments or
+  quarantine.
+- Source-backed relationships identify possible groups before lesson planning.
+  The first version covers only a verb and an agent noun naming someone who
+  performs that action. Jev assesses whether the noun's ordinary meanings are
+  clear from the verb and predictable formation; a derivation link alone does not
+  authorize grouping. An additional distinct ordinary meaning preserves the noun
+  as an independent candidate.
+- The [approved provisional Jev grouping rule](https://github.com/cwebley/word-well/issues/1#issuecomment-5818941996)
+  requires a mean supporting-form probability of at least 0.90 across three valid
+  trials, using the frozen evaluated question and evidence format. Lower scores,
+  incomplete assessments, and failed assessments leave candidates separate.
+  Jev runs through OpenRouter's v1 System One route, subject to the parity and
+  data-retention checks in the [route amendment](https://github.com/cwebley/word-well/issues/1#issuecomment-5819922435).
+- When a pair passes that rule, the verb's gate outcome decides the noun's fate:
+  - Verb eligible: the verb is the main lesson, and the noun is taught inside it
+    as a supporting form. The noun must pass appropriateness but needs no
+    usefulness pass of its own. Candidate processing order does not choose the
+    main word, and both source records are retained.
+  - Verb excluded as too familiar, by the frequency ceiling or the usefulness
+    gate's too-basic reason: the noun is discarded, with that reason recorded.
+    A predictable form of a word everyone knows teaches nothing new.
+  - Verb excluded for any other reason: the noun remains a separate candidate
+    and runs both gates like any other word.
+- Gate outcomes therefore record why a word was excluded, distinguishing too
+  familiar from archaic, inappropriate, too narrow, and other reasons.
+- A base found in OEWN or Wiktionary but absent from the candidate pool enters
+  as an ordinary candidate and runs intake and the gates. A noun with no
+  source-linked base has no pair.
+- Activation awaits the source-pair and planner contracts, including actual
+  meaning coverage and recovery when the preferred verb lesson fails.
+- This grouping is automatic and best-effort, without ongoing owner review of
+  pairs. Missing some redundant lessons is acceptable. Existing published lessons
+  stay unchanged when later candidates reveal a missed relationship; both lessons
+  may remain.
 - The first milestone requires human approval of each complete lesson after
   deterministic checks, for an initial batch of about ten words. Approval binds
   to the exact content, supporting evidence, attribution, and applicable check
