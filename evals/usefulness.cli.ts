@@ -3,13 +3,15 @@
 //
 //   npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
 //     --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json> [--replay-from ...]
+//   npm run eval:usefulness -- --dataset ... --combiner ... --jev live --max-requests 450
+// Live mode reads OPENROUTER_API_KEY from the environment and spends money.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { replayJev } from "../pipeline/execution/jev.js";
+import { httpJev, replayJev } from "../pipeline/execution/jev.js";
 import { configId, loadCombiner, MODEL, QUESTIONS, renderState } from "../pipeline/stages/usefulness.js";
 import { loadUsefulnessDataset } from "./datasets/usefulness.js";
 import { runUsefulnessEval, type UsefulnessRun } from "./usefulness.js";
@@ -18,26 +20,41 @@ const { values } = parseArgs({
   options: {
     dataset: { type: "string" },
     combiner: { type: "string" },
+    jev: { type: "string", default: "replay" },
     "replay-from": { type: "string", multiple: true },
+    "max-requests": { type: "string" },
     "fit-report": { type: "string" },
     "out-dir": { type: "string", default: join(homedir(), "src/wordwell-private/runs/usefulness") }
   }
 });
-if (!values.dataset || !values.combiner || !values["replay-from"]?.length) {
-  throw new Error("Required: --dataset, --combiner and at least one --replay-from");
-}
+if (!values.dataset || !values.combiner) throw new Error("Required: --dataset and --combiner");
+const live = values.jev === "live";
+if (!live && values.jev !== "replay") throw new Error("--jev must be replay or live");
+if (!live && !values["replay-from"]?.length) throw new Error("Replay needs at least one --replay-from");
+const maxRequests = Number(values["max-requests"]);
+if (live && !(Number.isInteger(maxRequests) && maxRequests > 0)) throw new Error("Live runs need --max-requests");
+const apiKey = process.env.OPENROUTER_API_KEY;
+if (live && !apiKey) throw new Error("Live runs need OPENROUTER_API_KEY");
 
 const dataset = loadUsefulnessDataset(values.dataset);
 const combiner = loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8")));
-const run = await runUsefulnessEval({ cases: dataset.cases, combiner, jev: replayJev(values["replay-from"]) });
+const startedAt = new Date().toISOString();
+const attemptsDir = join(values["out-dir"], "attempts", startedAt.replace(/[:.]/g, "-"));
+const jev = live
+  ? httpJev({ apiKey: apiKey!, maxRequests, attemptsDir })
+  : replayJev(values["replay-from"]!);
+const run = await runUsefulnessEval({ cases: dataset.cases, combiner, jev });
+const attempts = live ? readdirSync(attemptsDir).map((f) => JSON.parse(readFileSync(join(attemptsDir, f), "utf8")) as { costUsd?: number | null }) : [];
 
 const git = (cmd: string) => execSync(`git ${cmd}`, { encoding: "utf8" }).trim();
-const createdAt = new Date().toISOString();
+const createdAt = startedAt;
 const identity = {
   dataset: { name: dataset.name, split: dataset.split, version: dataset.version },
   configId: configId(combiner),
   combinerId: combiner.id,
-  jev: { mode: "replay", sources: values["replay-from"] },
+  jev: live
+    ? { mode: "live", attemptsDir, requests: attempts.length, knownCostUsd: attempts.reduce((sum, a) => sum + (a.costUsd ?? 0), 0), unknownCost: attempts.filter((a) => a.costUsd == null).length }
+    : { mode: "replay", sources: values["replay-from"] },
   git: { revision: git("rev-parse HEAD"), dirty: git("status --porcelain -- pipeline evals config") !== "" }
 };
 const experimentId = `${createdAt.replace(/[:.]/g, "-")}-${createHash("sha256").update(JSON.stringify(identity)).digest("hex").slice(0, 8)}`;
@@ -68,6 +85,7 @@ function format(run: UsefulnessRun, id: typeof identity, fitReport?: string): st
     Object.entries(t).map(([k, v]) => `${k} ${v!.correct}/${v!.cases}`).join(", ");
   const lines = [
     `dataset ${id.dataset.name} (${id.dataset.split}) ${id.dataset.version.slice(0, 12)}`,
+    `jev ${id.jev.mode}${id.jev.mode === "live" ? `  ${id.jev.requests} requests, $${id.jev.knownCostUsd!.toFixed(6)} known cost, ${id.jev.unknownCost} unknown` : ""}`,
     `combiner ${id.combinerId.slice(0, 12)}  config ${id.configId.slice(0, 12)}  git ${id.git.revision.slice(0, 7)}${id.git.dirty ? " (dirty)" : ""}`,
     "",
     `precision on keeps  ${pct(r.precision)}`,

@@ -1,6 +1,8 @@
 // Jev client. Every adapter returns only answers that passed validation, so
 // callers never see a raw reply.
-import { readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 
@@ -45,6 +47,82 @@ export class JevError extends Error {
 
 export interface JevClient {
   ask(request: JevRequest, trial: number): Promise<JevAnswers>;
+}
+
+export const V1_ROUTE = "https://openrouter.ai/api/v1/systemone";
+export const PINNED_MODEL_VERSION = "typesafe/jev-1.13-20260917";
+
+const reply = z.object({
+  model: z.string(),
+  answers: z.record(z.string(), z.unknown()),
+  usage: z.object({ cost: z.number().nonnegative().optional() }).optional()
+});
+
+type Fetch = typeof globalThis.fetch;
+
+// Live Jev through OpenRouter's v1 route. Every attempt, valid or not, is
+// saved privately before and after the call. No retries: any failure stops
+// the run, and a lost connection is "uncertain" because Jev may have charged.
+export function httpJev({ apiKey, maxRequests, attemptsDir, fetch = globalThis.fetch, timeoutMs = 60_000 }: {
+  apiKey: string;
+  maxRequests: number;
+  attemptsDir: string;
+  fetch?: Fetch;
+  timeoutMs?: number;
+}): JevClient {
+  let sent = 0;
+  mkdirSync(attemptsDir, { recursive: true, mode: 0o700 });
+  return {
+    async ask(request, trial) {
+      if (sent >= maxRequests) throw new JevError("cap_reached", `Request cap of ${maxRequests} reached`);
+      sent += 1;
+      const attempt: Record<string, unknown> = { id: randomUUID(), at: new Date().toISOString(), trial, request, status: "in_flight" };
+      const path = join(attemptsDir, `${attempt.id}.json`);
+      const save = () => writeFileSync(path, JSON.stringify(attempt, null, 1), { mode: 0o600 });
+      save();
+      const started = Date.now();
+      const finish = (status: string, fields: Record<string, unknown> = {}) => {
+        Object.assign(attempt, { status, elapsedMs: Date.now() - started }, fields);
+        save();
+      };
+      let response: Response;
+      let raw: string;
+      try {
+        response = await fetch(V1_ROUTE, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "X-OpenRouter-Cache": "false" },
+          body: JSON.stringify(request),
+          signal: AbortSignal.timeout(timeoutMs)
+        });
+        raw = await response.text();
+      } catch (e) {
+        finish("uncertain", { error: String(e) });
+        throw new JevError("uncertain", `No complete reply: ${String(e)}`);
+      }
+      if (!response.ok) {
+        finish("http", { httpStatus: response.status, raw });
+        throw new JevError("http", `HTTP ${response.status}`);
+      }
+      try {
+        const data = reply.parse(JSON.parse(raw));
+        const costUsd = data.usage?.cost ?? null;
+        Object.assign(attempt, { raw, costUsd });
+        if (data.model !== PINNED_MODEL_VERSION) throw new JevError("invalid", `Unexpected model ${data.model}`);
+        const expected = Object.keys(request.questions).sort();
+        const got = Object.keys(data.answers).sort();
+        if (!isDeepStrictEqual(expected, got)) throw new JevError("invalid", "Answers do not match the questions asked");
+        const answers: JevAnswers = {};
+        for (const [name, definition] of Object.entries(request.questions)) {
+          answers[name] = validateAnswer(name, definition, data.answers[name]);
+        }
+        finish("valid");
+        return answers;
+      } catch (e) {
+        finish("invalid", { raw, error: String(e) });
+        throw e instanceof JevError ? e : new JevError("invalid", `Unreadable reply: ${String(e)}`);
+      }
+    }
+  };
 }
 
 const answersFile = z.object({

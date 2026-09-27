@@ -1,9 +1,9 @@
 // @vitest-environment node
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { replayJev, type JevRequest, type Questions } from "./jev.js";
+import { httpJev, replayJev, type JevRequest, type Questions } from "./jev.js";
 
 const questions: Questions = {
   field_association: {
@@ -98,5 +98,87 @@ describe("replayJev", () => {
     const path = answersFile([record("concept", 1, bad)], choiceQuestions);
 
     await expect(replayJev([path]).ask({ ...request, questions: choiceQuestions }, 1)).rejects.toMatchObject({ kind: "invalid" });
+  });
+});
+
+describe("httpJev", () => {
+  const reply = (overrides: Record<string, unknown> = {}) => ({
+    id: "gen-dec-1",
+    model: "typesafe/jev-1.13-20260917",
+    provider: "TypeSafe",
+    answers: { field_association: fieldAnswer, precision: precisionAnswer },
+    usage: { input_tokens: 620, output_tokens: 20, cost: 0.000026 },
+    ...overrides
+  });
+
+  function fakeFetch(respond: () => Response | Promise<Response>) {
+    const calls: { url: string; init: RequestInit }[] = [];
+    const fetch = async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), init: init! });
+      return respond();
+    };
+    return { fetch: fetch as typeof globalThis.fetch, calls };
+  }
+
+  const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+  const attemptsDir = () => mkdtempSync(join(tmpdir(), "jev-attempts-"));
+
+  it("posts the request to the v1 System One route and returns validated answers", async () => {
+    const f = fakeFetch(() => json(reply()));
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: attemptsDir(), fetch: f.fetch });
+
+    const answers = await jev.ask(request, 2);
+
+    expect(answers).toEqual({ field_association: fieldAnswer, precision: precisionAnswer });
+    expect(f.calls[0].url).toBe("https://openrouter.ai/api/v1/systemone");
+    expect(f.calls[0].init.method).toBe("POST");
+    expect((f.calls[0].init.headers as Record<string, string>).Authorization).toBe("Bearer key");
+    expect(JSON.parse(f.calls[0].init.body as string)).toEqual({ model: "typesafe/jev-1.13", state: request.state, questions });
+  });
+
+  it.each([
+    ["an unpinned model version", reply({ model: "typesafe/jev-1.14-20261001" })],
+    ["a missing answer", reply({ answers: { field_association: fieldAnswer } })],
+    ["an extra answer", reply({ answers: { field_association: fieldAnswer, precision: precisionAnswer, other: fieldAnswer } })],
+    ["an invalid answer", reply({ answers: { field_association: { type: "noul", noul: 2 }, precision: precisionAnswer } })]
+  ])("rejects a reply with %s", async (_case, body) => {
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: attemptsDir(), fetch: fakeFetch(() => json(body)).fetch });
+
+    await expect(jev.ask(request, 1)).rejects.toMatchObject({ kind: "invalid" });
+  });
+
+  it("reports an HTTP failure and keeps the raw reply in the attempt record", async () => {
+    const dir = attemptsDir();
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: dir, fetch: fakeFetch(() => new Response("upstream down", { status: 502 })).fetch });
+
+    await expect(jev.ask(request, 1)).rejects.toMatchObject({ kind: "http" });
+    const [attempt] = readdirSync(dir).map((name) => JSON.parse(readFileSync(join(dir, name), "utf8")));
+    expect(attempt).toMatchObject({ status: "http", httpStatus: 502, raw: "upstream down", trial: 1 });
+  });
+
+  it("treats a lost connection as uncertain, since Jev may have answered and charged", async () => {
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: attemptsDir(), fetch: fakeFetch(() => { throw new TypeError("fetch failed"); }).fetch });
+
+    await expect(jev.ask(request, 1)).rejects.toMatchObject({ kind: "uncertain" });
+  });
+
+  it("refuses to send more requests than its cap", async () => {
+    const f = fakeFetch(() => json(reply()));
+    const jev = httpJev({ apiKey: "key", maxRequests: 1, attemptsDir: attemptsDir(), fetch: f.fetch });
+
+    await jev.ask(request, 1);
+
+    await expect(jev.ask(request, 2)).rejects.toMatchObject({ kind: "cap_reached" });
+    expect(f.calls).toHaveLength(1);
+  });
+
+  it("records each valid reply's cost", async () => {
+    const dir = attemptsDir();
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: dir, fetch: fakeFetch(() => json(reply())).fetch });
+
+    await jev.ask(request, 1);
+
+    const [attempt] = readdirSync(dir).map((name) => JSON.parse(readFileSync(join(dir, name), "utf8")));
+    expect(attempt).toMatchObject({ status: "valid", costUsd: 0.000026, request: { state: request.state } });
   });
 });
