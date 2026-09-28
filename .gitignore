@@ -15,6 +15,7 @@ prototypes/content-pipeline-source-shapes/mechanical-flags.jsonl
 
 # Prototype scratch: virtualenvs and downloaded source snapshots are rebuilt, never committed.
 prototypes/**/venv/
+tools/**/venv/
 prototypes/**/data/
 prototypes/**/out/
 __pycache__/
