@@ -2,7 +2,8 @@
 
 How WordWell measures each content-pipeline stage, so a model, prompt or
 configuration change can be re-run against the same cases and compared.
-Approved 2026-09-24. No eval code exists yet; this describes the design.
+Approved 2026-09-24. The usefulness eval is built (see below); the other stages
+are still design only.
 
 ```text
 intake (rules) -> appropriateness (Jev) -> usefulness (Jev) -> planner (Luna) -> writer (Luna) -> owner review
@@ -56,10 +57,11 @@ Full design on [#11](https://github.com/cwebley/word-well/issues/11#issuecomment
   cutoff sweeps need no new calls.
 - **Trials.** Production averages three Jev trials, and the eval scores that
   averaged verdict. Words whose verdict flips between trials are reported.
-- **Development set.** All current owner labels (109 firm at the time of
-  writing). Undecided labels are resolved before freezing. Soft labels count as
-  correct either way and are reported separately.
-- **Held-out set.** 60 words drawn at random from the pool after intake and the
+- **Development set.** All owner labels, frozen as
+  `evals/datasets/usefulness-dev-v1.json`: 136 words, 132 firm and 4 soft. It is
+  committed with headword, OEWN parts of speech, decision and tags only. Soft
+  labels count as correct either way and are reported separately.
+- **Held-out set.** Kept private, outside the repo. 60 words drawn at random from the pool after intake and the
   appropriateness rules, labelled blind before any model output exists, topped
   up until 15 are keeps.
 - **Tags.** Difficulty `clear` or `hard`; category `too_familiar`,
@@ -76,6 +78,34 @@ Full design on [#11](https://github.com/cwebley/word-well/issues/11#issuecomment
 
 The owner may override a floor with a written reason. With about 15 held-out
 keeps, the numbers are coarse.
+
+### Running it
+
+```sh
+# Replay saved answers, no cost
+npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
+  --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json>
+
+# Live Jev; OPENROUTER_API_KEY in the environment. With --replay-from, only
+# requests never answered are sent.
+npm run eval:usefulness -- ... --jev live --max-requests 450
+```
+
+Experiments and every Jev attempt are written privately under
+`~/src/wordwell-private/runs/usefulness/`. A bad reply for one word marks that
+word incomplete; HTTP errors, lost connections, the request cap, an unpinned
+model version, or a third bad reply stop the run. The combiner is fitted by
+`tools/usefulness-fit/fit.py` and committed under `config/` as numbers only.
+
+### Results
+
+| Date | Dataset | Combiner | Jev | Precision | Recall |
+| --- | --- | --- | --- | --- | --- |
+| 2026-09-28 | usefulness-dev-v1 (`d712efb9`), 132 scored of 136 | `27dab670`, fitted on the same set | v1 route, fresh, 411 requests, $0.039 | 0.810 | 0.839 |
+
+Development numbers are optimistic: the combiner was fitted on 109 of these
+words. Cross-validated on replayed lab answers it scored 0.714 precision and
+0.714 recall. Only held-out numbers count toward a pass bar.
 
 ## Planner and writer
 
