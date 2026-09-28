@@ -35,9 +35,10 @@ export type ChoiceAnswer = { type: "choice"; choice: string; probabilities: Reco
 export type Answer = NoulAnswer | ScoreAnswer | ChoiceAnswer;
 export type JevAnswers = Record<string, Answer>;
 
-export type JevErrorKind = "not_saved" | "invalid" | "http" | "uncertain" | "cap_reached";
+export type JevErrorKind = "not_saved" | "invalid" | "http" | "uncertain" | "cap_reached" | "wrong_model";
 
-// Every Jev failure stops the run. Nothing retries or substitutes an answer.
+// Nothing retries or substitutes an answer. "invalid" concerns one reply;
+// every other kind is likely to repeat on the next call.
 export class JevError extends Error {
   constructor(readonly kind: JevErrorKind, message: string) {
     super(message);
@@ -107,7 +108,7 @@ export function httpJev({ apiKey, maxRequests, attemptsDir, fetch = globalThis.f
         const data = reply.parse(JSON.parse(raw));
         const costUsd = data.usage?.cost ?? null;
         Object.assign(attempt, { raw, costUsd });
-        if (data.model !== PINNED_MODEL_VERSION) throw new JevError("invalid", `Unexpected model ${data.model}`);
+        if (data.model !== PINNED_MODEL_VERSION) throw new JevError("wrong_model", `Unexpected model ${data.model}`);
         const expected = Object.keys(request.questions).sort();
         const got = Object.keys(data.answers).sort();
         if (!isDeepStrictEqual(expected, got)) throw new JevError("invalid", "Answers do not match the questions asked");
@@ -118,7 +119,7 @@ export function httpJev({ apiKey, maxRequests, attemptsDir, fetch = globalThis.f
         finish("valid");
         return answers;
       } catch (e) {
-        finish("invalid", { raw, error: String(e) });
+        finish(e instanceof JevError && e.kind === "wrong_model" ? "wrong_model" : "invalid", { raw, error: String(e) });
         throw e instanceof JevError ? e : new JevError("invalid", `Unreadable reply: ${String(e)}`);
       }
     }
@@ -168,6 +169,7 @@ function find(files: SavedFile[], request: JevRequest, name: string, definition:
 }
 
 const probability = z.number().min(0).max(1);
+const ROUNDING_STEP = 0.01 + 1e-9;
 const noulAnswer = z.object({ type: z.literal("noul"), noul: probability });
 const distributionAnswer = z.object({
   probabilities: z.record(z.string(), probability),
@@ -205,10 +207,13 @@ export function validateAnswer(name: string, definition: Question, raw: unknown)
     if (!parsed.success) fail("invalid choice answer");
     const { choice, probabilities, confidence } = parsed.data!;
     checkDistribution(probabilities);
-    if (!keys.includes(choice) || probabilities[choice] + 1e-6 < Math.max(...Object.values(probabilities))) {
-      fail("choice is not the most probable option");
-    }
-    return { type: "choice", choice, probabilities, confidence };
+    // Jev rounds probabilities to two decimals, so options within one step of
+    // the top are tied. The owner chose to break ties toward the option shown
+    // last, to offset a possible bias toward earlier options.
+    const top = Math.max(...Object.values(probabilities));
+    const tied = keys.filter((k) => probabilities[k] >= top - ROUNDING_STEP);
+    if (!tied.includes(choice)) fail("choice is not the most probable option");
+    return { type: "choice", choice: tied[tied.length - 1], probabilities, confidence };
   }
   const parsed = scoreAnswer.safeParse(raw);
   if (!parsed.success) fail("invalid score answer");
@@ -221,4 +226,19 @@ export function validateAnswer(name: string, definition: Question, raw: unknown)
     fail("legend differs from the rubric");
   }
   return { type: "score", score, probabilities, confidence };
+}
+
+// Reuses saved answers and asks live Jev only for requests never answered,
+// so finishing an interrupted run pays only for what is missing.
+export function replayThenLive(replay: JevClient, live: JevClient): JevClient {
+  return {
+    async ask(request, trial) {
+      try {
+        return await replay.ask(request, trial);
+      } catch (e) {
+        if (e instanceof JevError && e.kind === "not_saved") return live.ask(request, trial);
+        throw e;
+      }
+    }
+  };
 }

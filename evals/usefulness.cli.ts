@@ -7,11 +7,11 @@
 // Live mode reads OPENROUTER_API_KEY from the environment and spends money.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { httpJev, replayJev } from "../pipeline/execution/jev.js";
+import { httpJev, replayJev, replayThenLive } from "../pipeline/execution/jev.js";
 import { configId, loadCombiner, MODEL, QUESTIONS, renderState } from "../pipeline/stages/usefulness.js";
 import { loadUsefulnessDataset } from "./datasets/usefulness.js";
 import { runUsefulnessEval, type UsefulnessRun } from "./usefulness.js";
@@ -40,11 +40,13 @@ const dataset = loadUsefulnessDataset(values.dataset);
 const combiner = loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8")));
 const startedAt = new Date().toISOString();
 const attemptsDir = join(values["out-dir"], "attempts", startedAt.replace(/[:.]/g, "-"));
-const jev = live
-  ? httpJev({ apiKey: apiKey!, maxRequests, attemptsDir })
-  : replayJev(values["replay-from"]!);
+// Live with --replay-from reuses saved answers and pays only for the rest.
+const replaySources = values["replay-from"] ?? [];
+const jev = !live ? replayJev(replaySources)
+  : replaySources.length ? replayThenLive(replayJev(replaySources), httpJev({ apiKey: apiKey!, maxRequests, attemptsDir }))
+  : httpJev({ apiKey: apiKey!, maxRequests, attemptsDir });
 const run = await runUsefulnessEval({ cases: dataset.cases, combiner, jev });
-const attempts = live ? readdirSync(attemptsDir).map((f) => JSON.parse(readFileSync(join(attemptsDir, f), "utf8")) as { costUsd?: number | null }) : [];
+const attempts = live && existsSync(attemptsDir) ? readdirSync(attemptsDir).map((f) => JSON.parse(readFileSync(join(attemptsDir, f), "utf8")) as { costUsd?: number | null }) : [];
 
 const git = (cmd: string) => execSync(`git ${cmd}`, { encoding: "utf8" }).trim();
 const createdAt = startedAt;
@@ -53,7 +55,7 @@ const identity = {
   configId: configId(combiner),
   combinerId: combiner.id,
   jev: live
-    ? { mode: "live", attemptsDir, requests: attempts.length, knownCostUsd: attempts.reduce((sum, a) => sum + (a.costUsd ?? 0), 0), unknownCost: attempts.filter((a) => a.costUsd == null).length }
+    ? { mode: "live", replayedFrom: replaySources, attemptsDir, requests: attempts.length, knownCostUsd: attempts.reduce((sum, a) => sum + (a.costUsd ?? 0), 0), unknownCost: attempts.filter((a) => a.costUsd == null).length }
     : { mode: "replay", sources: values["replay-from"] },
   git: { revision: git("rev-parse HEAD"), dirty: git("status --porcelain -- pipeline evals config") !== "" }
 };
@@ -63,7 +65,7 @@ mkdirSync(values["out-dir"], { recursive: true, mode: 0o700 });
 const base = join(values["out-dir"], experimentId);
 writeFileSync(`${base}.json`, JSON.stringify({
   schema: "wordwell-usefulness-experiment/v1", experimentId, createdAt, ...identity,
-  error: run.error, report: run.report,
+  error: run.error, failures: run.failures, report: run.report,
   rows: run.rows.map((r) => ({ caseId: r.case.id, headword: r.case.headword, result: r.result }))
 }, null, 1));
 writeFileSync(`${base}.answers.json`, JSON.stringify({
@@ -99,6 +101,7 @@ function format(run: UsefulnessRun, id: typeof identity, fitReport?: string): st
     `flips               ${r.flips.join(", ") || "none"}`,
     `incomplete          ${r.incomplete.length} of ${r.cases}${r.incomplete.length ? ": " + r.incomplete.join(", ") : ""}`
   ];
+  for (const f of run.failures) lines.push(`failed              ${f.headword}: ${f.kind}, ${f.message}`);
   if (run.error) lines.push(`STOPPED             ${run.error.kind} at ${run.error.headword}: ${run.error.message}`);
   if (fitReport) {
     const cv = JSON.parse(readFileSync(fitReport, "utf8")).development_cv.rows as { expected: string; predicted: string }[];

@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { httpJev, replayJev, type JevRequest, type Questions } from "./jev.js";
+import { httpJev, replayJev, replayThenLive, type JevAnswers, type JevRequest, type Questions } from "./jev.js";
 
 const questions: Questions = {
   field_association: {
@@ -99,6 +99,49 @@ describe("replayJev", () => {
 
     await expect(replayJev([path]).ask({ ...request, questions: choiceQuestions }, 1)).rejects.toMatchObject({ kind: "invalid" });
   });
+
+  describe("choices tied within rounding", () => {
+    // Rubric order as shown to Jev: reusable, factual, everyday, mixed, cannot_judge.
+    const conceptQuestions: Questions = {
+      concept: {
+        type: "choice",
+        instructions: "What does this word principally let an adult name?",
+        criteria: { reusable_concept: "R", factual_label: "F", everyday_concept: "E", mixed: "M", cannot_judge: "C" }
+      }
+    };
+    const ask = (answer: unknown) =>
+      replayJev([answersFile([record("concept", 1, answer)], conceptQuestions)]).ask({ ...request, questions: conceptQuestions }, 1);
+
+    it("accepts a pick one rounding step below the top and records the last tied option in rubric order", async () => {
+      // The reply Jev gave for "wanter": picked factual_label at 0.33 with everyday_concept at 0.34.
+      const wanter = {
+        type: "choice", choice: "factual_label", confidence: 0.17,
+        probabilities: { cannot_judge: 0.01, mixed: 0.01, factual_label: 0.33, reusable_concept: 0.31, everyday_concept: 0.34 }
+      };
+
+      const answers = await ask(wanter);
+
+      expect(answers.concept).toMatchObject({ type: "choice", choice: "everyday_concept" });
+    });
+
+    it("breaks an exact tie toward the later option even when Jev picked the earlier one", async () => {
+      const tie = {
+        type: "choice", choice: "reusable_concept", confidence: 0.5,
+        probabilities: { reusable_concept: 0.45, factual_label: 0.1, everyday_concept: 0.45, mixed: 0, cannot_judge: 0 }
+      };
+
+      expect((await ask(tie)).concept).toMatchObject({ choice: "everyday_concept" });
+    });
+
+    it("keeps Jev's pick when no other option is within rounding of it", async () => {
+      const clear = {
+        type: "choice", choice: "factual_label", confidence: 0.75,
+        probabilities: { reusable_concept: 0.23, factual_label: 0.75, everyday_concept: 0.01, mixed: 0, cannot_judge: 0.01 }
+      };
+
+      expect((await ask(clear)).concept).toMatchObject({ choice: "factual_label" });
+    });
+  });
 });
 
 describe("httpJev", () => {
@@ -137,7 +180,6 @@ describe("httpJev", () => {
   });
 
   it.each([
-    ["an unpinned model version", reply({ model: "typesafe/jev-1.14-20261001" })],
     ["a missing answer", reply({ answers: { field_association: fieldAnswer } })],
     ["an extra answer", reply({ answers: { field_association: fieldAnswer, precision: precisionAnswer, other: fieldAnswer } })],
     ["an invalid answer", reply({ answers: { field_association: { type: "noul", noul: 2 }, precision: precisionAnswer } })]
@@ -145,6 +187,13 @@ describe("httpJev", () => {
     const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: attemptsDir(), fetch: fakeFetch(() => json(body)).fetch });
 
     await expect(jev.ask(request, 1)).rejects.toMatchObject({ kind: "invalid" });
+  });
+
+  it("reports an unpinned model version as a wrong model, not a bad answer", async () => {
+    const body = reply({ model: "typesafe/jev-1.14-20261001" });
+    const jev = httpJev({ apiKey: "key", maxRequests: 5, attemptsDir: attemptsDir(), fetch: fakeFetch(() => json(body)).fetch });
+
+    await expect(jev.ask(request, 1)).rejects.toMatchObject({ kind: "wrong_model" });
   });
 
   it("reports an HTTP failure and keeps the raw reply in the attempt record", async () => {
@@ -180,5 +229,19 @@ describe("httpJev", () => {
 
     const [attempt] = readdirSync(dir).map((name) => JSON.parse(readFileSync(join(dir, name), "utf8")));
     expect(attempt).toMatchObject({ status: "valid", costUsd: 0.000026, request: { state: request.state } });
+  });
+});
+
+describe("replayThenLive", () => {
+  it("serves saved answers and calls live Jev only for what was never saved", async () => {
+    const path = answersFile([record("field_association", 1, fieldAnswer), record("precision", 1, precisionAnswer)]);
+    const liveCalls: number[] = [];
+    const live = { async ask(_r: JevRequest, trial: number) { liveCalls.push(trial); return { field_association: fieldAnswer, precision: precisionAnswer } as JevAnswers; } };
+    const jev = replayThenLive(replayJev([path]), live);
+
+    await jev.ask(request, 1);
+    await jev.ask(request, 2);
+
+    expect(liveCalls).toEqual([2]);
   });
 });

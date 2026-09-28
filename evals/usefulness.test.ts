@@ -63,12 +63,35 @@ describe("runUsefulnessEval", () => {
     expect(run.error).toBeNull();
   });
 
-  it("stops at the first real Jev failure and leaves the remaining cases incomplete", async () => {
-    const jev = jevFor({ parlance: 0, nuance: new JevError("http", "HTTP 502"), fetid: 0 });
+  it.each(["http", "uncertain", "cap_reached", "wrong_model"] as const)(
+    "stops at a %s failure, which would repeat on every call, and leaves the rest incomplete", async (kind) => {
+      const jev = jevFor({ parlance: 0, nuance: new JevError(kind, "failed"), fetid: 0 });
+
+      const run = await runUsefulnessEval({ cases, combiner, jev });
+
+      expect(run.error).toEqual({ kind, message: "failed", headword: "nuance" });
+      expect(run.report.incomplete).toEqual(["nuance", "fetid"]);
+    });
+
+  it("marks a word with an invalid reply incomplete, records why, and carries on", async () => {
+    const jev = jevFor({ parlance: 0, nuance: new JevError("invalid", "concept: bad distribution"), fetid: 0 });
 
     const run = await runUsefulnessEval({ cases, combiner, jev });
 
-    expect(run.error).toEqual({ kind: "http", message: "HTTP 502", headword: "nuance" });
-    expect(run.report.incomplete).toEqual(["nuance", "fetid"]);
+    expect(run.error).toBeNull();
+    expect(run.report.incomplete).toEqual(["nuance"]);
+    expect(run.failures).toEqual([{ headword: "nuance", kind: "invalid", message: "concept: bad distribution" }]);
+    expect(run.rows[2].result?.verdict).toBe("advance");
+  });
+
+  it("stops after three invalid replies, since that many suggests something systemic", async () => {
+    const more: UsefulnessCase[] = ["a", "b", "c", "d"].map((h) => ({ ...cases[1], id: h, headword: h }));
+    const bad = new JevError("invalid", "bad");
+    const jev = jevFor({ a: bad, b: bad, c: bad, d: 0 });
+
+    const run = await runUsefulnessEval({ cases: more, combiner, jev });
+
+    expect(run.error).toMatchObject({ kind: "invalid", headword: "c" });
+    expect(run.report.incomplete).toEqual(["a", "b", "c", "d"]);
   });
 });

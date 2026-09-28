@@ -1,15 +1,25 @@
 // Runs the usefulness gate over an eval set and scores it. Cases run one at a
-// time so a live failure stops before any further calls are made.
+// time so a run-stopping failure stops before any further calls are made.
 import { JevError, type JevClient, type JevErrorKind } from "../pipeline/execution/jev.js";
 import { judgeUsefulness, type Combiner } from "../pipeline/stages/usefulness.js";
 import type { UsefulnessCase } from "./datasets/usefulness.js";
 import { scoreUsefulness, type ScoredRow, type UsefulnessReport } from "./scorers/usefulness.js";
 
+export type Failure = { kind: JevErrorKind; message: string; headword: string };
+
 export type UsefulnessRun = {
   rows: ScoredRow[];
   report: UsefulnessReport;
-  error: { kind: JevErrorKind; message: string; headword: string } | null;
+  // Words left incomplete by a one-word failure, with the reason.
+  failures: Failure[];
+  // The failure that stopped the run, if any.
+  error: Failure | null;
 };
+
+// A bad reply for one word marks only that word incomplete. Failures that
+// would repeat on every call (HTTP, lost connection, cap, wrong model) stop
+// the run at once, and so does a third bad reply.
+const MAX_INVALID = 3;
 
 export async function runUsefulnessEval({ cases, combiner, jev }: {
   cases: UsefulnessCase[];
@@ -17,7 +27,8 @@ export async function runUsefulnessEval({ cases, combiner, jev }: {
   jev: JevClient;
 }): Promise<UsefulnessRun> {
   const rows: ScoredRow[] = [];
-  let error: UsefulnessRun["error"] = null;
+  const failures: Failure[] = [];
+  let error: Failure | null = null;
   for (const c of cases) {
     if (error) {
       rows.push({ case: c, result: null });
@@ -28,9 +39,14 @@ export async function runUsefulnessEval({ cases, combiner, jev }: {
     } catch (e) {
       if (!(e instanceof JevError)) throw e;
       rows.push({ case: c, result: null });
-      // A replay gap costs nothing and says nothing about Jev; anything else stops the run.
-      if (e.kind !== "not_saved") error = { kind: e.kind, message: e.message, headword: c.headword };
+      const failure = { kind: e.kind, message: e.message, headword: c.headword };
+      if (e.kind === "not_saved") continue;
+      if (e.kind === "invalid") {
+        failures.push(failure);
+        if (failures.filter((f) => f.kind === "invalid").length < MAX_INVALID) continue;
+      }
+      error = failure;
     }
   }
-  return { rows, report: scoreUsefulness(rows), error };
+  return { rows, report: scoreUsefulness(rows), failures, error };
 }
