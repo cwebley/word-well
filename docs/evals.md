@@ -102,10 +102,14 @@ model version, or a third bad reply stop the run. The combiner is fitted by
 | Date | Dataset | Combiner | Jev | Precision | Recall |
 | --- | --- | --- | --- | --- | --- |
 | 2026-09-28 | usefulness-dev-v1 (`d712efb9`), 132 scored of 136 | `27dab670`, fitted on the same set | v1 route, fresh, 411 requests, $0.039 | 0.810 | 0.839 |
+| 2026-09-28 | usefulness-dev-v1 | `152642aa`, refitted on v1-route answers | replay of the run above | 0.814 | 0.857 |
+| 2026-09-28 | usefulness-dev-v2 (`29766667`), one label corrected | `152642aa` | replay | 0.831 | 0.860 |
+| 2026-09-28 | usefulness-dev-v2 | `d7022878`, refitted on dev-v2 | replay | 0.845 | 0.860 |
 
-Development numbers are optimistic: the combiner was fitted on 109 of these
-words. Cross-validated on replayed lab answers it scored 0.714 precision and
-0.714 recall. Only held-out numbers count toward a pass bar.
+Development numbers are optimistic because each combiner is fitted on the words
+it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
+0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
+No combiner is promoted. Only held-out numbers count toward a pass bar.
 
 ## Planner and writer
 
