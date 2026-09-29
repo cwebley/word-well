@@ -10,11 +10,16 @@ three trials. Only complete, non-soft cases train the model.
 
 Usage:
   python3 tools/usefulness-fit/fit.py DATASET_JSON COMBINER_DIR PRIVATE_REPORT_JSON ANSWERS_JSON [ANSWERS_JSON ...]
+      [--extra-questions CANDIDATE_JSON]
+
+--extra-questions adds candidate questions (for example
+evals/candidates/figurative-transfer-v2.json) to the gate's nine, to measure
+whether they help before they join the gate.
 """
 
+import argparse
 import hashlib
 import json
-import sys
 from pathlib import Path
 
 from fitting import fit_model
@@ -33,7 +38,7 @@ def load_answers(paths, questions):
     for path in paths:
         data = json.loads(Path(path).read_text())
         for name, question in questions.items():
-            if data["questions"].get(name) != question:
+            if name in data["questions"] and data["questions"][name] != question:
                 raise ValueError(f"{path} was answered with different text for {name}")
         for a in data["answers"]:
             found.setdefault((a["state"], a["question"], a["trial"]), a["answer"])
@@ -54,10 +59,12 @@ def features(case, questions, answers):
     return result
 
 
-def main(dataset_path, combiner_dir, report_path, *answer_paths):
+def main(dataset_path, combiner_dir, report_path, answer_paths, extra_questions=None):
     dataset_bytes = Path(dataset_path).read_bytes()
     dataset = json.loads(dataset_bytes)
     questions = json.loads(QUESTIONS_PATH.read_text())
+    if extra_questions:
+        questions.update(json.loads(Path(extra_questions).read_text()))
     answers = load_answers(answer_paths, questions)
     rows, skipped = [], []
     for case in dataset["cases"]:
@@ -85,4 +92,8 @@ def main(dataset_path, combiner_dir, report_path, *answer_paths):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset"); parser.add_argument("combiner_dir"); parser.add_argument("report")
+    parser.add_argument("answers", nargs="+"); parser.add_argument("--extra-questions")
+    a = parser.parse_args()
+    main(a.dataset, a.combiner_dir, a.report, a.answers, a.extra_questions)

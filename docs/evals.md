@@ -119,6 +119,19 @@ Both fail the first-time bar (precision ≥ 0.80, recall ≥ 0.50). For comparis
 `d7022878` has a cross-validated development AUC of 0.895. Keeps are 25% of the
 random draw and 43% of the development set.
 
+**Development v3 (2026-09-29).** `usefulness-dev-v3` (`8ab6d761`): dev-v2 plus
+the 60 words of held-out v1, which moved to development once inspected, with a
+relabel under a new owner rule: a too-specific word is kept if an ordinary adult
+could use it figuratively in a clear comparison. 196 words, 79 keeps.
+Cross-validated on identical folds, v1-route answers:
+
+| Questions | Precision | Recall | AUC | On the 60 random-pool words (P / R / AUC) |
+| --- | --- | --- | --- | --- |
+| Nine gate questions | 0.760 | 0.722 | 0.859 | 0.600 / 0.353 / 0.802 |
+| Nine + `figurative_transfer` (candidate) | 0.776 | 0.747 | 0.865 | 0.667 / 0.471 / 0.817 |
+
+A new held-out set is needed before any pass-bar judgment.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
