@@ -1,9 +1,9 @@
 {
   "schema": "wordwell-inclusion-fit/v2",
-  "id": "7bec94e4966eb683ddb42c6bee270b932c206522f34ca7272e352efffbeba0e8",
+  "id": "3e5c41bb3c1fd6d682370c9ab2aa5d8620217af593fa5697236bcfc4a58a10fb",
   "method": "L2 logistic regression",
   "C": 1.0,
-  "threshold": 0.5,
+  "threshold": 0.6,
   "scaling": "standard",
   "sklearn_version": "1.7.2",
   "input_feature_names": [

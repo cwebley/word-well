@@ -10,7 +10,7 @@ three trials. Only complete, non-soft cases train the model.
 
 Usage:
   python3 tools/usefulness-fit/fit.py DATASET_JSON COMBINER_DIR PRIVATE_REPORT_JSON ANSWERS_JSON [ANSWERS_JSON ...]
-      [--extra-questions CANDIDATE_JSON]
+      [--extra-questions CANDIDATE_JSON] [--threshold 0.6]
 
 --extra-questions adds candidate questions (a JSON file shaped like
 pipeline/stages/usefulness-questions.json) to the gate's own, to measure
@@ -59,7 +59,7 @@ def features(case, questions, answers):
     return result
 
 
-def main(dataset_path, combiner_dir, report_path, answer_paths, extra_questions=None):
+def main(dataset_path, combiner_dir, report_path, answer_paths, extra_questions=None, threshold=0.5):
     dataset_bytes = Path(dataset_path).read_bytes()
     dataset = json.loads(dataset_bytes)
     questions = json.loads(QUESTIONS_PATH.read_text())
@@ -76,7 +76,7 @@ def main(dataset_path, combiner_dir, report_path, answer_paths, extra_questions=
             continue
         rows.append({"id": case["id"], "headword": case["headword"], "decision": case["expected"],
                      "strength": "firm", "features": values})
-    fit = fit_model(rows)
+    fit = fit_model(rows, threshold=threshold)
     public = {k: fit[k] for k in ("schema", "id", "method", "C", "threshold", "scaling", "sklearn_version",
                                   "input_feature_names", "excluded_features", "feature_names",
                                   "mean", "scale", "coefficients", "intercept", "training_digest")}
@@ -95,5 +95,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset"); parser.add_argument("combiner_dir"); parser.add_argument("report")
     parser.add_argument("answers", nargs="+"); parser.add_argument("--extra-questions")
+    parser.add_argument("--threshold", type=float, default=0.5, help="keep-score cutoff; choose it from development data only")
     a = parser.parse_args()
-    main(a.dataset, a.combiner_dir, a.report, a.answers, a.extra_questions)
+    main(a.dataset, a.combiner_dir, a.report, a.answers, a.extra_questions, a.threshold)
