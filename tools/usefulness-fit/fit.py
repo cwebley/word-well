@@ -12,8 +12,8 @@ Usage:
   python3 tools/usefulness-fit/fit.py DATASET_JSON COMBINER_DIR PRIVATE_REPORT_JSON ANSWERS_JSON [ANSWERS_JSON ...]
       [--extra-questions CANDIDATE_JSON]
 
---extra-questions adds candidate questions (for example
-evals/candidates/figurative-transfer-v2.json) to the gate's nine, to measure
+--extra-questions adds candidate questions (a JSON file shaped like
+pipeline/stages/usefulness-questions.json) to the gate's own, to measure
 whether they help before they join the gate.
 """
 
