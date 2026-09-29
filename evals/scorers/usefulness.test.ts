@@ -6,9 +6,10 @@ import { scoreUsefulness } from "./usefulness.js";
 
 let nextId = 0;
 function row(headword: string, category: UsefulnessCase["category"], verdict: Verdict | null,
-  { expected, difficulty = "clear", trialVerdicts }: { expected?: "keep" | "exclude"; difficulty?: "clear" | "hard"; trialVerdicts?: Verdict[] } = {}) {
+  { expected, difficulty = "clear", trialVerdicts }: { expected?: "keep" | "exclude"; difficulty?: "clear" | "hard" | null; trialVerdicts?: Verdict[] } = {}) {
   const c: UsefulnessCase = {
-    id: `word-${nextId++}`, headword, partsOfSpeech: ["n"], category, difficulty,
+    id: `word-${nextId++}`, headword, partsOfSpeech: ["n"], category,
+    ...(difficulty ? { difficulty } : {}),
     expected: expected ?? (category === "keep" ? "keep" : "exclude")
   };
   if (verdict === null) return { case: c, result: null };
@@ -80,6 +81,13 @@ describe("scoreUsefulness", () => {
     expect(report.byCategory.too_specific).toEqual({ cases: 1, correct: 1 });
     expect(report.byDifficulty.hard).toEqual({ cases: 1, correct: 0 });
     expect(report.byDifficulty.clear).toEqual({ cases: 4, correct: 2 });
+  });
+
+  it("leaves cases without a difficulty out of the difficulty lines only", () => {
+    const report = scoreUsefulness([row("parlance", "keep", "advance", { difficulty: null })]);
+
+    expect(report.byDifficulty).toEqual({});
+    expect(report.byCategory.keep).toEqual({ cases: 1, correct: 1 });
   });
 
   it("lists words whose trials disagree, even when the averaged verdict is right", () => {

@@ -39,6 +39,13 @@ describe("loadUsefulnessDataset", () => {
     expect(() => loadUsefulnessDataset(datasetFile(cases).path)).toThrow();
   });
 
+  it("accepts held-out cases labelled without a difficulty", () => {
+    const { difficulty: _omitted, ...undifficult } = keep;
+    const { path } = datasetFile([undifficult], { split: "held_out" });
+
+    expect(loadUsefulnessDataset(path).cases[0]).toEqual(undifficult);
+  });
+
   it("accepts either decision for a soft case", () => {
     const { path } = datasetFile([soft, { ...soft, id: "word-4", headword: "persnickety", expected: "keep" }]);
 

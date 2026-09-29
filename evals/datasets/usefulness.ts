@@ -14,7 +14,8 @@ const usefulnessCase = z.strictObject({
   // The owner's decision. For a soft case it is only a lean and is not scored.
   expected: z.enum(["keep", "exclude"]),
   category: z.enum(["keep", ...EXCLUDE_CATEGORIES, "soft"]),
-  difficulty: z.enum(["clear", "hard"])
+  // Development labels carry a difficulty; held-out labels are collected without one.
+  difficulty: z.enum(["clear", "hard"]).optional()
 }).refine((c) => c.category === "soft" || (c.category === "keep") === (c.expected === "keep"),
   "category and expected decision disagree");
 

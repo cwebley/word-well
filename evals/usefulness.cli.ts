@@ -111,6 +111,6 @@ function format(run: UsefulnessRun, id: typeof identity, fitReport?: string): st
     lines.push("", `cross-validated     precision ${pct(tp / (tp + fp))}  recall ${pct(tp / (tp + fn))}  (in-sample numbers above are optimistic)`);
   }
   lines.push("", "mistakes:");
-  for (const m of r.mistakes) lines.push(`  ${m.kind.padEnd(13)} ${m.headword.padEnd(18)} ${m.category.padEnd(20)} ${m.difficulty.padEnd(5)} keep ${m.keepScore.toFixed(3)}`);
+  for (const m of r.mistakes) lines.push(`  ${m.kind.padEnd(13)} ${m.headword.padEnd(18)} ${m.category.padEnd(20)} ${(m.difficulty ?? "").padEnd(5)} keep ${m.keepScore.toFixed(3)}`);
   return lines.join("\n");
 }

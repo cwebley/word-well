@@ -10,7 +10,7 @@ export type Mistake = {
   headword: string;
   kind: "wrong_admit" | "wrong_exclude";
   category: Category;
-  difficulty: UsefulnessCase["difficulty"];
+  difficulty?: UsefulnessCase["difficulty"];
   keepScore: number;
 };
 
@@ -25,7 +25,7 @@ export type UsefulnessReport = {
   wrongAdmits: { too_familiar: number; too_specific: number; intake_should_catch: number };
   mistakes: Mistake[];
   byCategory: Partial<Record<Category, Tally>>;
-  byDifficulty: Partial<Record<UsefulnessCase["difficulty"], Tally>>;
+  byDifficulty: Partial<Record<NonNullable<UsefulnessCase["difficulty"]>, Tally>>;
   soft: { cases: number; agreedWithLean: number; headwords: string[] };
   intakeShouldCatch: { cases: number; admitted: string[] };
   flips: string[];
@@ -68,7 +68,7 @@ export function scoreUsefulness(rows: ScoredRow[]): UsefulnessReport {
     const isKeep = c.category === "keep";
     const correct = admitted === isKeep;
     tally(report.byCategory, c.category, correct);
-    tally(report.byDifficulty, c.difficulty, correct);
+    if (c.difficulty) tally(report.byDifficulty, c.difficulty, correct);
     if (c.category === "intake_should_catch") {
       report.intakeShouldCatch.cases += 1;
       if (admitted) report.intakeShouldCatch.admitted.push(c.headword);
