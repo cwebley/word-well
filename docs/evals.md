@@ -132,6 +132,19 @@ Cross-validated on identical folds, v1-route answers:
 
 A new held-out set is needed before any pass-bar judgment.
 
+**Held-out v2 baseline (2026-09-29).** `usefulness-heldout-v2`: 60 more random
+pool words, labelled blind, 20 keeps. Gate: ten questions (figurative transfer
+added), combiner `3e5c41bb` fitted on `usefulness-dev-v4` (256 words, 120 of
+them random-pool), cutoff 0.60 chosen from development data before this run.
+Live v1 route, 180 requests, $0.020.
+
+| Precision | Recall | Wrong admits | Wrong excludes |
+| --- | --- | --- | --- |
+| 0.571 | 0.400 | 6 (3 too familiar, 3 too specific) | 12 |
+
+Fails the first-time bar. This is the fixed yardstick for question changes
+under #11; it is read as aggregates only and not rerun after every change.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
