@@ -142,6 +142,10 @@ Live v1 route, 180 requests, $0.020.
 | --- | --- | --- | --- |
 | 0.571 | 0.400 | 6 (3 too familiar, 3 too specific) | 12 |
 
+Rescored by replay (same Jev answers) with combiner `17332331` (dev-v5, 0.60):
+precision 0.583, recall 0.350, AUC 0.760, against a cross-validated development
+estimate of 0.850 / 0.515 on random-pool words.
+
 Fails the first-time bar. This is the fixed yardstick for question changes
 under #11; it is read as aggregates only and not rerun after every change.
 
