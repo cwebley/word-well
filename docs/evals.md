@@ -106,6 +106,19 @@ model version, or a third bad reply stop the run. The combiner is fitted by
 | 2026-09-28 | usefulness-dev-v2 (`29766667`), one label corrected | `152642aa` | replay | 0.831 | 0.860 |
 | 2026-09-28 | usefulness-dev-v2 | `d7022878`, refitted on dev-v2 | replay | 0.845 | 0.860 |
 
+**Held-out, first run (2026-09-29).** `usefulness-heldout-v1`: 60 words drawn at
+random from the prototype pool (seed 20260928), appropriateness pre-screened,
+labelled blind: 15 keeps, 45 excludes. Live v1 route, 180 requests, $0.017.
+
+| Combiner | Precision | Recall | AUC |
+| --- | --- | --- | --- |
+| `152642aa` | 0.500 | 0.267 | 0.742 |
+| `d7022878` | 0.500 | 0.267 | 0.744 |
+
+Both fail the first-time bar (precision ≥ 0.80, recall ≥ 0.50). For comparison,
+`d7022878` has a cross-validated development AUC of 0.895. Keeps are 25% of the
+random draw and 43% of the development set.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
