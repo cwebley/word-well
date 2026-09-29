@@ -1,0 +1,2481 @@
+{
+  "schema": "wordwell-usefulness-dataset/v1",
+  "name": "usefulness-dev-v5",
+  "split": "development",
+  "sources": {
+    "dev_v4_sha256": "66df937b6a30694c852ce20137227a43ad47bf1cfb4b0f6b1799383e2d7e1bcd",
+    "amendment": "owner-amendment-20260929-familiar-line.json"
+  },
+  "cases": [
+    {
+      "id": "word-089bba625f777bfa942d",
+      "headword": "adhesive",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-09d2b3f681eeaad09b16",
+      "headword": "adoration",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-15e859a1ab5f37b0c297",
+      "headword": "amelioration",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-ade4d8216678ae6ea7a4",
+      "headword": "appal",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6135f01112dbcaf84e9d",
+      "headword": "aridity",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-a315d087e3b3a387b14b",
+      "headword": "aspersion",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b05c667c6474a39df77d",
+      "headword": "assorted",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-eac521fcd4c6be1d3d8d",
+      "headword": "austere",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-e0a07fe01dbc0b618c7f",
+      "headword": "avalanche",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-c05a9492adfcb87fc3b8",
+      "headword": "backgammon",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-211d2e36d24eae7e063b",
+      "headword": "Bade",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-67ab4cb77f88b626516e",
+      "headword": "befit",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-7f466e0ffd69778ab788",
+      "headword": "benchmark",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-e57d4276420c35b75189",
+      "headword": "biff",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-d91785050b6977fc8f45",
+      "headword": "bilberry",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-08403aef02c4f27eae00",
+      "headword": "birdseed",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-7ddad0b942f8ed87e0b7",
+      "headword": "blindfold",
+      "partsOfSpeech": [
+        "a",
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-661272019a005b9a1171",
+      "headword": "blueprint",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-0d0ed54650e087b0ddb8",
+      "headword": "Boeotian",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-d3d7b541a08ae286e119",
+      "headword": "bollard",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-929cde5f1e6a29786420",
+      "headword": "bordelaise",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-88a67ce77f6ae6abb4cc",
+      "headword": "bowdlerize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-ee0ca505a092d0f35829",
+      "headword": "braising",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-37beebd8b572445733c8",
+      "headword": "brome",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-2f555998f3547b9a9d24",
+      "headword": "bullish",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-137ef7924c17cefd6d29",
+      "headword": "bundling",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-880ab8e2d1989aa77fd1",
+      "headword": "buttery",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-0b1c13f939ebb9f0143e",
+      "headword": "calculus",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-a664d3de021031261f38",
+      "headword": "cascara",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-92db8a6a2a6fdae6f788",
+      "headword": "categorized",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-de963cf53588533028ca",
+      "headword": "cephalexin",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-ce2bf6ead0a71b7543bc",
+      "headword": "chaw",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-56bafb7b1298ba32de6c",
+      "headword": "cheerlead",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-c90ff17c69609a261990",
+      "headword": "chime",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-bfc2efa9097357445237",
+      "headword": "clog",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-3c7ee31ce61dfe0e8a77",
+      "headword": "commemorate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-d0fb4fff754c8935fb64",
+      "headword": "commendable",
+      "partsOfSpeech": [
+        "a",
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-203e8e3114649cd664ea",
+      "headword": "companionship",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-c10a15ed338c66a0ef82",
+      "headword": "complementarity",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-6f27b9d4427de864bbf9",
+      "headword": "concealment",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-b258db099b5a78b08512",
+      "headword": "concretize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-7e79885b4c9e4ba18470",
+      "headword": "conical",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-6f251d101e17281343d2",
+      "headword": "consoling",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-5c31cff83be441031ee8",
+      "headword": "construe",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-066aeca8e9120b62c44f",
+      "headword": "cornel",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-9ed8e714eb2dab330586",
+      "headword": "cortege",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-bc31e4c6d3f51b7c1fcb",
+      "headword": "darkish",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-0929c5b266c2e06cfb49",
+      "headword": "deficit",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-37dfac3ef62da1578f88",
+      "headword": "dependability",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-0547e9ca26fd2cc81ca5",
+      "headword": "despoiler",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-5770fd5a70e5be2c7403",
+      "headword": "dimwit",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-7842a2c38c0b9d613cee",
+      "headword": "dissonant",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-6ef6d9225d43adbc1d12",
+      "headword": "distillate",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-2bd2a257558367386abc",
+      "headword": "diurnal",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-06dbc67fdc6efb7a30a8",
+      "headword": "domestication",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-005eac01347da4f68d19",
+      "headword": "donee",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b3a2eb8f3fd462d55e77",
+      "headword": "duress",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-3cce6963512d6c40cbd9",
+      "headword": "eloquence",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-578e8f112d57b0ae2b5f",
+      "headword": "emolument",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6506dfe276963c047803",
+      "headword": "emotionless",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b566b685a99790b66d52",
+      "headword": "encomium",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-50d55d146b56061a4bba",
+      "headword": "enviable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-af27d52f54ee4561c86c",
+      "headword": "epigraph",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-64cedcd4c87d0131d1e0",
+      "headword": "equanimous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-f9193d64e51c67f56ebf",
+      "headword": "equivocate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-4998676633ae4512b2ae",
+      "headword": "erratum",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-5312b5153c2c2d65cd28",
+      "headword": "essayist",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-14f00e6e6e0150b48509",
+      "headword": "expatiate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-7d1b2838fe45f7a60217",
+      "headword": "eyelid",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-f7064f47e2fc03c603d3",
+      "headword": "fatuous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-3a86f9a1e6bd4ee9b1b4",
+      "headword": "fecundity",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-e068cc12906444fda408",
+      "headword": "fetid",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-0429ac031db46208e671",
+      "headword": "fifteenth",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "intake_should_catch"
+    },
+    {
+      "id": "word-1a5b410ba1b82312f503",
+      "headword": "fitful",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-160b07396af689da481f",
+      "headword": "fruitwood",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-1d15e50cc1169ac5f5e1",
+      "headword": "furtherance",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-cc2200628cb7feab6450",
+      "headword": "gaskin",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-021f747b4e7de48da481",
+      "headword": "gastroesophageal",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-217bc8f51962621559da",
+      "headword": "gloominess",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-2d1a34d98a1fc5ebe074",
+      "headword": "gobble",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-3c2f4ab21f10d684f1bb",
+      "headword": "gourde",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-deced1c179bb3726a00e",
+      "headword": "grammatical",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-7befdaaa3d5d3338d492",
+      "headword": "grandly",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-d32756cb509c1c0ea2ee",
+      "headword": "gravitationally",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-64f3439d1d45f708c371",
+      "headword": "habituate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-f63f40e05d025250bceb",
+      "headword": "Habsburg",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-7f15c6f4929945a7606b",
+      "headword": "hailstorm",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-716d69055d91915b8547",
+      "headword": "hanger",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-205863aaaeb24ce78f7d",
+      "headword": "happy",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-8341ff807f9c902e3293",
+      "headword": "headscarf",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-1b89ffe038921cd9ba72",
+      "headword": "hearth",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "soft",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-5232f69dfcf0fbdb02ec",
+      "headword": "helium",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-f36ba752213d8f7a6a17",
+      "headword": "hematology",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b85841f98c0bea82436b",
+      "headword": "herbivorous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-bbfe20ea6d3ac46232e7",
+      "headword": "historiographer",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-b7b403555c226b0c0fcb",
+      "headword": "hoarfrost",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-274fb4ff30239a5e65c5",
+      "headword": "homegirl",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-717cb24941ee1eb0f472",
+      "headword": "horsemanship",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-8bf3722aa2f0cdff316c",
+      "headword": "hyperventilation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-5f0448af83f22e253d3b",
+      "headword": "immortality",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b626d81db93ba9ffb656",
+      "headword": "impasse",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-353b1950d8031c524246",
+      "headword": "incorporeal",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-1cd5f632d753439204fa",
+      "headword": "indebtedness",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-bdc36a63e5c1c54d7800",
+      "headword": "indinavir",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-4907876e21928fd90234",
+      "headword": "inexpedient",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-2b94d72d1a46c206543d",
+      "headword": "insecticidal",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-022066dd7fa3a969fdbf",
+      "headword": "insomniac",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-17d338a0d574fb88f979",
+      "headword": "insulation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-98b8ca07ab8e879b6f1c",
+      "headword": "insuperable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-5b9dea8b7a844102643a",
+      "headword": "integrality",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-bb902c997520444a3dd7",
+      "headword": "intelligentsia",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-79fef0099abb46980996",
+      "headword": "interlaced",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-a822a9c3e2de7fd97904",
+      "headword": "internalisation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-ebfdfa757ec11a542208",
+      "headword": "interoceptive",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-94c33d1abe0f4da29684",
+      "headword": "intrinsically",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-647e1d742cf058c78fdd",
+      "headword": "inveigle",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6585c7c6effe792b9162",
+      "headword": "irredentist",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-90c7d3578338a20d0d6a",
+      "headword": "irremovable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-19cd1903ca879d721d08",
+      "headword": "isthmus",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-f5843eae137412d41a04",
+      "headword": "juju",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-493ef2419015909f683d",
+      "headword": "juxtapose",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-1e4b025a6a0927e50bea",
+      "headword": "keg",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-8f17afe577a6de6a4f36",
+      "headword": "kibosh",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-70855d36a63a0120967c",
+      "headword": "kiln",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-a08f9ae40c1920188fde",
+      "headword": "Kshatriya",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-d44cc495af84b9ea6a2c",
+      "headword": "laconic",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-36700287016dd23b7ab7",
+      "headword": "landslide",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-5159a963ef31120821f8",
+      "headword": "lifesize",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-628bd8736da98a62c1d3",
+      "headword": "linguistics",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-184dbc3a3d4d58b14607",
+      "headword": "lucrative",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-40092ca340b54fae0106",
+      "headword": "Lusatian",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-78f651e8f0e1dd43a4c8",
+      "headword": "marginalia",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-627751ea4f458d484487",
+      "headword": "Marut",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "intake_should_catch",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-90503913457f4f953574",
+      "headword": "Masai",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "intake_should_catch",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-d71a5d02328eeb00911b",
+      "headword": "matey",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-402433b979271591b2fa",
+      "headword": "matinee",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-c4239e1bc2f05b23bc53",
+      "headword": "mayday",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-ab03cbc20bac9a42ee44",
+      "headword": "mellowed",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-3ccaf8303c10920f1db9",
+      "headword": "menstruation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-4fa61d812dcf31c43a55",
+      "headword": "merchantable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-2902d6110fe462bb7aff",
+      "headword": "Mesozoic",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-e3d7b3058e4212236145",
+      "headword": "monocyte",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-50aa7f8e36f53d5f778b",
+      "headword": "moonshine",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-cdb19f4d6b9abf9328e5",
+      "headword": "muckraking",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-829aef91946582498d77",
+      "headword": "munificent",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-d875ee14af5a49901b05",
+      "headword": "muscleman",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-00d83f36fc7d84c0e09b",
+      "headword": "newsboy",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-b538d2156d8f4a7a3792",
+      "headword": "nitpick",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-2b749f0a1d170fbafc2c",
+      "headword": "noncommunicable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-304d69c5b9239ae52fae",
+      "headword": "nondescript",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-e5fb13a9de2d8afb2a39",
+      "headword": "northeastward",
+      "partsOfSpeech": [
+        "a",
+        "n",
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6b291e89a11a3d951c89",
+      "headword": "nuance",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-b85a33d9be74938711bb",
+      "headword": "obsidian",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-e1161cb07c68cfc3eafc",
+      "headword": "oligarchy",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-d90b432ef8082939d82e",
+      "headword": "omnivorous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-12479a1a8b5b5e9bce20",
+      "headword": "orchestrator",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-baa83f3059f57cf34f82",
+      "headword": "outsmart",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-c149a05db30e16199bd6",
+      "headword": "palaver",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-3579da6ed6543ffee2bc",
+      "headword": "pandemonium",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-36ef8ca73b9231568718",
+      "headword": "paranoia",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-ff93f29a35f5cb997399",
+      "headword": "parasitically",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-b352098be2c932b6f3fe",
+      "headword": "parlance",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-baa03f383a49a8b5d303",
+      "headword": "pedagogy",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-135e9ac759e9236db96c",
+      "headword": "peeved",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "soft",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-c77e091c24aad3188d7f",
+      "headword": "penury",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-e7ae586393cba403e481",
+      "headword": "perfidious",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-40c34ded351af2eb980f",
+      "headword": "perforated",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-432783a964809fde7df8",
+      "headword": "pernicious",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-538360cbf25af3d56d77",
+      "headword": "perphenazine",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-a46a01c95491156a214c",
+      "headword": "persevering",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-88c09b5cd00c035dfa18",
+      "headword": "persnickety",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-cfa982e80805a3093a6c",
+      "headword": "phantasmagoric",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-a027018933b903dc48ca",
+      "headword": "phasmid",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-a12eda6241385124465a",
+      "headword": "philanthropy",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "soft",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-c7956960a111276d2b9f",
+      "headword": "pinnate",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-92df71888eee2493dc68",
+      "headword": "pirouette",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-f8e92fb7e52da960162d",
+      "headword": "plagiarize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-1ff9a1251275def300aa",
+      "headword": "pleasingly",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-6417b892f48c9e9720c0",
+      "headword": "plexus",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "soft",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-0e5c7b66779845f3f7e1",
+      "headword": "pneumatic",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-85e10ed95d4d5591ad71",
+      "headword": "poplar",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-e809dd9c63c19655c89c",
+      "headword": "preeminent",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-e9122311811808dd9459",
+      "headword": "pretended",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-8af01cea309502bc1a5a",
+      "headword": "preternaturally",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-174107768c196911eab6",
+      "headword": "prokaryote",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-8a50425c0985700e31ef",
+      "headword": "pugnacity",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-a7f3e7c07b09f048dc23",
+      "headword": "punctilious",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-cfc82008a420eaaed533",
+      "headword": "pundit",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-2d77a6be5703ce2351be",
+      "headword": "pung",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-465a41db87ebe5d4d6fd",
+      "headword": "querulous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-44421d808748a224a923",
+      "headword": "rasp",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-72c398f51b7bcace3067",
+      "headword": "reaffirmation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-8a5f3ba55bededc31b1c",
+      "headword": "rearward",
+      "partsOfSpeech": [
+        "a",
+        "n",
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-2e91359fff9ff82e7c63",
+      "headword": "recopy",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-f951cac19e404876d115",
+      "headword": "referenced",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-9c22f8540eec1d3097cd",
+      "headword": "regurgitate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-8e0e46f81e4a35659b20",
+      "headword": "remission",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-18b7d62525feea382a18",
+      "headword": "reticulation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-88574b0a07aca7c9d275",
+      "headword": "rhapsodize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-208586f01d1331702ec5",
+      "headword": "rotundity",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-e5caeeadabb17dc72575",
+      "headword": "salaat",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-720f7084e7ce6dbdea7d",
+      "headword": "salvage",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-926a3815cfc28f0fe165",
+      "headword": "saquinavir",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-b7fb1eae3cd828b819bc",
+      "headword": "scintillating",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-93e8ccc07e6e46da7ef5",
+      "headword": "sensory",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-5e5e2e06d40ff6d75075",
+      "headword": "serialize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-ab3c21b550226cd121c7",
+      "headword": "shallot",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-3b3d9a6d2df6a56edfae",
+      "headword": "skedaddle",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-63036445a084127714f1",
+      "headword": "Skinnerian",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-88868006f10324657eae",
+      "headword": "skittish",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-a31fdb746eb180570676",
+      "headword": "snugness",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-f8e82683f7d074fedaf9",
+      "headword": "solvation",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-0100af1bc641873d10a1",
+      "headword": "spacetime",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-ce5d960f376024a713f3",
+      "headword": "stent",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-510134fd3e63d63cf887",
+      "headword": "stimulate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-f388a15f324c1c296916",
+      "headword": "stoop",
+      "partsOfSpeech": [
+        "n",
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-37428d189ba103cfb483",
+      "headword": "subcommittee",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-835741101f102efe68f9",
+      "headword": "subliminal",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-9320150a23deed47b291",
+      "headword": "subunit",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-6eb1975c79ffb627e429",
+      "headword": "supercilious",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-7513e2ae40805a96cb16",
+      "headword": "superintendence",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-9c96921206528ec059db",
+      "headword": "symposium",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-9d9d5fdbf960b9a4dd5d",
+      "headword": "synaesthesia",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-e43f035e84a24fc25c2a",
+      "headword": "syndic",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-786e46603272730fc8d1",
+      "headword": "synecdoche",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-316935d7618d53ca997a",
+      "headword": "talon",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-096a27184a2d0715bfb7",
+      "headword": "taproom",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-79cc90e0c6b3fb768b94",
+      "headword": "tertiary",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-87bb8920575ab54f2e44",
+      "headword": "Texan",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "intake_should_catch",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-fa65ca3a75b9149fe564",
+      "headword": "thievish",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-1da656e7e7f8b7bd4e5b",
+      "headword": "totter",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6cfa8340f51bd4fb2ae8",
+      "headword": "trajectory",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-25e791b9b883fab45f61",
+      "headword": "transmute",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-31d720424eb8306d8bed",
+      "headword": "triton",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-1690c6651291ab8e2a9c",
+      "headword": "trivialize",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-e5fb516ea5c022024199",
+      "headword": "truculence",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-5311dcbe8e9703531ecd",
+      "headword": "twosome",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-e9fa2ddd033fcbd981b2",
+      "headword": "ubiquitous",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-948faeb3393c124006dd",
+      "headword": "ulster",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    },
+    {
+      "id": "word-bbf95f35653a7c21eb38",
+      "headword": "unfriendly",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-c1049a4593b5dca9b8fc",
+      "headword": "ungentle",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-331cf6041d7539bb0571",
+      "headword": "uniqueness",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-37251bf289443b57c03e",
+      "headword": "unparliamentary",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-3ef2927dbdec0c78e6d3",
+      "headword": "unrecognized",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-98a878cad0caa6df74e6",
+      "headword": "unwarrantable",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-243ee7d14dfd016fc1c9",
+      "headword": "vagary",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-8433da2384b9b6b67b9e",
+      "headword": "verbally",
+      "partsOfSpeech": [
+        "r"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-738abbe9d3633afdfe8f",
+      "headword": "vibraphone",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-0f158ca2ec01c51e3087",
+      "headword": "violative",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep"
+    },
+    {
+      "id": "word-e15f9c8fa3c54983226b",
+      "headword": "vitiate",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-64a56b4e4b456b81a8a3",
+      "headword": "vitrine",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-5d29538c7f962c0a53e5",
+      "headword": "wanter",
+      "partsOfSpeech": [
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar",
+      "difficulty": "hard"
+    },
+    {
+      "id": "word-9ea65286667476f02346",
+      "headword": "wield",
+      "partsOfSpeech": [
+        "v"
+      ],
+      "expected": "exclude",
+      "category": "too_familiar"
+    },
+    {
+      "id": "word-102da5b5e31121adf23c",
+      "headword": "winsome",
+      "partsOfSpeech": [
+        "a"
+      ],
+      "expected": "keep",
+      "category": "keep",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-9e390fbc765d28f9f66a",
+      "headword": "xiii",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "intake_should_catch",
+      "difficulty": "clear"
+    },
+    {
+      "id": "word-6677792f7509e2bf3117",
+      "headword": "zygomatic",
+      "partsOfSpeech": [
+        "a",
+        "n"
+      ],
+      "expected": "exclude",
+      "category": "too_specific"
+    }
+  ]
+}
