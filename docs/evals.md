@@ -145,6 +145,14 @@ Live v1 route, 180 requests, $0.020.
 Fails the first-time bar. This is the fixed yardstick for question changes
 under #11; it is read as aggregates only and not rerun after every change.
 
+**Frequency as a gate input, measured and not adopted (2026-09-29).** Adding
+direct wordfreq Zipf as an eleventh input on `usefulness-dev-v6` (cutoff 0.60,
+same folds) gave no consistent gain on random-pool words: +0.06 recall with
+all development words, −0.05 precision and −0.03 recall when training only on
+intake-eligible words. Dropping two words alone moved the baseline by about
+0.05, so these differences are within fold noise. The gate keeps its approved
+headword-and-POS input; frequency stays an intake ceiling only.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
