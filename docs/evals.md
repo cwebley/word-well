@@ -186,6 +186,23 @@ On dev-v7 cross-validation it left AUC and top-ranked keeps unchanged (weight
 rank 15 of 17). Jev rates owner keeps such as pedagogy as scholarly as the
 too-specific words it was meant to catch. 768 requests, $0.016.
 
+**Top-ranked bar, second measurement (2026-10-01).** Combiner `c35a2cbf`,
+fitted on dev-v8, which adds the dev-v7 gate's top 40 (plus 20 random) from a
+second fresh 1,000-word sample, labelled blind. Same held-out 1,000-word sample
+as above, rescored by replay; the 14 words new to its top 40 were labelled blind
+with 14 random fillers.
+
+| Gate's top | Keeps | Precision | Cutoff | Projected admitted pool |
+| --- | --- | --- | --- | --- |
+| 10 | 8 | 0.80 | 0.752 | about 420 |
+| 20 | 17 | 0.85 | 0.656 | about 840 |
+| 30 | 20 | 0.67 | 0.531 | about 1,260 |
+| 40 | 23 | 0.57 | 0.481 | about 1,680 |
+
+Wrong admits in the top 40: 15 too familiar, 2 too specific (was 7 and 11).
+Close to the bar but not over it: 0.80 holds only up to a pool of about 840.
+The second sample cost 6,171 requests, $0.40.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
