@@ -161,6 +161,24 @@ intake-eligible words. Dropping two words alone moved the baseline by about
 0.05, so these differences are within fold noise. The gate keeps its approved
 headword-and-POS input; frequency stays an intake ceiling only.
 
+**Top-ranked bar, first measurement (2026-10-01).** Bar amended on
+[#11](https://github.com/cwebley/word-well/issues/11#issuecomment-5925213214).
+1,000 fresh random pool words (seed 20260928, after the words already used),
+appropriateness pre-screened, scored by combiner `78e8b008` (dev-v7). The
+owner labelled the gate's top 40 plus 40 random from the rest, shuffled, blind.
+6,147 requests, $0.40.
+
+| Gate's top | Keeps | Precision | Cutoff | Projected admitted pool |
+| --- | --- | --- | --- | --- |
+| 10 | 6 | 0.60 | 0.909 | about 420 |
+| 20 | 13 | 0.65 | 0.857 | about 840 |
+| 40 | 22 | 0.55 | 0.709 | about 1,680 |
+
+Random 40 from the rest: 2 keeps (5%), so about 48 keeps among the other 960 and
+an estimated recall of about 0.31 for the top 40. The top is enriched about
+eleven-fold over the rest, but fails the 0.80 bar. Of the 18 wrong admits in the
+top 40, 11 are too specific and 7 too familiar.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
