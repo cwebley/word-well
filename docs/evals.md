@@ -179,6 +179,13 @@ an estimated recall of about 0.31 for the top 40. The top is enriched about
 eleven-fold over the rest, but fails the 0.80 bar. Of the 18 wrong admits in the
 top 40, 11 are too specific and 7 too familiar.
 
+**Candidate question `general_reading`, measured and not adopted (2026-10-01).**
+"Where would an educated adult ordinarily encounter this word?" (general vs
+specialist or scholarly writing, 0–3; `evals/candidates/general-reading-v1.json`).
+On dev-v7 cross-validation it left AUC and top-ranked keeps unchanged (weight
+rank 15 of 17). Jev rates owner keeps such as pedagogy as scholarly as the
+too-specific words it was meant to catch. 768 requests, $0.016.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
