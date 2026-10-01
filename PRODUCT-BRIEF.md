@@ -41,8 +41,17 @@ when it sounds wrong, and give the learner a lightweight way to retain it.
 
 ## Personalization And Retention
 
-Word difficulty and learner mastery are separate concepts.
+Catalogue eligibility, word rating, and learner mastery are separate concepts.
 
+- Usefulness decides whether a word belongs anywhere in WordWell. Its inclusion
+  prediction is separate from the word rating used to match eligible words to
+  learners.
+- The first version has no grouping of predictable forms. Every candidate is
+  planned as its own lesson, and occasional redundant lessons are accepted.
+- Word rating estimates prior understanding. The initial estimate may combine
+  direct word frequency with Jev familiarity measurements; the mapping requires
+  separate calibration. Learner familiarity responses then refine it. Learning
+  payoff and difficulty of accurate use are not the rating's target.
 - Word difficulty is an editorial estimate based on frequency, register,
   usage/meaning complexity, and a practical-use rubric.
 - Learner mastery is estimated from the selected starting band, familiarity,
@@ -86,6 +95,12 @@ strong feedback can nominate an item for content regeneration/review.
 - Candidate frequency measures the headword itself, without adding its inflected
   or related forms. Missing frequency remains an unresolved prerequisite rather
   than an invented score or a usefulness rejection.
+- Before weighing other usefulness, exclude a headword whose ordinary meaning
+  would be immediately clear to a degree-educated adult unfamiliar with it,
+  from the word itself without a definition or explanatory context. Require
+  accurate understanding, not a rough guess or recognition of the category.
+  Rarity and expressive potential cannot override this too-basic exclusion;
+  compound or derivative status alone does not establish it.
 - Reject archaic and impractical vocabulary outright. Judge the headword as a
   whole, from the meanings an educated adult would ordinarily encounter, rather
   than rescuing a mundane word with a niche, archaic, regional, or technical
@@ -109,6 +124,11 @@ live tutor in the learner's daily experience.
 - Definitions, etymology, usage-frequency/register labels, and factual claims
   must be grounded in a source. Natural examples and practical coaching may be
   generated.
+- Each published meaning has three examples: one demonstrates the meaning
+  directly, one shows a natural figurative use where it works, and the third
+  serves the strongest remaining teaching purpose. Use another direct example
+  when a figurative use would be forced. A creative analogy can illustrate a
+  source-backed meaning without becoming a separate established meaning.
 - OEWN supplies the lesson meaning inventory and source-backed synonym and
   contrast candidates. The planner groups source meanings and writes grounded
   definitions; the writer adds material around that plan. Wiktionary supplies
@@ -130,9 +150,25 @@ live tutor in the learner's daily experience.
   outcomes and source evidence. Compounds, derivatives, missing synonyms, and
   broad topic labels do not automatically exclude a candidate. Endorsement does
   not bypass factual exclusions or either candidate gate.
-- Usefulness and appropriateness decide candidate eligibility before lesson
-  planning. Appropriateness judges the headword as a whole and accepts or
-  rejects it, without per-meaning judgments or quarantine.
+- After deterministic intake, appropriateness runs before usefulness. Both gates
+  must accept a candidate before it is planned as its own lesson. Appropriateness judges the
+  headword as a whole and accepts or rejects it, without per-meaning judgments or
+  quarantine.
+- Both gates use Jev through OpenRouter's v1 System One route, subject to the
+  parity and data-retention checks in the [route amendment](https://github.com/cwebley/word-well/issues/1#issuecomment-5819922435)
+  and to passing their evals. A gate averages three Jev trials before deciding.
+  Each gate sits behind an adapter, so a different model can replace Jev and run
+  the same eval.
+- The usefulness gate leans toward excluding. A wrong admit spends a learner's
+  daily word on a word not worth studying, so precision on admitted words is its
+  primary measure. The [top-ranked pass bar](https://github.com/cwebley/word-well/issues/11#issuecomment-5925213214)
+  requires at least 80% precision at a projected admitted pool of at least 1,000
+  words, plus owner review of mistakes. The owner approved the `e9d29c21` weights
+  at a 0.58 keep-score cutoff. The production configuration and accepted evidence
+  are recorded in [docs/evals.md](docs/evals.md#promoted-configuration).
+- The first version does not group a verb and its agent noun into one lesson.
+  Every word is its own candidate. The [grouping decision](https://github.com/cwebley/word-well/issues/1#issuecomment-5823937201)
+  parks the evaluated grouping rule for a later version.
 - The first milestone requires human approval of each complete lesson after
   deterministic checks, for an initial batch of about ten words. Approval binds
   to the exact content, supporting evidence, attribution, and applicable check
@@ -141,8 +177,9 @@ live tutor in the learner's daily experience.
 - Planner and writer keep the newer lesson prototype's compact prompts and use
   GPT Luna. Separate, versioned golden evaluations exercise the shared stage
   implementations with three fresh trials per case, deterministic contract
-  checks, and human quality comparison. Prompt changes follow observed failures
-  and evaluation evidence; this milestone adds no LLM judge.
+  checks, and human quality comparison: the owner reads every trial and scores
+  it 1 to 5 for comparison, with no threshold. Prompt changes follow observed
+  failures and evaluation evidence; this milestone adds no LLM judge.
 - Practice items are independent of the lesson body. The first milestone
   publishes with an empty bank, which reading and Practice views must tolerate.
   Existing prototype content is disposable; start fresh rather than convert it
@@ -159,7 +196,7 @@ live tutor in the learner's daily experience.
 
 The [approved planner/writer contract](https://github.com/cwebley/word-well/issues/10#issuecomment-5733461061)
 records the first milestone's stage boundaries, publication checks, and
-evaluation acceptance.
+evaluation acceptance. [docs/evals.md](docs/evals.md) describes each stage's eval.
 
 ## Identity, Privacy, And Data
 

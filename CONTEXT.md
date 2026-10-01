@@ -70,6 +70,14 @@ shown alongside it. Membership follows a recorded relation, never a shared
 spelling or a shared synonym.
 _Avoid_: Related words, derived forms, word forms
 
+**Supporting form**:
+A source-linked word taught briefly inside another headword's Word lesson,
+because its ordinary meanings are clear from that headword and predictable word
+formation. It is not planned as a Word lesson of its own. Membership in a Word
+family alone does not make a word a Supporting form. The first version has no
+Supporting forms: every candidate is planned as its own Word lesson.
+_Avoid_: Learning-equivalent form, duplicate, variant
+
 **Unavailable lesson**:
 A delivered word that remains in learner history after its current content is
 withdrawn or under quality review. History marks it unavailable and removes
@@ -108,22 +116,36 @@ alone does not settle it. Word-formation attributes, missing synonyms, and broad
 topic labels do not by themselves establish that a headword is unsuitable.
 _Avoid_: Cleanup, moderation, review
 
+**Meaning obviousness**:
+Whether a degree-educated adult unfamiliar with a headword can immediately and
+accurately understand its ordinary meaning from the word alone, without a
+definition or explanatory context. It is distinct from prior familiarity, word
+frequency, and how much a lesson could teach; a rough or partial guess is
+insufficient.
+
 **Usefulness gate**:
-The judgment pass deciding whether a headword rewards deliberate study, from the
-headword and its recorded parts of speech alone. It reports familiarity, scope,
-and learning value; deterministic policy, never the model, turns those into
-advance or exclude. It folds toward admitting, because a wrong admit is visible
-in the app while a wrong exclude is silent and permanent.
+The judgment pass deciding whether an appropriate headword rewards deliberate
+study anywhere in WordWell, separately from its placement on the rating scale.
+Its assessment uses the headword and recorded parts of speech alone and reports
+familiarity, meaning obviousness, scope, and learning value; deterministic policy,
+never the model, turns those into advance or exclude. It leans toward excluding,
+because a wrong admit spends a learner's daily word on a word not worth studying.
 _Avoid_: Usefulness score, interest filter, teaching value
 
 **Appropriateness gate**:
-The headword-level judgment deciding whether a candidate advanced by the
-Usefulness gate is fit to serve, with acceptance or rejection of the whole
-candidate rather than separate judgments of its meanings or quarantine.
+The headword-level judgment deciding whether a candidate is fit to serve before
+the Usefulness gate, with acceptance or rejection of the whole candidate rather
+than separate judgments of its meanings or quarantine.
 It rejects offensive or derogatory usage, sexually explicit usage, profanity,
 and vulgar bodily usage, including plausible connotations in those categories;
 neutral medical or anatomical subject matter alone does not disqualify a word.
 _Avoid_: Safety gate, content filter, moderation
+
+**Promotion**:
+The owner's recorded decision that a stage configuration runs in production. It
+requires evaluation evidence meeting the stage's pass bar and never happens
+automatically.
+_Avoid_: Auto-switch, rollout
 
 **Config fingerprint**:
 The identity of a pipeline stage's evidence and effective configuration, used to
@@ -132,19 +154,19 @@ and gate authorization remain separate requirements for reusing a result.
 _Avoid_: Run id, pipeline version, build hash
 
 **Evaluation set**:
-A versioned, hand-curated collection of complete word lessons, including
-per-meaning cases, used to judge content quality before publication.
-_Avoid_: Test suite, benchmark (when referring to the WordWell content set)
+A frozen, versioned collection of one pipeline stage's inputs with owner-approved
+expected outcomes, split into development cases and held-out cases never used
+for tuning. Expected outcomes never enter a model input.
+_Avoid_: Test suite, benchmark, golden data (when meaning the whole set)
 
 **Content evaluation**:
-An assessment of a word lesson's grounding, factuality, meaning coverage,
-naturalness, practical usefulness, duplicate protection, and contextual-practice
-discrimination.
+An assessment of planner or writer output: deterministic contract checks on every
+trial, plus the owner's reading and comparative score for grounding, factuality,
+meaning coverage, naturalness, and practical usefulness.
 
 **Quarantined record**:
 A generated vocabulary record withheld from learner publication because a
-deterministic gate, quality threshold, evaluator disagreement, or required
-human review was not cleared.
+deterministic check or required human review was not cleared.
 
 **Passkey**:
 A cryptographic authenticator held by a learner's device or password manager
@@ -201,16 +223,17 @@ the lesson is read and used as initial scheduling evidence.
 **Word difficulty**:
 An editorial estimate of how challenging a word is based on frequency, register,
 usage or meaning complexity, and practical usefulness. It is separate from any
-learner's mastery, and distinct from a word rating, which is measured rather
-than estimated.
+learner's mastery, and distinct from a word rating, which targets prior
+understanding and is revised from reported familiarity.
 
 **Word rating**:
-A word's measured difficulty on the shared rating scale, seeded from its
-frequency and revised as learners report familiarity. A word rating drifting
-above its frequency prior means the word is better known than frequency
-predicted. A word is retired from delivery once its rating passes the band
-ceiling by a margin, not at the ceiling itself, so a word near the boundary is
-not served once and lost.
+A word's position on the shared rating scale, estimating prior understanding
+rather than usefulness or difficulty of accurate use. It starts from an initial
+familiarity estimate and is revised as learners report familiarity. A word rating
+drifting above its initial estimate means the word is better known than predicted.
+A word is retired from delivery once its rating passes the band ceiling by a
+margin, not at the ceiling itself, so a word near the boundary is not served once
+and lost.
 _Avoid_: Difficulty score, Elo, weight
 
 **Learner rating**:

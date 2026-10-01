@@ -15,6 +15,7 @@ prototypes/content-pipeline-source-shapes/mechanical-flags.jsonl
 
 # Prototype scratch: virtualenvs and downloaded source snapshots are rebuilt, never committed.
 prototypes/**/venv/
+tools/**/venv/
 prototypes/**/data/
 prototypes/**/out/
 __pycache__/
@@ -48,3 +49,6 @@ prototypes/intake-adjudication/*.sqlite
 prototypes/intake-adjudication/reports/*.html
 prototypes/content-pipeline-source-shapes/runs/
 prototypes/content-pipeline-source-shapes/out/
+
+# Owner review exports hold private labels; copies live in ~/src/wordwell-private
+wordwell-*-review-*.json
