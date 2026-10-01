@@ -146,6 +146,10 @@ Rescored by replay (same Jev answers) with combiner `17332331` (dev-v5, 0.60):
 precision 0.583, recall 0.350, AUC 0.760, against a cross-validated development
 estimate of 0.850 / 0.515 on random-pool words.
 
+After a blind owner review of its 20 keeps under the familiar line (13 moved to
+too familiar), `usefulness-heldout-v2.1` has 7 keeps, below the 15 the design
+requires. Replay with `17332331`: precision 0.167, recall 0.286, AUC 0.701.
+
 Fails the first-time bar. This is the fixed yardstick for question changes
 under #11; it is read as aggregates only and not rerun after every change.
 
