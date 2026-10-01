@@ -57,33 +57,60 @@ Full design on [#11](https://github.com/cwebley/word-well/issues/11#issuecomment
   cutoff sweeps need no new calls.
 - **Trials.** Production averages three Jev trials, and the eval scores that
   averaged verdict. Words whose verdict flips between trials are reported.
-- **Development set.** All owner labels, frozen as
-  `evals/datasets/usefulness-dev-v1.json`: 136 words, 132 firm and 4 soft. It is
+- **Development set.** Development labels, currently frozen as
+  `evals/datasets/usefulness-dev-v9.json`: 344 words, 340 firm and 4 soft. It is
   committed with headword, OEWN parts of speech, decision and tags only. Soft
   labels count as correct either way and are reported separately.
-- **Held-out set.** Kept private, outside the repo. 60 words drawn at random from the pool after intake and the
-  appropriateness rules, labelled blind before any model output exists, topped
-  up until 15 are keeps.
+- **Held-out set.** Kept private, outside the repo. Under the amended design,
+  1,000 fresh random pool words pass intake and appropriateness screening. The
+  owner labels the gate's top 40 plus 40 random words from the rest, shuffled
+  blind. Ranking changes may require blind follow-up labels. Owner corrections
+  after a by-name review create a separate reviewed version.
 - **Tags.** Difficulty `clear` or `hard`; category `too_familiar`,
   `too_specific`, `keep`, `intake_should_catch`, `soft`. Scores are reported per
   tag and overall.
-- **Metrics.** Precision on keeps is primary: a wrong admit is the worse
-  mistake. Recall on keeps is the floor. Wrong admits are counted by type, and
-  every mistake is listed by name.
+- **Metrics.** Precision on top-ranked keeps is primary: a wrong admit is the
+  worse mistake. Projected admitted-pool size is the floor. Recall remains a
+  diagnostic. Wrong admits are counted by type, and every mistake is listed by
+  name.
 
 | Situation | Pass bar |
 | --- | --- |
-| First time in production | Held-out precision ≥ 0.80 and recall ≥ 0.50, plus owner review of each mistake by name |
-| Replacing the current configuration | Same dataset version; precision no lower; recall down by at most one keep (about 0.07); same review |
+| First time in production | Top-ranked precision ≥ 0.80 at a projected admitted pool of at least 1,000 words, plus owner review of each mistake by name |
+| Replacing the current configuration | Same measurement design and dataset version; top-ranked precision no lower; projected admitted pool still at least 1,000 words; same review |
 
-The owner may override a floor with a written reason. With about 15 held-out
-keeps, the numbers are coarse.
+The owner may override a floor with a written reason. The top-ranked bar
+[replaced the original precision/recall bar](https://github.com/cwebley/word-well/issues/11#issuecomment-5925213214)
+on 2026-10-01. These estimates come from small labelled samples.
+
+### Promoted configuration
+
+The owner [approved production use](https://github.com/cwebley/word-well/issues/11#issuecomment-5940925373)
+of the `e9d29c21` weights with a **0.58** cutoff. `PRODUCTION_COMBINER` in
+`pipeline/stages/usefulness-production.ts` loads
+`config/usefulness-combiner-effc8eb93ba0.json`. The gate advances a word when
+the score from its averaged three Jev trials is at least 0.58.
+
+`effc8eb93ba0` identifies this threshold selection separately from the original
+`e9d29c21` fit at 0.50. Its ID is the SHA-256 of the canonical, key-sorted
+`threshold_selection` object in the artifact. The weights are identical, but
+the stage config fingerprints differ so results at the two cutoffs stay distinct.
+
+The accepted reviewed sample gives 22 keeps among 26 admits, precision 0.846,
+and a projected pool of about 1,090 words. The projection uses the intake frame
+before appropriateness screening. A fresh blind check is deferred. This records
+the approved stage configuration; the production pipeline executor is not yet
+built. The eval runner uses this configuration by default.
 
 ### Running it
 
 ```sh
-# Replay saved answers, no cost
+# Replay saved answers with the promoted configuration, no cost
 npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
+  --replay-from <answers.json>
+
+# For an experiment, explicitly select another frozen combiner
+npm run eval:usefulness -- --dataset <dataset.json> \
   --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json>
 
 # Live Jev; OPENROUTER_API_KEY in the environment. With --replay-from, only
@@ -203,10 +230,83 @@ Wrong admits in the top 40: 15 too familiar, 2 too specific (was 7 and 11).
 Close to the bar but not over it: 0.80 holds only up to a pool of about 840.
 The second sample cost 6,171 requests, $0.40.
 
+**Top-ranked bar, third measurement (2026-10-01).**
+Combiner `e9d29c21`, fitted on dev-v9. The owner labelled the eight previously
+unlabelled words in `c35a2cbf`'s top 40 from the second sample, mixed with 20
+random unlabelled words from the rest. Existing labels cover the other 32.
+The new batch has 5 keeps, 16 too-familiar excludes and 7 too-specific excludes.
+Dev-v9 has 344 words, including 81 keeps and 4 soft labels; 340 firm cases train
+the combiner. The previous fit reproduced exactly before refitting with the
+same settings. Development cross-validated precision is 0.757, recall 0.691.
+
+The same held-out 1,000-word sample was rescored by replay. No held-out words
+entered training. A two-word blind follow-up covered the one unlabelled word
+in the top 40 and one random filler. Both were excludes. All top-40 labels
+are now complete; the follow-up did not change scores or ranking.
+
+| Gate's top | Keeps | Precision | Cutoff | Projected admitted pool |
+| --- | --- | --- | --- | --- |
+| 10 | 8 | 0.800 | 0.755 | about 419 |
+| 20 | 17 | 0.850 | 0.673 | about 838 |
+| 22 | 19 | 0.864 | 0.644 | about 922 |
+| 23 | 19 | 0.826 | 0.630 | about 964 |
+| 24 | 19 | 0.792 | 0.597 | about 1,006 |
+| 30 | 21 | 0.700 | 0.519 | about 1,258 |
+| 40 | 22 | 0.550 | 0.480 | about 1,677 |
+
+Among the measured ranks, the largest top-ranked set at or above 0.80 is the
+top 23, short of the 1,000-word pool target. The top 24 still have 19 keeps.
+Wrong admits in the top 40 are 15 too familiar and 3 too specific. Top-40
+precision fell from 23/40 for `c35a2cbf` to 22/40; top-24 precision is unchanged
+at 19/24. This round does not meet the promotion bar. By-name reports for both
+combiners are ready privately and await owner review. No new model requests
+or cost.
+
+Pool projections use the same calculation as earlier measurements: the rank
+fraction of the 1,000-word sample times the 41,920-word intake frame. That
+frame is before appropriateness screening, so these are estimates, not counts
+of a fully screened admitted pool.
+
+**Owner review of the third measurement (2026-10-01).** After reading the
+by-name report, the owner corrected seven labels: three excludes became
+keeps, three keeps became excludes, and one exclusion reason changed. The
+private reviewed dataset `usefulness-pool-reviewed-v1` contains all 110
+labelled sample words with these corrections. The original exports and blind
+measurement reports are preserved. Neither combiner was refitted; both fixed
+rankings were evaluated against the same reviewed labels.
+
+| Combiner | Gate's top | Keeps | Precision | Cutoff | Projected admitted pool |
+| --- | --- | --- | --- | --- | --- |
+| `c35a2cbf` | 24 | 21 | 0.875 | 0.628 | about 1,006 |
+| `c35a2cbf` | 27 | 22 | 0.815 | 0.577 | about 1,132 |
+| `c35a2cbf` | 40 | 24 | 0.600 | 0.481 | about 1,677 |
+| `e9d29c21` | 24 | 21 | 0.875 | 0.597 | about 1,006 |
+| `e9d29c21` | 26 | 22 | 0.846 | 0.580 | about 1,090 |
+| `e9d29c21` | 27 | 22 | 0.815 | 0.575 | about 1,132 |
+| `e9d29c21` | 40 | 23 | 0.575 | 0.480 | about 1,677 |
+
+Both reach the numerical bar on reviewed labels. Among ranks 1 through 40,
+the largest qualifying prefix is the top 27 for both. Top-40 wrong admits
+are 13 too familiar and 3 too specific for `c35a2cbf`, and 14 too familiar
+and 3 too specific for `e9d29c21`. These are post-review results, not a new
+blind measurement or evidence of a ranking improvement. The projection caveat
+above still applies. The owner subsequently approved the configuration below.
+The corrections and reviewed by-name reports are private. No model requests
+or cost.
+
+**Evidence accepted by the owner.** The owner accepted the reviewed results
+as sufficient evidence to proceed with choosing a production configuration,
+and deferred a fresh blind 80-word check until a later date if needed.
+[Decision on #11](https://github.com/cwebley/word-well/issues/11#issuecomment-5940800815).
+The owner then [approved `e9d29c21` weights at a 0.58 cutoff](https://github.com/cwebley/word-well/issues/11#issuecomment-5940925373),
+recorded as artifact `effc8eb93ba0`. Its 26 admits contain 22 keeps, precision
+0.846, with a projected pool of about 1,090 words.
+
 Development numbers are optimistic because each combiner is fitted on the words
 it is scored on. Cross-validated precision and recall: `27dab670` 0.714 and
 0.714 (lab answers), `152642aa` 0.783 and 0.839, `d7022878` 0.770 and 0.825.
-No combiner is promoted. Only held-out numbers count toward a pass bar.
+Development numbers do not count toward the pass bar. The promotion above uses
+the owner-accepted reviewed version of the held-out sample.
 
 ## Planner and writer
 
@@ -230,6 +330,7 @@ It is a publication decision, not a measurement.
 
 ## Open
 
-- Usefulness gate contract: questions, combiner, obviousness cutoff (#11).
+- Remaining usefulness gate contract work, including whether meaning obviousness
+  needs a separate veto. The approved combiner has no independent veto (#11).
 - Jev on the v1 route: parity re-run and account-level zero data retention.
 - Braintrust `trialCount` behavior, to confirm against its docs.

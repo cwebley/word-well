@@ -161,7 +161,11 @@ live tutor in the learner's daily experience.
   the same eval.
 - The usefulness gate leans toward excluding. A wrong admit spends a learner's
   daily word on a word not worth studying, so precision on admitted words is its
-  primary measure, with a recall floor. See the [usefulness eval design](https://github.com/cwebley/word-well/issues/11#issuecomment-5823939569).
+  primary measure. The [top-ranked pass bar](https://github.com/cwebley/word-well/issues/11#issuecomment-5925213214)
+  requires at least 80% precision at a projected admitted pool of at least 1,000
+  words, plus owner review of mistakes. The owner approved the `e9d29c21` weights
+  at a 0.58 keep-score cutoff. The production configuration and accepted evidence
+  are recorded in [docs/evals.md](docs/evals.md#promoted-configuration).
 - The first version does not group a verb and its agent noun into one lesson.
   Every word is its own candidate. The [grouping decision](https://github.com/cwebley/word-well/issues/1#issuecomment-5823937201)
   parks the evaluated grouping rule for a later version.

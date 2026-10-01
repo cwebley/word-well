@@ -4,6 +4,7 @@
 //   npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
 //     --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json> [--replay-from ...]
 //   npm run eval:usefulness -- --dataset ... --combiner ... --jev live --max-requests 450
+// Omit --combiner to evaluate the owner-promoted production configuration.
 // Live mode reads OPENROUTER_API_KEY from the environment and spends money.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -13,6 +14,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { httpJev, replayJev, replayThenLive } from "../pipeline/execution/jev.js";
 import { configId, loadCombiner, MODEL, QUESTIONS, renderState } from "../pipeline/stages/usefulness.js";
+import { PRODUCTION_COMBINER } from "../pipeline/stages/usefulness-production.js";
 import { loadUsefulnessDataset } from "./datasets/usefulness.js";
 import { runUsefulnessEval, type UsefulnessRun } from "./usefulness.js";
 
@@ -27,7 +29,7 @@ const { values } = parseArgs({
     "out-dir": { type: "string", default: join(homedir(), "src/wordwell-private/runs/usefulness") }
   }
 });
-if (!values.dataset || !values.combiner) throw new Error("Required: --dataset and --combiner");
+if (!values.dataset) throw new Error("Required: --dataset");
 const live = values.jev === "live";
 if (!live && values.jev !== "replay") throw new Error("--jev must be replay or live");
 if (!live && !values["replay-from"]?.length) throw new Error("Replay needs at least one --replay-from");
@@ -37,7 +39,7 @@ const apiKey = process.env.OPENROUTER_API_KEY;
 if (live && !apiKey) throw new Error("Live runs need OPENROUTER_API_KEY");
 
 const dataset = loadUsefulnessDataset(values.dataset);
-const combiner = loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8")));
+const combiner = values.combiner ? loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8"))) : PRODUCTION_COMBINER;
 const startedAt = new Date().toISOString();
 const attemptsDir = join(values["out-dir"], "attempts", startedAt.replace(/[:.]/g, "-"));
 // Live with --replay-from reuses saved answers and pays only for the rest.
