@@ -2,8 +2,8 @@
 
 How WordWell measures each content-pipeline stage, so a model, prompt or
 configuration change can be re-run against the same cases and compared.
-Approved 2026-09-24. The usefulness eval is built (see below); the other stages
-are still design only.
+Approved 2026-09-24. The usefulness eval and private appropriateness authoring
+are built. Private appropriateness execution and the other stage evals remain unbuilt.
 
 ```text
 intake (rules) -> appropriateness (Jev) -> usefulness (Jev) -> planner (Luna) -> writer (Luna) -> owner review
@@ -37,16 +37,40 @@ pass. No model, so no eval.
 
 ## Appropriateness
 
-Design fixed by [#2](https://github.com/cwebley/word-well/issues/2#issuecomment-5693877045),
-with the model moved to Jev ([amendment](https://github.com/cwebley/word-well/issues/2#issuecomment-5823943376)).
+The [approved authoring resolution](https://github.com/cwebley/word-well/issues/12#issuecomment-5959625563)
+amends the original policy to headword-only Jev with two findings, `clear` and
+`blocked`. Blocked includes plausible prohibited connotations in the agreed
+categories. Neutral medical or anatomical subject matter alone remains allowed.
 
-- **Cases.** Owner-authored `clear`, `sensitive` or `blocked` findings with a
-  short reason, written before seeing model answers. None exist yet; authoring
-  is [#12](https://github.com/cwebley/word-well/issues/12), blocked by private
-  storage in [#8](https://github.com/cwebley/word-well/issues/8).
-- **Scoring.** Three trials per case. Reports per-trial correctness, cases
-  correct on all three trials, and cases whose verdict varied.
-- **Where it runs.** Privately. One aggregate summary row goes to Braintrust.
+- The model receives the exact frozen headword and the fixed policy question.
+  Parts of speech, definitions, source labels, and owner expectations/reasons do
+  not enter the request. Dictionary labels still drive deterministic intake and
+  help select private candidates.
+- The initial set targets 40 firm owner-approved cases, 20 development and 20
+  held-out, roughly balanced clear/blocked. Combine label-selected Wiktionary
+  candidates, owner nominations, and legitimate clear controls. Keep close
+  variants on the same side. Uncertain labels remain exploration cases.
+- The local browser form accepts a word, expected finding, and optional short
+  reason before model-answer inspection. The owner [made reasons optional](https://github.com/cwebley/word-well/issues/14#issuecomment-5984954383)
+  for saving, approval, and freezing. It saves encrypted drafts outside the
+  checkout and freezes approved cases into immutable encrypted artifacts. No
+  frozen owner-authored set exists yet. See [local setup and walkthrough](private-authoring.md).
+- Run three fresh trials per case. Production blocks when the mean blocked
+  probability is at least 0.50, including exact ties, calculated before rounding.
+  Evaluation checks that averaged verdict and every individual trial against
+  the expected disposition. A correct average cannot hide a failing trial.
+  Invalid, missing, or unresolved failed trials block a pass.
+- Report wrong accepts/rejects, cases correct on all three trials, and disposition
+  instability. Promotion requires the owner's explicit decision.
+- Authoring, freezing, inspection, finalization, and export make zero model calls.
+  Execution and detailed review stay private. Braintrust receives one finalized
+  aggregate summary row.
+
+Private authoring and age/Keychain file storage are implemented. Durable evaluation
+storage/execution and
+[storage/provider verification](https://github.com/cwebley/word-well/issues/8#issuecomment-5946639405)
+still precede actual case collection or paid execution. The authoring resolution
+does not establish Jev accuracy or authorize a model run.
 
 ## Usefulness
 

@@ -159,6 +159,15 @@ live tutor in the learner's daily experience.
   and to passing their evals. A gate averages three Jev trials before deciding.
   Each gate sits behind an adapter, so a different model can replace Jev and run
   the same eval.
+- Appropriateness receives the headword alone and a fixed policy question, with
+  `clear` or `blocked` findings. Prohibited usage or plausible prohibited
+  connotations count as blocked. A mean blocked probability of at least 0.50
+  rejects, including exact ties. Its private evaluation checks the averaged
+  verdict and requires correctness on every individual trial. The
+  [approved authoring resolution](https://github.com/cwebley/word-well/issues/12#issuecomment-5959625563)
+  specifies the planned 40-case set and local encrypt-before-save owner form.
+  The owner [made reasons optional](https://github.com/cwebley/word-well/issues/14#issuecomment-5984954383)
+  for saving, approval, and freezing. Firm labels still require an expected finding.
 - The usefulness gate leans toward excluding. A wrong admit spends a learner's
   daily word on a word not worth studying, so precision on admitted words is its
   primary measure. The [top-ranked pass bar](https://github.com/cwebley/word-well/issues/11#issuecomment-5925213214)
