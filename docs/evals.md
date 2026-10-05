@@ -2,8 +2,8 @@
 
 How WordWell measures each content-pipeline stage, so a model, prompt or
 configuration change can be re-run against the same cases and compared.
-Approved 2026-09-24. The usefulness eval and private appropriateness authoring
-are built. Private appropriateness execution and the other stage evals remain unbuilt.
+Approved 2026-09-24. The usefulness eval, private appropriateness authoring and
+private appropriateness execution are built. The other stage evals remain unbuilt.
 
 ```text
 intake (rules) -> appropriateness (Jev) -> usefulness (Jev) -> planner (Luna) -> writer (Luna) -> owner review
@@ -40,7 +40,8 @@ pass. No model, so no eval.
 The [approved authoring resolution](https://github.com/cwebley/word-well/issues/12#issuecomment-5959625563)
 amends the original policy to headword-only Jev with two findings, `clear` and
 `blocked`. Blocked includes plausible prohibited connotations in the agreed
-categories. Neutral medical or anatomical subject matter alone remains allowed.
+categories, and any slur sense blocks a headword even when its main sense is
+harmless. Neutral medical or anatomical subject matter alone remains allowed.
 
 - The model receives the exact frozen headword and the fixed policy question.
   Parts of speech, definitions, source labels, and owner expectations/reasons do
@@ -53,24 +54,36 @@ categories. Neutral medical or anatomical subject matter alone remains allowed.
 - The local browser form accepts a word, expected finding, and optional short
   reason before model-answer inspection. The owner [made reasons optional](https://github.com/cwebley/word-well/issues/14#issuecomment-5984954383)
   for saving, approval, and freezing. It saves encrypted drafts outside the
-  checkout and freezes approved cases into immutable encrypted artifacts. No
-  frozen owner-authored set exists yet. See [local setup and walkthrough](private-authoring.md).
-- Run three fresh trials per case. Production blocks when the mean blocked
-  probability is at least 0.50, including exact ties, calculated before rounding.
-  Evaluation checks that averaged verdict and every individual trial against
-  the expected disposition. A correct average cannot hide a failing trial.
-  Invalid, missing, or unresolved failed trials block a pass.
+  checkout and freezes approved cases into immutable encrypted artifacts. Owner-authored
+  versions v1 to v7 are frozen. See [local setup and walkthrough](private-authoring.md).
+- Each request asks the main `appropriateness` choice question plus a narrow
+  `slur_sense` yes/no question. A trial rejects when blocked probability reaches
+  0.50 or slur probability reaches 0.40. Production averages each question over
+  three fresh trials, unrounded, before applying its threshold.
+- The default configuration is `v4` (owner decision, [#15](https://github.com/cwebley/word-well/issues/15#issuecomment-5989103199)).
+  It excludes terms for genitals and sexual acts from the anatomical exemption.
+  Earlier configurations (`v1` to `v3`) and tried variants stay runnable by name
+  on the same frozen inputs.
+- **Pass rule: no wrong accepts** ([owner decision](https://github.com/cwebley/word-well/issues/15#issuecomment-5989305376)).
+  A case passes when all three trials are valid and no trial and no average
+  wrongly accepts a blocked word. Wrong rejects are counted and shown, but
+  tolerated. Invalid, missing or unresolved trials block a pass.
 - Report wrong accepts/rejects, cases correct on all three trials, and disposition
   instability. Promotion requires the owner's explicit decision.
 - Authoring, freezing, inspection, finalization, and export make zero model calls.
   Execution and detailed review stay private. Braintrust receives one finalized
-  aggregate summary row.
+  aggregate summary row per experiment.
 
-Private authoring and age/Keychain file storage are implemented. Durable evaluation
-storage/execution and
-[storage/provider verification](https://github.com/cwebley/word-well/issues/8#issuecomment-5946639405)
-still precede actual case collection or paid execution. The authoring resolution
-does not establish Jev accuracy or authorize a model run.
+Private authoring and durable private execution are implemented. See
+[private authoring](private-authoring.md) and [private execution](private-appropriateness.md).
+Provider prerequisites were verified on 2026-10-04: zero data retention, logging
+off, Broadcast empty, and published pricing.
+
+| Run | Configuration | Cases passing | Wrong accepts (avg) | Wrong rejects (avg) |
+| --- | --- | --- | --- | --- |
+| Dataset v7, held-out (21 cases) | `v4` | 21 of 21 | 0 | 1 |
+
+These are aggregate counts only. Per-case results stay in the local report.
 
 ## Usefulness
 
