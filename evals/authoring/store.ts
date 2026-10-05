@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { z } from "zod";
 import { digest, keyReferenceSchema, PrivateError, type KeyReference, type PrivateCrypto } from "../../pipeline/storage/crypto.js";
 import { atomicWrite, privateDirectory, readBytes, syncDirectory, withFileLock } from "../../pipeline/storage/files.js";
-import { approved, caseSchema, contentDigest, firmLabel, inspectionHistorySchema, inspectionRestricted, opaqueId, parseCaseContent, rememberInspection, validateWorkspace, workspaceSchema, type Workspace } from "./records.js";
+import { approved, caseSchema, contentDigest, firmLabel, inspectionHistorySchema, opaqueId, parseCaseContent, rememberInspection, validateWorkspace, workspaceSchema, type Workspace } from "./records.js";
 
 export const manifestSchema = z.object({
   schema: z.literal("wordwell-private-dataset-manifest-v1"),
@@ -25,10 +25,13 @@ const frozenSchema = datasetBodySchema.extend({ contentIdentity: z.string().rege
 export type FrozenDataset = z.infer<typeof frozenSchema>;
 
 export type AuthoringCommand =
-  | { action: "save"; revision: number; id?: string; content: unknown }
-  | { action: "approve"; revision: number; id: string }
-  | { action: "split"; revision: number; id: string; split: "development" | "held-out"; beforeInspection: boolean }
-  | { action: "freeze"; revision: number; version: number };
+  // A firm save records the content-bound approval. An optional split assigns it in the same write.
+  // split null ("Not yet") unassigns; undefined keeps the current split.
+  | { action: "save"; revision: number; id?: string; content: unknown; split?: "development" | "held-out" | null }
+  // Several moves applied in one write; any disallowed move rejects the whole batch.
+  | { action: "splits"; revision: number; assignments: { id: string; split: "development" | "held-out" }[] }
+  // Refuses while a firm case lacks approval or a split, unless omitUnassigned confirms leaving them out.
+  | { action: "freeze"; revision: number; version: number; omitUnassigned?: boolean };
 
 export async function loadFrozenDataset(directory: string, expected: DatasetManifest, crypto: PrivateCrypto): Promise<FrozenDataset> {
   try {
@@ -97,6 +100,8 @@ export async function createAuthoringStore(options: {
           throw new PrivateError("revision_conflict");
         if (command.action === "freeze") {
           validateWorkspace(workspace);
+          const unassigned = workspace.cases.filter(row => firmLabel(row.content) && !(approved(row) && row.split));
+          if (unassigned.length && !command.omitUnassigned) throw new PrivateError("firm_cases_unassigned");
           const cases = workspace.cases.filter(row => approved(row) && row.split).sort((a, b) => a.id.localeCompare(b.id));
           if (!cases.length) throw new PrivateError("no_scored_cases");
           if (!Number.isSafeInteger(command.version) || command.version < 1 || command.version > 999999)
@@ -135,23 +140,35 @@ export async function createAuthoringStore(options: {
           if (command.id && !existing) throw new PrivateError("case_missing");
           if (existing?.content.answersInspected && !content.answersInspected) throw new PrivateError("inspection_cannot_reset");
           rememberInspection(workspace);
-          if (existing) {
-            if (contentDigest(existing.content) !== contentDigest(content)) {
-              existing.content = content; existing.approval = null; existing.split = null; existing.assignedAt = null;
+          let row = existing;
+          if (row) {
+            if (contentDigest(row.content) !== contentDigest(content)) {
+              row.content = content; row.approval = null; row.split = null; row.assignedAt = null;
             }
-          } else workspace.cases.push({ id: randomUUID(), content, approval: null, split: null, assignedAt: null });
-        } else {
-          const row = workspace.cases.find(row => row.id === command.id);
-          if (!row) throw new PrivateError("case_missing");
-          if (command.action === "approve") {
-            if (!firmLabel(row.content)) throw new PrivateError("firm_label_required");
-            row.approval = { contentDigest: contentDigest(row.content), approvedAt: new Date().toISOString(), reviewer: "local-owner" };
           } else {
-            if (!approved(row)) throw new PrivateError("approval_required");
-            if (!["development", "held-out"].includes(command.split)) throw new PrivateError("split_invalid");
-            if (!command.beforeInspection && !inspectionRestricted(workspace).has(row.id)) throw new PrivateError("inspection_attestation_required");
+            row = { id: randomUUID(), content, approval: null, split: null, assignedAt: null };
+            workspace.cases.push(row);
+          }
+          // Saving a firm label is the owner's approval of exactly this content.
+          if (firmLabel(row.content) && !approved(row))
+            row.approval = { contentDigest: contentDigest(row.content), approvedAt: new Date().toISOString(), reviewer: "local-owner" };
+          if (command.split === null) { row.split = null; row.assignedAt = null; }
+          else if (command.split) {
+            if (!firmLabel(row.content)) throw new PrivateError("firm_label_required");
+            // Held-out must be unseen: inspected cases and their variants are refused.
             if (command.split === "held-out" && row.content.answersInspected) throw new PrivateError("heldout_inspected");
-            row.split = command.split; row.assignedAt = new Date().toISOString();
+            if (row.split !== command.split) { row.split = command.split; row.assignedAt = new Date().toISOString(); }
+          }
+        } else if (command.action === "splits") {
+          const ids = command.assignments.map(item => item.id);
+          if (!ids.length || ids.length > 1000 || new Set(ids).size !== ids.length) throw new PrivateError("request_invalid");
+          for (const { id, split } of command.assignments) {
+            const row = workspace.cases.find(row => row.id === id);
+            if (!row) throw new PrivateError("case_missing");
+            if (!approved(row)) throw new PrivateError("approval_required");
+            if (split !== "development" && split !== "held-out") throw new PrivateError("split_invalid");
+            if (split === "held-out" && row.content.answersInspected) throw new PrivateError("heldout_inspected");
+            if (row.split !== split) { row.split = split; row.assignedAt = new Date().toISOString(); }
           }
         }
         rememberInspection(workspace);
