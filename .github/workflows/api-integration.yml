@@ -35,5 +35,6 @@ jobs:
       - run: npm ci
       - run: npm run db:migrate
       - run: npm run test:api
+      - run: npm run test:private
       - run: npx playwright install --with-deps chromium
       - run: npm run test:acceptance

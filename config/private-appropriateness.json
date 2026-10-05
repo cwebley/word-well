@@ -1,0 +1,19 @@
+{
+  "schema": "wordwell-private-appropriateness-config-v1",
+  "execution": {
+    "requestTimeoutSeconds": 600,
+    "maxTransportRetries": 2,
+    "retryDelaysSeconds": [
+      2,
+      8
+    ],
+    "maxRetryWaitSeconds": 60
+  },
+  "pricing": {
+    "status": "verified",
+    "inputNanoUsdPerToken": 42,
+    "contextTokens": 32000,
+    "requestFeeNanoUsd": 0,
+    "evidence": "Verified 2026-10-04. OpenRouter's public endpoint listing for typesafe/jev-1.13 (endpoint typesafe/jev-1.13-20260917) publishes prompt $0.000000042 per token, completion $0, context 32,000 tokens. 45 live harmless smoke requests were each charged exactly 42 nano-USD per input token. Reservation = 32,000 x 42 = 1,344,000 nano-USD per request."
+  }
+}
