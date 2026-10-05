@@ -22,7 +22,9 @@
     "swatchkit:watch": "swatchkit --watch",
     "serve": "http-server dist -c-1 -p 0 -o",
     "dev": "export API_BASE_URL=${API_BASE_URL:-http://localhost:3000} && npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve",
-    "eval:usefulness": "tsx evals/usefulness.cli.ts"
+    "eval:usefulness": "tsx evals/usefulness.cli.ts",
+    "eval:author": "tsx evals/private-authoring.ts",
+    "test:authoring": "vitest run pipeline/storage evals/authoring"
   },
   "devDependencies": {
     "@types/node": "^26.4.0",
@@ -40,6 +42,7 @@
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.3",
+    "age-encryption": "0.3.1",
     "pg": "^8.23.0",
     "tsx": "^4.23.12",
     "zod": "^4.6.5"
