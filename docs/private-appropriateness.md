@@ -8,6 +8,9 @@ runs began on 2026-10-04, after the owner verified provider privacy and
 pricing. The pieces of #16 the owner pulled forward are also here: the local
 report, finalize, and aggregate export.
 
+The [saved-results and restore walkthrough](private-results-and-restore.md)
+explains those commands, their failure paths, and the completed #16 rehearsal.
+
 ```text
 evals/datasets/appropriateness-v000001 (age, dataset key)
         │ loadFrozenDataset

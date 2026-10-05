@@ -28,6 +28,7 @@
     "eval:private:smoke": "node --env-file-if-exists=.env --import tsx evals/private-appropriateness-cli.ts smoke --max-cost-usd 0.05",
     "eval:private:audit": "node --env-file-if-exists=.env --import tsx evals/private-appropriateness-cli.ts audit --max-cost-usd 0.25",
     "eval:private:report": "tsx evals/private-report.ts",
+    "eval:private:restore-check": "tsx scripts/rehearse-private-restore.ts",
     "eval:export": "node --env-file-if-exists=.env --import tsx evals/export-summary.ts",
     "test:authoring": "vitest run pipeline/storage evals/authoring",
     "test:private": "node -e \"process.env.DATABASE_URL || (console.error('test:private requires DATABASE_URL'), process.exit(1))\" && vitest run pipeline/stages/appropriateness pipeline/execution evals/scorers/appropriateness evals/private-appropriateness evals/private-report evals/summarize evals/export-summary"
