@@ -31,6 +31,29 @@ async function cli(args: string[], input: Uint8Array, identity?: string): Promis
 }
 
 describe("native age private records", () => {
+  it("loads each key from Keychain once per process, but never caches a failure", async () => {
+    const identity = await generateIdentity();
+    const key = { id: "ww-storage-v1", recipient: await identityToRecipient(identity) };
+    let loads = 0;
+    let available = false;
+    const crypto = createPrivateCrypto(async () => { loads++; if (!available) throw new Error("locked"); return identity; }, { cacheIdentities: true });
+    await expect(crypto.verify(key)).rejects.toThrow("key_unavailable");
+    available = true;
+    for (let i = 0; i < 5; i++) {
+      const bytes = await crypto.encrypt(key, `record-${i}`, { marker: "harmless" });
+      await crypto.decrypt(key, `record-${i}`, bytes, schema);
+    }
+    expect(loads).toBe(2);
+    // Without the option, every operation re-checks the Keychain.
+    let uncachedLoads = 0;
+    const uncached = createPrivateCrypto(async () => { uncachedLoads++; return identity; });
+    await uncached.verify(key); await uncached.verify(key);
+    expect(uncachedLoads).toBe(2);
+    // A reference naming a different recipient still fails against the cached identity.
+    const other = { id: "ww-storage-v1", recipient: await identityToRecipient(await generateIdentity()) };
+    await expect(crypto.verify(other)).rejects.toThrow("key_unavailable");
+  });
+
   it("round trips and rejects wrong keys, corruption, truncation, identity and schema mismatches", async () => {
     const { key, crypto } = await keys();
     const payload = { marker: "harmless-crypto-marker" };

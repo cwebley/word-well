@@ -32,11 +32,20 @@ const envelopeSchema = z.object({
 }).strict();
 
 // The envelope authenticates the expected record and key, not just the bytes.
-export function createPrivateCrypto(loadIdentity: LoadIdentity) {
+export function createPrivateCrypto(loadIdentity: LoadIdentity, options: { cacheIdentities?: boolean } = {}) {
+  // Opt-in for high-volume evaluation: each Keychain load spawns a helper
+  // (~230 ms) and a run makes many record operations. Only verified identities
+  // are kept, in memory, for this process's lifetime; a failure is retried.
+  // Authoring keeps re-checking the Keychain on every operation.
+  const verified = new Map<string, string>();
   const load = async (key: KeyReference) => {
+    const cacheKey = `${key.id}\0${key.recipient}`;
+    const cached = verified.get(cacheKey);
+    if (cached) return cached;
     try {
       const identity = await loadIdentity(key);
       await verifyIdentity(key, identity);
+      if (options.cacheIdentities) verified.set(cacheKey, identity);
       return identity;
     } catch { throw new PrivateError("key_unavailable"); }
   };

@@ -11,9 +11,8 @@ for saving, approval, and freezing. This amends the earlier required-reason cont
 ```text
 Browser form on 127.0.0.1
     -> exact headword + owner finding + optional private reason/provenance
+    -> one save: firm label = content-bound approval, plus the chosen split
     -> age-encrypted workspace outside the checkout
-    -> explicit approval of the saved content
-    -> development/held-out assignment
     -> immutable encrypted dataset directory in evals/datasets/
 ```
 
@@ -66,39 +65,35 @@ failure permits a plaintext fallback.
 
 ## Browser workflow
 
-1. Enter the exact headword. There is no finding selected by default. Supply
-   `clear` or `blocked` yourself. A short reason and source provenance are optional.
-   Owner nominations need no dictionary evidence assembly.
-2. Check the firm-label box only when certain. Exploration drafts can have no
-   finding and cannot be approved or scored. A firm label needs a finding. A blank
-   reason does not block saving, approval, or freezing. A missing-finding message
-   keeps the unsaved form available for correction.
-3. If this is a close spelling variant of an existing case, choose that case's
-   variant group. Case, punctuation, and accent-normalized variants are connected
-   automatically. All connected variants must stay on one side of the split,
-   including connections through an unassigned exploration case.
-4. Save the encrypted draft. The success message appears only after encrypted
-   bytes have been written, synced, renamed into place, and the directory synced.
-   Saving does not approve a case. Select **Edit case** on a saved case to change
-   its fields or move it between exploration and firm. **Save case changes** updates
-   that same case. Exploration cases show editing guidance instead of an approval button.
-5. Review the saved case and select **Approve current saved content**. Approval
-   records the local owner, time, and a digest of all current private content
-   inside the encrypted workspace. Changing any content clears approval and split.
-6. Assign development or held-out. An uninspected case requires an explicit
-   confirmation that assignment precedes inspecting model answers or tuning.
-   If answers were already inspected, mark that fact in the editor. It cannot be
-   reset, and the case can only enter development. Inspected inputs and their owner
-   groups remain recorded with stable case identity in encrypted history after edits. Connected variants,
-   including unassigned exploration rows, also cannot enter held-out. Move affected
-   held-out cases to development before recording inspection. Once a case inherits
-   an inspected-variant restriction, regrouping or renaming it cannot restore held-out
-   eligibility. The form does not inspect answers.
-7. Check coverage. The planned set is 20 development and 20 held-out, roughly
+The owner [approved one-step authoring](https://github.com/cwebley/word-well/issues/15#issuecomment-5989103199)
+on 2026-10-05. Saving a firm label is the content-bound approval, and the same
+save can assign the split.
+
+1. Enter the exact headword and choose `clear` or `blocked` yourself; no finding
+   is preselected. A short reason and source provenance are optional.
+2. "This is a firm owner label" is ticked by default. Untick it for an uncertain
+   exploration draft, which has no approval or split and is never scored.
+3. Choose **Development**, **Held-out**, or **Not yet**. If you have already seen
+   model answers for the word, tick "I have already inspected model answers". The
+   case and its spelling variants can then only enter development, even after edits.
+4. For a close spelling variant of an existing case, choose that case's variant
+   group. Case, punctuation and accent-normalized variants connect automatically,
+   and connected variants must stay on one side of the split.
+5. Click **Save case**. One encrypted write stores the case, records approval of
+   exactly this content, and assigns the split. The success message names the split.
+   If the split is not allowed, for example held-out for an inspected word,
+   nothing is saved and the form keeps your input.
+6. **Edit case** reopens a saved case with its current split selected. Saving a
+   content change records a new approval and keeps the selected split. Unticking
+   firm turns the case back into a draft and drops its split.
+7. To move cases between splits, change any number of radios in **Saved cases**
+   and click **Save split changes** once. All moves are saved in one encrypted
+   write. If any move is not allowed, nothing is saved and your selections stay.
+8. Check coverage. The planned set is 20 development and 20 held-out, roughly
    balanced clear/blocked. These counts are a target, not a reason to force a label.
-8. Review the scored membership, choose a new integer version, and freeze. Only
-   firm, approved, split-assigned cases enter the frozen set. The page names the
-   omitted draft categories and shows their counts. An empty scored set cannot freeze.
+9. Freeze with a new integer version. Only firm, approved, split-assigned cases
+   enter the frozen set. While any firm case has no split, the page names how many,
+   and freezing refuses unless you tick "Leave out the … firm cases without a split".
 
 The app uses ordinary HTML forms with no JavaScript. Values are escaped as text.
 There are no external resources, analytics, exports, localStorage, sessionStorage,
@@ -158,32 +153,35 @@ the scorer and send only the exact headword and fixed policy question to the mod
 The Chromium acceptance test uses `exuberant`, the approved harmless walkthrough
 word. Its test finding is a synthetic form entry, not an approved golden label.
 
-1. `page.ts` renders an empty finding selector. The test enters `exuberant`, chooses
-   a stand-in `clear` finding, and enters `harmless-browser-reason-marker` with an
-   HTML-looking suffix and `harmless-browser-source-marker` as provenance.
-   The suffix remains text and triggers no resource request.
+1. `page.ts` renders an empty finding selector, with the firm-label box ticked
+   by default. The test enters `exuberant`, chooses a stand-in `clear` finding,
+   and enters `harmless-browser-reason-marker` with an HTML-looking suffix and
+   `harmless-browser-source-marker` as provenance. The suffix remains text and
+   triggers no resource request.
 2. `server.ts` receives the native POST with the session cookie, CSRF token, Origin,
    and workspace revision. `store.ts` creates an opaque case UUID, preserves the
-   exact submitted values, and saves `workspace.age` with the storage identity.
-   No approval or split exists yet.
-3. The owner-approval action saves a content-bound approval in the same encrypted
-   workspace. Split assignment saves `development` after the before-inspection
-   confirmation. Coverage shows one clear development case.
+   exact submitted values, records the content-bound approval because the label is
+   firm, and saves `workspace.age` with the storage identity. No split was chosen.
+3. Freezing now refuses: the page names one firm case without a split. The test
+   moves it to development with **Save split changes**. Coverage shows one clear
+   development case.
 4. The test stops the server and constructs a fresh store/session. Decryption
    restores the same case UUID, content, approval, and split. A separate acceptance
    test repeats saving/reopening across actual CLI process restarts with Keychain.
-5. A second synthetic case, `harmless-browser-headword-marker`, is given a stand-in
-   blocked finding, approved, and assigned held-out. Freezing version 1 writes
-   `appropriateness-v000001/cases.age` and its safe manifest under the test checkout.
-   The dataset loader verifies two approved, split-assigned cases.
-6. Editing the first reason clears its approval and development assignment.
-   Reapproval and reassignment permit version 2. Version 1's bytes and identity
-   remain unchanged. Tests remove their temporary encrypted artifacts afterward.
+5. A second synthetic case, `harmless-browser-headword-marker`, gets a stand-in
+   blocked finding and **Held-out** on the entry form. One save stores, approves
+   and assigns it. Freezing version 1 writes `appropriateness-v000001/cases.age`
+   and its safe manifest under the test checkout. The loader verifies two cases.
+6. Editing the first reason keeps its selected development split and records a new
+   approval of the changed content, so version 2 freezes directly. Version 1's
+   bytes and identity remain unchanged. Tests remove their temporary artifacts.
 7. A simulated write failure preserves the old encrypted workspace and leaves the
    unsaved form visible with `Not confirmed saved. save_failed`. It does not claim
-   approval or saving succeeded. A key failure returns `key_unavailable` without
-   private case text. A killed writer after ciphertext fsync leaves the previous
-   workspace readable and blocks writes until explicit stopped-owner recovery.
+   saving succeeded. A key failure returns `key_unavailable` without private case
+   text. A killed writer after ciphertext fsync leaves the previous workspace
+   readable and blocks writes until explicit stopped-owner recovery.
+8. A batch test moves two cases with one **Save split changes**, and a batch that
+   splits connected spelling variants is refused whole, keeping the selections.
 
 The browser trace exposed a native-form detail: `Referrer-Policy: no-referrer`
 makes Chromium send `Origin: null` on POST. The implemented `same-origin` policy
@@ -242,7 +240,8 @@ The browser tests require Playwright Chromium. Install it with
 it provisions/reuses real local items. CLI interoperability skips when no CLI is
 installed; completion evidence requires running it with the pinned binary present.
 
-Verified in this implementation session: 17 authoring tests, including both age
+Verified originally with 17 authoring tests; the suite now has 22, adding one-step
+saves, batch split moves, unassigning, and the freeze guard. Coverage includes both age
 directions, wrong-key/corruption/truncation rejection, content/record selection,
 missing-finding validation, reason-free approval/freezing, exploration-to-firm editing,
 correction after approval, firm approvals, persistent

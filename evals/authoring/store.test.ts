@@ -12,8 +12,7 @@ import { withFileLock } from "../../pipeline/storage/files.js";
 async function ready(f: Awaited<ReturnType<typeof fixture>>, headword = "exuberant") {
   let workspace = (await f.store.execute({ action: "save", revision: (await f.store.load()).revision, content: content(headword) })).workspace;
   const id = workspace.cases.at(-1)!.id;
-  workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id })).workspace;
-  workspace = (await f.store.execute({ action: "split", revision: workspace.revision, id, split: "development", beforeInspection: true })).workspace;
+  workspace = (await f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "development" }] })).workspace;
   return { workspace, id };
 }
 
@@ -71,30 +70,34 @@ describe("private authoring durable workflow", () => {
     } finally { await f.cleanup(); }
   });
 
-  it("preserves exact input and opaque ID after restart, separates approval, and freezes immutable versions", async () => {
+  it("preserves exact input and opaque ID after restart, approves and assigns in one save, and freezes immutable versions", async () => {
     const f = await fixture();
     try {
       const initial = await f.store.execute({ action: "save", revision: 0, content: content("  Exuberant  ") });
       const row = initial.workspace.cases[0];
-      expect(row.approval).toBeNull(); expect(row.split).toBeNull();
+      // Saving a firm label records the content-bound approval; no split was chosen.
+      expect(row.approval).toMatchObject({ reviewer: "local-owner" }); expect(row.split).toBeNull();
       expect((await (await f.reopen()).load()).cases[0]).toEqual(row);
-      await expect(f.store.execute({ action: "split", revision: 1, id: row.id, split: "held-out", beforeInspection: true })).rejects.toThrow("approval_required");
-      await f.store.execute({ action: "approve", revision: 1, id: row.id });
-      await f.store.execute({ action: "split", revision: 2, id: row.id, split: "held-out", beforeInspection: true });
-      const first = await f.store.execute({ action: "freeze", revision: 3, version: 1 });
+      // A firm case without a split blocks freezing unless the owner leaves it out on purpose.
+      await expect(f.store.execute({ action: "freeze", revision: 1, version: 1 })).rejects.toThrow("firm_cases_unassigned");
+      await expect(f.store.execute({ action: "freeze", revision: 1, version: 1, omitUnassigned: true })).rejects.toThrow("no_scored_cases");
+      const assigned = await f.store.execute({ action: "save", revision: 1, id: row.id, content: row.content, split: "held-out" });
+      expect(assigned.workspace.revision).toBe(2);
+      expect(assigned.workspace.cases[0]).toMatchObject({ split: "held-out", approval: row.approval });
+      const first = await f.store.execute({ action: "freeze", revision: 2, version: 1 });
       const directory = resolve(f.datasetDir, "appropriateness-v000001");
       const original = await readFile(resolve(directory, "cases.age"));
       const frozen = await loadFrozenDataset(directory, first.manifest!, f.crypto);
       expect(frozen.cases[0].content.headword).toBe("  Exuberant  ");
       expect(frozen.cases[0].id).toBe(row.id);
-      await expect(f.store.execute({ action: "freeze", revision: 3, version: 1 })).rejects.toThrow("version_exists");
-      await f.store.execute({ action: "save", revision: 3, id: row.id, content: { ...row.content, finding: "blocked", reason: "harmless-correction-marker" } });
+      await expect(f.store.execute({ action: "freeze", revision: 2, version: 1 })).rejects.toThrow("version_exists");
+      // A correction re-approves the new content and clears the split unless one is chosen.
+      await f.store.execute({ action: "save", revision: 2, id: row.id, content: { ...row.content, finding: "blocked", reason: "harmless-correction-marker" } });
       const changed = (await f.store.load()).cases[0];
-      expect(changed.approval).toBeNull(); expect(changed.split).toBeNull();
-      await expect(f.store.execute({ action: "freeze", revision: 4, version: 2 })).rejects.toThrow("no_scored_cases");
-      await f.store.execute({ action: "approve", revision: 4, id: row.id });
-      await f.store.execute({ action: "split", revision: 5, id: row.id, split: "development", beforeInspection: true });
-      const second = await f.store.execute({ action: "freeze", revision: 6, version: 2 });
+      expect(changed.approval?.contentDigest).not.toBe(row.approval?.contentDigest); expect(changed.split).toBeNull();
+      await expect(f.store.execute({ action: "freeze", revision: 3, version: 2 })).rejects.toThrow("firm_cases_unassigned");
+      await f.store.execute({ action: "save", revision: 3, id: row.id, content: changed.content, split: "development" });
+      const second = await f.store.execute({ action: "freeze", revision: 4, version: 2 });
       expect(second.manifest!.id).not.toBe(first.manifest!.id);
       expect(await readFile(resolve(directory, "cases.age"))).toEqual(original);
       expect((await loadFrozenDataset(directory, first.manifest!, f.crypto)).contentIdentity).toBe(frozen.contentIdentity);
@@ -108,26 +111,73 @@ describe("private authoring durable workflow", () => {
     } finally { await f.cleanup(); }
   });
 
-  it("keeps exploration out, requires preinspection attestation, and keeps connected variants on one side", async () => {
+  it("moves several cases between splits in one write, or none if any move is not allowed", async () => {
+    const f = await fixture();
+    try {
+      const save = async (headword: string, split: "development" | "held-out", extra = {}) => {
+        const { workspace } = await f.store.execute({ action: "save", revision: (await f.store.load()).revision, content: content(headword, extra), split });
+        return workspace.cases.at(-1)!.id;
+      };
+      const a = await save("exuberant", "held-out");
+      const b = await save("meticulous", "held-out");
+      const c = await save("ephemeral", "development", { answersInspected: true });
+      const before = await f.store.load();
+      const moved = await f.store.execute({ action: "splits", revision: before.revision, assignments: [{ id: a, split: "development" }, { id: b, split: "development" }] });
+      expect(moved.workspace.revision).toBe(before.revision + 1);
+      expect(moved.workspace.cases.map(row => row.split)).toEqual(["development", "development", "development"]);
+      // One disallowed move (an inspected case to held-out) blocks the whole batch.
+      await expect(f.store.execute({ action: "splits", revision: moved.workspace.revision, assignments: [{ id: a, split: "held-out" }, { id: c, split: "held-out" }] }))
+        .rejects.toThrow("heldout_inspected");
+      expect((await f.store.load()).cases.map(row => row.split)).toEqual(["development", "development", "development"]);
+      await expect(f.store.execute({ action: "splits", revision: moved.workspace.revision, assignments: [{ id: a, split: "held-out" }, { id: a, split: "development" }] }))
+        .rejects.toThrow("request_invalid");
+    } finally { await f.cleanup(); }
+  });
+
+  it("unassigns a case when saved with Not yet, and keeps its split when no choice is sent", async () => {
+    const f = await fixture();
+    try {
+      const { workspace } = await f.store.execute({ action: "save", revision: 0, content: content("exuberant"), split: "development" });
+      const row = workspace.cases[0];
+      const kept = await f.store.execute({ action: "save", revision: 1, id: row.id, content: row.content });
+      expect(kept.workspace.cases[0].split).toBe("development");
+      const cleared = await f.store.execute({ action: "save", revision: 2, id: row.id, content: row.content, split: null });
+      expect(cleared.workspace.cases[0]).toMatchObject({ split: null, assignedAt: null });
+      expect(cleared.workspace.cases[0].approval).not.toBeNull();
+    } finally { await f.cleanup(); }
+  });
+
+  it("saves nothing when the split in a one-step save is not allowed", async () => {
+    const f = await fixture();
+    try {
+      await expect(f.store.execute({ action: "save", revision: 0, content: content("exuberant", { firm: false, finding: null }), split: "development" }))
+        .rejects.toThrow("firm_label_required");
+      await expect(f.store.execute({ action: "save", revision: 0, content: content("exuberant", { answersInspected: true }), split: "held-out" }))
+        .rejects.toThrow("heldout_inspected");
+      expect(await f.store.load()).toMatchObject({ revision: 0, cases: [] });
+      // An exploration draft never counts as approved.
+      const draft = await f.store.execute({ action: "save", revision: 0, content: content("exuberant", { firm: false, finding: null }) });
+      expect(draft.workspace.cases[0].approval).toBeNull();
+    } finally { await f.cleanup(); }
+  });
+
+  it("keeps exploration out, refuses held-out for inspected words without a separate confirmation, and keeps connected variants on one side", async () => {
     const f = await fixture();
     try {
       const first = await ready(f, "Exuberant");
       let workspace = (await f.store.execute({ action: "save", revision: first.workspace.revision,
         content: content("exubérant", { variantGroup: randomUUID() }) })).workspace;
       const id = workspace.cases[1].id;
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id, split: "held-out", beforeInspection: false })).rejects.toThrow("inspection_attestation_required");
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id, split: "held-out", beforeInspection: true })).rejects.toThrow("variant_split_conflict");
-      workspace = (await f.store.execute({ action: "split", revision: workspace.revision, id, split: "development", beforeInspection: true })).workspace;
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "held-out" }] })).rejects.toThrow("variant_split_conflict");
+      workspace = (await f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "development" }] })).workspace;
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, content: content("joyful", { finding: null, reason: "uncertain-marker", firm: false }) })).workspace;
       const uncertain = workspace.cases[2];
-      await expect(f.store.execute({ action: "approve", revision: workspace.revision, id: uncertain.id })).rejects.toThrow("firm_label_required");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: uncertain.id, split: "development" }] })).rejects.toThrow("approval_required");
       const freeze = await f.store.execute({ action: "freeze", revision: workspace.revision, version: 1 });
       expect((await loadFrozenDataset(resolve(f.datasetDir, "appropriateness-v000001"), freeze.manifest!, f.crypto)).cases).toHaveLength(2);
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, content: content("radiant", { answersInspected: true }) })).workspace;
       const inspected = workspace.cases[3];
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id: inspected.id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: inspected.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: inspected.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected");
       await expect(f.store.execute({ action: "save", revision: workspace.revision, id: inspected.id, content: { ...inspected.content, answersInspected: false } })).rejects.toThrow("inspection_cannot_reset");
     } finally { await f.cleanup(); }
   });
@@ -140,8 +190,7 @@ describe("private authoring durable workflow", () => {
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, content: content("sunbeam", { variantGroup: group }) })).workspace;
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, content: content("SUN-BEAM") })).workspace;
       const id = workspace.cases[2].id;
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id, split: "held-out", beforeInspection: true })).rejects.toThrow("variant_split_conflict");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "held-out" }] })).rejects.toThrow("variant_split_conflict");
     } finally { await f.cleanup(); }
   });
 
@@ -152,30 +201,27 @@ describe("private authoring durable workflow", () => {
       const inspected = workspace.cases[0];
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, content: content("SUN-BEAM") })).workspace;
       const duplicate = workspace.cases[1];
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id: duplicate.id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: duplicate.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected_variant");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: duplicate.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected_variant");
       // Editing the inspected row's spelling and owner group cannot reset the old input's history.
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, id: inspected.id,
         content: content("radiant", { answersInspected: true, firm: false }) })).workspace;
       expect((await (await f.reopen()).load()).inspectionHistory).toHaveLength(3);
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: duplicate.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected_variant");
-      workspace = (await f.store.execute({ action: "split", revision: workspace.revision, id: duplicate.id, split: "development", beforeInspection: true })).workspace;
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: duplicate.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected_variant");
+      workspace = (await f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: duplicate.id, split: "development" }] })).workspace;
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision,
         content: content("sunshine", { variantGroup: inspected.content.variantGroup }) })).workspace;
       const ownerVariant = workspace.cases[2];
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id: ownerVariant.id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: ownerVariant.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected_variant");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: ownerVariant.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected_variant");
       // An inherited restriction cannot be erased by changing group or the whole input.
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, id: ownerVariant.id,
         content: { ...ownerVariant.content, variantGroup: randomUUID() } })).workspace;
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id: ownerVariant.id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: ownerVariant.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected_variant");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: ownerVariant.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected_variant");
       const regrouped = workspace.cases[2];
       workspace = (await f.store.execute({ action: "save", revision: workspace.revision, id: ownerVariant.id,
         content: { ...regrouped.content, headword: "sunlit", variantGroup: randomUUID() } })).workspace;
-      workspace = (await f.store.execute({ action: "approve", revision: workspace.revision, id: ownerVariant.id })).workspace;
-      await expect(f.store.execute({ action: "split", revision: workspace.revision, id: ownerVariant.id, split: "held-out", beforeInspection: true })).rejects.toThrow("heldout_inspected_variant");
-      const freeze = await f.store.execute({ action: "freeze", revision: workspace.revision, version: 1 });
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id: ownerVariant.id, split: "held-out" }] })).rejects.toThrow("heldout_inspected_variant");
+      // The rejected variant stays unassigned on purpose, so leaving it out is explicit.
+      const freeze = await f.store.execute({ action: "freeze", revision: workspace.revision, version: 1, omitUnassigned: true });
       const frozen = await loadFrozenDataset(resolve(f.datasetDir, "appropriateness-v000001"), freeze.manifest!, f.crypto);
       expect(frozen.inspectionHistory).toEqual(workspace.inspectionHistory);
       expect(frozen.cases).toHaveLength(1);
@@ -195,12 +241,12 @@ describe("private authoring durable workflow", () => {
       expect((await (await f.reopen()).load()).cases[0].content.headword).toBe("exuberant");
       fail = false; f.setKeysAvailable(false);
       await expect(f.reopen()).rejects.toThrow(/^key_unavailable$/);
-      await expect(f.store.execute({ action: "approve", revision: workspace.revision, id })).rejects.toThrow(/^key_unavailable$/);
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "development" }] })).rejects.toThrow(/^key_unavailable$/);
       expect(await readFile(resolve(f.privateDir, "workspace.age"))).toEqual(before);
       f.setKeysAvailable(true);
       const results = await Promise.allSettled([0, 1].map(() => f.store.execute({ action: "save", revision: workspace.revision, content: content("concurrent-harmless-marker") })));
       expect(results.filter(result => result.status === "fulfilled")).toHaveLength(1);
-      await expect(f.store.execute({ action: "approve", revision: workspace.revision, id })).rejects.toThrow("revision_conflict");
+      await expect(f.store.execute({ action: "splits", revision: workspace.revision, assignments: [{ id, split: "development" }] })).rejects.toThrow("revision_conflict");
     } finally { await f.cleanup(); }
   });
 

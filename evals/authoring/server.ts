@@ -8,8 +8,12 @@ import { type AuthoringCommand, type AuthoringStore } from "./store.js";
 // Fixed messages only. Never render raw validation issues or submitted values in errors.
 const validationMessages: Record<string, string> = {
   firm_finding_required: "Draft not saved. Choose an expected finding for a firm owner label, then save again.",
-  firm_label_required: "Case not approved. Edit the case, choose a finding, mark the label firm, and save before approving.",
-  case_invalid: "Draft not saved. Check the headword, finding, and field lengths, then save again."
+  firm_label_required: "Not saved. Only a firm label with a finding can have a split. Mark the label firm, or choose Not yet.",
+  firm_cases_unassigned: "Not frozen. Some firm cases have no split. Assign them, or tick the box to leave them out.",
+  heldout_inspected: "Not saved. A case whose model answers you inspected can only enter development.",
+  case_invalid: "Draft not saved. Check the headword, finding, and field lengths, then save again.",
+  heldout_inspected_variant: "Not saved. This word or a connected spelling variant has inspected model answers, so it can only enter development.",
+  variant_split_conflict: "Not saved. Connected spelling variants must stay on the same side of the split."
 };
 
 function equal(value: string, expected: string): boolean {
@@ -63,6 +67,9 @@ export async function startAuthoringServer(store: AuthoringStore, port = 0) {
       let notice: string | undefined;
       let editing: AuthoringCase | undefined;
       let attempted: Partial<CaseContent> | undefined;
+      let attemptedSplit: "development" | "held-out" | null | undefined;
+      // Unsaved batch selections are shown again if the batch is rejected.
+      let attemptedSplits: Map<string, "development" | "held-out"> | undefined;
       if (request.method === "POST" && request.url === "/action") {
         if (request.headers.origin !== origin) return deny(403, "origin_rejected");
         const fields = await formData(request);
@@ -70,7 +77,7 @@ export async function startAuthoringServer(store: AuthoringStore, port = 0) {
         const revision = Number(fields.get("revision"));
         const id = fields.get("id") || undefined;
         if (id && !opaqueId.safeParse(id).success) return deny(400, "request_invalid");
-        let command: AuthoringCommand;
+        let command: AuthoringCommand | undefined;
         switch (fields.get("action")) {
           case "save": {
             const group = fields.get("variantGroup") || randomUUID();
@@ -80,25 +87,38 @@ export async function startAuthoringServer(store: AuthoringStore, port = 0) {
               reason: fields.get("reason") ?? "", firm: fields.has("firm"), provenance: fields.get("provenance") ?? "",
               variantGroup: group, answersInspected: fields.has("answersInspected")
             };
-            command = { action: "save", revision, id, content: attempted }; break;
+            const split = fields.get("split") ?? "";
+            if (!["", "development", "held-out"].includes(split)) return deny(400, "request_invalid");
+            // Unticking "firm" turns the case back into a draft, so its split is dropped.
+            attemptedSplit = split === "" || !attempted.firm ? null : split as "development" | "held-out";
+            command = { action: "save", revision, id, content: attempted, split: attemptedSplit }; break;
           }
-          case "approve":
-            if (!id) return deny(400, "request_invalid");
-            command = { action: "approve", revision, id }; break;
-          case "split":
-            if (!id || !["development", "held-out"].includes(fields.get("split") ?? "")) return deny(400, "request_invalid");
-            command = { action: "split", revision, id, split: fields.get("split") as "development" | "held-out", beforeInspection: fields.has("beforeInspection") }; break;
+          case "splits": {
+            // Only radios that differ from the saved split become moves.
+            const current = new Map((await store.load()).cases.map(row => [row.id, row.split]));
+            const assignments: { id: string; split: "development" | "held-out" }[] = [];
+            for (const [key, value] of fields) {
+              if (!key.startsWith("split:")) continue;
+              const caseId = key.slice(6);
+              if (!opaqueId.safeParse(caseId).success || !["development", "held-out"].includes(value)) return deny(400, "request_invalid");
+              if (current.get(caseId) !== value) assignments.push({ id: caseId, split: value as "development" | "held-out" });
+            }
+            if (!assignments.length) { notice = "No split changes to save."; break; }
+            attemptedSplits = new Map(assignments.map(item => [item.id, item.split]));
+            command = { action: "splits", revision, assignments }; break;
+          }
           case "freeze":
             if (!fields.has("confirmFreeze")) return deny(400, "freeze_confirmation_required");
-            command = { action: "freeze", revision, version: Number(fields.get("version")) }; break;
+            command = { action: "freeze", revision, version: Number(fields.get("version")), omitUnassigned: fields.has("omitUnassigned") }; break;
           default: return deny(400, "request_invalid");
         }
-        try {
+        if (command) try {
           const result = await store.execute(command);
           notice = command.action === "freeze" ? `Encrypted dataset version ${result.manifest!.version} frozen.` :
-            command.action === "approve" ? "Owner approval saved encrypted." :
-            command.action === "split" ? "Split assignment saved encrypted." : "Draft saved encrypted. Approval is separate.";
-          attempted = undefined;
+            command.action === "splits" ? `Saved ${command.assignments.length} split ${command.assignments.length === 1 ? "change" : "changes"}.` :
+            command.split ? `Case saved encrypted and assigned to ${command.split}.` :
+            (command.content as CaseContent).firm ? "Case saved encrypted. Choose a split before freezing." : "Exploration draft saved encrypted.";
+          attempted = undefined; attemptedSplit = undefined; attemptedSplits = undefined;
         } catch (error) {
           response.statusCode = 409;
           const code = error instanceof PrivateError ? error.code : "operation_failed";
@@ -113,7 +133,7 @@ export async function startAuthoringServer(store: AuthoringStore, port = 0) {
           if (!editing) return deny(404, "not_found");
         }
       } else return deny(405, "method_rejected");
-      response.end(authoringPage({ workspace: await store.load(), versions: await store.versions(), csrf, notice, editing, attempted }));
+      response.end(authoringPage({ workspace: await store.load(), versions: await store.versions(), csrf, notice, editing, attempted, attemptedSplit, attemptedSplits }));
     } catch (error) {
       // No exception object or request payload leaves the process.
       deny(503, error instanceof PrivateError ? error.code : "operation_failed");

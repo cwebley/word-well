@@ -4,15 +4,19 @@ import { readFile, readdir, rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { chromium, type Browser, type Page } from "playwright";
 import { describe, expect, it } from "vitest";
-import { fixture } from "./fixtures.js";
+import { content, fixture } from "./fixtures.js";
 import { startAuthoringServer } from "./server.js";
 import { loadFrozenDataset, manifestSchema } from "./store.js";
 
 async function click(page: Page, name: string) {
-  const [response] = await Promise.all([page.waitForNavigation(), page.getByRole("button", { name, exact: true }).click()]);
+  // The case list repeats its save button above and below the cases.
+  const [response] = await Promise.all([page.waitForNavigation(), page.getByRole("button", { name, exact: true }).first().click()]);
   if (response && response.status() >= 400 && response.status() !== 409)
     throw new Error(`browser_http_${response.status()}`);
 }
+
+// The entry form; case cards have their own split controls.
+const entry = (page: Page) => page.locator("section").filter({ has: page.getByLabel("Exact headword") });
 
 async function leakScan(directory: string, markers: string[]): Promise<void> {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -38,11 +42,13 @@ describe("actual private authoring browser", () => {
       await page.goto(server.url);
       await page.getByLabel("Exact headword").fill("harmless-exploration-marker");
       await page.getByLabel("Expected finding").selectOption("clear");
-      await click(page, "Save encrypted draft");
+      // Firm is ticked by default for new entries; this one is an exploration draft.
+      await page.getByLabel("This is a firm owner label", { exact: false }).uncheck();
+      await click(page, "Save case");
       const original = (await f.store.load()).cases[0];
       expect(original.content.firm).toBe(false);
-      expect(await page.getByRole("button", { name: "Approve current saved content" }).count()).toBe(0);
-      await expect(f.store.execute({ action: "approve", revision: 1, id: original.id })).rejects.toThrow("firm_label_required");
+      expect(original.approval).toBeNull();
+      await expect(f.store.execute({ action: "splits", revision: 1, assignments: [{ id: original.id, split: "development" }] })).rejects.toThrow("approval_required");
 
       await page.getByRole("link", { name: "Edit case", exact: true }).click();
       expect(await page.getByLabel("Exact headword").inputValue()).toBe("harmless-exploration-marker");
@@ -52,12 +58,11 @@ describe("actual private authoring browser", () => {
       expect(firm).toHaveLength(1);
       expect(firm[0].id).toBe(original.id);
       expect(firm[0].content.firm).toBe(true);
-      await click(page, "Approve current saved content");
-      expect((await f.store.load()).cases[0].approval).not.toBeNull();
+      // Saving the firm label is the approval.
+      expect(firm[0].approval).not.toBeNull();
 
-      await page.locator('article select[name="split"]').selectOption("development");
-      await page.getByLabel("I am assigning this before", { exact: false }).check();
-      await click(page, "Save split assignment");
+      await page.locator('article input[name^="split:"][value="development"]').check();
+      await click(page, "Save split changes");
       await page.getByRole("link", { name: "Edit case", exact: true }).click();
       await page.getByLabel("This is a firm owner label", { exact: false }).uncheck();
       await click(page, "Save case changes");
@@ -66,7 +71,6 @@ describe("actual private authoring browser", () => {
       expect(corrected.content.firm).toBe(false);
       expect(corrected.approval).toBeNull();
       expect(corrected.split).toBeNull();
-      expect(await page.getByRole("button", { name: "Approve current saved content" }).count()).toBe(0);
       await leakScan(f.root, ["harmless-exploration-marker"]);
     } finally { await browser?.close(); await server.close(); await f.cleanup(); }
   }, 15_000);
@@ -81,7 +85,7 @@ describe("actual private authoring browser", () => {
       await page.goto(server.url);
       await page.getByLabel("Exact headword").fill("harmless-validation-marker");
       await page.getByLabel("This is a firm owner label", { exact: false }).check();
-      await click(page, "Save encrypted draft");
+      await click(page, "Save case");
       expect(await page.locator("#notice").textContent()).toBe("Draft not saved. Choose an expected finding for a firm owner label, then save again.");
       expect(await page.getByLabel("Exact headword").inputValue()).toBe("harmless-validation-marker");
       expect(await page.getByLabel("Short reason").inputValue()).toBe("");
@@ -89,13 +93,12 @@ describe("actual private authoring browser", () => {
       expect(await readdir(f.privateDir)).toEqual([]);
 
       await page.getByLabel("Expected finding").selectOption("blocked");
-      await click(page, "Save encrypted draft");
-      expect(await page.locator("#notice").textContent()).toContain("Draft saved encrypted");
+      // One save stores, approves and assigns.
+      await entry(page).locator('input[name="split"][value="development"]').check();
+      await click(page, "Save case");
+      expect(await page.locator("#notice").textContent()).toBe("Case saved encrypted and assigned to development.");
       expect((await f.store.load()).cases).toHaveLength(1);
-      await click(page, "Approve current saved content");
-      await page.locator('article select[name="split"]').selectOption("development");
-      await page.getByLabel("I am assigning this before", { exact: false }).check();
-      await click(page, "Save split assignment");
+      expect((await f.store.load()).revision).toBe(1);
       await page.getByLabel("I reviewed the scored membership", { exact: false }).check();
       await click(page, "Freeze encrypted dataset");
       expect(await page.locator("#notice").textContent()).toContain("version 1 frozen");
@@ -137,14 +140,17 @@ describe("actual private authoring browser", () => {
       await page.getByLabel("Short reason").fill(`${marker} <img src="https://example.invalid/leak" onerror="alert(1)">`);
       await page.getByLabel("This is a firm owner label", { exact: false }).check();
       await page.getByLabel("Private nomination", { exact: false }).fill(source);
-      await click(page, "Save encrypted draft");
-      expect(await page.locator("#notice").textContent()).toContain("Draft saved encrypted");
-      expect(await page.locator("article").textContent()).toContain("Not approved");
+      // Saved without a split first: freezing must then refuse to drop it silently.
+      await click(page, "Save case");
+      expect(await page.locator("#notice").textContent()).toBe("Case saved encrypted. Choose a split before freezing.");
+      expect(await page.locator("article").textContent()).toContain("Owner-approved");
       expect(await page.locator("article img").count()).toBe(0);
-      await click(page, "Approve current saved content");
-      await page.locator('article select[name="split"]').selectOption("development");
-      await page.getByLabel("I am assigning this before", { exact: false }).check();
-      await click(page, "Save split assignment");
+      expect(await page.locator("#unassigned").textContent()).toContain("1 firm case has no split");
+      await page.getByLabel("I reviewed the scored membership", { exact: false }).check();
+      await click(page, "Freeze encrypted dataset");
+      expect(await page.locator("#notice").textContent()).toBe("Not frozen. Some firm cases have no split. Assign them, or tick the box to leave them out.");
+      await page.locator('article input[name^="split:"][value="development"]').check();
+      await click(page, "Save split changes");
       expect(await page.locator("#coverage").textContent()).toContain("Development: 1 clear");
       const initialId = (await f.store.load()).cases[0].id;
 
@@ -160,13 +166,10 @@ describe("actual private authoring browser", () => {
       await page.getByLabel("Exact headword").fill(word);
       await page.getByLabel("Expected finding").selectOption("blocked");
       await page.getByLabel("Short reason").fill("Synthetic blocked expectation for workflow testing only.");
-      await page.getByLabel("This is a firm owner label", { exact: false }).check();
-      await click(page, "Save encrypted draft");
-      const second = page.locator("article").filter({ has: page.getByRole("link", { name: word, exact: true }) });
-      await Promise.all([page.waitForNavigation(), second.getByRole("button", { name: "Approve current saved content" }).click()]);
-      await second.locator('select[name="split"]').selectOption("held-out");
-      await second.getByLabel("I am assigning this before", { exact: false }).check();
-      await Promise.all([page.waitForNavigation(), second.getByRole("button", { name: "Save split assignment" }).click()]);
+      await entry(page).locator('input[name="split"][value="held-out"]').check();
+      expect(await page.getByText("Held-out only", { exact: false }).count()).toBe(0);
+      await click(page, "Save case");
+      expect(await page.locator("#notice").textContent()).toBe("Case saved encrypted and assigned to held-out.");
       expect(await page.locator("#coverage").textContent()).toContain("Held-out: 0 clear, 1 blocked");
 
       await page.getByLabel("I reviewed the scored membership", { exact: false }).check();
@@ -180,14 +183,14 @@ describe("actual private authoring browser", () => {
 
       await page.getByRole("link", { name: "exuberant", exact: true }).click();
       await page.getByLabel("Short reason").fill(`${marker} correction`);
+      // The editor keeps the current split selected, so the correction stays assigned.
+      expect(await entry(page).locator('input[name="split"][value="development"]').isChecked()).toBe(true);
+      const before = (await f.store.load()).cases.find(row => row.id === initialId)!;
       await click(page, "Save case changes");
-      expect((await f.store.load()).cases.find(row => row.id === initialId)!.approval).toBeNull();
-      expect(await page.locator("#coverage").textContent()).toContain("Development: 0 clear");
-      const firstArticle = page.locator("article").filter({ has: page.getByRole("link", { name: "exuberant", exact: true }) });
-      await Promise.all([page.waitForNavigation(), firstArticle.getByRole("button", { name: "Approve current saved content" }).click()]);
-      await firstArticle.locator('select[name="split"]').selectOption("development");
-      await firstArticle.getByLabel("I am assigning this before", { exact: false }).check();
-      await Promise.all([page.waitForNavigation(), firstArticle.getByRole("button", { name: "Save split assignment" }).click()]);
+      const after = (await f.store.load()).cases.find(row => row.id === initialId)!;
+      expect(after.approval?.contentDigest).not.toBe(before.approval?.contentDigest);
+      expect(after.split).toBe("development");
+      expect(await page.locator("#coverage").textContent()).toContain("Development: 1 clear");
       await page.getByLabel("I reviewed the scored membership", { exact: false }).check();
       await click(page, "Freeze encrypted dataset");
       expect(await page.locator("#notice").textContent()).toContain("version 2 frozen");
@@ -196,8 +199,9 @@ describe("actual private authoring browser", () => {
       // The server must retain the unsaved form, never claim success or print the error.
       failSave = true;
       await page.getByLabel("Exact headword").fill(unsaved);
+      await page.getByLabel("Expected finding").selectOption("clear");
       await page.getByLabel("Short reason").fill("harmless-unsaved-reason-marker");
-      await click(page, "Save encrypted draft");
+      await click(page, "Save case");
       expect(await page.locator("#notice").textContent()).toContain("Not confirmed saved. save_failed");
       expect(await page.getByLabel("Exact headword").inputValue()).toBe(unsaved);
       expect((await f.store.load()).cases).toHaveLength(2);
@@ -224,6 +228,50 @@ describe("actual private authoring browser", () => {
       expect(events.every(value => !value.includes(marker))).toBe(true);
     } finally { await browser?.close(); await server.close(); await f.cleanup(); }
   }, 30_000);
+
+  it("moves several cases with one save, and keeps the selections when the batch is refused", async () => {
+    const f = await fixture();
+    const add = async (headword: string, split: "development" | "held-out", extra = {}) => {
+      const { workspace } = await f.store.execute({ action: "save", revision: (await f.store.load()).revision, content: content(headword, extra), split });
+      return workspace.cases.at(-1)!.id;
+    };
+    const a = await add("harmless-batch-a", "held-out");
+    const b = await add("harmless-batch-b", "held-out");
+    const c = await add("harmless-batch-c", "development");
+    const server = await startAuthoringServer(f.store);
+    let browser: Browser | undefined;
+    try {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage();
+      await page.goto(server.url);
+      const revision = (await f.store.load()).revision;
+      await page.locator(`input[name="split:${a}"][value="development"]`).check();
+      await page.locator(`input[name="split:${b}"][value="development"]`).check();
+      await click(page, "Save split changes");
+      expect(await page.locator("#notice").textContent()).toBe("Saved 2 split changes.");
+      const saved = await f.store.load();
+      expect(saved.revision).toBe(revision + 1);
+      expect(Object.fromEntries(saved.cases.map(row => [row.id, row.split]))).toEqual({ [a]: "development", [b]: "development", [c]: "development" });
+      await click(page, "Save split changes");
+      expect(await page.locator("#notice").textContent()).toBe("No split changes to save.");
+
+      // Connected spelling variants must share a side. Moving only one refuses the whole batch.
+      const twin = await add("Harmless-Batch-A", "development");
+      await page.reload();
+      await page.locator(`input[name="split:${b}"][value="held-out"]`).check();
+      await page.locator(`input[name="split:${twin}"][value="held-out"]`).check();
+      const unchanged = await f.store.load();
+      await click(page, "Save split changes");
+      expect(await page.locator("#notice").textContent()).toBe("Not saved. Connected spelling variants must stay on the same side of the split.");
+      expect(await f.store.load()).toEqual(unchanged);
+      // The refused selections are still shown, ready to correct.
+      expect(await page.locator(`input[name="split:${b}"][value="held-out"]`).isChecked()).toBe(true);
+      expect(await page.locator(`input[name="split:${twin}"][value="held-out"]`).isChecked()).toBe(true);
+      await page.locator(`input[name="split:${a}"][value="held-out"]`).check();
+      await click(page, "Save split changes");
+      expect(await page.locator("#notice").textContent()).toBe("Saved 3 split changes.");
+    } finally { await browser?.close(); await server.close(); await f.cleanup(); }
+  }, 20_000);
 
   it("rejects absent sessions, cross-origin writes, invalid CSRF, DNS-rebinding Host and stale forms", async () => {
     const f = await fixture(); const server = await startAuthoringServer(f.store);
@@ -280,8 +328,9 @@ describe("actual private authoring browser", () => {
       await page.goto(await start());
       await page.getByLabel("Exact headword").fill("exuberant");
       await page.getByLabel("Short reason").fill("harmless-keychain-restart-marker");
-      await click(page, "Save encrypted draft");
-      expect(await page.locator("#notice").textContent()).toContain("Draft saved encrypted");
+      await page.getByLabel("This is a firm owner label", { exact: false }).uncheck();
+      await click(page, "Save case");
+      expect(await page.locator("#notice").textContent()).toBe("Exploration draft saved encrypted.");
       await stop();
       await page.goto(await start());
       expect(await page.locator("article").textContent()).toContain("harmless-keychain-restart-marker");
