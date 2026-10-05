@@ -1,0 +1,11 @@
+{
+  "schema": "wordwell-private-dataset-manifest-v1",
+  "format": "age-v1-X25519",
+  "id": "c7bd448d-66e1-42df-9e53-a0108c26320d",
+  "version": 2,
+  "key": {
+    "id": "ww-dataset-v1",
+    "recipient": "age1qfjuhahs67x8r35dhz0nzy8duj3mvf6ckfy46ed3u7pfwyfhlcuq87edst"
+  },
+  "ciphertextSha256": "4f41e57c34bf7bc1bc1e42bc669da38f8781bfa2d4d827b8f0f6b9d4542be7b8"
+}
