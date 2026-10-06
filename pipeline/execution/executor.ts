@@ -7,7 +7,7 @@
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { PrivateError } from "../storage/crypto.js";
-import type { AttemptRecord, PrivateStore, RequestRecord } from "../storage/postgres.js";
+import type { AttemptRecord, PrivateStore, RequestRecord, ExecutionOwnership } from "../storage/postgres.js";
 import type { ReceiptLedger } from "../storage/receipts.js";
 import type { ModelAdapter } from "./model.js";
 import type { StageDefinition } from "./stage.js";
@@ -64,9 +64,16 @@ export function createStageExecutor(dependencies: {
   }
 
   async function execute<Input, Result>(request: {
-    experimentId: string; attemptId: string; stage: StageDefinition<Input, Result>; input: Input;
+    experimentId?: string; runId?: string; attemptId: string; stage: StageDefinition<Input, Result>; input: Input;
+    // Recovery may reconcile and validate saved work, but cannot dispatch.
+    allowDispatch?: boolean;
+    beforeDispatch?: () => Promise<void>;
+    assertOwnership?: () => Promise<void>;
+    ownership?: ExecutionOwnership;
   }): Promise<ExecutionOutcome<Result>> {
-    const { experimentId, attemptId, stage } = request;
+    const { experimentId, runId, attemptId, stage } = request;
+    if ((experimentId === undefined) === (runId === undefined)) throw new PrivateError("attempt_owner_invalid");
+    const owner = runId ? { runId } : { experimentId: experimentId! };
     const body = stage.render(request.input);
     const saved = (attempt: AttemptRecord): ExecutionOutcome<Result> | null => {
       switch (attempt.status) {
@@ -77,7 +84,8 @@ export function createStageExecutor(dependencies: {
       }
     };
     const finish = async (status: "valid" | "invalid" | "failed" | "uncertain" | "response_lost", outcomeCode: string | null, result?: Result) => {
-      await persist(() => store.finishAttempt(attemptId, { status, outcomeCode, result }));
+      await request.assertOwnership?.();
+      await persist(() => store.finishAttempt(attemptId, { status, outcomeCode, result }, request.ownership));
       return saved((await store.readAttempt(attemptId))!)!;
     };
     // Decide from the last saved exchange. The saved raw reply is the evidence,
@@ -96,19 +104,24 @@ export function createStageExecutor(dependencies: {
     try {
       let attempt = await store.readAttempt(attemptId);
       if (!attempt) {
-        await persist(() => store.createAttempt({ id: attemptId, experimentId, stage: stage.name, input: { input: request.input, request: body } }));
+        await persist(() => store.createAttempt({ id: attemptId, ...owner, stage: stage.name, input: { input: request.input, request: body } }));
         attempt = (await store.readAttempt(attemptId))!;
-      } else if (attempt.experimentId !== experimentId || attempt.stage !== stage.name || !isDeepStrictEqual(attempt.input.request, body)) {
+      } else if ((attempt.experimentId ?? undefined) !== experimentId || (attempt.runId ?? undefined) !== runId || attempt.stage !== stage.name || !isDeepStrictEqual(attempt.input.request, body)) {
         throw new PrivateError("attempt_input_mismatch");
       }
       // Reconcile with the ledger: restore receipts a failed append left out,
       // then settle reservations left by an interrupted process.
       const receipts = attempt.requests.length ? (await ledger.read()).filter(event => event.attemptId === attemptId) : [];
+      for (const receipt of receipts) {
+        if (receipt.type === "request_outcome" && receipt.chargeNanoUsd !== null && attempt.requests.some(r => r.id === receipt.requestId && r.chargeStatus === "unknown"))
+          await store.reconcileRequestAccounting(receipt.requestId, { ...receipt, chargeNanoUsd: receipt.chargeNanoUsd });
+      }
+      attempt = (await store.readAttempt(attemptId))!;
       for (const settled of attempt.requests.filter(r => r.status === "responded" || r.status === "no_response")) {
         if (receipts.some(event => event.type === "request_outcome" && event.requestId === settled.id)) continue;
         try {
           await ledger.append({
-            type: "request_outcome", eventId: randomUUID(), at: (settled.completedAt ?? now()).toISOString(), experimentId, attemptId,
+            type: "request_outcome", eventId: randomUUID(), at: (settled.completedAt ?? now()).toISOString(), ...owner, attemptId,
             requestId: settled.id, outcome: settled.status as "responded" | "no_response", httpStatus: settled.httpStatus,
             generationId: settled.generationId, inputTokens: settled.inputTokens, outputTokens: settled.outputTokens,
             chargeStatus: settled.chargeNanoUsd === null ? "unknown" : "known", chargeNanoUsd: settled.chargeNanoUsd
@@ -117,6 +130,11 @@ export function createStageExecutor(dependencies: {
       }
       const done = saved(attempt);
       if (done) return done;
+      const cancelled = receipts.find(event => event.type === "dispatch_cancelled");
+      if (cancelled) {
+        await persist(() => store.abandonRequest(cancelled.requestId, true));
+        return finish("failed", "dispatch_cancelled");
+      }
 
       const open = attempt.requests.filter(r => r.status === "reserved");
       if (open.length) {
@@ -160,17 +178,28 @@ export function createStageExecutor(dependencies: {
           if (wait > 0) await sleep(wait);
         }
 
+        if (request.allowDispatch === false) return { attemptId, state: "paused", code: "retry_deferred" };
+        await request.beforeDispatch?.();
         const requestId = randomUUID();
         const sequence = attempt.requests.length + 1;
-        const reserved = await store.reserveRequest({ requestId, attemptId, experimentId, sequence, reservedNanoUsd: settings.reservationNanoUsd, at: now() });
+        const reserved = await store.reserveRequest({ requestId, attemptId, ...owner, sequence, reservedNanoUsd: settings.reservationNanoUsd, at: now() });
         if (!reserved) return { attemptId, state: "paused", code: "budget_exhausted" };
         try {
-          await ledger.append({ type: "dispatch_intent", eventId: randomUUID(), at: now().toISOString(), experimentId, attemptId, requestId, sequence, reservedNanoUsd: settings.reservationNanoUsd });
+          await ledger.append({ type: "dispatch_intent", eventId: randomUUID(), at: now().toISOString(), ...owner, attemptId, requestId, sequence, reservedNanoUsd: settings.reservationNanoUsd });
         } catch {
           await persist(() => store.abandonRequest(requestId));
           return { attemptId, state: "paused", code: "accounting_unavailable" };
         }
 
+        try { await request.beforeDispatch?.(); }
+        catch {
+          // The physical send has not begun. Cancellation must be durable so
+          // restart does not mistake the preceding intent for a sent request.
+          try { await ledger.append({ type: "dispatch_cancelled", eventId: randomUUID(), at: now().toISOString(), ...owner, attemptId, requestId }); }
+          catch { return { attemptId, state: "paused", code: "accounting_unavailable" }; }
+          await persist(() => store.abandonRequest(requestId, true));
+          return finish("failed", "dispatch_cancelled");
+        }
         const exchange = await model.send(body, { timeoutMs: settings.requestTimeoutMs });
         const completedAt = now();
         const accounting = model.accounting(exchange);
@@ -178,7 +207,7 @@ export function createStageExecutor(dependencies: {
         let accountingFailed = false;
         try {
           await ledger.append({
-            type: "request_outcome", eventId: randomUUID(), at: completedAt.toISOString(), experimentId, attemptId, requestId,
+            type: "request_outcome", eventId: randomUUID(), at: completedAt.toISOString(), ...owner, attemptId, requestId,
             outcome: exchange.kind === "response" ? "responded" : "no_response",
             httpStatus: exchange.kind === "response" ? exchange.status : null,
             ...accounting, chargeStatus: accounting.chargeNanoUsd === null ? "unknown" : "known"

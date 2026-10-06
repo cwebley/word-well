@@ -1,0 +1,52 @@
+{
+  "schema": "wordwell-source-lock-v1",
+  "mappingVersion": "wordwell-source-evidence-v1",
+  "artifacts": [
+    {
+      "source": "oewn",
+      "release": "2025-edition",
+      "filename": "english-wordnet-2025.xml.gz",
+      "url": "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.xml.gz",
+      "bytes": 11363503,
+      "checksums": {"sha256": "9ca6d1dcb75f822fdd66617f7d9da48142ace38dd544d6ad5e2feca1674ad3fe"},
+      "checksumOrigin": "https://api.github.com/repos/globalwordnet/english-wordnet/releases/tags/2025-edition",
+      "license": "CC-BY-4.0 and inherited Princeton WordNet license",
+      "attribution": "Princeton WordNet and the Open English WordNet team",
+      "noticeUrl": "https://raw.githubusercontent.com/globalwordnet/english-wordnet/2025-edition/LICENSE.md",
+      "additionalNoticeUrls": ["https://raw.githubusercontent.com/globalwordnet/english-wordnet/2025-edition/WNDB_License.txt"]
+    },
+    {
+      "source": "wiktionary",
+      "release": "20260901",
+      "filename": "enwiktionary-20260901-pages-articles.xml.bz2",
+      "url": "https://dumps.wikimedia.org/enwiktionary/20260901/enwiktionary-20260901-pages-articles.xml.bz2",
+      "bytes": 1632298458,
+      "checksums": {"sha1": "1ed7d1f8ff20ac07349dabe2a921d411385a1e04"},
+      "checksumOrigin": "https://dumps.wikimedia.org/enwiktionary/20260901/enwiktionary-20260901-sha1sums.txt",
+      "license": "CC-BY-SA-4.0 AND GFDL-1.3-or-later; quotation-specific rights retained",
+      "attribution": "English Wiktionary contributors",
+      "noticeUrl": "https://dumps.wikimedia.org/legal.html"
+    },
+    {
+      "source": "wordfreq",
+      "release": "3.1.1",
+      "filename": "wordfreq-3.1.1-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/24/61/62835c475d69872d30689f284497853fe33fe1d6dd18f57346d13305861d/wordfreq-3.1.1-py3-none-any.whl",
+      "bytes": 56834549,
+      "checksums": {"sha256": "4b1c6ecffc6198be3396d5cf871c4423ca71c907c231348d352dd54d62b97473"},
+      "checksumOrigin": "https://pypi.org/pypi/wordfreq/3.1.1/json",
+      "license": "Apache-2.0 code; CC-BY-SA-4.0 data and bundled source notices",
+      "attribution": "Robyn Speer and credited corpus authors",
+      "noticeUrl": "https://pypi.org/pypi/wordfreq/3.1.1/json"
+    }
+  ],
+  "extractor": {
+    "wiktextract": "d6fca2773bc90b9157248b9edf69585da06bf393",
+    "wikitextprocessor": "65e1673d15c3b06f1de84d1c34303fc8f68c3528",
+    "scribunto": "d35ca1f8d5fd23f1a9915e497cc00cac238f28c4",
+    "edition": "en",
+    "languages": ["en"],
+    "capture": "all",
+    "mediaDownloads": false
+  }
+}

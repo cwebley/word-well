@@ -9,7 +9,7 @@ import { PrivateError } from "./crypto.js";
 import { privateDirectory, readBytes, syncDirectory } from "./files.js";
 
 const ids = {
-  eventId: z.uuid(), at: z.iso.datetime(), experimentId: z.uuid(), attemptId: z.uuid(), requestId: z.uuid()
+  eventId: z.uuid(), at: z.iso.datetime(), experimentId: z.uuid().optional(), runId: z.uuid().optional(), attemptId: z.uuid(), requestId: z.uuid()
 };
 const nano = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const tokens = z.number().int().nonnegative().max(10_000_000).nullable();
@@ -27,8 +27,9 @@ export const receiptSchema = z.discriminatedUnion("type", [
     inputTokens: tokens, outputTokens: tokens,
     chargeStatus: z.enum(["known", "unknown"]),
     chargeNanoUsd: nano.nullable()
-  }).strict().refine(event => (event.chargeStatus === "known") === (event.chargeNanoUsd !== null))
-]);
+  }).strict().refine(event => (event.chargeStatus === "known") === (event.chargeNanoUsd !== null)),
+  z.object({ schema: z.literal("wordwell-receipt-v1"), type: z.literal("dispatch_cancelled"), ...ids }).strict()
+]).refine(event => (event.experimentId === undefined) !== (event.runId === undefined));
 export type Receipt = z.infer<typeof receiptSchema>;
 type Distribute<T> = T extends unknown ? Omit<T, "schema"> : never;
 export type ReceiptInput = Distribute<Receipt>;

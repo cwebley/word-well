@@ -30,7 +30,7 @@ wordwell_dev -> pg_dump -> age -> temporary snapshot.age
 | --- | --- | --- |
 | `evals/private-local.ts` | Loads public key references from `keys.json`, verifies their Keychain identities, opens the selected database | Nothing new |
 | `pipeline/storage/postgres.ts` | Reads encrypted records, decrypts them and verifies their embedded row and key identities | Reading changes nothing |
-| `evals/private-appropriateness.ts` | The reader reconstructs cases, trial details and scores. `finalize` builds the fixed summary under an experiment lock | Finalization writes aggregate JSON and records its digest and timestamp in PostgreSQL |
+| `evals/private-appropriateness.ts` | The reader reconstructs cases, trial details and scores. `finalize` builds the fixed summary under an experiment lock | New finalizations save the exact encrypted aggregate snapshot, digest and timestamp through the live lock-owning PostgreSQL connection, then write aggregate JSON. A failed file write recreates that frozen snapshot on retry, even if accounting later changes |
 | `evals/private-report.ts` | Turns reader results into escaped HTML on `127.0.0.1`. The printed session link sets a cookie through an HTTP header, then redirects to the report | No deliberate page, log or result-file writes. The browser manages a session-token cookie |
 | `evals/summarize.ts` | Validates fixed aggregate fields and count denominators; rejects extra fields and free text | The aggregate file written by finalization |
 | `evals/export-summary.ts` | Receives only the summary file and Braintrust credentials. Uses a deterministic experiment name and row ID | One remote summary row and a local acknowledgement receipt |
@@ -41,6 +41,11 @@ It has no JavaScript or external resources, and its responses disable caching.
 The cookie contains only a random session token. Restarting the server invalidates
 the old token. Stopping the server does not erase a page already rendered in a
 browser.
+
+Migration `007_frozen_summaries.sql` adds exact snapshot storage for new
+finalizations. Historical finalized rows and their existing files are not
+backfilled or rewritten. Current accounting can settle a late charge while the
+frozen aggregate continues to report the amounts recorded at finalization.
 
 ## One actual saved example
 

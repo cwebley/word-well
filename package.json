@@ -14,6 +14,11 @@
     "test:acceptance": "test -n \"$DATABASE_URL\" && vitest run acceptance",
     "test:watch": "vitest",
     "typecheck": "tsc -b",
+    "pipeline": "node --env-file-if-exists=.env --import tsx pipeline/cli.ts",
+    "test:sources": "tsx scripts/test-sources.ts",
+    "test:scoped-sources": "tsx scripts/test-scoped-sources.ts",
+    "test:production": "tsx scripts/test-production.ts",
+    "eval:private:assess-promotion": "tsx scripts/assess-saved-promotion.ts",
     "clean": "node scripts/clean.js",
     "build:site": "node scripts/build-site.js",
     "build:swatchkit": "swatchkit",
@@ -54,6 +59,7 @@
     "age-encryption": "0.3.1",
     "pg": "^8.23.0",
     "tsx": "^4.23.12",
+    "yaml": "^2.8.3",
     "zod": "^4.6.5"
   }
 }

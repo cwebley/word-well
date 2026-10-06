@@ -1,0 +1,58 @@
+# Intake policy only. Paid stage settings remain in their own approved tickets.
+filters:
+  source_match:
+    require_oewn: true
+    ambiguous: unresolved
+  frequency:
+    dataset: wordfreq
+    version: 3.1.1
+    language: en
+    wordlist: large
+    measure: direct_headword
+    required_tokens: 1
+    ceiling: 3.7
+    floor: null
+    missing: unresolved
+  prohibited_labels:
+    enabled: true
+    scope: all_recorded_meanings
+    labels:
+      - offensive
+      - slur
+      - ethnic slur
+      - ethnic-slur
+      - vulgar
+      - derogatory
+      - pejorative
+      - taboo
+      - profanity
+      - obscene
+      - coarse
+      - racially offensive
+      - homophobic
+      - transphobic
+      - misogynistic
+    aliases:
+      ethnic slur: ethnic-slur
+      racial slur: slur
+      religious slur: slur
+      pejoratively: pejorative
+      pej.: pejorative
+      derog.: derogatory
+      derogative: derogatory
+      disparaging: derogatory
+      strong language: vulgar
+  spelling:
+    preferred_dialect: en-US
+    exclude_explicit_nonpreferred: true
+    require_preferred_target: true
+    ambiguous: no_exclusion
+  entry_form:
+    exclude_only: [numeral, abbreviation, inflected_form]
+    preserve_lexical_entries: true
+  speculative:
+    affix_transparency: false
+    compound_splitting: false
+    derivation_redundancy: false
+    missing_synonyms: false
+    broad_topic: false

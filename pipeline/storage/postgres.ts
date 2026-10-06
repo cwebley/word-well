@@ -3,6 +3,8 @@
 // payload with the storage key, binding each ciphertext to its table, row and
 // column. Plain columns hold only opaque IDs, fixed codes, counts and amounts.
 import pg from "pg";
+import { randomUUID } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 import { PrivateError, type KeyReference, type PrivateCrypto } from "./crypto.js";
 import type { Exchange } from "../execution/model.js";
@@ -20,7 +22,7 @@ export type RequestRecord = {
   response: Exchange | null;
 };
 export type AttemptRecord = {
-  id: string; experimentId: string; stage: string; status: AttemptStatus; outcomeCode: string | null;
+  id: string; experimentId: string | null; runId?: string | null; stage: string; status: AttemptStatus; outcomeCode: string | null;
   nextEligibleAt: Date | null; input: { input: unknown; request: unknown }; result: unknown;
   requests: RequestRecord[];
 };
@@ -43,6 +45,11 @@ const caseInputSchema = z.object({ headword: z.string() }).strict();
 const expectationSchema = z.object({ finding: z.enum(["clear", "blocked"]), reason: z.string(), split: z.enum(["development", "held-out"]) }).strict();
 export type Expectation = z.infer<typeof expectationSchema>;
 export type CaseRecord = { caseId: string; position: number; input: z.infer<typeof caseInputSchema>; expectation: Expectation };
+export type CandidateClaim = { candidateId: string; runId: string; token: string; assert: () => Promise<void>;
+  transaction: <T>(work: (client: pg.PoolClient) => Promise<T>) => Promise<T>; release: () => Promise<void> };
+export type ExperimentLock = (() => Promise<void>) & { assert: () => Promise<void>;
+  transaction: <T>(work: (client: pg.PoolClient) => Promise<T>) => Promise<T> };
+export type ExecutionOwnership = Pick<CandidateClaim, "assert" | "transaction">;
 
 const number = (value: string | number | null) => value === null ? null : Number(value);
 
@@ -89,9 +96,24 @@ export async function createPrivateStore(options: {
     }
   };
   const read = <T>(operation: string, work: () => Promise<T>) => guard(operation, work, false);
+  async function reconcileRequestAccounting(requestId: string, outcome: { chargeNanoUsd: number; generationId: string | null; inputTokens: number | null; outputTokens: number | null }) {
+    await guard("reconcile_request_accounting", async () => {
+      const { rows: [row] } = await pool.query("SELECT charge_status,charge_nano_usd FROM private.requests WHERE id=$1", [requestId]);
+      if (row?.charge_status === "known" && Number(row.charge_nano_usd) !== outcome.chargeNanoUsd) throw new PrivateError("accounting_conflict");
+      // Pricing an uncertain exchange never changes its execution outcome or
+      // creates a usable reply. Terminal attempts remain immutable.
+      await pool.query(`UPDATE private.requests SET charge_status='known',charge_nano_usd=$2,generation_id=COALESCE(generation_id,$3),
+        input_tokens=COALESCE(input_tokens,$4),output_tokens=COALESCE(output_tokens,$5)
+        WHERE id=$1 AND status IN ('responded','no_response') AND charge_status='unknown'`,
+        [requestId, outcome.chargeNanoUsd, outcome.generationId, outcome.inputTokens, outcome.outputTokens]);
+      const settled = (await pool.query("SELECT charge_status,charge_nano_usd FROM private.requests WHERE id=$1", [requestId])).rows[0];
+      if (settled?.charge_status === "known" && Number(settled.charge_nano_usd) !== outcome.chargeNanoUsd) throw new PrivateError("accounting_conflict");
+    });
+  }
 
   return {
     async close() { await pool.end(); },
+    reconcileRequestAccounting,
 
     // The experiment and its frozen cases are saved together or not at all.
     async createExperiment(record: {
@@ -126,9 +148,12 @@ export async function createPrivateStore(options: {
     },
 
     // Records the frozen summary digest once. Returns false if already finalized.
-    async finalizeExperiment(id: string, summarySha256: string, at: Date): Promise<boolean> {
-      const result = await guard("finalize_experiment", () => pool.query(
-        "UPDATE private.experiments SET finalized_at = $2, summary_sha256 = $3 WHERE id = $1 AND finalized_at IS NULL", [id, at, summarySha256]));
+    async finalizeExperiment(id: string, summarySha256: string, at: Date, ownership: ExperimentLock, summary: unknown): Promise<boolean> {
+      const payload = await seal(`experiments:${id}:summary`, summary);
+      await ownership.assert();
+      const result = await guard("finalize_experiment", () => ownership.transaction(client => client.query(
+        `UPDATE private.experiments SET finalized_at=$2,summary_sha256=$3,finalized_summary_key_id=$4,finalized_summary_payload=$5
+         WHERE id=$1 AND finalized_at IS NULL`, [id, at, summarySha256, key.id, payload])));
       return result.rowCount === 1;
     },
 
@@ -150,6 +175,7 @@ export async function createPrivateStore(options: {
         implementationFingerprint: row.implementation_fingerprint as string,
         capNanoUsd: Number(row.cap_nano_usd), createdAt: row.created_at as Date,
         finalizedAt: row.finalized_at as Date | null, summarySha256: row.summary_sha256 as string | null,
+        frozenSummary: row.finalized_summary_payload ? await open(`experiments:${id}:summary`, row.finalized_summary_key_id, row.finalized_summary_payload, anyJson) : null,
         material: await open(`experiments:${id}:payload`, row.key_id, row.payload, anyJson)
       };
     },
@@ -192,11 +218,11 @@ export async function createPrivateStore(options: {
       return rows.map(row => ({ caseId: row.case_id, trialIndex: row.trial_index, attemptId: row.attempt_id }));
     },
 
-    async createAttempt(record: { id: string; experimentId: string; stage: string; input: { input: unknown; request: unknown } }) {
+    async createAttempt(record: { id: string; experimentId?: string; runId?: string; stage: string; input: { input: unknown; request: unknown } }) {
       const payload = await seal(`attempts:${record.id}:input`, record.input);
       await guard("create_attempt", () => pool.query(
-        `INSERT INTO private.attempts (id, experiment_id, stage, status, key_id, input_payload)
-         VALUES ($1,$2,$3,'pending',$4,$5)`, [record.id, record.experimentId, record.stage, key.id, payload]));
+        `INSERT INTO private.attempts (id, experiment_id, stage, status, key_id, input_payload, run_id)
+         VALUES ($1,$2,$3,'pending',$4,$5,$6)`, [record.id, record.experimentId ?? null, record.stage, key.id, payload, record.runId ?? null]));
     },
 
     async readAttempt(id: string): Promise<AttemptRecord | null> {
@@ -206,7 +232,7 @@ export async function createPrivateStore(options: {
       }));
       if (!attempt) return null;
       return {
-        id, experimentId: attempt.experiment_id, stage: attempt.stage, status: attempt.status,
+        id, experimentId: attempt.experiment_id, runId: attempt.run_id, stage: attempt.stage, status: attempt.status,
         outcomeCode: attempt.outcome_code, nextEligibleAt: attempt.next_eligible_at,
         input: await open(`attempts:${id}:input`, attempt.key_id, attempt.input_payload, attemptInputSchema) as AttemptRecord["input"],
         result: attempt.result_payload ? await open(`attempts:${id}:result`, attempt.key_id, attempt.result_payload, anyJson) : null,
@@ -223,16 +249,18 @@ export async function createPrivateStore(options: {
 
     // Atomically requires settled charges + outstanding reservations + this
     // allowance to fit the experiment cap. Unknown charges keep their reservation.
-    async reserveRequest(record: { requestId: string; attemptId: string; experimentId: string; sequence: number; reservedNanoUsd: number; at: Date }): Promise<boolean> {
+    async reserveRequest(record: { requestId: string; attemptId: string; experimentId?: string; runId?: string; sequence: number; reservedNanoUsd: number; at: Date }): Promise<boolean> {
       return guard("reserve_request", async () => {
         const client = await pool.connect();
         try {
           await client.query("BEGIN");
-          const { rows: [experiment] } = await client.query("SELECT cap_nano_usd FROM private.experiments WHERE id = $1 FOR UPDATE", [record.experimentId]);
+          const production = record.runId !== undefined;
+          const ownerId = record.runId ?? record.experimentId;
+          const { rows: [experiment] } = await client.query(`SELECT cap_nano_usd FROM private.${production ? "production_runs" : "experiments"} WHERE id = $1 FOR UPDATE`, [ownerId]);
           const { rows: [spend] } = await client.query(
             `SELECT COALESCE(SUM(CASE WHEN r.charge_status = 'known' THEN r.charge_nano_usd
                                       WHEN r.charge_status IN ('pending', 'unknown') THEN r.reserved_nano_usd ELSE 0 END), 0) AS committed
-               FROM private.requests r JOIN private.attempts a ON a.id = r.attempt_id WHERE a.experiment_id = $1`, [record.experimentId]);
+               FROM private.requests r JOIN private.attempts a ON a.id = r.attempt_id WHERE a.${production ? "run_id" : "experiment_id"} = $1`, [ownerId]);
           if (BigInt(spend.committed) + BigInt(record.reservedNanoUsd) > BigInt(experiment.cap_nano_usd)) {
             await client.query("ROLLBACK");
             return false;
@@ -248,15 +276,16 @@ export async function createPrivateStore(options: {
       });
     },
 
-    // Only for a reservation with no durable dispatch intent: never sent.
-    async abandonRequest(requestId: string) {
+    // A reservation with no intent or a durable cancellation was never sent.
+    async abandonRequest(requestId: string, cancelled = false) {
       await guard("abandon_request", () => pool.query(
-        "UPDATE private.requests SET status = 'abandoned', charge_status = 'none' WHERE id = $1 AND status = 'reserved'", [requestId]));
+        `UPDATE private.requests SET status='abandoned',charge_status='none'
+         WHERE id=$1 AND (status='reserved' OR ($2 AND status='no_response' AND charge_status='unknown' AND response_payload IS NULL))`, [requestId, cancelled]));
     },
 
     async recordOutcome(requestId: string, outcome: RequestOutcome) {
       const payload = outcome.response ? await seal(`requests:${requestId}:response`, outcome.response) : null;
-      await guard("record_outcome", () => pool.query(
+      const written = await guard("record_outcome", () => pool.query(
         `UPDATE private.requests SET status = $2, http_status = $3, retryable = $4, retry_after_ms = $5,
            generation_id = $6, input_tokens = $7, output_tokens = $8,
            charge_status = $9, charge_nano_usd = $10, completed_at = $11, key_id = $12, response_payload = $13
@@ -264,14 +293,16 @@ export async function createPrivateStore(options: {
         [requestId, outcome.status, outcome.httpStatus, outcome.retryable, outcome.retryAfterMs,
           outcome.generationId, outcome.inputTokens, outcome.outputTokens,
           outcome.chargeNanoUsd === null ? "unknown" : "known", outcome.chargeNanoUsd, outcome.completedAt,
-          payload ? key.id : null, payload]));
+           payload ? key.id : null, payload]));
+      if (!written.rowCount && outcome.chargeNanoUsd !== null) await reconcileRequestAccounting(requestId, { ...outcome, chargeNanoUsd: outcome.chargeNanoUsd });
     },
 
-    async finishAttempt(id: string, outcome: { status: Exclude<AttemptStatus, "pending">; outcomeCode: string | null; result?: unknown }) {
+    async finishAttempt(id: string, outcome: { status: Exclude<AttemptStatus, "pending">; outcomeCode: string | null; result?: unknown }, ownership?: ExecutionOwnership) {
       const payload = outcome.result === undefined ? null : await seal(`attempts:${id}:result`, outcome.result);
-      await guard("finish_attempt", () => pool.query(
+      const write = (client: pg.Pool | pg.PoolClient) => client.query(
         `UPDATE private.attempts SET status = $2, outcome_code = $3, result_payload = $4, next_eligible_at = NULL, updated_at = now()
-         WHERE id = $1 AND status = 'pending'`, [id, outcome.status, outcome.outcomeCode, payload]));
+         WHERE id = $1 AND status = 'pending'`, [id, outcome.status, outcome.outcomeCode, payload]);
+      await guard("finish_attempt", () => ownership ? ownership.transaction(write) : write(pool));
     },
 
     async deferAttempt(id: string, nextEligibleAt: Date) {
@@ -279,12 +310,13 @@ export async function createPrivateStore(options: {
         "UPDATE private.attempts SET next_eligible_at = $2, updated_at = now() WHERE id = $1 AND status = 'pending'", [id, nextEligibleAt]));
     },
 
-    async saveCaseScore(experimentId: string, caseId: string, score: unknown) {
+    async saveCaseScore(experimentId: string, caseId: string, score: unknown, ownership?: ExecutionOwnership) {
       const payload = await sealOwner(`case_scores:${experimentId}:${caseId}`, score);
-      await guard("save_case_score", () => pool.query(
+      const write = (client: pg.Pool | pg.PoolClient) => client.query(
         `INSERT INTO private.case_scores (experiment_id, case_id, key_id, payload) VALUES ($1,$2,$3,$4)
          ON CONFLICT (experiment_id, case_id) DO UPDATE SET key_id = EXCLUDED.key_id, payload = EXCLUDED.payload, updated_at = now()`,
-        [experimentId, caseId, datasetKey().id, payload]));
+        [experimentId, caseId, datasetKey().id, payload]);
+      await guard("save_case_score", () => ownership ? ownership.transaction(write) : write(pool));
     },
 
     async readCaseScores(experimentId: string): Promise<{ caseId: string; score: unknown }[]> {
@@ -314,23 +346,210 @@ export async function createPrivateStore(options: {
         lastCompletedAt: row.last_completed as Date | null };
     },
 
+    async createProductionRun(record: { id: string; candidateId: string; capNanoUsd: number; material: unknown }) {
+      const payload = await seal(`production_runs:${record.id}:payload`, record.material);
+      await guard("create_production_run", () => pool.query(
+        "INSERT INTO private.production_runs(id,candidate_id,cap_nano_usd,key_id,payload) VALUES($1,$2,$3,$4,$5)",
+        [record.id, record.candidateId, record.capNanoUsd, key.id, payload]));
+    },
+    async readProductionRun(id: string) {
+      const { rows: [row] } = await read("read_production_run", () => pool.query("SELECT * FROM private.production_runs WHERE id=$1", [id]));
+      return row ? { id, candidateId: row.candidate_id as string, capNanoUsd: Number(row.cap_nano_usd), status: row.status as string,
+        outcomeCode: row.outcome_code as string | null, material: await open(`production_runs:${id}:payload`, row.key_id, row.payload, anyJson) } : null;
+    },
+    // The session lock proves that the prior connection has ended before recovery.
+    // A persistent token fences writes even if an obsolete process keeps running.
+    async claimCandidate(candidateId: string, runId: string, recover = false): Promise<CandidateClaim> {
+      const client = await read("claim_candidate", () => pool.connect());
+      let locked = false;
+      let connectionLost = false;
+      const disconnected = () => { connectionLost = true; };
+      client.on("error", disconnected);
+      const token = randomUUID();
+      try {
+        locked = (await client.query("SELECT pg_try_advisory_lock(hashtext('wordwell:candidate'),hashtext($1)) AS locked", [candidateId])).rows[0].locked;
+        if (!locked) throw new PrivateError("candidate_busy");
+        await client.query("BEGIN");
+        await client.query("INSERT INTO private.candidate_claims(candidate_id) VALUES($1) ON CONFLICT DO NOTHING", [candidateId]);
+        const { rows: [claim] } = await client.query("SELECT * FROM private.candidate_claims WHERE candidate_id=$1 FOR UPDATE", [candidateId]);
+        const run = (await client.query("SELECT candidate_id,status FROM private.production_runs WHERE id=$1", [runId])).rows[0];
+        if (run?.candidate_id !== candidateId) throw new PrivateError("claim_run_mismatch");
+        if (["accepted", "rejected", "failed"].includes(run.status) && (!recover || claim.run_id !== runId)) throw new PrivateError("run_completed");
+        if (claim.run_id && !(claim.run_id === runId && (recover || run.status === "paused"))) throw new PrivateError("candidate_recovery_required");
+        await client.query("UPDATE private.candidate_claims SET run_id=$2,token=$3 WHERE candidate_id=$1", [candidateId, runId, token]);
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        let destroy = false;
+        if (locked) try { await client.query("SELECT pg_advisory_unlock(hashtext('wordwell:candidate'),hashtext($1))", [candidateId]); } catch { destroy = true; }
+        client.removeListener("error", disconnected);
+        client.release(destroy || connectionLost);
+        if (error instanceof PrivateError) throw error;
+        throw new PrivateError("storage_unavailable");
+      }
+      let released = false;
+      return { candidateId, runId, token,
+        assert: async () => {
+          if (released || connectionLost) throw new PrivateError("claim_stale");
+          await read("assert_claim", async () => {
+            // This query must use the lock-owning connection, never another pool session.
+            const { rows } = await client.query("SELECT 1 FROM private.candidate_claims WHERE candidate_id=$1 AND run_id=$2 AND token=$3", [candidateId, runId, token]);
+            if (!rows.length) throw new PrivateError("claim_stale");
+          });
+        },
+        transaction: async work => {
+          if (released || connectionLost) throw new PrivateError("claim_stale");
+          return read("claim_transaction", async () => {
+            await client.query("BEGIN");
+            try {
+              const { rows } = await client.query("SELECT 1 FROM private.candidate_claims WHERE candidate_id=$1 AND run_id=$2 AND token=$3 FOR UPDATE", [candidateId, runId, token]);
+              if (!rows.length) throw new PrivateError("claim_stale");
+              const result = await work(client);
+              if (connectionLost) throw new PrivateError("claim_stale");
+              await client.query("COMMIT");
+              return result;
+            } catch (error) { await client.query("ROLLBACK").catch(() => {}); throw error; }
+          });
+        },
+        release: async () => {
+          released = true;
+          let destroy = false;
+          try { await client.query("SELECT pg_advisory_unlock(hashtext('wordwell:candidate'),hashtext($1))", [candidateId]); }
+          catch { destroy = true; }
+          finally { client.removeListener("error", disconnected); client.release(destroy || connectionLost); }
+        }
+      };
+    },
+    async productionTrial(runId: string, trialIndex: number): Promise<string> {
+      return guard("production_trial", async () => {
+        await pool.query("INSERT INTO private.production_trials VALUES($1,$2,$3) ON CONFLICT DO NOTHING", [runId, trialIndex, randomUUID()]);
+        return (await pool.query("SELECT attempt_id FROM private.production_trials WHERE run_id=$1 AND trial_index=$2", [runId, trialIndex])).rows[0].attempt_id;
+      });
+    },
+    async productionTrials(runId: string): Promise<{ trialIndex: number; attemptId: string }[]> {
+      const { rows } = await read("production_trials", () => pool.query("SELECT * FROM private.production_trials WHERE run_id=$1 ORDER BY trial_index", [runId]));
+      return rows.map(r => ({ trialIndex: r.trial_index, attemptId: r.attempt_id }));
+    },
+    async selectedProductionResult(candidateId: string) {
+      const { rows: [row] } = await read("selected_result", () => pool.query(
+        "SELECT r.* FROM private.stage_selections s JOIN private.production_results r ON r.id=s.result_id WHERE s.candidate_id=$1 AND s.stage='appropriateness'", [candidateId]));
+      return row ? { id: row.id as string, runId: row.run_id as string, reuseIdentity: row.reuse_identity as string,
+        material: await open(`production_results:${row.id}:payload`, row.key_id, row.payload, anyJson) } : null;
+    },
+    // Result, selection/history, current authorization and claim release commit
+    // together. Failed work updates only its run and retains earlier selections.
+    async completeProduction(claim: CandidateClaim, record: { status: "paused" | "accepted" | "rejected" | "failed"; code?: string;
+      result?: { id: string; reuseIdentity: string; material: unknown }; reusedResultId?: string;
+      assessmentId?: string; promotionId?: string; keepClaim?: boolean }) {
+      await claim.assert();
+      const payload = record.result ? await seal(`production_results:${record.result.id}:payload`, record.result.material) : null;
+      await guard("complete_production", async () => {
+        await claim.transaction(async client => {
+          if (record.result) {
+            await client.query("INSERT INTO private.production_results VALUES($1,$2,$3,'appropriateness',$4,$5,$6)", [record.result.id, claim.runId, claim.candidateId, record.result.reuseIdentity, key.id, payload]);
+            await client.query("INSERT INTO private.stage_selections VALUES($1,'appropriateness',$2) ON CONFLICT(candidate_id,stage) DO UPDATE SET result_id=EXCLUDED.result_id", [claim.candidateId, record.result.id]);
+            await client.query("INSERT INTO private.selection_history(id,candidate_id,stage,result_id,run_id) VALUES($1,$2,'appropriateness',$3,$4)", [randomUUID(), claim.candidateId, record.result.id, claim.runId]);
+          }
+          const resultId = record.result?.id ?? record.reusedResultId;
+          if (resultId && record.assessmentId) await client.query("INSERT INTO private.reuse_authorizations(run_id,result_id,assessment_id,promotion_id) VALUES($1,$2,$3,$4)", [claim.runId, resultId, record.assessmentId, record.promotionId ?? null]);
+          await client.query("UPDATE private.production_runs SET status=$2,outcome_code=$3 WHERE id=$1", [claim.runId, record.status, record.code ?? null]);
+          if (!record.keepClaim) await client.query("UPDATE private.candidate_claims SET run_id=NULL,token=NULL WHERE candidate_id=$1 AND token=$2", [claim.candidateId, claim.token]);
+        });
+      });
+    },
+    async productionSpend(runId: string) {
+      const { rows: [row] } = await read("production_spend", () => pool.query(
+        `SELECT p.cap_nano_usd, COALESCE(sum(r.charge_nano_usd) FILTER(WHERE r.charge_status='known'),0) AS known,
+          COALESCE(sum(r.reserved_nano_usd) FILTER(WHERE r.charge_status IN ('pending','unknown')),0) AS outstanding,
+          count(r.id) FILTER(WHERE r.charge_status IN ('pending','unknown')) AS unresolved,
+          count(r.id) FILTER(WHERE r.status <> 'abandoned') AS physical
+         FROM private.production_runs p LEFT JOIN private.attempts a ON a.run_id=p.id LEFT JOIN private.requests r ON r.attempt_id=a.id
+         WHERE p.id=$1 GROUP BY p.cap_nano_usd`, [runId]));
+      return { capNanoUsd: Number(row.cap_nano_usd), knownNanoUsd: Number(row.known), outstandingNanoUsd: Number(row.outstanding),
+        unresolvedRequests: Number(row.unresolved), physicalRequests: Number(row.physical) };
+    },
+    async savePromotionAssessment(record: { id: string; experimentId: string; configurationFingerprint: string; ruleIdentity: string; evidenceIdentity: string; qualifies: boolean; material: unknown }) {
+      const payload = await seal(`promotion_assessments:${record.id}:payload`, record.material);
+      await guard("save_promotion_assessment", async () => {
+        await pool.query(
+        "INSERT INTO private.promotion_assessments(id,experiment_id,configuration_fingerprint,rule_identity,evidence_identity,qualifies,key_id,payload) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING",
+        [record.id, record.experimentId, record.configurationFingerprint, record.ruleIdentity, record.evidenceIdentity, record.qualifies, key.id, payload]);
+        const { rows: [row] } = await pool.query("SELECT * FROM private.promotion_assessments WHERE id=$1", [record.id]);
+        if (!isDeepStrictEqual(await open(`promotion_assessments:${record.id}:payload`, row.key_id, row.payload, anyJson), record.material)) throw new PrivateError("assessment_identity_conflict");
+      });
+    },
+    async readPromotionAssessment(id: string) {
+      const { rows: [row] } = await read("read_promotion_assessment", () => pool.query("SELECT * FROM private.promotion_assessments WHERE id=$1", [id]));
+      return row ? { id, configurationFingerprint: row.configuration_fingerprint as string, qualifies: row.qualifies as boolean,
+        material: await open(`promotion_assessments:${id}:payload`, row.key_id, row.payload, anyJson) } : null;
+    },
+    async recordPromotion(record: { id: string; assessmentId: string; configurationFingerprint: string; decision: "promote" | "do_not_promote"; material: unknown }) {
+      const payload = await seal(`stage_promotions:${record.id}:payload`, record.material);
+      await guard("record_promotion", async () => {
+        const { rows: [assessment] } = await pool.query("SELECT * FROM private.promotion_assessments WHERE id=$1", [record.assessmentId]);
+        if (!assessment || assessment.configuration_fingerprint !== record.configurationFingerprint || (record.decision === "promote" && !assessment.qualifies)) throw new PrivateError("promotion_evidence_invalid");
+        await pool.query("INSERT INTO private.stage_promotions(id,configuration_fingerprint,assessment_id,decision,key_id,payload) VALUES($1,$2,$3,$4,$5,$6)",
+          [record.id, record.configurationFingerprint, record.assessmentId, record.decision, key.id, payload]);
+      });
+    },
+    async currentPromotion(configurationFingerprint: string) {
+      const { rows: [row] } = await read("current_promotion", () => pool.query(
+        "SELECT * FROM private.stage_promotions WHERE configuration_fingerprint=$1 ORDER BY created_at DESC,id DESC LIMIT 1", [configurationFingerprint]));
+      return row ? { id: row.id as string, decision: row.decision as "promote" | "do_not_promote", assessmentId: row.assessment_id as string,
+        material: await open(`stage_promotions:${row.id}:payload`, row.key_id, row.payload, anyJson) } : null;
+    },
+    async productionHistory(candidateId: string) {
+      const { rows } = await read("production_history", () => pool.query("SELECT id,result_id,run_id,created_at FROM private.selection_history WHERE candidate_id=$1 ORDER BY created_at,id", [candidateId]));
+      return rows.map(row => ({ id: row.id as string, resultId: row.result_id as string, runId: row.run_id as string }));
+    },
+    async candidateClaim(candidateId: string) {
+      const { rows: [row] } = await read("candidate_claim", () => pool.query("SELECT run_id FROM private.candidate_claims WHERE candidate_id=$1", [candidateId]));
+      return row?.run_id as string | null ?? null;
+    },
+
     // One runner per experiment. The session lock ends when its process stops,
     // so a crashed owner never blocks recovery and a live one cannot be raced.
-    async lockExperiment(experimentId: string): Promise<() => Promise<void>> {
+    async lockExperiment(experimentId: string): Promise<ExperimentLock> {
       const client = await read("lock_experiment", () => pool.connect());
+      let connectionLost = false;
+      const disconnected = () => { connectionLost = true; };
+      client.on("error", disconnected);
       try {
         const { rows: [row] } = await client.query(
           "SELECT pg_try_advisory_lock(hashtext('wordwell:experiment'), hashtext($1)) AS locked", [experimentId]);
         if (!row.locked) throw new PrivateError("experiment_busy");
       } catch (error) {
-        client.release();
+        client.removeListener("error", disconnected);
+        client.release(connectionLost);
         if (error instanceof PrivateError) throw error;
         throw new PrivateError("storage_unavailable");
       }
-      return async () => {
-        try { await client.query("SELECT pg_advisory_unlock(hashtext('wordwell:experiment'), hashtext($1))", [experimentId]); }
-        finally { client.release(); }
+      let released = false;
+      const assert = async () => {
+        if (released || connectionLost) throw new PrivateError("experiment_lock_lost");
+        await read("assert_experiment_lock", () => client.query("SELECT 1"));
       };
+      const release = async () => {
+        released = true;
+        let destroy = connectionLost;
+        try { await client.query("SELECT pg_advisory_unlock(hashtext('wordwell:experiment'), hashtext($1))", [experimentId]); }
+        catch { destroy = true; throw new PrivateError("storage_unavailable"); }
+        finally { client.removeListener("error", disconnected); client.release(destroy); }
+      };
+      return Object.assign(release, { assert,
+        transaction: async <T>(work: (client: pg.PoolClient) => Promise<T>) => {
+          await assert();
+          return read("experiment_transaction", async () => {
+            await client.query("BEGIN");
+            try {
+              const result = await work(client);
+              if (connectionLost) throw new PrivateError("experiment_lock_lost");
+              await client.query("COMMIT");
+              return result;
+            } catch (error) { await client.query("ROLLBACK").catch(() => {}); throw error; }
+          });
+        }
+      });
     }
   };
 }

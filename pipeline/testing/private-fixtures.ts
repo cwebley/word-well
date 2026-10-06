@@ -39,10 +39,19 @@ function databaseUrl(name: string): string {
   return inDatabase(adminUrl(), name);
 }
 
+// Like runtime pools, fixture pools must handle idle-client errors. pg-pool's
+// end promise can resolve before a socket closes, then forced disposal can
+// terminate that closing connection. Query failures still reject normally.
+export function fixturePool(connectionString: string) {
+  const pool = new pg.Pool({ connectionString });
+  pool.on("error", () => {});
+  return pool;
+}
+
 // A migrated throwaway database, separate from wordwell_dev and wordwell_test.
 export async function testDatabase() {
   const name = `wordwell_private_test_${randomBytes(6).toString("hex")}`;
-  const admin = new pg.Pool({ connectionString: databaseUrl("postgres") });
+  const admin = fixturePool(databaseUrl("postgres"));
   await admin.query(`CREATE DATABASE ${name}`);
   const url = databaseUrl(name);
   await applyMigrations(url);

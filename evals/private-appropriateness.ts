@@ -17,7 +17,7 @@ import { atomicWrite, privateDirectory } from "../pipeline/storage/files.js";
 import type { ReceiptLedger } from "../pipeline/storage/receipts.js";
 import { loadFrozenDataset, type DatasetManifest } from "./authoring/store.js";
 import { scoreCase, summarize, type CaseScore, type ExperimentSummary, type TrialOutcome } from "./scorers/appropriateness.js";
-import { buildSummary, summaryDigest } from "./summarize.js";
+import { buildSummary, parseSummary, summaryDigest } from "./summarize.js";
 import { outcomeFromAttempt, runTrial, trialOutcome } from "./trials.js";
 
 const checkout = fileURLToPath(new URL("../", import.meta.url));
@@ -187,6 +187,8 @@ export function createPrivateAppropriatenessRunner(deps: {
   implementation: ImplementationIdentity;
   now?: () => Date;
   sleep?: (ms: number) => Promise<void>;
+  // Internal filesystem fault-injection seam, not another summary format.
+  writeSummary?: typeof atomicWrite;
 }) {
   const { store } = deps;
   const reader = createPrivateAppropriatenessReader(store);
@@ -259,11 +261,12 @@ export function createPrivateAppropriatenessRunner(deps: {
           if (!expected) throw new PrivateError("expectation_missing");
           const outcomes: TrialOutcome[] = [];
           for (let trialIndex = 1; trialIndex <= TRIALS; trialIndex++) {
-            const { outcome, previouslySaved } = await runTrial({ store, executor, stage, experimentId, caseId: c.caseId, trialIndex, input: c.input });
+            await release.assert();
+            const { outcome, previouslySaved } = await runTrial({ store, executor, stage, experimentId, caseId: c.caseId, trialIndex, input: c.input, assertOwnership: release.assert, ownership: release });
             const scored = trialOutcome(outcome);
             if (scored) {
               outcomes.push(scored);
-              await store.saveCaseScore(experimentId, c.caseId, { caseScore: scoreCase(expected.finding, outcomes, thresholdsFor(material.configuration)) });
+              await store.saveCaseScore(experimentId, c.caseId, { caseScore: scoreCase(expected.finding, outcomes, thresholdsFor(material.configuration)) }, release);
             }
             if (outcome.state === "valid" || (previouslySaved && scored)) continue;
             stopped = outcome.state === "paused"
@@ -287,7 +290,7 @@ export function createPrivateAppropriatenessRunner(deps: {
         if (!experiment) throw new PrivateError("experiment_missing");
         const material = materialSchema.parse(experiment.material);
         const current = await status(experimentId);
-        const summary = buildSummary({
+        const summary = experiment.frozenSummary ? parseSummary(experiment.frozenSummary) : buildSummary({
           experimentId, datasetId: experiment.dataset.id, datasetVersion: experiment.dataset.version,
           configurationFingerprint: experiment.configurationFingerprint, pinnedModel: material.configuration.pinnedModel,
           purpose: material.purpose, split: material.split, summary: current.summary, spend: current.spend,
@@ -297,8 +300,11 @@ export function createPrivateAppropriatenessRunner(deps: {
         if (experiment.finalizedAt && experiment.summarySha256 !== sha256) throw new PrivateError("summary_mismatch");
         const directory = await privateDirectory(options.summariesDir, checkout);
         const path = resolve(directory, `${experimentId}.json`);
-        await atomicWrite(path, Buffer.from(JSON.stringify(summary, null, 2) + "\n"));
-        if (!experiment.finalizedAt) await store.finalizeExperiment(experimentId, sha256, new Date());
+        await release.assert();
+        // Freeze the digest through the live lock session before publishing the
+        // file. A failed file write can recreate this exact artifact on retry.
+        if (!experiment.finalizedAt) await store.finalizeExperiment(experimentId, sha256, new Date(), release, summary);
+        await (deps.writeSummary ?? atomicWrite)(path, Buffer.from(JSON.stringify(summary, null, 2) + "\n"));
         return { path, sha256 };
       } finally { await release(); }
     }

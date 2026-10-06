@@ -54,7 +54,11 @@ that #15 left open:
 Later owner decisions on #15:
 [the slur-sense question](https://github.com/cwebley/word-well/issues/15#issuecomment-5988530191),
 [default `v4`, names, and one-step authoring](https://github.com/cwebley/word-well/issues/15#issuecomment-5989103199),
-and [the no-wrong-accepts pass rule](https://github.com/cwebley/word-well/issues/15#issuecomment-5989305376).
+and [the historical no-wrong-accepts pass rule](https://github.com/cwebley/word-well/issues/15#issuecomment-5989305376).
+The [later promotion amendment](https://github.com/cwebley/word-well/issues/15#issuecomment-6008026037)
+requires at least 95% correct held-out averaged verdicts. See
+[production appropriateness](production-appropriateness.md) for its separate
+versioned assessment and explicit owner promotion.
 
 ## Configurations
 
@@ -74,10 +78,17 @@ A trial rejects when any asked question reaches its threshold: 0.50 for the
 main question, 0.40 for `v4`'s slur question. The three-trial verdict averages
 each question unrounded, then applies the same thresholds.
 
-**Pass rule: no wrong accepts.** All three trials must be valid, and no trial
+**Historical evaluation-summary rule: no wrong accepts.** All three trials must be valid, and no trial
 and no average may wrongly accept a blocked word. Wrong rejects are counted,
 shown, and tolerated. `status`, the report and `finalize` rescore saved trial
 outcomes under this rule, with zero model calls.
+
+That summary field is not the current production promotion bar. New promotion
+assessments require a nonempty frozen held-out set, three valid trials per case,
+and at least 95% correct averaged verdicts, counting both error directions.
+Individual-trial errors and development misses remain reported without vetoing
+qualification. Existing finalized summaries and exports keep their original rule
+and digest. Qualification never creates production permission automatically.
 
 ## Keys
 

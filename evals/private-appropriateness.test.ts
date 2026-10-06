@@ -7,11 +7,12 @@ import { CONFIGURATIONS, createAppropriatenessStage } from "../pipeline/stages/a
 import { createSystemOneAdapter, SYSTEM_ONE_ROUTE } from "../pipeline/execution/system-one.js";
 import { createPrivateStore } from "../pipeline/storage/postgres.js";
 import { createReceiptLedger } from "../pipeline/storage/receipts.js";
-import { jevReply, REPO, scriptedFetch, testDatabase, type ScriptedReply } from "../pipeline/testing/private-fixtures.js";
+import { fixturePool, jevReply, REPO, scriptedFetch, testDatabase, type ScriptedReply } from "../pipeline/testing/private-fixtures.js";
 import { frozenDataset as frozenDatasetFixture } from "./private-fixtures.js";
 import type { DatasetManifest } from "./authoring/store.js";
 import { createPrivateAppropriatenessRunner, implementationIdentity, loadLocalConfig } from "./private-appropriateness.js";
 import { parseSummary, summaryDigest } from "./summarize.js";
+import { PrivateError } from "../pipeline/storage/crypto.js";
 
 // Single-question fixtures: scripted replies answer one question.
 const SINGLE_QUESTION = CONFIGURATIONS["v2"];
@@ -282,5 +283,134 @@ withDatabase("private appropriateness runner", () => {
       expect(standin.trials.map(t => [t.slurProbability, t.vulgarProbability, t.disposition])).toEqual([[0.44, 0.1, "reject"], [0.49, 0.1, "reject"], [0.52, 0.1, "reject"]]);
       expect(Object.keys(JSON.parse(s.remote.sent[0].body).questions)).toEqual(["appropriateness", "slur_sense", "vulgar_sense"]);
     } finally { await s.close(); await d.f.cleanup(); }
+  });
+  it("stops evaluation dispatch when its experiment lock connection dies after intent", async () => {
+    const d = await frozenDataset();
+    const s = await stack(d, []);
+    const admin = fixturePool(database.adminUrl);
+    let killed = false;
+    const ledger = { ...s.ledger, append: async (...args: Parameters<typeof s.ledger.append>) => {
+      await s.ledger.append(...args);
+      if (args[0].type === "dispatch_intent" && !killed) {
+        killed = true;
+        await admin.query("SELECT pg_terminate_backend(pid) FROM pg_locks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND locktype='advisory' AND classid=hashtext('wordwell:experiment')::oid AND objid=hashtext($1)::oid", [args[0].experimentId]);
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+    } };
+    const runner = createPrivateAppropriatenessRunner({ store: s.store, ledger,
+      models: { [SYSTEM_ONE_ROUTE]: createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: s.remote.fetch }) }, implementation: await implementationIdentity() });
+    try {
+      const id = await s.create();
+      await expect(runner.run(id)).rejects.toThrow("storage_unavailable");
+      expect(s.remote.sent).toHaveLength(0);
+      expect((await s.ledger.read()).map(r => r.type)).toEqual(["dispatch_intent", "dispatch_cancelled"]);
+      expect(await s.store.spend(id)).toMatchObject({ physicalRequests: 0, outstandingNanoUsd: 0 });
+    } finally { await admin.end(); await s.close(); await d.f.cleanup(); }
+  });
+  it("cannot freeze or publish an aggregate through a dead experiment lock session", async () => {
+    const d = await frozenDataset();
+    const s = await stack(d, []);
+    const admin = fixturePool(database.adminUrl);
+    const store = { ...s.store, finalizeExperiment: async (...args: Parameters<typeof s.store.finalizeExperiment>) => {
+      await admin.query("SELECT pg_terminate_backend(pid) FROM pg_locks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND locktype='advisory' AND classid=hashtext('wordwell:experiment')::oid AND objid=hashtext($1)::oid", [args[0]]);
+      await new Promise(resolve => setTimeout(resolve, 20));
+      return s.store.finalizeExperiment(...args);
+    } };
+    const runner = createPrivateAppropriatenessRunner({ store, ledger: s.ledger,
+      models: { [SYSTEM_ONE_ROUTE]: createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: s.remote.fetch }) }, implementation: await implementationIdentity() });
+    try {
+      const id = await s.create();
+      const summariesDir = resolve(d.f.root, "summaries");
+      await expect(runner.finalize(id, { summariesDir })).rejects.toThrow("storage_unavailable");
+      expect((await s.store.readExperiment(id))?.finalizedAt).toBeNull();
+      await expect(readFile(resolve(summariesDir, `${id}.json`))).rejects.toMatchObject({ code: "ENOENT" });
+      const finalized = await s.runner.finalize(id, { summariesDir });
+      expect(summaryDigest(parseSummary(JSON.parse(await readFile(finalized.path, "utf8"))))).toBe(finalized.sha256);
+      expect(s.remote.sent).toHaveLength(0);
+    } finally { await admin.end(); await s.close(); await d.f.cleanup(); }
+  });
+  it("cannot mark a trial valid after lock loss during result encryption, and resumes from the saved raw reply", async () => {
+    const d = await frozenDataset();
+    const s = await stack(d, d.order.flatMap(h => Array.from({ length: 3 }, () => jevReply(h === "exuberant" ? "clear" : "blocked", h === "exuberant" ? 0.1 : 0.9))));
+    const admin = fixturePool(database.adminUrl);
+    let killed = false;
+    const crypto = { ...d.f.crypto, encrypt: async (...args: Parameters<typeof d.f.crypto.encrypt>) => {
+      const bytes = await d.f.crypto.encrypt(...args);
+      if (!killed && args[1].startsWith("attempts:") && args[1].endsWith(":result")) {
+        killed = true;
+        await admin.query("SELECT pg_terminate_backend(pid) FROM pg_locks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND locktype='advisory' AND classid=hashtext('wordwell:experiment')::oid");
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      return bytes;
+    } };
+    const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto });
+    const runner = createPrivateAppropriatenessRunner({ store, ledger: s.ledger, models: { [SYSTEM_ONE_ROUTE]: createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: s.remote.fetch }) }, implementation: await implementationIdentity() });
+    try {
+      const id = await s.create();
+      await expect(runner.run(id)).rejects.toThrow("storage_unavailable");
+      const firstTrial = (await s.store.listTrials(id))[0];
+      expect((await s.store.readAttempt(firstTrial.attemptId))).toMatchObject({ status: "pending", result: null });
+      expect((await s.runner.status(id)).summary.validTrials).toBe(0);
+      expect(s.remote.sent).toHaveLength(1);
+      expect((await s.runner.run(id)).summary).toMatchObject({ validTrials: 6, goldenRequirementsPass: true });
+      expect(s.remote.sent).toHaveLength(6);
+    } finally { await store.close(); await admin.end(); await s.close(); await d.f.cleanup(); }
+  });
+  it("recreates the exact frozen aggregate after file failure and a later known charge", async () => {
+    const d = await frozenDataset();
+    const s = await stack(d, [{ throws: "harmless-network-marker" }]);
+    const runner = createPrivateAppropriatenessRunner({ store: s.store, ledger: s.ledger, models: { [SYSTEM_ONE_ROUTE]: createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: s.remote.fetch }) },
+      implementation: await implementationIdentity(), writeSummary: async () => { throw new PrivateError("storage_unavailable"); } });
+    try {
+      const id = await s.create();
+      await s.runner.run(id);
+      const summariesDir = resolve(d.f.root, "summaries");
+      await expect(runner.finalize(id, { summariesDir })).rejects.toThrow("storage_unavailable");
+      const experiment = (await s.store.readExperiment(id))!;
+      const frozen = parseSummary(experiment.frozenSummary);
+      expect(frozen.cost).toMatchObject({ knownUsd: 0, unresolvedRequests: 1 });
+      await expect(readFile(resolve(summariesDir, `${id}.json`))).rejects.toMatchObject({ code: "ENOENT" });
+      const trial = (await s.store.listTrials(id))[0];
+      const request = (await s.store.readAttempt(trial.attemptId))!.requests[0];
+      await s.store.reconcileRequestAccounting(request.id, { chargeNanoUsd: 17_304, generationId: "gen-harmless-late", inputTokens: 412, outputTokens: 20 });
+      expect(await s.store.spend(id)).toMatchObject({ knownNanoUsd: 17_304, unresolvedRequests: 0 });
+      const restored = await s.runner.finalize(id, { summariesDir });
+      expect(restored.sha256).toBe(experiment.summarySha256);
+      expect(parseSummary(JSON.parse(await readFile(restored.path, "utf8")))).toEqual(frozen);
+      expect(s.remote.sent).toHaveLength(1);
+    } finally { await s.close(); await d.f.cleanup(); }
+  });
+  it("cannot overwrite finalized case scores after losing ownership during partial-score encryption", async () => {
+    const d = await frozenDataset();
+    const s = await stack(d, d.order.flatMap(h => Array.from({ length: 3 }, () => jevReply(h === "exuberant" ? "clear" : "blocked", h === "exuberant" ? 0.1 : 0.9))));
+    const admin = fixturePool(database.adminUrl);
+    let blocked!: () => void, releaseScore!: () => void;
+    const waiting = new Promise<void>(resolve => { blocked = resolve; });
+    const proceed = new Promise<void>(resolve => { releaseScore = resolve; });
+    let first = true;
+    const crypto = { ...d.f.crypto, encrypt: async (...args: Parameters<typeof d.f.crypto.encrypt>) => {
+      const bytes = await d.f.crypto.encrypt(...args);
+      if (first && args[1].startsWith("case_scores:")) {
+        first = false;
+        await admin.query("SELECT pg_terminate_backend(pid) FROM pg_locks WHERE database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND locktype='advisory' AND classid=hashtext('wordwell:experiment')::oid");
+        await new Promise(resolve => setTimeout(resolve, 20));
+        blocked(); await proceed;
+      }
+      return bytes;
+    } };
+    const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto });
+    const runner = createPrivateAppropriatenessRunner({ store, ledger: s.ledger, models: { [SYSTEM_ONE_ROUTE]: createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: s.remote.fetch }) }, implementation: await implementationIdentity() });
+    try {
+      const id = await s.create();
+      const stale = runner.run(id).catch(error => error);
+      await waiting;
+      expect((await s.runner.run(id)).summary.validTrials).toBe(6);
+      await s.runner.finalize(id, { summariesDir: resolve(d.f.root, "summaries") });
+      const scores = await s.store.readCaseScores(id);
+      releaseScore();
+      expect(await stale).toMatchObject({ code: "storage_unavailable" });
+      expect(await s.store.readCaseScores(id)).toEqual(scores);
+      expect(s.remote.sent).toHaveLength(6);
+    } finally { releaseScore(); await store.close(); await admin.end(); await s.close(); await d.f.cleanup(); }
   });
 });

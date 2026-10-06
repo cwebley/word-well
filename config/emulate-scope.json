@@ -1,0 +1,29 @@
+{
+  "schema": "wordwell-scoped-evidence-v1",
+  "candidates": ["emulate"],
+  "mappingVersion": "wordwell-emulate-mapping-v1",
+  "snapshot": "d8d3b078bf4c41478d5e9780f832f71e",
+  "trial": "kaikki-20261006",
+  "oewnEntry": "oewn-emulate-v",
+  "oewnMeanings": ["oewn-emulate__2.42.00..", "oewn-emulate__2.42.01..", "oewn-emulate__2.33.00.."],
+  "kaikki": {
+    "corpusSha256": "3dac8a09e57827bef493e2e6b552fe917bf3b1fc55dee05c4e4a3702aff5dbdb",
+    "indexSha256": "e52f72a5a4428369cbf59bbfc458630ef14c45b7d7092e62983f81fc03932592",
+    "records": [
+      {"line": 34324, "sha256": "603e2ee324cf6dfb5463eac28a1f60bc11864ecb3130cde000e56f4f19296cdd"},
+      {"line": 34325, "sha256": "cb11f3248c28e0f72b574309e4101f300068427a5f036557861dcc4e17940129"}
+    ]
+  },
+  "supplemental": {
+    "dumpSha256": "06acca8138eacb3e8ae9c1d6232f836e37c3bf9b6d582a86693731fe0d336c20",
+    "pageId": "7577",
+    "revisionId": "92422846",
+    "textSha256": "02467344b0af9e5085e9980648e09cd6326f42480affb9e77146686ec7584551"
+  },
+  "frequency": {
+    "exportSha256": "7680af729d5b5b573a827ec3a01b59056b46a61ff258485425c2765c47c7e598",
+    "dataSha256": "dffae8066b78dce0a6667cf5f58e567054f902674667090a7ac8a8a44628b05c",
+    "forms": 321180,
+    "order": 16960
+  }
+}

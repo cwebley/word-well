@@ -3,7 +3,7 @@ import { Decrypter, Encrypter, identityToRecipient } from "age-encryption";
 import { z } from "zod";
 
 export class PrivateError extends Error {
-  constructor(public readonly code: string) { super(code); }
+  constructor(public readonly code: string, public readonly references?: { runId: string; ownerRunId?: string }) { super(code); }
 }
 
 export const keyIdSchema = z.string().regex(/^ww-(dataset|storage)-v[1-9][0-9]*$/);
