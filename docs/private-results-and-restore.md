@@ -85,21 +85,22 @@ The command does not load `.env` or initialize a model adapter.
 
 ```sh
 docker compose up -d --wait
+npm run db:setup
 npm run eval:private:restore-check
 ```
 
-The script is limited to `wordwell_dev` on `127.0.0.1:54329`. It refuses a
-different `WORDWELL_PRIVATE_DATABASE_URL`. It generates a unique throwaway
+The script is limited to `wordwell_dev` on the local Compose port `54329`,
+using the admin connection from `.env.database`. It generates a unique throwaway
 database name and prints that name and its temporary directory before dumping.
 Only the encrypted snapshot is written to disk. The decrypted archive stays in
 process memory and a pipe to `pg_restore`.
 
 The check compares every public and private table's row count and content
 digest, migration history, ownership, effective schema/table grants and default
-grants. It switches to `wordwell_learner`, verifies public lesson reads, then
+grants. It connects as `wordwell_learner_login`, verifies public lesson reads, then
 requires permission denial for all six private tables. It loads the frozen
 evaluation artifacts and compares their identities, keys and case content with
-restored records. It reads every restored experiment and requests the report
+restored records. It reads every restored experiment with `wordwell_pipeline_login` and requests the report
 page twice. Any `fetch` request is blocked and counted; the expected count is
 zero. Database snapshots must still match afterward.
 
@@ -111,6 +112,16 @@ zero. Database snapshots must still match afterward.
 - The learner role was denied reads of all six private tables.
 - Two report views, zero model requests, unchanged source and restored rows.
 - No throwaway restore databases or encrypted snapshots remained after cleanup.
+
+### Reverified with actual logins for #22
+
+After the login and counter migrations, the rehearsal recovered the same 20
+experiments, 1,344 case records and 1,305 saved scores. All 11 migration records,
+rows and effective grants matched. The actual learner login was denied all six
+private tables. The pipeline login read restored evaluations and served two
+report views with zero model requests. Cleanup removed the temporary database
+and encrypted snapshot. Repeating local setup preserved the six private tables'
+counts and full-row digests captured before these migrations.
 
 The trace exposed one historical exception. Experiment
 `0d89389e-87c7-4ff5-8063-85c59d27c6d2` contains the five public smoke words, but
@@ -143,13 +154,16 @@ grants rather than treating a null grant array as a permission change.
 | Export receives a conflicting summary | It stops with `export_conflict` |
 
 The dump restores into the existing local PostgreSQL cluster, where
-`wordwell` and `wordwell_learner` already exist. `pg_dump` does not include
+the admin, learner and pipeline logins and their grant roles already exist.
+`pg_dump` does not include
 cluster roles, Keychain identities, dataset files, the accounting ledger,
 aggregate files or export receipts. Those dependencies need separate handling
 for a future cloud move.
 
-The learner-role connection is discarded after its permission checks, so cleanup
-does not depend on a successful `RESET ROLE`. Store closes, pool shutdowns,
+The learner-login pool closes after its permission checks. The rehearsal also
+revokes public database creation and temporary-table permissions on the restore
+database, because restoring without `--create` does not restore database-level
+ACLs. Store closes, pool shutdowns,
 database deletion and directory removal are attempted independently. The command
 prints `temporary_material_removed` only when all cleanup steps succeed.
 

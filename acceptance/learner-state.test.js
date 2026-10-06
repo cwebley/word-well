@@ -11,6 +11,7 @@ import { chromium } from "playwright";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { LearnerDatabase } from "../api/database.js";
 import { createApi } from "../api/http.js";
+import { databaseConnection, inDatabase } from "../db/connections.mjs";
 
 const exec = promisify(execFile);
 const databaseUrl = process.env.DATABASE_URL;
@@ -40,7 +41,8 @@ suite("learner-state browser acceptance", () => {
     });
 
     pool = new pg.Pool({ connectionString: isolatedUrl });
-    database = new LearnerDatabase({ pool, now: () => new Date(testTime) });
+    const learnerPool = new pg.Pool({ connectionString: inDatabase(databaseConnection("learner"), acceptanceDatabase) });
+    database = new LearnerDatabase({ pool: learnerPool, now: () => new Date(testTime) });
     apiServer = createServer(createApi(database));
     await listen(apiServer);
     apiUrl = `http://localhost:${apiServer.address().port}`;
@@ -64,6 +66,7 @@ suite("learner-state browser acceptance", () => {
     await close(siteServer);
     await close(apiServer);
     await database?.close();
+    await pool?.end();
     await adminPool?.query(`DROP DATABASE IF EXISTS ${acceptanceDatabase}`);
     await adminPool?.end();
   });
@@ -334,9 +337,7 @@ async function seedPublishedLesson() {
 }
 
 function databaseUrlFor(database) {
-  const url = new URL(databaseUrl);
-  url.pathname = `/${database}`;
-  return url.toString();
+  return inDatabase(databaseUrl, database);
 }
 
 function listen(server) {

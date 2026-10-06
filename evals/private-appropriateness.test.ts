@@ -29,7 +29,7 @@ const CAP = 1_000_000_000;
 const frozenDataset = () => frozenDatasetFixture([{ headword: "exuberant", finding: "clear" }, { headword: "harmless-blocked-standin", finding: "blocked" }]);
 
 async function stack(d: Awaited<ReturnType<typeof frozenDataset>>, script: ScriptedReply[], implementation?: Awaited<ReturnType<typeof implementationIdentity>>, localConfig = config) {
-  const store = await createPrivateStore({ connectionString: database.url, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto });
+  const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto });
   const ledger = await createReceiptLedger({ directory: resolve(d.f.root, "ledger"), checkout: REPO });
   const remote = scriptedFetch(script);
   const runner = createPrivateAppropriatenessRunner({
@@ -176,7 +176,7 @@ withDatabase("private appropriateness runner", () => {
   it("keeps owner expectations and scores unreadable to stage execution, which holds only the storage key", async () => {
     const d = await frozenDataset();
     const s = await stack(d, [...Array(6)].map(() => jevReply("clear", 0.1)));
-    const execution = await createPrivateStore({ connectionString: database.url, storageKey: d.f.storageKey, crypto: d.f.crypto });
+    const execution = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, crypto: d.f.crypto });
     try {
       const experimentId = await s.create();
       await s.runner.run(experimentId);

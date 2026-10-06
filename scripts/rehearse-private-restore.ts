@@ -17,10 +17,11 @@ import { startReportServer } from "../evals/private-report.js";
 import { digest, PrivateError } from "../pipeline/storage/crypto.js";
 import { loadKeychainIdentity } from "../pipeline/storage/keychain.js";
 import { createPrivateStore } from "../pipeline/storage/postgres.js";
+import { databaseConnection, inDatabase } from "../db/connections.mjs";
 
-const SOURCE = "postgresql://wordwell:wordwell@127.0.0.1:54329/wordwell_dev";
+const SOURCE = databaseConnection("admin");
 const name = `wordwell_restore_${randomBytes(6).toString("hex")}`;
-const connection = (database: string) => SOURCE.replace(/wordwell_dev$/, database);
+const connection = (database: string) => inDatabase(SOURCE, database);
 const check = (condition: boolean, code: string) => { if (!condition) throw new PrivateError(code); };
 
 // Child diagnostics are suppressed because PostgreSQL errors can echo data.
@@ -77,8 +78,9 @@ function get(url: string, cookie?: string) {
 async function main() {
   process.umask(0o077);
   // This rehearsal is specifically for the approved local Docker database.
-  check(!process.env.WORDWELL_PRIVATE_DATABASE_URL || process.env.WORDWELL_PRIVATE_DATABASE_URL === SOURCE, "local_source_required");
-  process.env.WORDWELL_PRIVATE_DATABASE_URL = SOURCE;
+  const sourceUrl = new URL(SOURCE);
+  check(["127.0.0.1", "localhost"].includes(sourceUrl.hostname) && sourceUrl.port === "54329" &&
+    sourceUrl.pathname === "/wordwell_dev" && sourceUrl.username === "wordwell", "local_source_required");
   let fetches = 0;
   globalThis.fetch = async () => { fetches++; throw new PrivateError("network_forbidden"); };
   const local = await openLocalPrivateStore();
@@ -115,9 +117,13 @@ async function main() {
     try { await restore.done; } finally { archive.fill(0); restore.process.kill(); }
     check(JSON.stringify(await snapshot(restored)) === JSON.stringify(before), "restored_snapshot_mismatch");
 
-    const learner = await restored.connect();
+    // pg_restore without --create does not restore database-level ACLs.
+    await restored.query(`REVOKE CREATE, TEMPORARY ON DATABASE ${name} FROM PUBLIC`);
+    const learnerPool = new pg.Pool({ connectionString: inDatabase(databaseConnection("learner"), name) });
+    const learner = await learnerPool.connect();
     try {
-      await learner.query("SET ROLE wordwell_learner");
+      check((await learner.query("SELECT current_user = session_user AND current_user = 'wordwell_learner_login' AS actual_login")).rows[0].actual_login,
+        "learner_login_required");
       await learner.query("SELECT count(*) FROM public.published_lessons");
       for (const table of ["experiments", "cases", "attempts", "trials", "requests", "case_scores"]) {
         let denied = false;
@@ -126,11 +132,11 @@ async function main() {
         check(denied, "learner_isolation_failed");
       }
     } finally {
-      // Discard this role-switched connection rather than depend on RESET ROLE.
-      learner.release(true);
+      learner.release();
+      await learnerPool.end();
     }
 
-    store = await createPrivateStore({ connectionString: connection(name), ...local.keys, crypto: local.crypto,
+    store = await createPrivateStore({ connectionString: inDatabase(databaseConnection("pipeline"), name), ...local.keys, crypto: local.crypto,
       beforeWrite: async () => { throw new PrivateError("restore_read_only"); } });
     const reader = createPrivateAppropriatenessReader(store);
     const original = createPrivateAppropriatenessReader(local.store);

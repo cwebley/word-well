@@ -33,7 +33,7 @@ async function harness(script: ScriptedReply[], options: {
   const keys = options.keys ?? await harmlessKeys();
   const temp = options.dir ? null : await privateTempDir();
   const dir = options.dir ?? temp!.root;
-  const store = await createPrivateStore({ connectionString: database.url, storageKey: keys.storageKey, crypto: keys.crypto, beforeWrite: options.beforeWrite });
+  const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: keys.storageKey, crypto: keys.crypto, beforeWrite: options.beforeWrite });
   const ledger = await createReceiptLedger({ directory: dir + "/ledger", checkout: REPO, beforeAppend: options.beforeAppend });
   const remote = scriptedFetch(script);
   const sleeps: number[] = [];
@@ -255,7 +255,7 @@ withDatabase("shared stage executor", () => {
   it("stops before any database work or dispatch when the storage key is unavailable", async () => {
     const keys = await harmlessKeys();
     keys.setAvailable(false);
-    await expect(createPrivateStore({ connectionString: database.url, storageKey: keys.storageKey, crypto: keys.crypto })).rejects.toThrow("key_unavailable");
+    await expect(createPrivateStore({ connectionString: database.pipelineUrl, storageKey: keys.storageKey, crypto: keys.crypto })).rejects.toThrow("key_unavailable");
   });
 
   it("marks a request in flight when its process was killed as uncertain and does not redispatch it", async () => {
@@ -267,7 +267,7 @@ withDatabase("shared stage executor", () => {
       await new Promise<void>((done, reject) => {
         child.stdout.on("data", bytes => { if (bytes.toString().includes("dispatched")) done(); });
         child.once("exit", () => reject(new Error("worker_exited_early")));
-        child.stdin.end(JSON.stringify({ url: database.url, storageKey: h.keys.storageKey, identities: Object.fromEntries(h.keys.identities),
+        child.stdin.end(JSON.stringify({ url: database.pipelineUrl, storageKey: h.keys.storageKey, identities: Object.fromEntries(h.keys.identities),
           ledgerDir: h.dir + "/ledger", settings, experimentId: h.experimentId, attemptId }));
       });
       child.kill("SIGKILL");

@@ -97,12 +97,16 @@ Requires the authoring setup from [private-authoring.md](private-authoring.md)
 
 ```sh
 docker compose up -d --wait
-DATABASE_URL=postgresql://wordwell:wordwell@127.0.0.1:54329/wordwell_dev npm run db:migrate
+npm run db:setup
 ```
 
 The compose volume `wordwell-postgres` holds `wordwell_dev` (durable private
 history) and `wordwell_test` (API suites). `db/postgres-init/` creates
 `wordwell_dev` only when the volume is first initialized.
+
+The private runner and report use `WORDWELL_PIPELINE_DATABASE_URL` from
+`.env.database`, through the restricted `wordwell_pipeline_login`. They no longer
+default to the owner connection. See [local database logins](local-database.md).
 
 Commands (the npm scripts load `OPENROUTER_API_KEY` and `BRAINTRUST_API_KEY` from `.env`):
 

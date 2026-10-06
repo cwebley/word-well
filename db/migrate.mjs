@@ -1,5 +1,5 @@
 import { applyMigrations } from "./apply-migrations.mjs";
+import { databaseConnection } from "./connections.mjs";
 
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error("DATABASE_URL is required.");
+const databaseUrl = process.env.DATABASE_URL ?? databaseConnection("admin");
 await applyMigrations(databaseUrl, (line) => console.log(line));

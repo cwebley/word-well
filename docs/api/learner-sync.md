@@ -8,11 +8,11 @@ response.
 
 ## Local PostgreSQL
 
-Start the fixture with Docker Compose, then apply SQL migrations:
+Start PostgreSQL and provision the separate local logins:
 
 ```sh
 docker compose up -d postgres
-DATABASE_URL=postgresql://wordwell:wordwell@localhost:54329/wordwell_test npm run db:migrate
+npm run db:setup
 ```
 
 Run the PostgreSQL HTTP seam tests with the same isolated database:
@@ -21,11 +21,16 @@ Run the PostgreSQL HTTP seam tests with the same isolated database:
 DATABASE_URL=postgresql://wordwell:wordwell@localhost:54329/wordwell_test npm run test:api
 ```
 
-Run the API after migrations with `DATABASE_URL` and optionally `PORT`:
+Run the API through `WORDWELL_LEARNER_DATABASE_URL` from `.env.database`,
+with optional `PORT`:
 
 ```sh
-DATABASE_URL=postgresql://wordwell:wordwell@localhost:54329/wordwell_test npm run api
+npm run api
 ```
+
+The HTTP tests use admin connections for fixtures and the real restricted
+learner login for requests. See [local database setup](../local-database.md)
+for connection selection, grants and repeat provisioning.
 
 ## Endpoints
 

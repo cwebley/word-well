@@ -1,14 +1,17 @@
+// @vitest-environment node
 import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 import pg from "pg";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { LearnerDatabase } from "./database.js";
 import { createApi } from "./http.js";
+import { databaseConnection, inDatabase } from "../db/connections.mjs";
 
 const databaseUrl = process.env.DATABASE_URL;
 const suite = describe.skipIf(!databaseUrl);
 
 let pool;
+let learnerPool;
 let database;
 let server;
 let baseUrl;
@@ -18,7 +21,9 @@ suite("learner HTTP seam", () => {
   beforeAll(async () => {
     now = new Date("2026-08-27T12:00:00Z");
     pool = new pg.Pool({ connectionString: databaseUrl });
-    database = new LearnerDatabase({ pool, now: () => now });
+    if (new URL(databaseUrl).pathname !== "/wordwell_test") throw new Error("HTTP fixtures require wordwell_test");
+    learnerPool = new pg.Pool({ connectionString: inDatabase(databaseConnection("learner"), "wordwell_test") });
+    database = new LearnerDatabase({ pool: learnerPool, now: () => now });
     server = createServer(createApi(database));
     await new Promise((resolve) => server.listen(0, resolve));
     baseUrl = `http://127.0.0.1:${server.address().port}`;
@@ -44,6 +49,7 @@ suite("learner HTTP seam", () => {
   afterAll(async () => {
     await new Promise((resolve) => server.close(resolve));
     await database.close();
+    await pool.end();
   });
 
   it("creates an anonymous profile and returns an empty learner-safe state", async () => {

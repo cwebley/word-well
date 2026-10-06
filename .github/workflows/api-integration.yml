@@ -26,6 +26,7 @@ jobs:
           --health-retries 30
     env:
       DATABASE_URL: postgresql://wordwell:wordwell@localhost:5432/wordwell_test
+      WORDWELL_ADMIN_DATABASE_URL: postgresql://wordwell:wordwell@localhost:5432/wordwell_dev
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,7 +34,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run db:migrate
+      - run: npm run db:setup
+      - run: npm run test:db-logins
       - run: npm run test:api
       - run: npm run test:private
       - run: npx playwright install --with-deps chromium

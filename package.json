@@ -7,6 +7,8 @@
     "build": "npm run clean && npm run build:site && npm run build:swatchkit && npm run build:assets",
     "api": "tsx api/server.ts",
     "db:migrate": "node db/migrate.mjs",
+    "db:setup": "node db/setup-local.mjs",
+    "test:db-logins": "node --env-file-if-exists=.env.database -e \"for (const job of ['ADMIN', 'LEARNER', 'PIPELINE']) if (!process.env['WORDWELL_' + job + '_DATABASE_URL']) { console.error('test:db-logins requires provisioned connections'); process.exit(1); }\" && node --env-file-if-exists=.env.database ./node_modules/vitest/vitest.mjs run db/logins.test.ts",
     "test": "vitest run",
     "test:api": "vitest run api",
     "test:acceptance": "test -n \"$DATABASE_URL\" && vitest run acceptance",

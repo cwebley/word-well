@@ -10,5 +10,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["pipeline/**/*.ts", "evals/**/*.ts", "scripts/**/*.ts"]
+  "include": ["pipeline/**/*.ts", "evals/**/*.ts", "scripts/**/*.ts", "db/**/*.ts"]
 }

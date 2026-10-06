@@ -51,7 +51,7 @@ withDatabase("private appropriateness report", () => {
       { headword: "exuberant", finding: "clear", overrides: { reason: "<b>harmless-reason-markup</b>" } },
       { headword: "harmless-blocked-standin", finding: "blocked" }
     ]);
-    const store = await createPrivateStore({ connectionString: database.url, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto });
+    const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto });
     const ledger = await createReceiptLedger({ directory: resolve(d.f.root, "ledger"), checkout: REPO });
     const byWord: Record<string, ReturnType<typeof jevReply>[]> = {
       "exuberant": [jevReply("clear", 0.05, { provider: RAW_MARKER }), jevReply("clear", 0.1), jevReply("clear", 0.02)],

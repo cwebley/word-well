@@ -71,7 +71,7 @@ withDatabase("private appropriateness privacy", () => {
       vi.spyOn(console, name).mockImplementation((...args) => { output.push(args.map(String).join(" ")); }));
     try {
       let failWrites = true;
-      const store = await createPrivateStore({ connectionString: database.url, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto,
+      const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto,
         beforeWrite: async operation => { if (failWrites && operation === "record_outcome") throw new Error(`${ERROR} ${HEADWORD}`); } });
       const ledger = await createReceiptLedger({ directory: resolve(d.f.root, "ledger"), checkout: REPO });
       const remote = scriptedFetch([
@@ -114,7 +114,7 @@ withDatabase("private appropriateness privacy", () => {
         expect(sent.body.includes(REASON) || sent.body.includes(PROVENANCE)).toBe(false);
       }
 
-      const sql = await plaintextColumns(database.url);
+      const sql = await plaintextColumns(database.pipelineUrl);
       const receipts = await readFile(resolve(d.f.root, "ledger/receipts.jsonl"), "utf8");
       const files = (await filesUnder(d.f.root)).map(f => f.text).join("\n");
       const surfaces = { sql, receipts, report, errors: errors.join("\n"), console: output.join("\n"), files };
@@ -131,7 +131,7 @@ withDatabase("private appropriateness privacy", () => {
   });
 
   it("denies the learner role any access to private records", async () => {
-    const pool = new pg.Pool({ connectionString: database.url });
+    const pool = new pg.Pool({ connectionString: database.adminUrl });
     const client = await pool.connect();
     try {
       await client.query("SET ROLE wordwell_learner");

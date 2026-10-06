@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import pg from "pg";
 import { generateIdentity, identityToRecipient } from "age-encryption";
 import { applyMigrations } from "../../db/apply-migrations.mjs";
+import { databaseConnection, inDatabase } from "../../db/connections.mjs";
 import { createPrivateCrypto, type KeyReference } from "../storage/crypto.js";
 
 export const REPO = resolve(import.meta.dirname, "../..");
@@ -35,9 +36,7 @@ export function adminUrl(): string {
 }
 
 function databaseUrl(name: string): string {
-  const url = new URL(adminUrl());
-  url.pathname = `/${name}`;
-  return url.toString();
+  return inDatabase(adminUrl(), name);
 }
 
 // A migrated throwaway database, separate from wordwell_dev and wordwell_test.
@@ -48,7 +47,9 @@ export async function testDatabase() {
   const url = databaseUrl(name);
   await applyMigrations(url);
   return {
-    url,
+    adminUrl: url,
+    pipelineUrl: inDatabase(databaseConnection("pipeline"), name),
+    learnerUrl: inDatabase(databaseConnection("learner"), name),
     async drop() {
       await admin.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
       await admin.end();
