@@ -1,4 +1,4 @@
-"""Read and verify the fixed approved evidence. No network, model or database writes."""
+"""Read and verify approved one-word evidence. No network, model or database writes."""
 import argparse
 import gzip
 import hashlib
@@ -12,6 +12,15 @@ import xml.etree.ElementTree as ET
 
 from prepare import DEFAULT_ROOT, PreparationError, outside_checkout
 
+# Bounded mapping contracts, not approval for arbitrary corpus candidates.
+INVENTORIES = {
+    'emulate': {'oewnPos': 'v', 'kaikkiPos': ['verb', 'adj'], 'kaikkiMeanings': 5,
+        'pagePos': ['verb'] * 4 + ['adjective'], 'pagePaths': [[1], [2], [3], [4], [1]],
+        'family': {'unemulated', 'emulatable', 'emulatory', 'emulable', 'emulative', 'emulator', 'emulation'}},
+    'evanescent': {'oewnPos': 'a', 'kaikkiPos': ['adj'], 'kaikkiMeanings': 6,
+        'pagePos': ['adjective'] * 6, 'pagePaths': [[1], [1, 1], [1, 2], [2], [3], [3, 1]],
+        'family': {'evanescence', 'evanescently', 'multiple evanescent white dot syndrome', 'nonevanescent', 'unevanescent'}}
+}
 
 def require(condition, code):
     if not condition:
@@ -67,6 +76,9 @@ def oewn_bundle(path, scope):
                           'relations': relations(s, 'SenseRelation')} for i, s in enumerate(element.findall('Sense'), 1)]}
     primary = entries.get(scope['oewnEntry'])
     require(primary and [m['id'] for m in primary['meanings']] == scope['oewnMeanings'], 'scoped_oewn_inventory_changed')
+    if 'candidates' in scope:
+        headword = scope['candidates'][0]
+        require(primary['headword'] == headword and primary['pos'] == INVENTORIES[headword]['oewnPos'], 'scoped_oewn_identity_failed')
     primary_concepts = {m['conceptId'] for m in primary['meanings']}
     family_ids = {r['target'] for m in primary['meanings'] for r in m['relations'] if r['relType'] in ('derivation', 'pertainym')}
     concepts = {}
@@ -134,28 +146,49 @@ def qualifier_labels(arguments):
     return result
 
 
-def supplemental_page(path, scope):
+def page_meanings(text):
+    sections = re.split(r'^==([^=\n]+)==\s*$', text, flags=re.M)
+    require(sections.count('English') == 1, 'scoped_supplemental_english_missing')
+    english = sections[sections.index('English') + 1]
+    meanings, pos, path = [], None, []
+    for line_no, line in enumerate(english.splitlines(), 1):
+        heading = re.fullmatch(r'(={3,})([^=]+)\1', line)
+        if heading and heading.group(2) in ('Verb', 'Adjective'):
+            pos, path = heading.group(2).lower(), []
+        elif heading and len(heading.group(1)) == 3:
+            pos, path = None, []
+        definition = re.match(r'^(#+) ', line)
+        if definition:
+            depth = len(definition.group(1))
+            require(pos and depth <= len(path) + 1, 'scoped_supplemental_mapping_failed')
+            path = path[:depth] if depth <= len(path) else path + [0]
+            path[-1] += 1
+            qualifiers = [{'template': match.group(), 'arguments': match.group(1).split('|')[1:],
+                'labels': qualifier_labels(match.group(1).split('|')[2:])} for match in re.finditer(r'\{\{(lb\|en\|[^{}]+)\}\}', line)]
+            meanings.append({'pos': pos, 'line': line_no, 'path': path.copy(), 'raw': line, 'qualifiers': qualifiers})
+    return meanings
+
+
+def supplemental_page(path, scope, headword):
     with read_index(path) as db:
-        pages = list(db.execute('SELECT page_id,revision_id,text_sha256,raw_wikitext FROM pages WHERE title=? AND namespace=0', ('emulate',)))
+        pages = list(db.execute('SELECT page_id,revision_id,revision_timestamp,text_sha256,raw_wikitext FROM pages WHERE title=? AND namespace=0', (headword,)))
     require(len(pages) == 1, 'scoped_supplemental_page_ambiguous')
     page = dict(pages[0])
     require(page['page_id'] == scope['pageId'] and page['revision_id'] == scope['revisionId'] and
             sha(page['raw_wikitext'].encode()) == scope['textSha256'] == page['text_sha256'], 'scoped_supplemental_page_changed')
-    english = page['raw_wikitext'].split('==English==\n', 1)[1].split('\n==Italian==', 1)[0]
-    meanings, pos = [], None
-    for line_no, line in enumerate(english.splitlines(), 1):
-        if line in ('===Verb===', '===Adjective==='):
-            pos = line.strip('=').lower()
-        if re.match(r'^# ', line):
-            qualifiers = [{'template': match.group(), 'arguments': match.group(1).split('|')[1:],
-                'labels': qualifier_labels(match.group(1).split('|')[2:])} for match in re.finditer(r'\{\{(lb\|[^{}]+)\}\}', line)]
-            meanings.append({'pos': pos, 'line': line_no, 'raw': line, 'qualifiers': qualifiers})
-    require([m['pos'] for m in meanings] == ['verb'] * 4 + ['adjective'], 'scoped_supplemental_mapping_failed')
+    if 'revisionTimestamp' in scope:
+        require(page['revision_timestamp'] == scope['revisionTimestamp'], 'scoped_supplemental_page_changed')
+    meanings = page_meanings(page['raw_wikitext'])
+    inventory = INVENTORIES[headword]
+    require([m['pos'] for m in meanings] == inventory['pagePos'] and
+            [m['path'] for m in meanings] == inventory['pagePaths'], 'scoped_supplemental_mapping_failed')
     return {**page, 'meanings': meanings, 'authenticatesKaikki': False}
 
 
 def build(root, scope, lock):
-    require(scope['schema'] == 'wordwell-scoped-evidence-v1' and scope['candidates'] == ['emulate'], 'unsupported_scoped_candidates')
+    require(scope['schema'] == 'wordwell-scoped-evidence-v1' and len(scope['candidates']) == 1 and scope['candidates'][0] in INVENTORIES, 'unsupported_scoped_candidates')
+    headword = scope['candidates'][0]
+    inventory = INVENTORIES[headword]
     snapshot = root / 'extractions' / scope['snapshot']
     trial = root / 'trials' / scope['trial']
     artifacts = []
@@ -185,20 +218,20 @@ def build(root, scope, lock):
     for line in (snapshot / 'frequency.jsonl').open():
         observation = json.loads(line)
         count += 1
-        if observation['form'] == 'emulate':
+        if observation['form'] == headword:
             frequency.append(observation)
     require(count == scope['frequency']['forms'] and len(frequency) == 1 and frequency[0]['order'] == scope['frequency']['order'], 'scoped_frequency_coverage_failed')
     entries, meanings, concepts, links = oewn_bundle(oewn_path, scope)
-    page = supplemental_page(snapshot / 'pages.sqlite', scope['supplemental'])
+    page = supplemental_page(snapshot / 'pages.sqlite', scope['supplemental'], headword)
     with read_index(trial / 'english.sqlite') as db:
         progress = json.loads(db.execute('SELECT value FROM progress WHERE id=1').fetchone()[0])
         require(progress['complete'] and progress['artifactSha256'] == scope['kaikki']['corpusSha256'], 'scoped_index_incomplete')
-        rows = list(db.execute('SELECT * FROM records WHERE word=? AND kind=? ORDER BY ordinal', ('emulate', 'english')))
-    require(len(rows) == 2, 'scoped_kaikki_entries_missing')
-    for row, pin in zip(rows, scope['kaikki']['records']):
+        rows = list(db.execute('SELECT * FROM records WHERE word=? AND kind=? ORDER BY ordinal', (headword, 'english')))
+    require(len(rows) == len(scope['kaikki']['records']) == len(inventory['kaikkiPos']), 'scoped_kaikki_entries_missing')
+    for row, pin, pos in zip(rows, scope['kaikki']['records'], inventory['kaikkiPos']):
         require(row['ordinal'] == pin['line'] and sha(row['raw_json'].encode()) == row['sha256'] == pin['sha256'], 'scoped_kaikki_record_changed')
         record = json.loads(row['raw_json'])
-        require(record['word'] == 'emulate' and record['lang_code'] == 'en' and record['pos'] in ('verb', 'adj'), 'scoped_kaikki_identity_failed')
+        require(record['word'] == headword and record['lang_code'] == 'en' and record['pos'] == pos, 'scoped_kaikki_identity_failed')
         eid = 'line:' + str(row['ordinal'])
         entries.append({'source': 'kaikki', 'id': eid, 'headword': record['word'], 'pos': record['pos'], 'order': row['ordinal'],
             'role': 'candidate', 'raw': row['raw_json'], 'rawSha256': row['sha256'],
@@ -208,18 +241,19 @@ def build(root, scope, lock):
             meanings.append({'source': 'kaikki', 'entryId': eid, 'id': eid + ':meaning:' + str(order), 'order': order, 'conceptId': None, 'relations': [], 'data': meaning})
         for derived in record.get('derived', []):
             links.append({'source': 'kaikki', 'from': eid, 'to': derived['word'], 'word': derived['word'], 'type': 'derived', 'purpose': 'family', 'data': derived})
-    require(sum(m['source'] == 'kaikki' for m in meanings) == 5, 'scoped_kaikki_inventory_failed')
-    require({r['word'] for r in links if r['source'] == 'kaikki'} == {'unemulated', 'emulatable', 'emulatory', 'emulable', 'emulative', 'emulator', 'emulation'}, 'scoped_family_mapping_failed')
+    require(sum(m['source'] == 'kaikki' for m in meanings) == inventory['kaikkiMeanings'], 'scoped_kaikki_inventory_failed')
+    require({r['word'] for r in links if r['source'] == 'kaikki'} == inventory['family'], 'scoped_family_mapping_failed')
     diagnostics = [
-        {'code': 'raw_now_rare_vs_normalized_archaic', 'impact': 'mapped_separately', 'source': 'kaikki:line:34324:meaning:1', 'supplemental': 'page:7577:92422846'},
         {'code': 'publisher_revision_unknown', 'impact': 'accepted_scoped_limitation', 'reason': 'Publisher line/hash identity is approved; supplemental page does not authenticate it.'},
         {'code': 'linked_targets_not_recursively_imported', 'impact': 'outside_declared_scope', 'reason': 'Whole records retain other relations and meanings; only declared immediate support is covered.'},
         {'code': 'external_quotations', 'impact': 'retained_not_generation', 'reason': 'Whole quotation metadata remains evidence; no quotation enters generation projection.'},
         {'code': 'complete_corpus_not_ready', 'impact': 'separate_acceptance', 'reason': 'The interrupted local extraction and corpus-wide mapping acceptance are not selected.'}
     ]
+    if headword == 'emulate':
+        diagnostics.insert(0, {'code': 'raw_now_rare_vs_normalized_archaic', 'impact': 'mapped_separately', 'source': 'kaikki:line:34324:meaning:1', 'supplemental': 'page:7577:92422846'})
     return {'scope': scope, 'artifacts': artifacts, 'entries': entries, 'meanings': meanings, 'concepts': concepts,
             'relations': links, 'frequency': frequency[0], 'supplemental': page, 'diagnostics': diagnostics,
-            'coverage': {'candidates': ['emulate'], 'fullCorpus': False, 'oewnMeanings': 3, 'kaikkiMeanings': 5}, 'modelCalls': 0}
+            'coverage': {'candidates': [headword], 'fullCorpus': False, 'oewnMeanings': len(scope['oewnMeanings']), 'kaikkiMeanings': inventory['kaikkiMeanings']}, 'modelCalls': 0}
 
 
 if __name__ == '__main__':

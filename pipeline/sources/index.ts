@@ -22,12 +22,12 @@ export async function buildScopedCandidate(store: SourceStore, bundleId: string,
   const input = bundleFilterInput(bundle);
   const assessment = evaluateFilters(input, config);
   // Resolutions remain inspectable, even when a prerequisite is unresolved.
-  return store.assess({ bundleId, headword: "emulate", configFingerprint: await intakeConfigurationIdentity(config), resolution: input.resolution,
+  return store.assess({ bundleId, headword: bundle.coverage.candidates[0], configFingerprint: await intakeConfigurationIdentity(config), resolution: input.resolution,
     assessment: { ...assessment, effectiveConfiguration: config, sourceSelection: bundleId, input, gateVerdict: null } });
 }
 export async function explainScopedCandidate(store: SourceStore, bundleId: string, headword: string, config: PipelineConfig) {
   const bundle = await store.readyBundle(bundleId);
-  if (!bundle.coverage.candidates.includes(headword as "emulate")) throw new PrivateError("candidate_outside_bundle_scope");
+  if (bundle.coverage.candidates[0] !== headword) throw new PrivateError("candidate_outside_bundle_scope");
   const explanation = await store.explanation(bundleId, headword, await intakeConfigurationIdentity(config));
   return { ...explanation, coverage: bundle.coverage, diagnostics: bundle.diagnostics,
     evidence: { entries: bundle.entries.map(e => ({ source: e.source, id: e.id, order: e.order, pos: e.pos, role: e.role, rawSha256: e.rawSha256, locator: e.locator })),

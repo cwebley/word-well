@@ -30,6 +30,7 @@
     "serve": "http-server dist -c-1 -p 0 -o",
     "dev": "export API_BASE_URL=${API_BASE_URL:-http://localhost:3000} && npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve",
     "eval:usefulness": "tsx evals/usefulness.cli.ts",
+    "eval:planner": "node --env-file-if-exists=.env --import tsx evals/planner.cli.ts",
     "eval:usefulness:replay-check": "tsx scripts/replay-durable-usefulness.ts",
     "eval:author": "tsx evals/private-authoring.ts",
     "eval:private": "node --env-file-if-exists=.env --import tsx evals/private-appropriateness-cli.ts",
@@ -55,9 +56,11 @@
     "vitest": "latest"
   },
   "dependencies": {
+    "@openrouter/ai-sdk-provider": "2.10.0",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.3",
     "age-encryption": "0.3.1",
+    "ai": "6.0.146",
     "pg": "^8.23.0",
     "tsx": "^4.23.12",
     "yaml": "^2.8.3",

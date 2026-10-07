@@ -12,9 +12,12 @@ export const bundleSchema = z.object({
   concepts: z.array(z.object({ source: z.literal("oewn"), id: z.string(), order: z.number().int(), raw: z.string(), rawSha256: z.string(), data }).strict()),
   relations: z.array(z.object({ source: z.enum(["oewn", "kaikki"]), from: z.string(), to: z.string(), word: z.string(), type: z.string(), purpose: z.enum(["contrast", "family"]), data: data.optional() }).strict()),
   frequency: z.object({ order: z.number().int(), form: z.string(), tokens: z.array(z.string()), storedFrequency: z.number(), directZipf: z.number().nullable() }).strict(),
-  supplemental: z.object({ page_id: z.string(), revision_id: z.string(), text_sha256: z.string(), raw_wikitext: z.string(), authenticatesKaikki: z.literal(false), meanings: z.array(z.object({ pos: z.string(), line: z.number(), raw: z.string(), qualifiers: z.array(z.object({ template: z.string(), arguments: z.array(z.string()), labels: z.array(z.string()) }).strict()) }).strict()) }).strict(),
+  supplemental: z.object({ page_id: z.string(), revision_id: z.string(), revision_timestamp: z.string().optional(), text_sha256: z.string(), raw_wikitext: z.string(), authenticatesKaikki: z.literal(false), meanings: z.array(z.object({ pos: z.string(), line: z.number(), path: z.array(z.number().int().positive()).nonempty().optional(), raw: z.string(), qualifiers: z.array(z.object({ template: z.string(), arguments: z.array(z.string()), labels: z.array(z.string()) }).strict()) }).strict()) }).strict(),
   diagnostics: z.array(data),
-  coverage: z.object({ candidates: z.tuple([z.literal("emulate")]), fullCorpus: z.literal(false), oewnMeanings: z.literal(3), kaikkiMeanings: z.literal(5) }).strict(),
+  coverage: z.union([
+    z.object({ candidates: z.tuple([z.literal("emulate")]), fullCorpus: z.literal(false), oewnMeanings: z.literal(3), kaikkiMeanings: z.literal(5) }).strict(),
+    z.object({ candidates: z.tuple([z.literal("evanescent")]), fullCorpus: z.literal(false), oewnMeanings: z.literal(1), kaikkiMeanings: z.literal(6) }).strict()
+  ]),
   modelCalls: z.literal(0)
 }).strict();
 export type EvidenceBundle = z.infer<typeof bundleSchema>;

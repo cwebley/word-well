@@ -11,12 +11,15 @@ export type Accounting = { generationId: string | null; inputTokens: number | nu
 export type Classification =
   | { kind: "reply" }
   | { kind: "retryable" }
+  | { kind: "verification_pending"; nextEligibleAt?: string }
   | { kind: "rejected"; code: string }
   | { kind: "uncertain" };
 
 export interface ModelAdapter {
   readonly route: string;
   send(body: unknown, options: { timeoutMs: number }): Promise<Exchange>;
+  // Reads evidence about an existing generation. Never creates another answer.
+  verify?(exchange: Exchange): Promise<Exchange>;
   accounting(exchange: Exchange): Accounting;
   classify(exchange: Exchange): Classification;
 }

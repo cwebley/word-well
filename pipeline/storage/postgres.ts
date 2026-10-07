@@ -20,7 +20,11 @@ export type RequestRecord = {
   generationId: string | null; inputTokens: number | null; outputTokens: number | null;
   createdAt: Date; completedAt: Date | null;
   response: Exchange | null;
+  verifications?: { id: string; response: Exchange }[];
 };
+export function latestResponse(request: RequestRecord): Exchange | null {
+  return request.verifications?.at(-1)?.response ?? request.response;
+}
 export type AttemptRecord = {
   id: string; experimentId: string | null; runId?: string | null; stage: string; status: AttemptStatus; outcomeCode: string | null;
   nextEligibleAt: Date | null; input: { input: unknown; request: unknown; provenance?: unknown }; result: unknown;
@@ -240,9 +244,10 @@ export async function createPrivateStore(options: {
     },
 
     async readAttempt(id: string): Promise<AttemptRecord | null> {
-      const { attempt, requests } = await read("read_attempt", async () => ({
+      const { attempt, requests, verifications } = await read("read_attempt", async () => ({
         attempt: (await pool.query("SELECT * FROM private.attempts WHERE id = $1", [id])).rows[0],
-        requests: (await pool.query("SELECT * FROM private.requests WHERE attempt_id = $1 ORDER BY sequence", [id])).rows
+        requests: (await pool.query("SELECT * FROM private.requests WHERE attempt_id = $1 ORDER BY sequence", [id])).rows,
+        verifications: (await pool.query("SELECT v.* FROM private.request_verifications v JOIN private.requests r ON r.id=v.request_id WHERE r.attempt_id=$1 ORDER BY v.sequence", [id])).rows
       }));
       if (!attempt) return null;
       return {
@@ -256,7 +261,9 @@ export async function createPrivateStore(options: {
           httpStatus: row.http_status, retryable: row.retryable, retryAfterMs: row.retry_after_ms,
           generationId: row.generation_id, inputTokens: row.input_tokens, outputTokens: row.output_tokens,
           createdAt: row.created_at, completedAt: row.completed_at,
-          response: row.response_payload ? await open(`requests:${row.id}:response`, row.key_id, row.response_payload, exchangeSchema) : null
+          response: row.response_payload ? await open(`requests:${row.id}:response`, row.key_id, row.response_payload, exchangeSchema) : null,
+          verifications: await Promise.all(verifications.filter(v => v.request_id === row.id).map(async v => ({ id: v.id,
+            response: await open(`request_verifications:${v.id}:payload`, v.key_id, v.payload, exchangeSchema) })))
         })))
       };
     },
@@ -317,6 +324,25 @@ export async function createPrivateStore(options: {
         `UPDATE private.attempts SET status = $2, outcome_code = $3, result_payload = $4, next_eligible_at = NULL, updated_at = now()
          WHERE id = $1 AND status = 'pending'`, [id, outcome.status, outcome.outcomeCode, payload]);
       await guard("finish_attempt", () => ownership ? ownership.transaction(write) : write(pool));
+    },
+
+    async saveRequestVerification(record: { id: string; requestId: string; sequence: number; response: Exchange }, ownership?: ExecutionOwnership) {
+      const payload = await seal(`request_verifications:${record.id}:payload`, exchangeSchema.parse(record.response));
+      await guard("save_request_verification", async () => {
+        const write = async (client: pg.Pool | pg.PoolClient) => {
+          const result = await client.query(`INSERT INTO private.request_verifications(id,request_id,sequence,key_id,payload)
+            SELECT $1,r.id,$3,$4,$5 FROM private.requests r JOIN private.attempts a ON a.id=r.attempt_id
+            WHERE r.id=$2 AND r.status='responded' AND r.response_payload IS NOT NULL AND a.status='pending'
+              AND (SELECT count(*) FROM private.request_verifications WHERE request_id=r.id)=$3-1
+            ON CONFLICT(id) DO NOTHING RETURNING id`, [record.id, record.requestId, record.sequence, key.id, payload]);
+          if (!result.rowCount) {
+            const { rows: [existing] } = await client.query("SELECT * FROM private.request_verifications WHERE id=$1", [record.id]);
+            if (!existing || existing.request_id !== record.requestId || existing.sequence !== record.sequence ||
+              !isDeepStrictEqual(await open(`request_verifications:${existing.id}:payload`, existing.key_id, existing.payload, exchangeSchema), record.response)) throw new PrivateError("verification_conflict");
+          }
+        };
+        await (ownership ? ownership.transaction(write) : write(pool));
+      });
     },
 
     async deferAttempt(id: string, nextEligibleAt: Date) {
@@ -454,7 +480,7 @@ export async function createPrivateStore(options: {
     // together. Failed work updates only its run and retains earlier selections.
     async completeProduction(claim: CandidateClaim, record: { status: "paused" | "accepted" | "rejected" | "failed"; code?: string;
       result?: { id: string; reuseIdentity: string; material: unknown }; reusedResultId?: string;
-      assessmentId?: string; promotionId?: string; keepClaim?: boolean; stage?: string; appropriatenessResultId?: string; continuing?: boolean }) {
+       assessmentId?: string; promotionId?: string; keepClaim?: boolean; stage?: string; appropriatenessResultId?: string; usefulnessResultId?: string; plannerPromotionId?: string; continuing?: boolean }) {
       await claim.assert();
       const payload = record.result ? await seal(`production_results:${record.result.id}:payload`, record.result.material) : null;
       await guard("complete_production", async () => {
@@ -465,7 +491,7 @@ export async function createPrivateStore(options: {
             await client.query("INSERT INTO private.selection_history(id,candidate_id,stage,result_id,run_id) VALUES($1,$2,$3,$4,$5)", [randomUUID(), claim.candidateId, record.stage ?? "appropriateness", record.result.id, claim.runId]);
           }
           const resultId = record.result?.id ?? record.reusedResultId;
-          if (resultId && record.assessmentId) await client.query("INSERT INTO private.reuse_authorizations(run_id,result_id,assessment_id,promotion_id,appropriateness_result_id) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING", [claim.runId, resultId, record.assessmentId, record.promotionId ?? null, record.appropriatenessResultId ?? null]);
+          if (resultId && record.assessmentId) await client.query("INSERT INTO private.reuse_authorizations(run_id,result_id,assessment_id,promotion_id,appropriateness_result_id,usefulness_result_id,planner_promotion_id) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING", [claim.runId, resultId, record.assessmentId, record.promotionId ?? null, record.appropriatenessResultId ?? null, record.usefulnessResultId ?? null, record.plannerPromotionId ?? null]);
           await client.query("UPDATE private.production_runs SET status=$2,outcome_code=$3 WHERE id=$1", [claim.runId, record.continuing ? "pending" : record.status, record.code ?? null]);
           if (!record.keepClaim) await client.query("UPDATE private.candidate_claims SET run_id=NULL,token=NULL WHERE candidate_id=$1 AND token=$2", [claim.candidateId, claim.token]);
         });
@@ -481,6 +507,26 @@ export async function createPrivateStore(options: {
          WHERE p.id=$1 GROUP BY p.cap_nano_usd`, [runId]));
       return { capNanoUsd: Number(row.cap_nano_usd), knownNanoUsd: Number(row.known), outstandingNanoUsd: Number(row.outstanding),
         unresolvedRequests: Number(row.unresolved), physicalRequests: Number(row.physical) };
+    },
+    async savePlannerReview(record: { id: string; experimentId: string; attemptId: string; configurationFingerprint: string; material: unknown }) {
+      const payload = await seal(`planner_trial_reviews:${record.id}:payload`, record.material);
+      await guard("save_planner_review", () => pool.query("INSERT INTO private.planner_trial_reviews(id,experiment_id,attempt_id,configuration_fingerprint,key_id,payload) VALUES($1,$2,$3,$4,$5,$6)",
+        [record.id, record.experimentId, record.attemptId, record.configurationFingerprint, key.id, payload]));
+    },
+    async plannerReviews(experimentId: string) {
+      const { rows } = await read("planner_reviews", () => pool.query("SELECT * FROM private.planner_trial_reviews WHERE experiment_id=$1 ORDER BY created_at DESC,id DESC", [experimentId]));
+      return Promise.all(rows.map(async row => ({ id: row.id as string, attemptId: row.attempt_id as string, configurationFingerprint: row.configuration_fingerprint as string,
+        material: await open(`planner_trial_reviews:${row.id}:payload`, row.key_id, row.payload, anyJson) })));
+    },
+    async savePlannerPromotion(record: { id: string; experimentId: string; configurationFingerprint: string; decision: "promote" | "do_not_promote"; material: unknown }) {
+      const payload = await seal(`planner_promotions:${record.id}:payload`, record.material);
+      await guard("save_planner_promotion", () => pool.query("INSERT INTO private.planner_promotions(id,experiment_id,configuration_fingerprint,decision,key_id,payload) VALUES($1,$2,$3,$4,$5,$6)",
+        [record.id, record.experimentId, record.configurationFingerprint, record.decision, key.id, payload]));
+    },
+    async currentPlannerPromotion(configurationFingerprint: string) {
+      const { rows: [row] } = await read("planner_promotion", () => pool.query("SELECT * FROM private.planner_promotions WHERE configuration_fingerprint=$1 ORDER BY created_at DESC,id DESC LIMIT 1", [configurationFingerprint]));
+      return row ? { id: row.id as string, experimentId: row.experiment_id as string, decision: row.decision as "promote" | "do_not_promote",
+        material: await open(`planner_promotions:${row.id}:payload`, row.key_id, row.payload, anyJson) } : null;
     },
     async savePromotionAssessment(record: { id: string; experimentId: string; configurationFingerprint: string; ruleIdentity: string; evidenceIdentity: string; qualifies: boolean; material: unknown }) {
       const payload = await seal(`promotion_assessments:${record.id}:payload`, record.material);
@@ -519,7 +565,7 @@ export async function createPrivateStore(options: {
       return rows.map(row => ({ id: row.id as string, resultId: row.result_id as string, runId: row.run_id as string }));
     },
     async productionAuthorizations(runId: string) {
-      return (await read("production_authorizations", () => pool.query("SELECT a.result_id,a.assessment_id,a.promotion_id,a.appropriateness_result_id,r.stage FROM private.reuse_authorizations a JOIN private.production_results r ON r.id=a.result_id WHERE a.run_id=$1 ORDER BY a.created_at,a.result_id", [runId]))).rows;
+      return (await read("production_authorizations", () => pool.query("SELECT a.result_id,a.assessment_id,a.promotion_id,a.appropriateness_result_id,a.usefulness_result_id,a.planner_promotion_id,r.stage FROM private.reuse_authorizations a JOIN private.production_results r ON r.id=a.result_id WHERE a.run_id=$1 ORDER BY a.created_at,a.result_id", [runId]))).rows;
     },
     async candidateClaim(candidateId: string) {
       const { rows: [row] } = await read("candidate_claim", () => pool.query("SELECT run_id FROM private.candidate_claims WHERE candidate_id=$1", [candidateId]));

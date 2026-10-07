@@ -41,7 +41,9 @@ describe.skipIf(!process.env.DATABASE_URL)("production appropriateness coordinat
     } else {
       evidence = bundleSchema.parse({ scope: { controlled: true }, artifacts: [],
         entries: [{ source: "oewn", id: "oewn-emulate-v", headword: "emulate", pos: "v", order: 1, role: "candidate", raw: "harmless-source-marker", rawSha256: "a".repeat(64), locator: {}, data: { forms: [] } },
-          { source: "kaikki", id: "standin", headword: "emulate", pos: "verb", order: 1, role: "candidate", raw: "harmless-source-marker", rawSha256: "a".repeat(64), locator: {}, data: { word: "emulate", pos: "verb", senses: Array.from({ length: 5 }, () => ({ glosses: ["harmless-source-marker"] })) } }],
+          // Reviewed identities stand in for complete source records in CI only.
+          { source: "kaikki", id: "line:34324", headword: "emulate", pos: "verb", order: 34324, role: "candidate", raw: "harmless-source-marker", rawSha256: "603e2ee324cf6dfb5463eac28a1f60bc11864ecb3130cde000e56f4f19296cdd", locator: {}, data: { word: "emulate", pos: "verb", senses: Array.from({ length: 4 }, () => ({ glosses: ["harmless-source-marker"] })) } },
+          { source: "kaikki", id: "line:34325", headword: "emulate", pos: "adj", order: 34325, role: "candidate", raw: "harmless-source-marker", rawSha256: "cb11f3248c28e0f72b574309e4101f300068427a5f036557861dcc4e17940129", locator: {}, data: { word: "emulate", pos: "adj", senses: [{ glosses: ["harmless-source-marker"] }] } }],
         meanings: [], concepts: [], relations: [], frequency: { order: 16960, form: "emulate", tokens: ["emulate"], storedFrequency: 0.0000025703957827688647, directZipf: 3.41 },
         supplemental: { page_id: "7577", revision_id: "92422846", text_sha256: "02467344b0af9e5085e9980648e09cd6326f42480affb9e77146686ec7584551", raw_wikitext: "harmless-source-marker", authenticatesKaikki: false, meanings: [] },
         diagnostics: [], coverage: { candidates: ["emulate"], fullCorpus: false, oewnMeanings: 3, kaikkiMeanings: 5 }, modelCalls: 0 });

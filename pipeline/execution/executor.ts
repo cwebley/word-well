@@ -8,6 +8,7 @@ import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { PrivateError } from "../storage/crypto.js";
 import type { AttemptRecord, PrivateStore, RequestRecord, ExecutionOwnership } from "../storage/postgres.js";
+import { latestResponse } from "../storage/postgres.js";
 import type { ReceiptLedger } from "../storage/receipts.js";
 import type { ModelAdapter } from "./model.js";
 import type { StageDefinition } from "./stage.js";
@@ -21,7 +22,7 @@ export type ExecutionSettings = {
   reservationNanoUsd: number;
 };
 
-export type PauseCode = "budget_exhausted" | "accounting_unavailable" | "storage_unavailable" | "retry_deferred";
+export type PauseCode = "budget_exhausted" | "accounting_unavailable" | "storage_unavailable" | "retry_deferred" | "metadata_unavailable";
 export type ExecutionOutcome<Result> =
   | { attemptId: string; state: "valid"; result: Result }
   | { attemptId: string; state: "invalid" | "failed"; code: string }
@@ -97,11 +98,34 @@ export function createStageExecutor(dependencies: {
     const conclude = async (last: RequestRecord): Promise<ExecutionOutcome<Result> | null> => {
       if (last.status === "no_response") return finish("uncertain", "request_uncertain");
       if (last.retryable) return null;
-      if (!last.response) return finish("response_lost", "response_lost");
-      const classification = model.classify(last.response);
+      let response = latestResponse(last);
+      if (!response) return finish("response_lost", "response_lost");
+      let classification = model.classify(response);
+      if (classification.kind === "verification_pending") {
+        if (classification.nextEligibleAt && Date.parse(classification.nextEligibleAt) > now().getTime())
+          return { attemptId, state: "paused", code: "metadata_unavailable", nextEligibleAt: classification.nextEligibleAt };
+        if (!model.verify) return { attemptId, state: "paused", code: "metadata_unavailable" };
+        await request.assertOwnership?.();
+        try { response = await model.verify(response); }
+        catch (error) {
+          if (error instanceof PrivateError && error.code === "metadata_credentials_required") return { attemptId, state: "paused", code: "metadata_unavailable" };
+          throw error;
+        }
+        // Evidence enrichment cannot change the completed request's accounting.
+        if (!isDeepStrictEqual(model.accounting(response), model.accounting(last.response!))) throw new PrivateError("verification_accounting_mismatch");
+        const record = { id: randomUUID(), requestId: last.id, sequence: (last.verifications?.length ?? 0) + 1, response };
+        await request.assertOwnership?.();
+        await persist(() => store.saveRequestVerification(record, request.ownership));
+        classification = model.classify(response);
+        if (classification.kind === "verification_pending") {
+          const nextEligibleAt = classification.nextEligibleAt;
+          if (nextEligibleAt) await persist(() => store.deferAttempt(attemptId, new Date(nextEligibleAt)));
+          return { attemptId, state: "paused", code: "metadata_unavailable", ...(nextEligibleAt ? { nextEligibleAt } : {}) };
+        }
+      }
       if (classification.kind === "rejected") return finish("failed", classification.code);
-      if (classification.kind !== "reply" || last.response.kind !== "response") return finish("uncertain", "request_uncertain");
-      const validation = stage.validate(last.response.body);
+      if (classification.kind !== "reply" || response.kind !== "response") return finish("uncertain", "request_uncertain");
+      const validation = stage.validate(response.body);
       return validation.ok ? finish("valid", null, validation.result) : finish("invalid", validation.code);
     };
 
@@ -227,7 +251,9 @@ export function createStageExecutor(dependencies: {
           ...accounting, completedAt, response: exchange
         }));
         attempt = (await store.readAttempt(attemptId))!;
-        const decided = await conclude(attempt.requests.at(-1)!);
+        // Metadata reads wait until both the original reply and its accounting
+        // are durable. A resume reconciles missing receipts before verification.
+        const decided = accountingFailed && classification.kind === "verification_pending" ? null : await conclude(attempt.requests.at(-1)!);
         // Durable accounting is unavailable: keep what was saved, dispatch nothing more.
         if (accountingFailed) return { attemptId, state: "paused", code: "accounting_unavailable" };
         if (decided) return decided;
