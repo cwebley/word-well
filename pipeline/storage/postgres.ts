@@ -23,7 +23,7 @@ export type RequestRecord = {
 };
 export type AttemptRecord = {
   id: string; experimentId: string | null; runId?: string | null; stage: string; status: AttemptStatus; outcomeCode: string | null;
-  nextEligibleAt: Date | null; input: { input: unknown; request: unknown }; result: unknown;
+  nextEligibleAt: Date | null; input: { input: unknown; request: unknown; provenance?: unknown }; result: unknown;
   requests: RequestRecord[];
 };
 export type RequestOutcome = {
@@ -40,7 +40,7 @@ const exchangeSchema: z.ZodType<Exchange> = z.union([
   z.object({ kind: z.literal("response"), status: z.number().int(), body: z.string(), retryAfter: z.string().nullable(), contentType: z.string().nullable() }).strict(),
   z.object({ kind: z.literal("no_response"), reason: z.enum(["timeout", "network"]) }).strict()
 ]);
-const attemptInputSchema = z.object({ input: z.unknown(), request: z.unknown() }).strict();
+const attemptInputSchema = z.object({ input: z.unknown(), request: z.unknown(), provenance: z.unknown().optional() }).strict();
 const caseInputSchema = z.object({ headword: z.string() }).strict();
 const expectationSchema = z.object({ finding: z.enum(["clear", "blocked"]), reason: z.string(), split: z.enum(["development", "held-out"]) }).strict();
 export type Expectation = z.infer<typeof expectationSchema>;
@@ -120,13 +120,16 @@ export async function createPrivateStore(options: {
       id: string; stage: string; dataset: { id: string; version: number; ciphertextSha256: string };
       configurationFingerprint: string; implementationFingerprint: string; capNanoUsd: number; material: unknown;
       cases?: CaseRecord[];
+      // Other stages validate their frozen contracts before storage. Expectations
+      // remain encrypted with the dataset identity, never in executor material.
+      stageCases?: { caseId: string; position: number; input: unknown; expectation: unknown }[];
     }) {
       const payload = await seal(`experiments:${record.id}:payload`, record.material);
-      const cases = await Promise.all((record.cases ?? []).map(async c => [
+      const cases = await Promise.all((record.cases ?? record.stageCases ?? []).map(async c => [
         record.id, c.caseId, c.position, key.id,
-        await seal(`cases:${record.id}:${c.caseId}:input`, caseInputSchema.parse(c.input)),
+        await seal(`cases:${record.id}:${c.caseId}:input`, record.stageCases ? c.input : caseInputSchema.parse(c.input)),
         datasetKey().id,
-        await sealOwner(`cases:${record.id}:${c.caseId}:expectation`, expectationSchema.parse(c.expectation))
+        await sealOwner(`cases:${record.id}:${c.caseId}:expectation`, record.stageCases ? c.expectation : expectationSchema.parse(c.expectation))
       ]));
       await guard("create_experiment", async () => {
         const client = await pool.connect();
@@ -191,6 +194,17 @@ export async function createPrivateStore(options: {
     },
 
     // Owner expectations, with the dataset key. For the scorer only.
+    async readStageCases(experimentId: string) {
+      const { rows } = await read("read_stage_cases", () => pool.query("SELECT case_id,position,key_id,input_payload FROM private.cases WHERE experiment_id=$1 ORDER BY position", [experimentId]));
+      return Promise.all(rows.map(async row => ({ caseId: row.case_id as string, position: row.position as number,
+        input: await open(`cases:${experimentId}:${row.case_id}:input`, row.key_id, row.input_payload, anyJson) })));
+    },
+    async readStageExpectations(experimentId: string) {
+      datasetKey();
+      const { rows } = await read("read_stage_expectations", () => pool.query("SELECT case_id,expectation_key_id,expectation_payload FROM private.cases WHERE experiment_id=$1", [experimentId]));
+      return new Map(await Promise.all(rows.map(async row => [row.case_id as string,
+        await openOwner(`cases:${experimentId}:${row.case_id}:expectation`, row.expectation_key_id, row.expectation_payload, anyJson)] as const)));
+    },
     async readExpectations(experimentId: string): Promise<Map<string, Expectation>> {
       datasetKey();
       const { rows } = await read("read_expectations", () => pool.query(
@@ -218,7 +232,7 @@ export async function createPrivateStore(options: {
       return rows.map(row => ({ caseId: row.case_id, trialIndex: row.trial_index, attemptId: row.attempt_id }));
     },
 
-    async createAttempt(record: { id: string; experimentId?: string; runId?: string; stage: string; input: { input: unknown; request: unknown } }) {
+    async createAttempt(record: { id: string; experimentId?: string; runId?: string; stage: string; input: { input: unknown; request: unknown; provenance?: unknown } }) {
       const payload = await seal(`attempts:${record.id}:input`, record.input);
       await guard("create_attempt", () => pool.query(
         `INSERT INTO private.attempts (id, experiment_id, stage, status, key_id, input_payload, run_id)
@@ -420,19 +434,19 @@ export async function createPrivateStore(options: {
         }
       };
     },
-    async productionTrial(runId: string, trialIndex: number): Promise<string> {
+    async productionTrial(runId: string, trialIndex: number, stage = "appropriateness"): Promise<string> {
       return guard("production_trial", async () => {
-        await pool.query("INSERT INTO private.production_trials VALUES($1,$2,$3) ON CONFLICT DO NOTHING", [runId, trialIndex, randomUUID()]);
-        return (await pool.query("SELECT attempt_id FROM private.production_trials WHERE run_id=$1 AND trial_index=$2", [runId, trialIndex])).rows[0].attempt_id;
+        await pool.query("INSERT INTO private.production_trials(run_id,trial_index,attempt_id,stage) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING", [runId, trialIndex, randomUUID(), stage]);
+        return (await pool.query("SELECT attempt_id FROM private.production_trials WHERE run_id=$1 AND trial_index=$2 AND stage=$3", [runId, trialIndex, stage])).rows[0].attempt_id;
       });
     },
-    async productionTrials(runId: string): Promise<{ trialIndex: number; attemptId: string }[]> {
-      const { rows } = await read("production_trials", () => pool.query("SELECT * FROM private.production_trials WHERE run_id=$1 ORDER BY trial_index", [runId]));
-      return rows.map(r => ({ trialIndex: r.trial_index, attemptId: r.attempt_id }));
+    async productionTrials(runId: string): Promise<{ stage: string; trialIndex: number; attemptId: string }[]> {
+      const { rows } = await read("production_trials", () => pool.query("SELECT * FROM private.production_trials WHERE run_id=$1 ORDER BY stage,trial_index", [runId]));
+      return rows.map(r => ({ stage: r.stage, trialIndex: r.trial_index, attemptId: r.attempt_id }));
     },
-    async selectedProductionResult(candidateId: string) {
+    async selectedProductionResult(candidateId: string, stage = "appropriateness") {
       const { rows: [row] } = await read("selected_result", () => pool.query(
-        "SELECT r.* FROM private.stage_selections s JOIN private.production_results r ON r.id=s.result_id WHERE s.candidate_id=$1 AND s.stage='appropriateness'", [candidateId]));
+        "SELECT r.* FROM private.stage_selections s JOIN private.production_results r ON r.id=s.result_id WHERE s.candidate_id=$1 AND s.stage=$2", [candidateId, stage]));
       return row ? { id: row.id as string, runId: row.run_id as string, reuseIdentity: row.reuse_identity as string,
         material: await open(`production_results:${row.id}:payload`, row.key_id, row.payload, anyJson) } : null;
     },
@@ -440,19 +454,19 @@ export async function createPrivateStore(options: {
     // together. Failed work updates only its run and retains earlier selections.
     async completeProduction(claim: CandidateClaim, record: { status: "paused" | "accepted" | "rejected" | "failed"; code?: string;
       result?: { id: string; reuseIdentity: string; material: unknown }; reusedResultId?: string;
-      assessmentId?: string; promotionId?: string; keepClaim?: boolean }) {
+      assessmentId?: string; promotionId?: string; keepClaim?: boolean; stage?: string; appropriatenessResultId?: string; continuing?: boolean }) {
       await claim.assert();
       const payload = record.result ? await seal(`production_results:${record.result.id}:payload`, record.result.material) : null;
       await guard("complete_production", async () => {
         await claim.transaction(async client => {
           if (record.result) {
-            await client.query("INSERT INTO private.production_results VALUES($1,$2,$3,'appropriateness',$4,$5,$6)", [record.result.id, claim.runId, claim.candidateId, record.result.reuseIdentity, key.id, payload]);
-            await client.query("INSERT INTO private.stage_selections VALUES($1,'appropriateness',$2) ON CONFLICT(candidate_id,stage) DO UPDATE SET result_id=EXCLUDED.result_id", [claim.candidateId, record.result.id]);
-            await client.query("INSERT INTO private.selection_history(id,candidate_id,stage,result_id,run_id) VALUES($1,$2,'appropriateness',$3,$4)", [randomUUID(), claim.candidateId, record.result.id, claim.runId]);
+            await client.query("INSERT INTO private.production_results VALUES($1,$2,$3,$4,$5,$6,$7)", [record.result.id, claim.runId, claim.candidateId, record.stage ?? "appropriateness", record.result.reuseIdentity, key.id, payload]);
+            await client.query("INSERT INTO private.stage_selections VALUES($1,$2,$3) ON CONFLICT(candidate_id,stage) DO UPDATE SET result_id=EXCLUDED.result_id", [claim.candidateId, record.stage ?? "appropriateness", record.result.id]);
+            await client.query("INSERT INTO private.selection_history(id,candidate_id,stage,result_id,run_id) VALUES($1,$2,$3,$4,$5)", [randomUUID(), claim.candidateId, record.stage ?? "appropriateness", record.result.id, claim.runId]);
           }
           const resultId = record.result?.id ?? record.reusedResultId;
-          if (resultId && record.assessmentId) await client.query("INSERT INTO private.reuse_authorizations(run_id,result_id,assessment_id,promotion_id) VALUES($1,$2,$3,$4)", [claim.runId, resultId, record.assessmentId, record.promotionId ?? null]);
-          await client.query("UPDATE private.production_runs SET status=$2,outcome_code=$3 WHERE id=$1", [claim.runId, record.status, record.code ?? null]);
+          if (resultId && record.assessmentId) await client.query("INSERT INTO private.reuse_authorizations(run_id,result_id,assessment_id,promotion_id,appropriateness_result_id) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING", [claim.runId, resultId, record.assessmentId, record.promotionId ?? null, record.appropriatenessResultId ?? null]);
+          await client.query("UPDATE private.production_runs SET status=$2,outcome_code=$3 WHERE id=$1", [claim.runId, record.continuing ? "pending" : record.status, record.code ?? null]);
           if (!record.keepClaim) await client.query("UPDATE private.candidate_claims SET run_id=NULL,token=NULL WHERE candidate_id=$1 AND token=$2", [claim.candidateId, claim.token]);
         });
       });
@@ -483,13 +497,15 @@ export async function createPrivateStore(options: {
       return row ? { id, configurationFingerprint: row.configuration_fingerprint as string, qualifies: row.qualifies as boolean,
         material: await open(`promotion_assessments:${id}:payload`, row.key_id, row.payload, anyJson) } : null;
     },
-    async recordPromotion(record: { id: string; assessmentId: string; configurationFingerprint: string; decision: "promote" | "do_not_promote"; material: unknown }) {
+    async recordPromotion(record: { id: string; assessmentId?: string; stage?: "appropriateness" | "usefulness"; configurationFingerprint: string; decision: "promote" | "do_not_promote"; material: unknown }) {
       const payload = await seal(`stage_promotions:${record.id}:payload`, record.material);
       await guard("record_promotion", async () => {
-        const { rows: [assessment] } = await pool.query("SELECT * FROM private.promotion_assessments WHERE id=$1", [record.assessmentId]);
-        if (!assessment || assessment.configuration_fingerprint !== record.configurationFingerprint || (record.decision === "promote" && !assessment.qualifies)) throw new PrivateError("promotion_evidence_invalid");
-        await pool.query("INSERT INTO private.stage_promotions(id,configuration_fingerprint,assessment_id,decision,key_id,payload) VALUES($1,$2,$3,$4,$5,$6)",
-          [record.id, record.configurationFingerprint, record.assessmentId, record.decision, key.id, payload]);
+        if (record.stage !== "usefulness") {
+          const { rows: [assessment] } = await pool.query("SELECT * FROM private.promotion_assessments WHERE id=$1", [record.assessmentId]);
+          if (!assessment || assessment.configuration_fingerprint !== record.configurationFingerprint || (record.decision === "promote" && !assessment.qualifies)) throw new PrivateError("promotion_evidence_invalid");
+        }
+        await pool.query("INSERT INTO private.stage_promotions(id,configuration_fingerprint,assessment_id,decision,key_id,payload,stage) VALUES($1,$2,$3,$4,$5,$6,$7)",
+          [record.id, record.configurationFingerprint, record.assessmentId ?? null, record.decision, key.id, payload, record.stage ?? "appropriateness"]);
       });
     },
     async currentPromotion(configurationFingerprint: string) {
@@ -501,6 +517,9 @@ export async function createPrivateStore(options: {
     async productionHistory(candidateId: string) {
       const { rows } = await read("production_history", () => pool.query("SELECT id,result_id,run_id,created_at FROM private.selection_history WHERE candidate_id=$1 ORDER BY created_at,id", [candidateId]));
       return rows.map(row => ({ id: row.id as string, resultId: row.result_id as string, runId: row.run_id as string }));
+    },
+    async productionAuthorizations(runId: string) {
+      return (await read("production_authorizations", () => pool.query("SELECT a.result_id,a.assessment_id,a.promotion_id,a.appropriateness_result_id,r.stage FROM private.reuse_authorizations a JOIN private.production_results r ON r.id=a.result_id WHERE a.run_id=$1 ORDER BY a.created_at,a.result_id", [runId]))).rows;
     },
     async candidateClaim(candidateId: string) {
       const { rows: [row] } = await read("candidate_claim", () => pool.query("SELECT run_id FROM private.candidate_claims WHERE candidate_id=$1", [candidateId]));

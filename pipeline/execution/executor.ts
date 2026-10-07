@@ -45,6 +45,9 @@ export function createStageExecutor(dependencies: {
   ledger: ReceiptLedger;
   model: ModelAdapter;
   settings: ExecutionSettings;
+  // Credential/setup checks apply only when dispatch is allowed. Ownership
+  // remains separate so saved replies can terminalize without a provider key.
+  beforeDispatch?: () => Promise<void>;
   now?: () => Date;
   sleep?: (ms: number) => Promise<void>;
 }) {
@@ -70,6 +73,7 @@ export function createStageExecutor(dependencies: {
     beforeDispatch?: () => Promise<void>;
     assertOwnership?: () => Promise<void>;
     ownership?: ExecutionOwnership;
+    provenance?: unknown;
   }): Promise<ExecutionOutcome<Result>> {
     const { experimentId, runId, attemptId, stage } = request;
     if ((experimentId === undefined) === (runId === undefined)) throw new PrivateError("attempt_owner_invalid");
@@ -104,7 +108,8 @@ export function createStageExecutor(dependencies: {
     try {
       let attempt = await store.readAttempt(attemptId);
       if (!attempt) {
-        await persist(() => store.createAttempt({ id: attemptId, ...owner, stage: stage.name, input: { input: request.input, request: body } }));
+        await persist(() => store.createAttempt({ id: attemptId, ...owner, stage: stage.name, input: { input: request.input, request: body,
+          ...(request.provenance === undefined ? {} : { provenance: request.provenance }) } }));
         attempt = (await store.readAttempt(attemptId))!;
       } else if ((attempt.experimentId ?? undefined) !== experimentId || (attempt.runId ?? undefined) !== runId || attempt.stage !== stage.name || !isDeepStrictEqual(attempt.input.request, body)) {
         throw new PrivateError("attempt_input_mismatch");
@@ -179,6 +184,7 @@ export function createStageExecutor(dependencies: {
         }
 
         if (request.allowDispatch === false) return { attemptId, state: "paused", code: "retry_deferred" };
+        await dependencies.beforeDispatch?.();
         await request.beforeDispatch?.();
         const requestId = randomUUID();
         const sequence = attempt.requests.length + 1;
@@ -191,7 +197,7 @@ export function createStageExecutor(dependencies: {
           return { attemptId, state: "paused", code: "accounting_unavailable" };
         }
 
-        try { await request.beforeDispatch?.(); }
+        try { await dependencies.beforeDispatch?.(); await request.beforeDispatch?.(); }
         catch {
           // The physical send has not begun. Cancellation must be durable so
           // restart does not mistake the preceding intent for a sent request.

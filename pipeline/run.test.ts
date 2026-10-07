@@ -19,6 +19,11 @@ import { fixturePool, harmlessKeys, jevReply, scriptedFetch, privateTempDir, tes
 import { PrivateError } from "./storage/crypto.js";
 import { bundleSchema, type EvidenceBundle } from "./sources/bundle.js";
 import { openLocalSourceStore } from "./storage/source-local.js";
+import { usefulnessMeasurements, usefulnessReply } from "./testing/usefulness-fixtures.js";
+import { combineTrials, createUsefulnessStage, features, usefulnessConfiguration } from "./stages/usefulness.js";
+import { PRODUCTION_COMBINER } from "./stages/usefulness-production.js";
+import { recordApprovedUsefulnessPromotion } from "./usefulness-promotion.js";
+import { createDurableUsefulnessEvaluator } from "../evals/durable-usefulness.js";
 
 const config = loadLocalConfig(JSON.parse(await readFile(resolve(REPO, "config/private-appropriateness.json"), "utf8")));
 const intake = await loadPipelineConfig(resolve(REPO, "config/pipeline.yaml"));
@@ -314,7 +319,7 @@ describe.skipIf(!process.env.DATABASE_URL)("production appropriateness coordinat
     } finally { finishReply(); await h.close(); }
   });
   it("uses exact owner promotion for normal dispatch and downstream authorization, and honors a later non-promotion", async () => {
-    const h = await harness(Array.from({ length: 6 }, clear));
+    const h = await harness([...Array.from({ length: 6 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply())]);
     const d = await frozenDataset([{ headword: "exuberant", finding: "clear", split: "held-out" }]);
     // Same production storage identity; owner labels remain under the separate
     // disposable dataset identity. Neither identity is installed in Keychain.
@@ -337,25 +342,27 @@ describe.skipIf(!process.env.DATABASE_URL)("production appropriateness coordinat
         decisionReference: "https://github.com/cwebley/word-well/issues/17#issuecomment-1", assessmentId: assessment.id, decision: "promote" };
       const promotion = await recordOwnerPromotion(h.store, owner);
       await h.coordinator.run(await h.create());
-      await expect(h.coordinator.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("appropriateness_not_accepted");
+      await expect(h.coordinator.authorizeDownstream({ bundleId: h.bundleId, intake, stage: "appropriateness" })).rejects.toThrow("appropriateness_not_accepted");
       const noKey = createProductionCoordinator({ store: h.store, sources: h.sources, ledger: h.ledger, currentIntake: h.currentIntake,
         beforeDispatch: async () => { throw new PrivateError("model_key_required"); }, execution: { kind: "live", model: h.model } });
-      const blockedId = await noKey.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
+      const blockedId = await noKey.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, stageOnly: true });
       await expect(noKey.run(blockedId)).rejects.toThrow("model_key_required");
       expect((await noKey.inspect(blockedId)).spend).toMatchObject({ physicalRequests: 0, outstandingNanoUsd: 0 });
       await noKey.recover(blockedId);
+      await recordApprovedUsefulnessPromotion(h.store);
       const live = createProductionCoordinator({ store: h.store, sources: h.sources, ledger: h.ledger, currentIntake: h.currentIntake, execution: { kind: "live", model: h.model } });
       const runId = await live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
       expect((await live.run(runId)).status).toBe("accepted");
-      expect(await live.authorizeDownstream({ bundleId: h.bundleId, intake })).toMatchObject({ promotionId: promotion.id });
+      expect(await live.authorizeDownstream({ bundleId: h.bundleId, intake, stage: "appropriateness" })).toMatchObject({ promotionId: promotion.id });
+      expect(await live.authorizeDownstream({ bundleId: h.bundleId, intake })).toMatchObject({ appropriatenessPromotionId: promotion.id });
       const reused = await live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
       expect((await live.run(reused)).spend.physicalRequests).toBe(0);
-      expect(h.remote.sent).toHaveLength(6);
+      expect(h.remote.sent).toHaveLength(9);
       expect(evalRemote.sent).toHaveLength(3);
       await recordOwnerPromotion(h.store, { ...owner, decision: "do_not_promote" });
       await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("configuration_not_promoted");
       await expect(live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 })).rejects.toThrow("configuration_not_promoted");
-      expect(h.remote.sent).toHaveLength(6);
+      expect(h.remote.sent).toHaveLength(9);
     } finally { await evaluationStore.close(); await d.f.cleanup(); await h.close(); }
   }, 30_000);
   it("durably cancels permission revoked before send instead of manufacturing an uncertain request", async () => {
@@ -432,5 +439,192 @@ describe.skipIf(!process.env.DATABASE_URL)("production appropriateness coordinat
       expect((await h.coordinator.inspect(id)).spend.knownNanoUsd).toBe(17_304);
       expect(h.remote.sent).toHaveLength(1);
     } finally { releaseReply(); await h.close(); }
+  });
+  const normal = (h: Awaited<ReturnType<typeof harness>>, fresh = false) => h.coordinator.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, fresh });
+  it("runs both gates, persists original dependencies and authorizes zero-call reuse after fresh acceptance", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), usefulnessReply(1.75), usefulnessReply(1.8), usefulnessReply(1.85), ...Array.from({ length: 3 }, clear)]);
+    try {
+      const first = await h.coordinator.run(await normal(h));
+      expect(first).toMatchObject({ status: "accepted", spend: { physicalRequests: 6, knownNanoUsd: 303_912 } });
+      const input = { headword: "emulate", partsOfSpeech: ["v"] };
+      const stage = createUsefulnessStage(usefulnessConfiguration(PRODUCTION_COMBINER));
+      expect(h.remote.sent.slice(3).map(r => JSON.parse(r.body))).toEqual(Array.from({ length: 3 }, () => stage.render(input)));
+      const answers = [1.75, 1.8, 1.85].map(usefulnessMeasurements), combined = combineTrials(answers, PRODUCTION_COMBINER);
+      expect(first.selectedUsefulness?.material).toMatchObject({ input, originalAppropriatenessResultId: first.selected?.id,
+        decision: { keepScore: combined.keepScore, verdict: "advance", averagedFeatures: features(answers) } });
+      for (const trial of first.trials.filter(t => t.stage === "usefulness")) expect(trial.attempt?.input.provenance).toMatchObject({ appropriatenessResultId: first.selected?.id });
+      const reused = await h.coordinator.run(await normal(h));
+      expect(reused.spend.physicalRequests).toBe(0);
+      expect(reused.authorizations).toHaveLength(2);
+      const fresh = await h.coordinator.run(await h.create(true));
+      const authorized = await h.coordinator.run(await normal(h));
+      expect(authorized.spend.physicalRequests).toBe(0);
+      expect(authorized.selectedUsefulness).toEqual(first.selectedUsefulness);
+      expect(authorized.authorizations.find(a => a.result_id === first.selectedUsefulness?.id)).toMatchObject({ appropriateness_result_id: fresh.selected?.id });
+      expect(h.remote.sent).toHaveLength(9);
+      expect(authorized.history).toHaveLength(3);
+    } finally { await h.close(); }
+  });
+  it("stops before usefulness on current rejection or failed fresh appropriateness", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply()),
+      { status: 200, body: "{invalid" }, ...Array.from({ length: 3 }, () => jevReply("blocked", 0.8, {}, 0.1))]);
+    try {
+      const first = await h.coordinator.run(await normal(h));
+      const failed = await h.coordinator.run(await normal(h, true));
+      expect(failed.status).toBe("failed"); expect(failed.spend.physicalRequests).toBe(1);
+      expect(failed.selectedUsefulness?.id).toBe(first.selectedUsefulness?.id);
+      const rejected = await h.coordinator.run(await normal(h, true));
+      expect(rejected.status).toBe("rejected"); expect(rejected.spend.physicalRequests).toBe(3);
+      expect(rejected.trials.every(t => t.stage === "appropriateness")).toBe(true);
+      await expect(h.coordinator.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, stageOnly: true, stage: "usefulness" })).rejects.toThrow("appropriateness_not_accepted");
+      expect((await h.coordinator.run(await normal(h))).spend.physicalRequests).toBe(0);
+      expect(h.remote.sent).toHaveLength(10);
+    } finally { await h.close(); }
+  });
+  it("supports usefulness-only inspection, invalid fresh output and a selected exclusion without erasing history", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply()),
+      usefulnessReply(1.8, { answers: {} }), ...Array.from({ length: 3 }, () => usefulnessReply(1.9))]);
+    const only = () => h.coordinator.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, stageOnly: true, stage: "usefulness", fresh: true });
+    try {
+      await expect(only()).rejects.toThrow("appropriateness_not_current");
+      await h.coordinator.run(await h.create());
+      const accepted = await h.coordinator.run(await only());
+      expect(accepted.spend.physicalRequests).toBe(3);
+      const failed = await h.coordinator.run(await only());
+      expect(failed).toMatchObject({ status: "failed", outcomeCode: "answers_invalid" });
+      expect(failed.selectedUsefulness?.id).toBe(accepted.selectedUsefulness?.id);
+      expect((await h.coordinator.run(failed.id)).spend.physicalRequests).toBe(1);
+      const excluded = await h.coordinator.run(await only());
+      expect(excluded.status).toBe("rejected");
+      expect(excluded.selectedUsefulness?.material).toMatchObject({ decision: { verdict: "exclude" } });
+      expect((await h.coordinator.run(await normal(h))).spend.physicalRequests).toBe(0);
+      expect(h.remote.sent).toHaveLength(10);
+    } finally { await h.close(); }
+  });
+  it("resumes fresh-all after a usefulness accounting pause without repeating completed appropriateness", async () => {
+    let block = true;
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply())],
+      { append: async type => { if (block && type === "request_outcome" && h.remote.sent.length === 4) throw new PrivateError("accounting_unavailable"); } });
+    try {
+      const id = await normal(h, true);
+      expect((await h.coordinator.run(id))).toMatchObject({ status: "paused", spend: { physicalRequests: 4 } });
+      const competitor = await normal(h);
+      await expect(h.coordinator.run(competitor)).rejects.toThrow("candidate_recovery_required");
+      block = false;
+      expect((await h.coordinator.run(id))).toMatchObject({ status: "accepted", spend: { physicalRequests: 6 } });
+      expect((await h.coordinator.run(competitor)).spend.physicalRequests).toBe(0);
+      expect(h.remote.sent).toHaveLength(6);
+      expect((await h.coordinator.inspect(id)).history).toHaveLength(2);
+    } finally { await h.close(); }
+  });
+  it("recovers an uncertain usefulness request without redispatch or an invented verdict", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), { throws: "harmless-network-failure" }]);
+    try {
+      const id = await normal(h), failed = await h.coordinator.run(id);
+      expect(failed).toMatchObject({ status: "failed", outcomeCode: "uncertain", selectedUsefulness: null,
+        spend: { physicalRequests: 4, unresolvedRequests: 1, outstandingNanoUsd: 1_344_000 } });
+      await h.coordinator.recover(id); await h.coordinator.run(id);
+      expect(h.remote.sent).toHaveLength(4);
+      expect(failed.selected).not.toBeNull();
+    } finally { await h.close(); }
+  });
+  it("records the existing usefulness owner authority without qualifying or promoting appropriateness", async () => {
+    const h = await harness([]);
+    try {
+      const recorded = await recordApprovedUsefulnessPromotion(h.store), again = await recordApprovedUsefulnessPromotion(h.store);
+      expect(again.id).toBe(recorded.id);
+      expect(await h.store.currentPromotion(stage.fingerprint)).toBeNull();
+      const live = createProductionCoordinator({ store: h.store, sources: h.sources, ledger: h.ledger, currentIntake: h.currentIntake, execution: { kind: "live", model: h.model } });
+      await expect(live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 })).rejects.toThrow("configuration_not_promoted");
+      expect(h.remote.sent).toHaveLength(0);
+    } finally { await h.close(); }
+  });
+  it("measures usefulness directly through the shared executor and never changes production selections", async () => {
+    const h = await harness([...Array.from({ length: 3 }, () => usefulnessReply())]);
+    const evaluationStore = await createPrivateStore({ ...h.options, datasetKey: h.keys.datasetKey });
+    try {
+      const evaluator = createDurableUsefulnessEvaluator({ store: evaluationStore, ledger: h.ledger, model: h.model });
+      const id = await evaluator.create({ dataset: { name: "harmless", version: "a".repeat(64), split: "development",
+        cases: [{ id: "harmless", headword: "emulate", partsOfSpeech: ["v"], expected: "keep", category: "keep" }] }, combiner: PRODUCTION_COMBINER, config, capNanoUsd: 100_000_000 });
+      const measured = await evaluator.run(id);
+      expect(measured.report.counts.truePositive).toBe(1);
+      expect(measured.spend.physicalRequests).toBe(3);
+      expect((await evaluator.run(id)).spend.physicalRequests).toBe(3);
+      expect(await h.store.selectedProductionResult((await authorizeScopedCandidate(h.sources, h.bundleId, intake)).candidateId, "usefulness")).toBeNull();
+      expect(h.remote.sent).toHaveLength(3);
+      expect(h.remote.sent.map(r => JSON.parse(r.body))).toEqual(Array.from({ length: 3 }, () => createUsefulnessStage(usefulnessConfiguration(PRODUCTION_COMBINER)).render({ headword: "emulate", partsOfSpeech: ["v"] })));
+    } finally { await evaluationStore.close(); await h.close(); }
+  });
+  it("preserves headword-only appropriateness across source selections but repeats usefulness without verified correspondence", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 6 }, () => usefulnessReply())]);
+    try {
+      const first = await h.coordinator.run(await normal(h));
+      const bundleId = fingerprint({ otherRelease: true, evidence });
+      await h.sources.importBundle({ id: bundleId, intention: { otherRelease: true }, load: async () => evidence });
+      await buildScopedCandidate(h.sources, bundleId, intake);
+      const id = await h.coordinator.create({ bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
+      const changed = await h.coordinator.run(id);
+      expect(changed.spend.physicalRequests).toBe(3);
+      expect(changed.selected?.id).toBe(first.selected?.id);
+      expect(changed.selectedUsefulness?.id).not.toBe(first.selectedUsefulness?.id);
+      expect(h.remote.sent).toHaveLength(9);
+    } finally { await h.close(); }
+  });
+  it("appends current intake authorization after a pause without rewriting the original gate dependencies", async () => {
+    let block = true;
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply())],
+      { append: async type => { if (block && type === "request_outcome" && h.remote.sent.length === 4) throw new PrivateError("accounting_unavailable"); } });
+    try {
+      const id = await normal(h, true), paused = await h.coordinator.run(id);
+      const changed = structuredClone(intake); changed.filters.frequency.ceiling = 3.6;
+      const assessed = await buildScopedCandidate(h.sources, h.bundleId, changed);
+      h.setIntake(changed); block = false;
+      const resumed = await h.coordinator.run(id);
+      expect(resumed.status).toBe("accepted");
+      const authorizations = resumed.authorizations.filter(a => a.stage === "appropriateness");
+      expect(authorizations).toHaveLength(2);
+      expect(new Set(authorizations.map(a => a.assessment_id))).toEqual(new Set([paused.material.assessmentId, assessed.assessmentId]));
+      expect(resumed.selectedUsefulness?.material).toMatchObject({ originalAssessmentId: paused.material.assessmentId });
+      expect(resumed.authorizations.find(a => a.stage === "usefulness")).toMatchObject({ assessment_id: assessed.assessmentId });
+      expect(h.remote.sent).toHaveLength(6);
+    } finally { await h.close(); }
+  });
+  it.each(["invalid", "uncertain"])("stops direct evaluation on a new %s trial, then resumes remaining trials without replacing it", async kind => {
+    const failed: ScriptedReply = kind === "invalid" ? { status: 200, body: "{invalid" } : { throws: "harmless-network-failure" };
+    const h = await harness([failed, usefulnessReply(), usefulnessReply()]);
+    const store = await createPrivateStore({ ...h.options, datasetKey: h.keys.datasetKey });
+    try {
+      const evaluator = createDurableUsefulnessEvaluator({ store, ledger: h.ledger, model: h.model });
+      const id = await evaluator.create({ dataset: { name: "harmless", version: "a".repeat(64), split: "development",
+        cases: [{ id: "harmless", headword: "emulate", partsOfSpeech: ["v"], expected: "keep", category: "keep" }] }, combiner: PRODUCTION_COMBINER, config, capNanoUsd: 100_000_000 });
+      const first = await evaluator.run(id);
+      expect(first.spend.physicalRequests).toBe(1);
+      const resumed = await evaluator.run(id);
+      expect(resumed.spend.physicalRequests).toBe(3);
+      expect(resumed.outcomes[0].attempts.map(a => a?.status)).toEqual([kind, "valid", "valid"]);
+      expect(resumed.rows[0].result).toBeNull();
+      await evaluator.run(id);
+      expect(h.remote.sent).toHaveLength(3);
+      expect(resumed.outcomes[0].attempts[0]?.id).toBe(first.outcomes[0].attempts[0]?.id);
+    } finally { await store.close(); await h.close(); }
+  });
+  it("terminalizes a saved evaluation reply without provider credentials before blocking the next new request", async () => {
+    const h = await harness([usefulnessReply()]);
+    let failFinish = true, keyAvailable = true;
+    const store = await createPrivateStore({ ...h.options, datasetKey: h.keys.datasetKey,
+      beforeWrite: async operation => { if (failFinish && operation === "finish_attempt") throw new PrivateError("storage_unavailable"); } });
+    try {
+      const evaluator = createDurableUsefulnessEvaluator({ store, ledger: h.ledger, model: h.model, sleep: async () => {},
+        beforeDispatch: async () => { if (!keyAvailable) throw new PrivateError("model_key_required"); } });
+      const id = await evaluator.create({ dataset: { name: "harmless", version: "a".repeat(64), split: "development",
+        cases: [{ id: "harmless", headword: "emulate", partsOfSpeech: ["v"], expected: "keep", category: "keep" }] }, combiner: PRODUCTION_COMBINER, config, capNanoUsd: 100_000_000 });
+      expect((await evaluator.run(id)).outcomes[0].attempts[0]?.status).toBe("pending");
+      failFinish = false; keyAvailable = false;
+      await expect(evaluator.run(id)).rejects.toThrow("model_key_required");
+      const recovered = await evaluator.inspect(id);
+      expect(recovered.outcomes[0].attempts[0]?.status).toBe("valid");
+      expect(recovered.spend.physicalRequests).toBe(1);
+      expect(h.remote.sent).toHaveLength(1);
+    } finally { await store.close(); await h.close(); }
   });
 });

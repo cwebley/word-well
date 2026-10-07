@@ -30,6 +30,7 @@
     "serve": "http-server dist -c-1 -p 0 -o",
     "dev": "export API_BASE_URL=${API_BASE_URL:-http://localhost:3000} && npm run build && npm-run-all --parallel watch:site watch:assets swatchkit:watch serve",
     "eval:usefulness": "tsx evals/usefulness.cli.ts",
+    "eval:usefulness:replay-check": "tsx scripts/replay-durable-usefulness.ts",
     "eval:author": "tsx evals/private-authoring.ts",
     "eval:private": "node --env-file-if-exists=.env --import tsx evals/private-appropriateness-cli.ts",
     "eval:private:smoke": "node --env-file-if-exists=.env --import tsx evals/private-appropriateness-cli.ts smoke --max-cost-usd 0.05",

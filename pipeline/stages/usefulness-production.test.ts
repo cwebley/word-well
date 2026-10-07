@@ -4,6 +4,8 @@ import sourceArtifact from "../../config/usefulness-combiner-e9d29c215805.json" 
 import type { JevAnswers, JevClient } from "../execution/jev.js";
 import { judgeUsefulness, loadCombiner, QUESTIONS } from "./usefulness.js";
 import { PRODUCTION_COMBINER } from "./usefulness-production.js";
+import { createUsefulnessStage, usefulnessConfiguration } from "./usefulness.js";
+import { PINNED_MODEL_VERSION } from "../execution/jev.js";
 
 // Synthetic measurements chosen to distinguish the original 0.50 cutoff from
 // the promoted 0.58 cutoff. They contain no owner labels or held-out words.
@@ -49,5 +51,19 @@ describe("production usefulness configuration", () => {
 
     expect(result.keepScore).toBeGreaterThan(0.58);
     expect(result.verdict).toBe("advance");
+  });
+  it("retains measured rounded-choice tie handling and rejects unpinned or invalid raw replies", () => {
+    const stage = createUsefulnessStage(usefulnessConfiguration(PRODUCTION_COMBINER));
+    const answers = measurements(1.8), choice = Object.entries(QUESTIONS).find(([, q]) => q.type === "choice")!;
+    const keys = Object.keys(choice[1].criteria), [a, b] = keys;
+    answers[choice[0]] = { type: "choice", choice: a, probabilities: Object.fromEntries(keys.map(k => [k, k === a ? 0.50 : k === b ? 0.49 : 0])), confidence: 0.5 };
+    const reply = (model = PINNED_MODEL_VERSION) => JSON.stringify({ model, answers });
+    const valid = stage.validate(reply());
+    expect(valid.ok).toBe(true);
+    if (valid.ok) expect(valid.result.answers[choice[0]]).toMatchObject({ choice: b });
+    expect(stage.validate(reply("wrong/model"))).toEqual({ ok: false, code: "wrong_model" });
+    expect(stage.validate("{")).toEqual({ ok: false, code: "malformed_reply" });
+    answers[choice[0]] = { type: "choice", choice: a, probabilities: { [a]: 0.1 }, confidence: 0.5 };
+    expect(stage.validate(reply())).toEqual({ ok: false, code: "answers_invalid" });
   });
 });

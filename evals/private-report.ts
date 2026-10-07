@@ -51,7 +51,7 @@ function layout(title: string, body: string): string {
 }
 
 async function indexPage(store: PrivateStore, runner: Runner): Promise<string> {
-  const experiments = await store.listExperiments();
+  const experiments = (await store.listExperiments()).filter(x => x.stage === "appropriateness");
   const rows = await Promise.all(experiments.map(async x => {
     const [info, status] = await Promise.all([runner.describe(x.id), runner.status(x.id)]);
     const s = status.summary;

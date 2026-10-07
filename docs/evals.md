@@ -135,9 +135,9 @@ the stage config fingerprints differ so results at the two cutoffs stay distinct
 
 The accepted reviewed sample gives 22 keeps among 26 admits, precision 0.846,
 and a projected pool of about 1,090 words. The projection uses the intake frame
-before appropriateness screening. A fresh blind check is deferred. This records
-the approved stage configuration; the production pipeline executor is not yet
-built. The eval runner uses this configuration by default.
+before appropriateness screening. A fresh blind check is deferred. The
+[durable coordinator and evaluation](production-usefulness.md) use the shared
+executor with this configuration by default.
 
 ### Running it
 
@@ -150,15 +150,17 @@ npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
 npm run eval:usefulness -- --dataset <dataset.json> \
   --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json>
 
-# Live Jev; OPENROUTER_API_KEY in the environment. With --replay-from, only
-# requests never answered are sent.
-npm run eval:usefulness -- ... --jev live --max-requests 450
+# New durable evaluation. Explicit budget and OPENROUTER_API_KEY required.
+npm run eval:usefulness -- --dataset <dataset.json> --jev live --max-cost-usd <cap>
+npm run eval:usefulness -- --resume <experiment-id>
+npm run eval:usefulness -- --inspect <experiment-id>
 ```
 
-Experiments and every Jev attempt are written privately under
-`~/src/wordwell-private/runs/usefulness/`. A bad reply for one word marks that
-word incomplete; HTTP errors, lost connections, the request cap, an unpinned
-model version, or a third bad reply stop the run. The combiner is fitted by
+Historical replay experiments and answers remain under
+`~/src/wordwell-private/runs/usefulness/`. New paid evaluations save encrypted
+attempts and replies in PostgreSQL through the shared executor. Invalid trials
+remain recorded and make that case incomplete. Transport/accounting failures
+stop further dispatch; resume preserves completed trials. The combiner is fitted by
 `tools/usefulness-fit/fit.py` and committed under `config/` as numbers only.
 
 ### Results

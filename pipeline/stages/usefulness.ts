@@ -5,6 +5,9 @@ import { createHash } from "node:crypto";
 import questionsJson from "./usefulness-questions.json" with { type: "json" };
 import { z } from "zod";
 import type { JevAnswers, JevClient, JevRequest, Questions } from "../execution/jev.js";
+import { PINNED_MODEL_VERSION, validateAnswer } from "../execution/jev.js";
+import { digest, PrivateError } from "../storage/crypto.js";
+import type { StageDefinition } from "../execution/stage.js";
 
 export const QUESTIONS = questionsJson as Questions;
 export const MODEL = "typesafe/jev-1.13";
@@ -59,7 +62,7 @@ export function loadCombiner(artifact: unknown): Combiner {
   return combiner;
 }
 
-function features(trials: JevAnswers[]): Record<string, number> {
+export function features(trials: JevAnswers[]): Record<string, number> {
   const sums: Record<string, number> = {};
   for (const answers of trials) {
     for (const [name, answer] of Object.entries(answers)) {
@@ -88,6 +91,11 @@ export function renderState(subject: Subject): string {
 export async function judgeUsefulness(subject: Subject, combiner: Combiner, jev: JevClient): Promise<UsefulnessResult> {
   const request: JevRequest = { model: MODEL, state: renderState(subject), questions: QUESTIONS };
   const trials = await Promise.all(Array.from({ length: TRIALS }, (_, i) => jev.ask(request, i + 1)));
+  return combineTrials(trials, combiner);
+}
+
+export function combineTrials(trials: JevAnswers[], combiner: Combiner): UsefulnessResult {
+  if (trials.length !== TRIALS) throw new PrivateError("usefulness_trials_incomplete");
   const score = keepScore(combiner, features(trials));
   return {
     verdict: verdictFor(combiner, score),
@@ -97,5 +105,49 @@ export async function judgeUsefulness(subject: Subject, combiner: Combiner, jev:
       return { answers, keepScore: alone, verdict: verdictFor(combiner, alone) };
     }),
     configId: configId(combiner)
+  };
+}
+
+export const usefulnessInputSchema = z.object({ headword: z.string().min(1).max(200), partsOfSpeech: z.array(z.string().min(1)) }).strict();
+export const usefulnessAnswersSchema = z.record(z.string(), z.unknown()).transform((value, ctx): JevAnswers => {
+  try {
+    const names = Object.keys(value).sort(), expected = Object.keys(QUESTIONS).sort();
+    if (JSON.stringify(names) !== JSON.stringify(expected)) throw new Error();
+    return Object.fromEntries(Object.entries(QUESTIONS).map(([name, question]) => [name, validateAnswer(name, question, value[name])]));
+  } catch {
+    ctx.addIssue({ code: "custom", message: "invalid measured answers" });
+    return z.NEVER;
+  }
+});
+export const usefulnessTrialSchema = z.object({ answers: usefulnessAnswersSchema, keepScore: z.number().min(0).max(1), verdict: z.enum(["advance", "exclude"]) }).strict();
+export const usefulnessConfigurationSchema = z.object({ schema: z.literal("wordwell-usefulness-configuration-v1"), stage: z.literal("usefulness"),
+  route: z.literal("openrouter-systemone-v1"), requestedModel: z.literal(MODEL), pinnedModel: z.literal(PINNED_MODEL_VERSION),
+  questions: z.unknown().refine(value => JSON.stringify(value) === JSON.stringify(QUESTIONS), "measured questions required"),
+  trials: z.literal(3), combiner: combinerArtifact }).strict();
+export type UsefulnessConfiguration = z.infer<typeof usefulnessConfigurationSchema>;
+export function usefulnessConfiguration(combiner: Combiner): UsefulnessConfiguration {
+  return usefulnessConfigurationSchema.parse({ schema: "wordwell-usefulness-configuration-v1", stage: "usefulness", route: "openrouter-systemone-v1",
+    requestedModel: MODEL, pinnedModel: PINNED_MODEL_VERSION, questions: QUESTIONS, trials: TRIALS, combiner: loadCombiner(combiner) });
+}
+export function createUsefulnessStage(material: UsefulnessConfiguration): StageDefinition<Subject, z.infer<typeof usefulnessTrialSchema>> {
+  const configuration = usefulnessConfigurationSchema.parse(material), combiner = loadCombiner(configuration.combiner);
+  return { name: "usefulness", fingerprint: digest(JSON.stringify(configuration)), configuration,
+    inputSchema: usefulnessInputSchema, resultSchema: usefulnessTrialSchema,
+    render(input) {
+      const parsed = usefulnessInputSchema.safeParse(input);
+      if (!parsed.success) throw new PrivateError("stage_input_invalid");
+      return { model: MODEL, state: renderState(parsed.data), questions: QUESTIONS };
+    },
+    validate(raw) {
+      let json: unknown;
+      try { json = JSON.parse(raw); } catch { return { ok: false, code: "malformed_reply" }; }
+      const reply = z.object({ model: z.string(), answers: z.unknown() }).safeParse(json);
+      if (!reply.success) return { ok: false, code: "malformed_reply" };
+      if (reply.data.model !== PINNED_MODEL_VERSION) return { ok: false, code: "wrong_model" };
+      const parsed = usefulnessAnswersSchema.safeParse(reply.data.answers);
+      if (!parsed.success) return { ok: false, code: "answers_invalid" };
+      const score = keepScore(combiner, features([parsed.data]));
+      return { ok: true, result: { answers: parsed.data, keepScore: score, verdict: verdictFor(combiner, score) } };
+    }
   };
 }

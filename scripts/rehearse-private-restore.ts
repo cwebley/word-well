@@ -148,6 +148,13 @@ async function main() {
     let ephemeralDatasets = 0;
     let legacySmokeExperiments = 0;
     for (const experiment of experiments) {
+      if (experiment.stage === "usefulness") {
+        const saved = async (s: typeof store & {}) => ({ experiment: await s.readExperiment(experiment.id),
+          cases: await s.readStageCases(experiment.id), expectations: [...await s.readStageExpectations(experiment.id)],
+          attempts: await Promise.all((await s.listTrials(experiment.id)).map(t => s.readAttempt(t.attemptId))), spend: await s.spend(experiment.id) });
+        check(digest(JSON.stringify(await saved(store))) === digest(JSON.stringify(await saved(local.store))), "restored_usefulness_mismatch");
+        continue;
+      }
       const info = await reader.describe(experiment.id);
       const results = await reader.caseResults(experiment.id);
       check(digest(JSON.stringify(results)) === digest(JSON.stringify(await original.caseResults(experiment.id))), "restored_results_mismatch");
@@ -185,7 +192,9 @@ async function main() {
       check((await get(report.origin)).status === 403, "restored_session_failed");
       const session = await get(report.url);
       check(session.status === 303 && !!session.cookie, "restored_session_failed");
-      for (let i = 0; i < 2; i++) check((await get(`${report.origin}/experiment/${experiments[0].id}`, session.cookie)).status === 200, "restored_report_failed");
+      const appropriateness = experiments.find(x => x.stage === "appropriateness");
+      check(!!appropriateness, "no_appropriateness_report");
+      for (let i = 0; i < 2; i++) check((await get(`${report.origin}/experiment/${appropriateness!.id}`, session.cookie)).status === 200, "restored_report_failed");
     } finally { await report.close(); }
     check(fetches === 0, "unexpected_network_request");
     check(JSON.stringify(await snapshot(source)) === JSON.stringify(before), "source_changed");

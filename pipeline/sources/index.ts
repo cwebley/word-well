@@ -42,5 +42,8 @@ export async function authorizeScopedCandidate(store: SourceStore, bundleId: str
   const result = await store.explanation(bundleId, headword, await intakeConfigurationIdentity(config));
   if (result.assessment.disposition !== "pass") throw new PrivateError("candidate_intake_not_passing");
   return { bundleId, candidateId: result.candidateId, lessonId: result.lessonId, assessmentId: result.assessmentId, headword,
-    appropriatenessInput: { headword } };
+    appropriatenessInput: { headword },
+    // Match the measured OEWN POS representation. Linked contrast/family entries
+    // and Wiktionary-only POS are not the candidate's OEWN inventory.
+    usefulnessInput: { headword, partsOfSpeech: [...new Set(bundle.entries.filter(e => e.source === "oewn" && e.role === "candidate" && e.headword === headword).map(e => e.pos).filter((pos): pos is string => !!pos))] } };
 }

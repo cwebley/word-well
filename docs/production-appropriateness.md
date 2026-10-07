@@ -1,7 +1,8 @@
 # Durable production appropriateness
 
-The #25 coordinator and saved-evidence assessment are implemented. They stop at
-appropriateness. The ready `emulate` bundle has passing intake, but no live
+The #25 coordinator and saved-evidence assessment are implemented. Appropriateness-only
+runs stop here; #26 adds [durable usefulness](production-usefulness.md) to normal
+runs. The ready `emulate` bundle has passing intake, but no live
 production gate result, lesson plan, written lesson or learner publication exists
 from this work. Owner promotion remains the decision in #17.
 

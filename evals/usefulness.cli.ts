@@ -1,22 +1,28 @@
-// Usefulness eval command. Writes the experiment and its Jev answers to a
-// private directory; the answers file is itself a replay source for later runs.
+// Replay retains the historical file format. New evaluations use the shared
+// durable executor and encrypted store under an explicit spending cap.
 //
 //   npm run eval:usefulness -- --dataset evals/datasets/usefulness-dev-v1.json \
 //     --combiner config/usefulness-combiner-<id>.json --replay-from <answers.json> [--replay-from ...]
-//   npm run eval:usefulness -- --dataset ... --combiner ... --jev live --max-requests 450
+//   npm run eval:usefulness -- --dataset ... --jev live --max-cost-usd 0.25
 // Omit --combiner to evaluate the owner-promoted production configuration.
 // Live mode reads OPENROUTER_API_KEY from the environment and spends money.
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { httpJev, replayJev, replayThenLive } from "../pipeline/execution/jev.js";
+import { replayJev } from "../pipeline/execution/jev.js";
 import { configId, loadCombiner, MODEL, QUESTIONS, renderState } from "../pipeline/stages/usefulness.js";
 import { PRODUCTION_COMBINER } from "../pipeline/stages/usefulness-production.js";
 import { loadUsefulnessDataset } from "./datasets/usefulness.js";
 import { runUsefulnessEval, type UsefulnessRun } from "./usefulness.js";
+import { createDurableUsefulnessEvaluator } from "./durable-usefulness.js";
+import { openLocalPrivateStore, checkout } from "./private-local.js";
+import { createReceiptLedger } from "../pipeline/storage/receipts.js";
+import { createSystemOneAdapter } from "../pipeline/execution/system-one.js";
+import { loadLocalConfig } from "./private-appropriateness.js";
+import { PrivateError } from "../pipeline/storage/crypto.js";
 
 const { values } = parseArgs({
   options: {
@@ -25,30 +31,39 @@ const { values } = parseArgs({
     jev: { type: "string", default: "replay" },
     "replay-from": { type: "string", multiple: true },
     "max-requests": { type: "string" },
+    "max-cost-usd": { type: "string" }, resume: { type: "string" }, inspect: { type: "string" },
     "fit-report": { type: "string" },
     "out-dir": { type: "string", default: join(homedir(), "src/wordwell-private/runs/usefulness") }
   }
 });
+if (values.jev === "live" || values.resume || values.inspect) {
+  if (values["replay-from"]?.length || values["max-requests"] || values.resume && values.inspect || (values.resume || values.inspect) && (values.dataset || values.combiner || values["max-cost-usd"])) throw new PrivateError("usefulness_mode_invalid");
+  const capNanoUsd = Number(values["max-cost-usd"]) * 1e9;
+  if (!values.resume && !values.inspect && (!values.dataset || !Number.isSafeInteger(capNanoUsd) || capNanoUsd <= 0)) throw new PrivateError("explicit_dataset_cap_required");
+  const local = await openLocalPrivateStore();
+  try {
+    const ledger = await createReceiptLedger({ directory: join(homedir(), "Library/Application Support/WordWell/usefulness-evaluation/ledger"), checkout });
+    const evaluator = createDurableUsefulnessEvaluator({ store: local.store, ledger, model: createSystemOneAdapter({ apiKey: process.env.OPENROUTER_API_KEY ?? "read-only-no-key" }),
+      beforeDispatch: async () => { if (values.inspect || !process.env.OPENROUTER_API_KEY) throw new PrivateError("model_key_required"); } });
+    const id = values.resume ?? values.inspect ?? await evaluator.create({ dataset: loadUsefulnessDataset(values.dataset!),
+      combiner: values.combiner ? loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8"))) : PRODUCTION_COMBINER,
+      config: loadLocalConfig(JSON.parse(readFileSync(join(checkout, "config/private-appropriateness.json"), "utf8"))), capNanoUsd });
+    const result = values.inspect ? await evaluator.inspect(id) : await evaluator.run(id);
+    console.log(JSON.stringify(result, null, 2));
+  } finally { await local.store.close(); }
+  process.exit(0);
+}
 if (!values.dataset) throw new Error("Required: --dataset");
-const live = values.jev === "live";
-if (!live && values.jev !== "replay") throw new Error("--jev must be replay or live");
-if (!live && !values["replay-from"]?.length) throw new Error("Replay needs at least one --replay-from");
-const maxRequests = Number(values["max-requests"]);
-if (live && !(Number.isInteger(maxRequests) && maxRequests > 0)) throw new Error("Live runs need --max-requests");
-const apiKey = process.env.OPENROUTER_API_KEY;
-if (live && !apiKey) throw new Error("Live runs need OPENROUTER_API_KEY");
+if (values.jev !== "replay") throw new Error("--jev must be replay or live");
+if (!values["replay-from"]?.length) throw new Error("Replay needs at least one --replay-from");
+if (values["max-cost-usd"] || values["max-requests"]) throw new PrivateError("usefulness_mode_invalid");
 
 const dataset = loadUsefulnessDataset(values.dataset);
 const combiner = values.combiner ? loadCombiner(JSON.parse(readFileSync(values.combiner, "utf8"))) : PRODUCTION_COMBINER;
 const startedAt = new Date().toISOString();
-const attemptsDir = join(values["out-dir"], "attempts", startedAt.replace(/[:.]/g, "-"));
-// Live with --replay-from reuses saved answers and pays only for the rest.
 const replaySources = values["replay-from"] ?? [];
-const jev = !live ? replayJev(replaySources)
-  : replaySources.length ? replayThenLive(replayJev(replaySources), httpJev({ apiKey: apiKey!, maxRequests, attemptsDir }))
-  : httpJev({ apiKey: apiKey!, maxRequests, attemptsDir });
+const jev = replayJev(replaySources);
 const run = await runUsefulnessEval({ cases: dataset.cases, combiner, jev });
-const attempts = live && existsSync(attemptsDir) ? readdirSync(attemptsDir).map((f) => JSON.parse(readFileSync(join(attemptsDir, f), "utf8")) as { costUsd?: number | null }) : [];
 
 const git = (cmd: string) => execSync(`git ${cmd}`, { encoding: "utf8" }).trim();
 const createdAt = startedAt;
@@ -56,9 +71,7 @@ const identity = {
   dataset: { name: dataset.name, split: dataset.split, version: dataset.version },
   configId: configId(combiner),
   combinerId: combiner.id,
-  jev: live
-    ? { mode: "live", replayedFrom: replaySources, attemptsDir, requests: attempts.length, knownCostUsd: attempts.reduce((sum, a) => sum + (a.costUsd ?? 0), 0), unknownCost: attempts.filter((a) => a.costUsd == null).length }
-    : { mode: "replay", sources: values["replay-from"] },
+   jev: { mode: "replay", sources: values["replay-from"] },
   git: { revision: git("rev-parse HEAD"), dirty: git("status --porcelain -- pipeline evals config") !== "" }
 };
 const experimentId = `${createdAt.replace(/[:.]/g, "-")}-${createHash("sha256").update(JSON.stringify(identity)).digest("hex").slice(0, 8)}`;
@@ -89,7 +102,7 @@ function format(run: UsefulnessRun, id: typeof identity, fitReport?: string): st
     Object.entries(t).map(([k, v]) => `${k} ${v!.correct}/${v!.cases}`).join(", ");
   const lines = [
     `dataset ${id.dataset.name} (${id.dataset.split}) ${id.dataset.version.slice(0, 12)}`,
-    `jev ${id.jev.mode}${id.jev.mode === "live" ? `  ${id.jev.requests} requests, $${id.jev.knownCostUsd!.toFixed(6)} known cost, ${id.jev.unknownCost} unknown` : ""}`,
+    `jev ${id.jev.mode}`,
     `combiner ${id.combinerId.slice(0, 12)}  config ${id.configId.slice(0, 12)}  git ${id.git.revision.slice(0, 7)}${id.git.dirty ? " (dirty)" : ""}`,
     "",
     `precision on keeps  ${pct(r.precision)}`,

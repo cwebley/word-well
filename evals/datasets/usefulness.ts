@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const EXCLUDE_CATEGORIES = ["too_familiar", "too_specific", "intake_should_catch"] as const;
 
-const usefulnessCase = z.strictObject({
+export const usefulnessCase = z.strictObject({
   id: z.string().min(1),
   headword: z.string().min(1),
   partsOfSpeech: z.array(z.string()),
