@@ -1,6 +1,8 @@
 # Import and inspect the fixed emulate bundle
 
 The #31 scoped import and intake path is implemented and verified locally.
+The separate [evanescent scope](evanescent-source-import.md) extends this path
+for #32 and preserves the original emulate scope and evidence.
 
 ```text
 Kaikki SQLite records + pinned OEWN/frequency + supplemental original page

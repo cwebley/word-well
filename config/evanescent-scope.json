@@ -1,0 +1,29 @@
+{
+  "schema": "wordwell-scoped-evidence-v1",
+  "candidates": ["evanescent"],
+  "mappingVersion": "wordwell-evanescent-mapping-v1",
+  "snapshot": "d8d3b078bf4c41478d5e9780f832f71e",
+  "trial": "kaikki-20261006",
+  "oewnEntry": "oewn-evanescent-a",
+  "oewnMeanings": ["oewn-evanescent__5.00.00.impermanent.00"],
+  "kaikki": {
+    "corpusSha256": "3dac8a09e57827bef493e2e6b552fe917bf3b1fc55dee05c4e4a3702aff5dbdb",
+    "indexSha256": "e52f72a5a4428369cbf59bbfc458630ef14c45b7d7092e62983f81fc03932592",
+    "records": [
+      {"line": 242376, "sha256": "5ab5d9b480e60b88942d232ab081eccba1ed295e6d91108a3449ae0d6f42d455"}
+    ]
+  },
+  "supplemental": {
+    "dumpSha256": "06acca8138eacb3e8ae9c1d6232f836e37c3bf9b6d582a86693731fe0d336c20",
+    "pageId": "64368",
+    "revisionId": "92133237",
+    "revisionTimestamp": "2026-08-23T18:06:03Z",
+    "textSha256": "eac73dd56ee2ce1f6845930c7a842ab8859457462e7dd5c98c47569f1138b8d2"
+  },
+  "frequency": {
+    "exportSha256": "7680af729d5b5b573a827ec3a01b59056b46a61ff258485425c2765c47c7e598",
+    "dataSha256": "dffae8066b78dce0a6667cf5f58e567054f902674667090a7ac8a8a44628b05c",
+    "forms": 321180,
+    "order": 79805
+  }
+}

@@ -13,7 +13,10 @@ if (group === "sources" && ["fetch", "setup", "extract", "verify", "status", "re
   for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, () => child.kill(signal));
 } else {
   try {
-    if (["run", "resume", "recover", "inspect"].includes(group)) {
+    if (group === "planner") {
+      const { executePlannerCommand } = await import("./planner-commands.js");
+      console.log(JSON.stringify(await executePlannerCommand(process.argv.slice(3))));
+    } else if (["run", "resume", "recover", "inspect"].includes(group)) {
       const { executeProductionCommand } = await import("./production-commands.js");
       console.log(JSON.stringify(await executeProductionCommand(process.argv.slice(2))));
     } else if (group === "promotion") {
