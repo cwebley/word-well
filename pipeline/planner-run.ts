@@ -104,7 +104,7 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
     async create(options: { bundleId: string; candidate: string; configuration: PlannerConfiguration; capNanoUsd: number; fresh?: boolean; stageOnly?: boolean }) {
       if (!Number.isSafeInteger(options.capNanoUsd) || options.capNanoUsd <= 0) throw new PrivateError("cap_invalid");
       const checked = await current(options.bundleId, options.candidate), config = plannerConfigurationSchema.parse(options.configuration);
-      if (config.schema !== "wordwell-planner-configuration-v4") throw new PrivateError("planner_configuration_historical_only");
+      if (config.schema !== "wordwell-planner-configuration-v5") throw new PrivateError("planner_configuration_historical_only");
       if (deps.model.route !== config.route) throw new PrivateError("model_adapter_unavailable");
       if (deps.executionKind === "live") await requirePlannerPromotion(store, createPlannerStage(config, checked.input).fingerprint);
       const id = randomUUID();

@@ -46,7 +46,11 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
       }
     }
     return { experimentId: id, configurationFingerprint: experiment.configurationFingerprint, material, outcomes,
-      summary: { cases: cases.length, requiredTrials: cases.length * 3, validTrials: outcomes.filter(o => o.contractPass).length,
+       summary: { cases: cases.length, requiredTrials: cases.length * 3, validTrials: outcomes.filter(o => o.contractPass).length,
+         verificationUnresolvedTrials: outcomes.filter(o => o.attempt?.status === "verification_unresolved").length,
+         invalidContentTrials: outcomes.filter(o => o.attempt?.status === "invalid").length,
+         rejectedRoutingTrials: outcomes.filter(o => o.attempt?.outcomeCode === "luna_routing_unverified").length,
+         pendingTrials: outcomes.filter(o => o.attempt?.status === "pending").length, unstartedTrials: outcomes.filter(o => !o.attempt).length,
         expectationPasses: outcomes.filter(o => o.expectationPass).length, humanReviewRequired: true,
         splits: { development: outcomes.filter(o => o.split === "development").length / 3, heldOut: outcomes.filter(o => o.split === "held-out").length / 3 } }, spend: await store.spend(id) };
   }
@@ -68,7 +72,8 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
             ? await runTrial({ store, executor, stage, experimentId: id, caseId: c.caseId, trialIndex, input, ownership: lock, assertOwnership: lock.assert })
             : { outcome: await executor.execute({ experimentId: id, attemptId: trial!.attemptId, stage, input,
               ownership: lock, assertOwnership: lock.assert, allowDispatch: false }), previouslySaved: prior!.status !== "pending" };
-          if (outcome.state === "paused" || outcome.state !== "valid" && !previouslySaved) return inspect(id);
+           if (outcome.state === "paused" || outcome.state !== "valid" && outcome.state !== "verification_unresolved" && !previouslySaved ||
+             (await store.spend(id)).unresolvedRequests > 0) return inspect(id);
         }
       }
       return inspect(id);
@@ -77,7 +82,7 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
   return { inspect, recover: (id: string) => run(id, false), run: (id: string) => run(id, true),
     async create(options: { dataset: FrozenPlannerDataset; manifest: z.infer<typeof plannerManifestSchema>; configuration: PlannerConfiguration; capNanoUsd: number }) {
       const dataset = frozenPlannerSchema.parse(options.dataset), config = plannerConfigurationSchema.parse(options.configuration);
-      if (config.schema !== "wordwell-planner-configuration-v4") throw new PrivateError("planner_configuration_historical_only");
+      if (config.schema !== "wordwell-planner-configuration-v5") throw new PrivateError("planner_configuration_historical_only");
       if (!Number.isSafeInteger(options.capNanoUsd) || options.capNanoUsd <= 0) throw new PrivateError("cap_invalid");
       const { contentIdentity, ...body } = dataset;
       // Fingerprint uses canonical JSON, while the frozen file uses its exact JSON bytes.

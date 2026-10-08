@@ -30,13 +30,18 @@ export async function executeProductionCommand(args: string[]) {
   if (operation !== "run" && !["resume", "recover", "inspect"].includes(operation)) throw new PrivateError("production_command_invalid");
   if (operation === "run") {
     if (positionals.length !== 1 || !values.candidate || !/^[a-f0-9]{64}$/.test(values.bundle ?? "")) throw new PrivateError("explicit_candidate_bundle_required");
-    if (values.stage && !["appropriateness", "usefulness", "planner"].includes(values.stage) || values.fresh && !values.stage || values["fresh-all"] && (values.stage || values.fresh)) throw new PrivateError("production_mode_invalid");
+    if (values.stage && !["appropriateness", "usefulness", "planner", "writer"].includes(values.stage) || values.fresh && !values.stage || values["fresh-all"] && (values.stage || values.fresh)) throw new PrivateError("production_mode_invalid");
   } else if (positionals.length !== 2 || !z.uuid().safeParse(runId).success || Object.keys(values).some(k => operation !== "resume" || k !== "config")) throw new PrivateError("production_command_option_invalid");
   const capNanoUsd = Number(values["max-cost-usd"]) * 1e9;
   if (operation === "run" && !values["dry-run"] && (!Number.isSafeInteger(capNanoUsd) || capNanoUsd <= 0)) throw new PrivateError("explicit_cap_required");
   const stores = await openLocalProductionStores();
   try {
     const saved = operation === "run" ? null : await stores.store.readProductionRun(runId);
+    if (values.stage === "writer" || saved?.material && typeof saved.material === "object" && "schema" in saved.material && saved.material.schema === "wordwell-writer-run-v1") {
+      const { executeWriterProduction } = await import("./writer-commands.js");
+      return await executeWriterProduction({ operation, runId, candidate: values.candidate, bundleId: values.bundle, configPath: values.config,
+        dryRun: values["dry-run"], fresh: values.fresh, stageOnly: true, capNanoUsd });
+    }
     if (values.stage === "planner" || saved?.material && typeof saved.material === "object" && "schema" in saved.material && saved.material.schema === "wordwell-planner-run-v1") {
       const { executePlannerProduction } = await import("./planner-commands.js");
       return await executePlannerProduction({ operation, runId, candidate: values.candidate, bundleId: values.bundle, configPath: values.config,

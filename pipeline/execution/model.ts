@@ -12,6 +12,7 @@ export type Classification =
   | { kind: "reply" }
   | { kind: "retryable" }
   | { kind: "verification_pending"; nextEligibleAt?: string }
+  | { kind: "verification_unresolved"; code: string }
   | { kind: "rejected"; code: string }
   | { kind: "uncertain" };
 

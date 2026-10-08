@@ -4,7 +4,7 @@ import { checkPlan, createPlannerStage, PLANNER_CONFIGURATION, plannerPayload } 
 import { createLunaAdapter } from "../execution/openrouter.js";
 import { scriptedFetch } from "../testing/private-fixtures.js";
 
-import { plannerFixture, plannerPlan, plannerReply, plannerExchangeBody, plannerMetadataFetch, plannerRoutingMetadata } from "../testing/planner-fixtures.js";
+import { plannerFixture, plannerPlan, plannerReply, plannerInlineBody as plannerExchangeBody } from "../testing/planner-fixtures.js";
 import { completionBody } from "../execution/luna-response.js";
 describe("source-backed planner", () => {
   it("renders opaque refs and optional evidence without private source identities or expectations", () => {
@@ -42,14 +42,13 @@ describe("source-backed planner", () => {
   });
   it("forwards the exact recorded strict request through locked SDK/provider with one send", async () => {
     const remote = scriptedFetch([{ status: 200, body: plannerReply(), headers: { "content-type": "application/json" } }]);
-    let metadataReads = 0;
-    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch, metadataFetch: async (...args) => { metadataReads++; return plannerMetadataFetch(...args); } });
+    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch });
     const stage = createPlannerStage(PLANNER_CONFIGURATION, plannerFixture), body = stage.render(plannerFixture);
     const exchange = await adapter.send(body, { timeoutMs: 10000 });
     expect(exchange.kind).toBe("response");
     if (exchange.kind === "response") expect(completionBody(exchange.body)).toBe(plannerReply());
-    expect(metadataReads).toBe(0);
-    expect(adapter.classify(exchange)).toEqual({ kind: "verification_pending" });
+    expect(adapter.verify).toBeUndefined();
+    expect(adapter.classify(exchange)).toEqual({ kind: "reply" });
     expect(remote.sent).toHaveLength(1);
     expect(JSON.parse(remote.sent[0].body)).toEqual(body);
     expect(adapter.accounting(exchange)).toEqual({ generationId: "gen-harmless-planner", inputTokens: 900, outputTokens: 200, chargeNanoUsd: 420000 });
@@ -61,7 +60,7 @@ describe("source-backed planner", () => {
     { status: 200, body: JSON.stringify({ error: { code: 503 }, usage: { cost: 0.0002 } }) }
   ])("retains raw charged errors despite SDK parse failures and never retries", async reply => {
     const remote = scriptedFetch([{ ...reply, headers: { "content-type": "application/json" } }]);
-    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch, metadataFetch: plannerMetadataFetch });
+    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch });
     const exchange = await adapter.send(createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).render(plannerFixture), { timeoutMs: 10000 });
     expect(exchange).toMatchObject({ kind: "response", status: reply.status });
     if (exchange.kind === "response") expect(completionBody(exchange.body)).toBe(reply.body);
@@ -72,40 +71,17 @@ describe("source-backed planner", () => {
     const stage = createPlannerStage(PLANNER_CONFIGURATION, plannerFixture);
     expect(stage.validate(plannerExchangeBody(plannerPlan, { model: "openai/gpt-5.6-luna" }))).toEqual({ ok: true, result: plannerPlan });
     expect(stage.validate(plannerReply(plannerPlan, { model: "openai/gpt-5.6-luna" })).ok).toBe(false);
-    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { model: "openai/different-model" })).ok).toBe(false);
-    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { id: "gen-unrelated" })).ok).toBe(false);
-    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { response_cache_source_id: "gen-cached" })).ok).toBe(false);
-    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { provider_responses: [{ status: 200, provider_name: "Azure", model_permaslug: "openai/gpt-5.6-luna-20260709" }] })).ok).toBe(false);
+    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { attempts: [{ model: "openai/different-model", provider: "OpenAI", status: 200 }] })).ok).toBe(false);
+    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, {}, { generationId: "gen-unrelated" })).ok).toBe(false);
+    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, {}, { cacheSourceId: "gen-cached" })).ok).toBe(false);
+    expect(stage.validate(plannerExchangeBody(plannerPlan, {}, { attempts: [{ status: 200, provider: "Azure", model: "openai/gpt-5.6-luna-20260709" }] })).ok).toBe(false);
   });
-  it("preserves a charged completion when routing lookup fails and refuses success", async () => {
-    const remote = scriptedFetch([{ status: 200, body: plannerReply(), headers: { "content-type": "application/json" } }]);
-    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch, metadataSleep: async () => {}, metadataFetch: async () => { throw new Error("lookup-unavailable"); } });
-    const exchange = await adapter.verify!(await adapter.send(createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).render(plannerFixture), { timeoutMs: 10000 }));
+  it("preserves a charged completion without inline proof and refuses success", async () => {
+    const remote = scriptedFetch([{ status: 200, body: plannerReply(plannerPlan, { openrouter_metadata: undefined }), headers: { "content-type": "application/json" } }]);
+    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch });
+    const exchange = await adapter.send(createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).render(plannerFixture), { timeoutMs: 10000 });
     expect(adapter.accounting(exchange).chargeNanoUsd).toBe(420000);
-    expect(adapter.classify(exchange)).toEqual({ kind: "verification_pending" });
+    expect(adapter.classify(exchange)).toEqual({ kind: "verification_unresolved", code: "luna_verification_unresolved" });
     expect(remote.sent).toHaveLength(1);
-  });
-  it("waits for generation metadata after an initial 404 without another generation", async () => {
-    const remote = scriptedFetch([{ status: 200, body: plannerReply(), headers: { "content-type": "application/json" } }]);
-    let reads = 0;
-    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch,
-      metadataFetch: async () => ++reads === 1 ? new Response(JSON.stringify({ error: { code: 404 } }), { status: 404 }) : new Response(JSON.stringify(plannerRoutingMetadata())), metadataSleep: async () => {} });
-    const exchange = await adapter.verify!(await adapter.send(createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).render(plannerFixture), { timeoutMs: 10000 }));
-    expect(adapter.classify(exchange)).toEqual({ kind: "reply" });
-    expect(reads).toBe(2);
-    expect(remote.sent).toHaveLength(1);
-    if (exchange.kind === "response") expect(JSON.parse(exchange.body).routingLookups.map((r: { status: number }) => r.status)).toEqual([404, 200]);
-  });
-  it("bounds metadata reads and keeps the charge when the record never becomes available", async () => {
-    const remote = scriptedFetch([{ status: 200, body: plannerReply(), headers: { "content-type": "application/json" } }]);
-    let reads = 0;
-    const adapter = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch, metadataSleep: async () => {}, metadataFetch: async () => {
-      reads++; return new Response(JSON.stringify({ error: { code: 404 } }), { status: 404 });
-    } });
-    const exchange = await adapter.verify!(await adapter.send(createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).render(plannerFixture), { timeoutMs: 10000 }));
-    expect(reads).toBe(6);
-    expect(remote.sent).toHaveLength(1);
-    expect(adapter.accounting(exchange).chargeNanoUsd).toBe(420000);
-    expect(adapter.classify(exchange)).toEqual({ kind: "verification_pending" });
   });
 });

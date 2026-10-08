@@ -2,7 +2,7 @@ import { z } from "zod";
 import { fingerprint } from "../config.js";
 import { PrivateError } from "../storage/crypto.js";
 import type { StageDefinition } from "../execution/stage.js";
-import { checkLunaRouting, completionBody, LUNA_LOOKUP_POLICY, lunaExchangeSchema } from "../execution/luna-response.js";
+import { checkLunaRouting, completionBody, lunaExchangeSchema } from "../execution/luna-response.js";
 
 // The approved newer prototype prompt, followed only by explicit source accounting.
 export const PLANNER_PROMPT = `You are planning a vocabulary lesson for an adult learner.
@@ -53,11 +53,13 @@ export const plannerConfigurationSchema = z.union([legacyPlannerConfigurationSch
   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v3"), routingVerification: z.literal("authenticated-generation-poll-v1"),
     routingLookup: routingLookupSchema }).strict(),
   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v4"), routingVerification: z.literal("authenticated-generation-resumable-v1"),
-    routingLookup: routingLookupSchema, metadataRecovery: z.literal("saved-completion-append-only-rounds-v1") }).strict()]);
+     routingLookup: routingLookupSchema, metadataRecovery: z.literal("saved-completion-append-only-rounds-v1") }).strict(),
+   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v5"), routingVerification: z.literal("completion-inline-strict-v1"),
+     responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved") }).strict()]);
 export type PlannerConfiguration = z.infer<typeof plannerConfigurationSchema>;
-export const PLANNER_CONFIGURATION: PlannerConfiguration = { schema: "wordwell-planner-configuration-v4", stage: "planner", route: "openrouter-aisdk-v1",
+export const PLANNER_CONFIGURATION: PlannerConfiguration = { schema: "wordwell-planner-configuration-v5", stage: "planner", route: "openrouter-aisdk-v1",
   requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", provider: "openai", maxOutputTokens: 16000, prompt: PLANNER_PROMPT,
-  routingVerification: "authenticated-generation-resumable-v1", routingLookup: { ...LUNA_LOOKUP_POLICY, delaysMs: [...LUNA_LOOKUP_POLICY.delaysMs] }, metadataRecovery: "saved-completion-append-only-rounds-v1" };
+  routingVerification: "completion-inline-strict-v1", responseCache: "disabled", missingEvidence: "terminal-verification-unresolved" };
 
 export function plannerPayload(input: PlannerInput) {
   const senses = input.meanings.map(m => `${m.ref} [${m.partOfSpeech}] ${m.definition}` +
@@ -117,6 +119,7 @@ export function createPlannerStage(configuration: PlannerConfiguration, boundInp
         const historical = config.schema === "wordwell-planner-configuration-v1";
         if (config.schema === "wordwell-planner-configuration-v3" && lunaExchangeSchema.parse(JSON.parse(raw)).schema !== "wordwell-luna-exchange-v2") throw new PrivateError("luna_lookup_history_missing");
         if (config.schema === "wordwell-planner-configuration-v4" && lunaExchangeSchema.parse(JSON.parse(raw)).schema !== "wordwell-luna-exchange-v3") throw new PrivateError("luna_lookup_history_missing");
+        if (config.schema === "wordwell-planner-configuration-v5" && lunaExchangeSchema.parse(JSON.parse(raw)).schema !== "wordwell-luna-exchange-v4") throw new PrivateError("luna_inline_evidence_missing");
         if (!historical) checkLunaRouting(raw, config);
         const envelope = z.object({ model: historical ? z.literal(config.pinnedModel) : z.enum([config.requestedModel, config.pinnedModel]), provider: z.literal("OpenAI"), choices: z.array(z.object({
           finish_reason: z.literal("stop"), message: z.object({ content: z.string(), refusal: z.null().optional() }).passthrough() }).passthrough()).length(1) }).passthrough().parse(JSON.parse(historical ? raw : completionBody(raw)));

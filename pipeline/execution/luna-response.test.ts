@@ -1,48 +1,29 @@
 // @vitest-environment node
 import { expect, it } from "vitest";
-import { lookupLunaRouting } from "./luna-response.js";
+import { checkLunaRouting, completionBody } from "./luna-response.js";
+import { plannerExchangeBody, plannerPlan } from "../testing/planner-fixtures.js";
+import { createPlannerStage, plannerConfigurationSchema } from "../stages/planner.js";
+import { createWriterStage, writerConfigurationSchema } from "../stages/writer.js";
+import { plannerFixture } from "../testing/planner-fixtures.js";
+import { writerFixture, writtenFixture } from "../testing/writer-fixtures.js";
 
-it.each(["network", 524, 529])("retries transient metadata failure %s without generation", async failure => {
-  let reads = 0, clock = 0;
-  const sleeps: number[] = [];
-  const result = await lookupLunaRouting({ generationId: "gen-harmless", apiKey: "harmless-key", now: () => clock,
-    sleep: async ms => { sleeps.push(ms); clock += ms; }, fetch: async (url, options) => {
-      expect(String(url)).toBe("https://openrouter.ai/api/v1/generation?id=gen-harmless");
-      expect(options?.method ?? "GET").toBe("GET");
-      if (++reads === 1) {
-        if (failure === "network") throw new Error("controlled-network-failure");
-        return new Response("busy", { status: Number(failure) });
-      }
-      return new Response("available");
-    } });
-  expect(reads).toBe(2);
-  expect(sleeps).toEqual([1000]);
-  expect(result.routing).toMatchObject({ status: 200, body: "available" });
-  expect(result.lookups.map(r => r.body)).toEqual(failure === "network" ? ["available"] : ["busy", "available"]);
+const historical = { route: "openrouter-aisdk-v1", requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", provider: "openai",
+  maxOutputTokens: 16000, prompt: "Historical synthetic prompt.", routingVerification: "authenticated-generation-resumable-v1",
+  metadataRecovery: "saved-completion-append-only-rounds-v1", routingLookup: { maxAttempts: 6, maxWaitMs: 30000, delaysMs: [1000, 2000, 4000, 8000, 8000] } };
+
+it.each(["wordwell-luna-exchange-v1", "wordwell-luna-exchange-v2", "wordwell-luna-exchange-v3"])("decodes retained historical evidence %s without network", schema => {
+  const original = JSON.parse(plannerExchangeBody()), raw = JSON.stringify({ schema, completion: original.completion, routing: original.routing,
+    ...(schema === "wordwell-luna-exchange-v1" ? {} : { routingLookups: original.routingLookups }),
+    ...(schema === "wordwell-luna-exchange-v3" ? { lookupAttempts: 1, nextEligibleAt: null } : {}) });
+  expect(completionBody(raw)).toBe(original.completion);
+  expect(checkLunaRouting(raw, historical).metadata).toMatchObject({ model: historical.pinnedModel });
 });
 
-it("bounds repeated network failures and honors a Retry-After beyond the lookup deadline", async () => {
-  let reads = 0, clock = 0;
-  const result = await lookupLunaRouting({ generationId: "gen-harmless", apiKey: "harmless-key", now: () => clock,
-    sleep: async ms => { clock += ms; }, fetch: async () => { reads++; throw new Error("controlled-network-failure"); } });
-  expect(reads).toBe(6);
-  expect(clock).toBe(23000);
-  expect(result.routing).toBeNull();
-  reads = 0;
-  const deferred = await lookupLunaRouting({ generationId: "gen-harmless", apiKey: "harmless-key", now: () => clock,
-    sleep: async () => { throw new Error("must-not-sleep"); }, fetch: async () => { reads++; return new Response("busy", { status: 429, headers: { "retry-after": "60" } }); } });
-  expect(reads).toBe(1);
-  expect(deferred.routing?.status).toBe(429);
-});
-
-it("retains Retry-After when the metadata response body disconnects", async () => {
-  let reads = 0;
-  const result = await lookupLunaRouting({ generationId: "gen-harmless", apiKey: "harmless-key", now: () => 0,
-    sleep: async () => { throw new Error("must-not-sleep-before-provider-cooldown"); }, fetch: async () => {
-      reads++;
-      return new Response(new ReadableStream({ start(controller) { controller.error(new Error("controlled-body-disconnection")); } }),
-        { status: 429, headers: { "retry-after": "60" } });
-    } });
-  expect(reads).toBe(1);
-  expect(result).toMatchObject({ attempts: 1, lookups: [], routing: null, nextEligibleAt: "1970-01-01T00:01:00.000Z" });
+it("keeps historical stage validation under its original configurations", () => {
+  const planner = createPlannerStage(plannerConfigurationSchema.parse({ ...historical, stage: "planner", schema: "wordwell-planner-configuration-v4" }), plannerFixture);
+  const writer = createWriterStage(writerConfigurationSchema.parse({ ...historical, stage: "writer", schema: "wordwell-writer-configuration-v1" }), writerFixture);
+  expect(planner.validate(plannerExchangeBody())).toEqual({ ok: true, result: plannerPlan });
+  expect(writer.validate(plannerExchangeBody(writtenFixture))).toEqual({ ok: true, result: writtenFixture });
+  expect(planner.validate(plannerExchangeBody(plannerPlan, {}, { response_cache_source_id: "gen-cached" })).ok).toBe(false);
+  expect(writer.validate(plannerExchangeBody(writtenFixture, {}, { provider_responses: [] })).ok).toBe(false);
 });

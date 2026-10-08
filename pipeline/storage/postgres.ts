@@ -9,7 +9,7 @@ import { z } from "zod";
 import { PrivateError, type KeyReference, type PrivateCrypto } from "./crypto.js";
 import type { Exchange } from "../execution/model.js";
 
-export type AttemptStatus = "pending" | "valid" | "invalid" | "failed" | "uncertain" | "response_lost";
+export type AttemptStatus = "pending" | "valid" | "invalid" | "failed" | "uncertain" | "response_lost" | "verification_unresolved";
 export type RequestRecord = {
   id: string; sequence: number;
   status: "reserved" | "abandoned" | "responded" | "no_response";

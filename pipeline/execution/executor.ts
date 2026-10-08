@@ -25,7 +25,7 @@ export type ExecutionSettings = {
 export type PauseCode = "budget_exhausted" | "accounting_unavailable" | "storage_unavailable" | "retry_deferred" | "metadata_unavailable";
 export type ExecutionOutcome<Result> =
   | { attemptId: string; state: "valid"; result: Result }
-  | { attemptId: string; state: "invalid" | "failed"; code: string }
+  | { attemptId: string; state: "invalid" | "failed" | "verification_unresolved"; code: string }
   | { attemptId: string; state: "uncertain" | "response_lost" }
   // Not terminal: nothing was decided, and resume may continue later.
   | { attemptId: string; state: "paused"; code: PauseCode; nextEligibleAt?: string };
@@ -83,12 +83,12 @@ export function createStageExecutor(dependencies: {
     const saved = (attempt: AttemptRecord): ExecutionOutcome<Result> | null => {
       switch (attempt.status) {
         case "valid": return { attemptId, state: "valid", result: stage.resultSchema.parse(attempt.result) };
-        case "invalid": case "failed": return { attemptId, state: attempt.status, code: attempt.outcomeCode ?? attempt.status };
+        case "invalid": case "failed": case "verification_unresolved": return { attemptId, state: attempt.status, code: attempt.outcomeCode ?? attempt.status };
         case "uncertain": case "response_lost": return { attemptId, state: attempt.status };
         default: return null;
       }
     };
-    const finish = async (status: "valid" | "invalid" | "failed" | "uncertain" | "response_lost", outcomeCode: string | null, result?: Result) => {
+    const finish = async (status: "valid" | "invalid" | "failed" | "uncertain" | "response_lost" | "verification_unresolved", outcomeCode: string | null, result?: Result) => {
       await request.assertOwnership?.();
       await persist(() => store.finishAttempt(attemptId, { status, outcomeCode, result }, request.ownership));
       return saved((await store.readAttempt(attemptId))!)!;
@@ -124,6 +124,7 @@ export function createStageExecutor(dependencies: {
         }
       }
       if (classification.kind === "rejected") return finish("failed", classification.code);
+      if (classification.kind === "verification_unresolved") return finish("verification_unresolved", classification.code);
       if (classification.kind !== "reply" || response.kind !== "response") return finish("uncertain", "request_uncertain");
       const validation = stage.validate(response.body);
       return validation.ok ? finish("valid", null, validation.result) : finish("invalid", validation.code);
@@ -251,9 +252,10 @@ export function createStageExecutor(dependencies: {
           ...accounting, completedAt, response: exchange
         }));
         attempt = (await store.readAttempt(attemptId))!;
-        // Metadata reads wait until both the original reply and its accounting
-        // are durable. A resume reconciles missing receipts before verification.
-        const decided = accountingFailed && classification.kind === "verification_pending" ? null : await conclude(attempt.requests.at(-1)!);
+        // Luna interpretation waits until the original reply and its accounting
+        // are durable. A resume reconciles missing receipts before validation.
+        const decided = accountingFailed && (model.route === "openrouter-aisdk-v1" || classification.kind === "verification_pending")
+          ? null : await conclude(attempt.requests.at(-1)!);
         // Durable accounting is unavailable: keep what was saved, dispatch nothing more.
         if (accountingFailed) return { attemptId, state: "paused", code: "accounting_unavailable" };
         if (decided) return decided;

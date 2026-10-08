@@ -7,7 +7,7 @@ import { averageDecision, dispositionFor, TRIALS, type Disposition, type Thresho
 export type Finding = "clear" | "blocked";
 export type TrialOutcome =
   | { state: "valid"; blockedProbability: number; slurProbability?: number | null; vulgarProbability?: number | null }
-  | { state: "invalid" | "failed" | "uncertain" | "response_lost" };
+  | { state: "invalid" | "failed" | "uncertain" | "response_lost" | "verification_unresolved" };
 type Direction = "wrong_accept" | "wrong_reject" | null;
 
 export type TrialScore = { state: TrialOutcome["state"]; disposition: Disposition | null; correct: boolean | null; error: Direction };
@@ -71,7 +71,7 @@ export function summarize(scores: CaseScore[]): ExperimentSummary {
     validTrials: count(trials, t => t.state === "valid"),
     invalidTrials: count(trials, t => t.state === "invalid"),
     failedTrials: count(trials, t => t.state === "failed" || t.state === "response_lost"),
-    unresolvedTrials: count(trials, t => t.state === "uncertain"),
+    unresolvedTrials: count(trials, t => t.state === "uncertain" || t.state === "verification_unresolved"),
     missingTrials: requiredTrials - trials.length,
     trialWrongAccepts: count(trials, t => t.error === "wrong_accept"),
     trialWrongRejects: count(trials, t => t.error === "wrong_reject"),

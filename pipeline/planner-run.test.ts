@@ -15,7 +15,7 @@ import { createPlannerEvaluator } from "../evals/planner.js";
 import { freezePlannerDataset, loadPlannerDataset } from "../evals/datasets/planner.js";
 import { recordPlannerDecision, recordPlannerReview, requirePlannerPromotion } from "./planner-promotion.js";
 import { fingerprint, loadPipelineConfig } from "./config.js";
-import { plannerFixture, plannerPlan, plannerReply, plannerMetadataFetch, plannerRoutingMetadata } from "./testing/planner-fixtures.js";
+import { plannerFixture, plannerPlan, plannerReply, plannerInlineMetadata } from "./testing/planner-fixtures.js";
 import { bundleSchema } from "./sources/bundle.js";
 import { PrivateError } from "./storage/crypto.js";
 import { createStageExecutor } from "./execution/executor.js";
@@ -23,7 +23,7 @@ import { LUNA_EXECUTION, lunaExecutionSettings } from "./planner-config.js";
 import { latestResponse } from "./storage/postgres.js";
 
 describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted disposable databases", () => {
-  async function harness(script: ScriptedReply[], faults: { write?: (operation: string) => Promise<void>; append?: (type: string) => Promise<void>; beforeDispatch?: () => Promise<void>; metadataFetch?: typeof globalThis.fetch } = {}) {
+  async function harness(script: ScriptedReply[], faults: { write?: (operation: string) => Promise<void>; append?: (type: string) => Promise<void>; beforeDispatch?: () => Promise<void> } = {}) {
     const database = await testDatabase(), keys = await harmlessKeys(), temp = await privateTempDir();
     const store = await createPrivateStore({ connectionString: database.pipelineUrl, storageKey: keys.storageKey, datasetKey: keys.datasetKey, crypto: keys.crypto, beforeWrite: faults.write });
     const sources = await createSourceStore({ connectionString: database.pipelineUrl, storageKey: keys.storageKey, crypto: keys.crypto });
@@ -46,7 +46,7 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       try { await store.completeProduction(claim, { stage, status: "accepted", result: { id, reuseIdentity: "a".repeat(64), material: { controlledGateStandin: true } }, continuing: stage === "appropriateness" }); }
       finally { await claim.release(); }
     }
-    const remote = scriptedFetch(script), model = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch, metadataFetch: faults.metadataFetch ?? plannerMetadataFetch, metadataSleep: async () => {} });
+    const remote = scriptedFetch(script), model = createLunaAdapter({ apiKey: "harmless-key", fetch: remote.fetch });
     const ledger = await createReceiptLedger({ directory: resolve(temp.root, "ledger"), checkout: REPO, beforeAppend: faults.append });
     const config = await loadPipelineConfig("config/pipeline.yaml");
     let permission = true;
@@ -61,59 +61,41 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
   }
   const onePlan = { meanings: [{ definition: "A harmless adjective fixture.", part_of_speech: "adjective", sense_ids: ["s1"], usage_note_sense_ids: [], synonyms: [] }], word_family: [], omitted_source_meanings: [] };
   const reply = () => ({ status: 200, body: plannerReply(onePlan), headers: { "content-type": "application/json" } });
-  it("settles the completion before metadata lookup, pauses repeatedly and recovers the same generation without dispatch", async () => {
-    let available = false, reads = 0;
-    let h: Awaited<ReturnType<typeof harness>>;
-    h = await harness([reply()], { metadataFetch: async (url, options) => {
-      reads++;
-      expect(options?.method ?? "GET").toBe("GET");
-      expect(String(url)).toContain("id=gen-harmless-planner");
-      const receipts = await h.ledger.read();
-      expect(receipts.at(-1)).toMatchObject({ type: "request_outcome", chargeNanoUsd: 420000 });
-      return available ? plannerMetadataFetch(url, options) : new Response("not yet available", { status: 404 });
-    } });
+  it("retains a charged unresolved completion and never reopens or replaces it", async () => {
+    const h = await harness([{ ...reply(), body: plannerReply(onePlan, { openrouter_metadata: undefined }) }]);
     try {
       const id = await h.create();
       const first = await h.coordinator.run(id);
-      expect(first).toMatchObject({ status: "paused", outcomeCode: "metadata_unavailable", selected: null,
+      expect(first).toMatchObject({ status: "failed", outcomeCode: "luna_verification_unresolved", selected: null,
         spend: { physicalRequests: 1, knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
-      expect(first.trials[0].attempt?.status).toBe("pending");
+      expect(first.trials[0].attempt?.status).toBe("verification_unresolved");
       const original = (await h.admin.query("SELECT response_payload FROM private.requests WHERE attempt_id=$1", [first.trials[0].attemptId])).rows[0].response_payload;
       h.model.send = async () => { throw new Error("replacement_generation_forbidden"); };
-      expect(await h.coordinator.recover(id)).toMatchObject({ status: "paused", outcomeCode: "metadata_unavailable" });
-      expect(reads).toBe(12);
-      available = true;
-      expect((await h.coordinator.recover(id)).trials[0].attempt?.status).toBe("valid");
+      expect(await h.coordinator.recover(id)).toMatchObject({ status: "failed", outcomeCode: "luna_verification_unresolved" });
       const final = await h.coordinator.run(id);
-      expect(final).toMatchObject({ status: "accepted", spend: { physicalRequests: 1, knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
+      expect(final).toMatchObject({ status: "failed", claimOwnerRunId: null, spend: { physicalRequests: 1, knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
       expect(h.remote.sent).toHaveLength(1);
-      expect(reads).toBe(13);
       expect((await h.admin.query("SELECT response_payload FROM private.requests WHERE attempt_id=$1", [first.trials[0].attemptId])).rows[0].response_payload).toEqual(original);
-      expect((await h.admin.query("SELECT count(*)::int AS count FROM private.request_verifications")).rows[0].count).toBe(3);
-      const saved = (await h.store.readAttempt(first.trials[0].attemptId))!, verification = saved.requests[0].verifications![0];
-      await h.store.saveRequestVerification({ id: verification.id, requestId: saved.requests[0].id, sequence: 1, response: verification.response });
-      expect((await h.admin.query("SELECT count(*)::int AS count FROM private.request_verifications")).rows[0].count).toBe(3);
-      await expect(h.store.saveRequestVerification({ id: randomUUID(), requestId: saved.requests[0].id, sequence: 4, response: verification.response })).rejects.toThrow("verification_conflict");
+      expect((await h.admin.query("SELECT count(*)::int AS count FROM private.request_verifications")).rows[0].count).toBe(0);
       await expect(h.learner.query("SELECT * FROM private.request_verifications")).rejects.toMatchObject({ code: "42501" });
-      await expect(h.admin.query("DELETE FROM private.request_verifications")).rejects.toThrow();
+      const request = first.trials[0].attempt!.requests[0];
+      await expect(h.store.saveRequestVerification({ id: randomUUID(), requestId: request.id, sequence: 1, response: request.response! })).rejects.toThrow("verification_conflict");
     } finally { await h.close(); }
   }, 30000);
   it.each(["wrong_model", "wrong_provider", "cached", "wrong_generation"])("fails verified %s evidence without a replacement generation", async kind => {
-    let available = false;
-    const changed = kind === "wrong_model" ? { model: "openai/wrong-model" } : kind === "wrong_provider" ? { provider_name: "Azure" } : kind === "cached" ? { response_cache_source_id: "gen-cached" } : { id: "gen-unrelated" };
-    const h = await harness([reply()], { metadataFetch: async () => available ? new Response(JSON.stringify(plannerRoutingMetadata("gen-harmless-planner", changed))) : new Response("not yet", { status: 404 }) });
+    const changed = kind === "wrong_model" ? { model: "openai/wrong-model" } : kind === "wrong_provider" ? { provider: "Azure" } : {};
+    const headers: Record<string, string> = kind === "cached" ? { "x-openrouter-cache-status": "HIT" } : kind === "wrong_generation" ? { "x-generation-id": "gen-unrelated" } : {};
+    const h = await harness([{ ...reply(), body: plannerReply(onePlan, changed), headers: { ...reply().headers, ...headers } }]);
     try {
       const id = await h.create();
-      expect((await h.coordinator.run(id)).status).toBe("paused");
-      available = true;
+      expect((await h.coordinator.run(id)).status).toBe("failed");
       expect(await h.coordinator.recover(id)).toMatchObject({ status: "failed", outcomeCode: "luna_routing_unverified", claimOwnerRunId: null });
       expect((await h.coordinator.recover(id)).status).toBe("failed");
       expect(h.remote.sent).toHaveLength(1);
     } finally { await h.close(); }
   }, 30000);
-  it("recovers an evaluation's pending trial without starting its remaining intentional trials", async () => {
-    let available = false;
-    const h = await harness([reply(), reply(), reply()], { metadataFetch: async (url, options) => available ? plannerMetadataFetch(url, options) : new Response("not yet", { status: 404 }) });
+  it("finishes other serial evaluation trials after unresolved proof and preserves every outcome on restart", async () => {
+    const h = await harness([{ ...reply(), body: plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }) }) }, reply(), reply()]);
     try {
       const frozen = await freezePlannerDataset({ directory: resolve(h.temp.root, "datasets"), checkout: REPO, version: 1, key: h.keys.datasetKey, crypto: h.keys.crypto,
         cases: [{ id: randomUUID(), input: h.input, expectation: { requiredDefiningGroups: [["s1"]], allowedUsageNoteRefs: [], allowedOmissionRefs: [], semanticCriteria: ["Controlled coverage."] },
@@ -122,94 +104,82 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       const evaluator = createPlannerEvaluator({ store: h.store, ledger: h.ledger, model: h.model });
       const id = await evaluator.create({ ...loaded, configuration: PLANNER_CONFIGURATION, capNanoUsd: 2e9 });
       const first = await evaluator.run(id), attemptId = first.outcomes[0].attempt!.id;
-      expect(first).toMatchObject({ summary: { validTrials: 0, requiredTrials: 3 }, spend: { physicalRequests: 1, knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
-      expect(first.outcomes[0].attempt?.status).toBe("pending");
-      expect(first.outcomes[1].attempt).toBeNull();
-      available = true;
-      const send = h.model.send;
+      expect(first).toMatchObject({ summary: { validTrials: 2, requiredTrials: 3, verificationUnresolvedTrials: 1, unstartedTrials: 0 }, spend: { physicalRequests: 3, knownNanoUsd: 1260000, outstandingNanoUsd: 0 } });
+      expect(first.outcomes[0].attempt?.status).toBe("verification_unresolved");
       h.model.send = async () => { throw new Error("replacement_generation_forbidden"); };
       const restarted = createPlannerEvaluator({ store: h.store, ledger: h.ledger, model: h.model, beforeDispatch: async () => { throw new Error("dispatch_forbidden"); } });
       const recovered = await restarted.recover(id);
-      expect(recovered.summary).toMatchObject({ validTrials: 1, expectationPasses: 1, requiredTrials: 3 });
+      expect(recovered.summary).toMatchObject({ validTrials: 2, expectationPasses: 2, requiredTrials: 3 });
       expect(recovered.outcomes[0].attempt?.id).toBe(attemptId);
-      expect(recovered.outcomes[1].attempt).toBeNull();
-      expect(recovered.outcomes[2].attempt).toBeNull();
-      expect(h.remote.sent).toHaveLength(1);
-      expect((await restarted.recover(id)).summary.validTrials).toBe(1);
-      h.model.send = send;
-      expect((await evaluator.run(id)).summary.validTrials).toBe(3);
+      expect(recovered.outcomes.map(o => o.attempt?.id)).toEqual(first.outcomes.map(o => o.attempt?.id));
+      expect((await restarted.recover(id)).summary.validTrials).toBe(2);
+      expect((await restarted.run(id)).summary.validTrials).toBe(2);
+      await expect(recordPlannerDecision(h.store, restarted, { experimentId: id, decision: "promote", reference: "Synthetic check." })).rejects.toThrow("planner_evaluation_not_passing");
       expect(h.remote.sent).toHaveLength(3);
       expect((await evaluator.inspect(id)).outcomes[0].attempt?.id).toBe(attemptId);
     } finally { await h.close(); }
   }, 30000);
-  it("waits for durable accounting and retains the completed answer when verification writes fail", async () => {
-    let accountingBlocked = true, verificationBlocked = true, reads = 0;
+  it("waits for durable accounting and retains the completed answer when terminalization writes fail", async () => {
+    let accountingBlocked = true, terminalizationBlocked = true;
     const h = await harness([reply()], { append: async type => { if (accountingBlocked && type === "request_outcome") throw new Error("controlled-ledger-failure"); },
-      write: async operation => { if (verificationBlocked && operation === "save_request_verification") throw new PrivateError("storage_unavailable"); },
-      metadataFetch: async (...args) => { reads++; return plannerMetadataFetch(...args); } });
+      write: async operation => { if (terminalizationBlocked && operation === "finish_attempt") throw new PrivateError("storage_unavailable"); } });
     try {
       const id = await h.create();
       expect(await h.coordinator.run(id)).toMatchObject({ status: "paused", outcomeCode: "accounting_unavailable", spend: { knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
-      expect(reads).toBe(0);
       expect((await h.coordinator.recover(id)).outcomeCode).toBe("accounting_unavailable");
-      expect(reads).toBe(0);
       accountingBlocked = false;
       expect(await h.coordinator.recover(id)).toMatchObject({ status: "paused", outcomeCode: "storage_unavailable" });
-      expect(reads).toBe(1);
       const pending = await h.coordinator.inspect(id);
-      expect(pending.trials[0].attempt?.requests[0].response).toMatchObject({ body: reply().body });
-      verificationBlocked = false;
+      const response = pending.trials[0].attempt?.requests[0].response;
+      expect(response?.kind === "response" && JSON.parse(response.body).completion).toBe(reply().body);
+      terminalizationBlocked = false;
       expect((await h.coordinator.recover(id)).trials[0].attempt?.status).toBe("valid");
-      expect(reads).toBe(2);
       expect(h.remote.sent).toHaveLength(1);
       expect((await h.ledger.read()).filter(e => e.type === "request_outcome")).toHaveLength(1);
     } finally { await h.close(); }
   }, 30000);
-  it("honors metadata Retry-After across recovery and does not require generation credentials checks", async () => {
-    let reads = 0;
-    const h = await harness([reply()], { metadataFetch: async (...args) => ++reads === 1 ? new Response("busy", { status: 429, headers: { "retry-after": "60" } }) : plannerMetadataFetch(...args) });
+  it("can terminalize a saved completion without generation credentials or provider access", async () => {
+    let blocked = true;
+    const h = await harness([reply()], { write: async operation => { if (blocked && operation === "finish_attempt") throw new PrivateError("storage_unavailable"); } });
     try {
       const id = await h.create(), paused = await h.coordinator.run(id);
-      expect(paused).toMatchObject({ status: "paused", outcomeCode: "metadata_unavailable" });
+      expect(paused).toMatchObject({ status: "paused", outcomeCode: "storage_unavailable" });
       const attempt = paused.trials[0].attempt!;
-      expect(attempt.nextEligibleAt).not.toBeNull();
-      expect((await h.coordinator.recover(id)).status).toBe("paused");
-      expect(reads).toBe(1);
-      const executor = createStageExecutor({ store: h.store, ledger: h.ledger, model: h.model,
-        settings: lunaExecutionSettings(LUNA_EXECUTION, PLANNER_CONFIGURATION.maxOutputTokens), now: () => new Date(attempt.nextEligibleAt!.getTime() + 1),
+      expect(attempt.nextEligibleAt).toBeNull();
+      blocked = false;
+      const executor = createStageExecutor({ store: h.store, ledger: h.ledger, model: createLunaAdapter({ fetch: async () => { throw new Error("network_forbidden"); } }),
+        settings: lunaExecutionSettings(LUNA_EXECUTION, PLANNER_CONFIGURATION.maxOutputTokens),
         beforeDispatch: async () => { throw new Error("generation_setup_forbidden"); } });
       const claim = await h.store.claimCandidate(paused.candidateId, id, true);
       try {
         expect(await executor.execute({ runId: id, attemptId: attempt.id, stage: createPlannerStage(PLANNER_CONFIGURATION, h.input), input: h.input,
           allowDispatch: false, ownership: claim, assertOwnership: claim.assert })).toMatchObject({ state: "valid" });
       } finally { await claim.release(); }
-      expect(reads).toBe(2);
       const saved = (await h.store.readAttempt(attempt.id))!;
-      expect(saved.requests[0].verifications).toHaveLength(2);
+      expect(saved.requests[0].verifications).toHaveLength(0);
       const response = latestResponse(saved.requests[0]);
       expect(response?.kind === "response" && createPlannerStage(PLANNER_CONFIGURATION, h.input).validate(response.body).ok).toBe(true);
       expect(h.remote.sent).toHaveLength(1);
     } finally { await h.close(); }
   }, 30000);
-  it("keeps missing metadata credentials recoverable and releases ownership if gate permission is revoked", async () => {
-    const h = await harness([reply()], { metadataFetch: async () => new Response("not yet", { status: 404 }) });
+  it("releases ownership if gate permission is revoked while storage is blocked", async () => {
+    let blocked = true;
+    const h = await harness([reply()], { write: async operation => { if (blocked && operation === "finish_attempt") throw new PrivateError("storage_unavailable"); } });
     try {
       const id = await h.create();
       expect((await h.coordinator.run(id)).status).toBe("paused");
-      const noKey = createLunaAdapter({ fetch: async () => { throw new Error("network_forbidden_without_key"); } });
-      h.model.verify = noKey.verify;
-      expect(await h.coordinator.recover(id)).toMatchObject({ status: "paused", outcomeCode: "metadata_unavailable", claimOwnerRunId: id });
-      expect((await h.admin.query("SELECT count(*)::int AS count FROM private.request_verifications")).rows[0].count).toBe(1);
+      expect(await h.coordinator.recover(id)).toMatchObject({ status: "paused", outcomeCode: "storage_unavailable", claimOwnerRunId: id });
       h.setPermission(false);
+      blocked = false;
       const failed = await h.coordinator.recover(id);
       expect(failed).toMatchObject({ status: "failed", outcomeCode: "usefulness_not_accepted", claimOwnerRunId: null });
-      expect(failed.trials[0].attempt?.status).toBe("failed");
+      expect(failed.trials[0].attempt?.status).toBe("valid");
       expect(h.remote.sent).toHaveLength(1);
     } finally { await h.close(); }
   }, 30000);
-  it("fences verification writes when ownership is lost during metadata lookup", async () => {
+  it("fences terminalization when ownership is lost after saving a completion", async () => {
     let stale = false;
-    const h = await harness([reply()], { metadataFetch: async (...args) => { stale = true; return plannerMetadataFetch(...args); } });
+    const h = await harness([reply()], { write: async operation => { if (operation === "record_outcome") stale = true; } });
     const original = h.store.claimCandidate;
     h.store.claimCandidate = async (...args) => {
       const claim = await original(...args);
@@ -221,7 +191,6 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       expect((await h.admin.query("SELECT count(*)::int AS count FROM private.request_verifications")).rows[0].count).toBe(0);
       expect((await h.coordinator.inspect(id)).spend).toMatchObject({ knownNanoUsd: 420000, outstandingNanoUsd: 0 });
       stale = false;
-      h.model.verify = createLunaAdapter({ apiKey: "harmless-key", metadataFetch: plannerMetadataFetch }).verify;
       expect((await h.coordinator.recover(id)).trials[0].attempt?.status).toBe("valid");
       expect(h.remote.sent).toHaveLength(1);
     } finally { await h.close(); }

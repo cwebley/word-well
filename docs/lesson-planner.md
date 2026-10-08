@@ -12,8 +12,7 @@ explicit split without changing the approved input or criteria.
 ready source bundle + current factual intake + both promoted gate acceptances
     -> pipeline/planner-run.ts
     -> shared executor -> AI SDK/OpenRouter adapter -> encrypted charged completion
-    -> metadata verification -> append-only encrypted lookup round
-    -> unavailable metadata: pause -> recover the same generation
+    -> saved inline verification proof, or terminal verification_unresolved
     -> complete source accounting -> selected plan + current authorization
     -> stop for inspection
 
@@ -30,8 +29,8 @@ frozen encrypted input + separate owner expectations
 | --- | --- |
 | `pipeline/sources/planner.ts` | Maps candidate OEWN source meanings in retained order to `s1`, `s2` and later opaque references. Preserves recorded POS, entry/concept identities, examples and typed contrast/family support in private input |
 | `pipeline/stages/planner.ts` | Owns the prototype prompt, strict output schema, renderer and input-bound checks. The model-visible payload has normalized POS names, definitions, source examples and eligible selections. Source IDs, gate judgments and owner criteria are absent |
-| `pipeline/execution/openrouter.ts` | Uses the locked AI SDK and OpenRouter provider once per physical request. Verifies the outgoing wire body against the recorded body, captures raw HTTP bytes before SDK parsing and extracts accounting independently. Returns the completion before metadata lookup so the executor can save it and settle accounting first. Its separate verification method reads metadata for that generation without generating |
-| `pipeline/execution/luna-response.ts` | Checks the generation ID, dated model, OpenAI provider, single successful provider response and explicit absence of response-cache reuse. Bounds each metadata round to six reads within 30 seconds, retries transient HTTP/network failures and records a later eligibility time when Retry-After exceeds the round |
+| `pipeline/execution/openrouter.ts` | Sends inline-metadata and response-cache-opt-out headers through the locked SDK once per physical request. Checks the recorded wire body, captures completion bytes and selected headers before SDK parsing, and extracts accounting independently. Makes no generation-metadata lookup |
+| `pipeline/execution/luna-response.ts` | Requires returned dated-model/OpenAI evidence, an explicit single successful attempt and absence of response-cache replay. Separates missing proof from contradictions. Decodes historical lookup envelopes for inspection |
 | `pipeline/execution/luna-setup.ts` | Makes a public metadata GET, with no generation, to check the dated OpenAI endpoint, required structured-output settings, input/output limits and price ceilings before dispatch |
 | `pipeline/planner-config.ts` | Records timeout/retry settings and pricing evidence. Reserves against the full documented endpoint input limit and enforced inclusive output limit |
 | `pipeline/planner-run.ts` | Uses current intake and both live gate acceptances, claims the candidate, reuses or generates one plan, saves original dependencies and appends current authorization. A no-meaning plan stops before writing |
@@ -42,9 +41,12 @@ frozen encrypted input + separate owner expectations
 | `db/private-migrations/010_lesson_planner.sql` | Adds planner stage identities, immutable encrypted review/decision records and current usefulness/planner-promotion dependencies. Earlier source, gate and evaluation rows remain intact |
 | `db/private-migrations/011_request_verifications.sql` | Adds append-only encrypted metadata verification rounds keyed to the original request. Neither the original response ciphertext nor its accounting columns are overwritten |
 
-The shared executor saves and reconciles accounting before metadata verification.
-An optional adapter verification method can pause an attempt without a transport
-retry. Jev has no verification method and retains its existing execution path.
+The shared executor saves and reconciles Luna accounting before interpreting
+inline proof. Missing required evidence is terminal, while independent evaluation
+trials can continue serially. Jev retains its existing execution behavior. The
+[single-response contract](single-response-verification.md) covers exact evidence,
+durable outcomes and the frozen historical recovery path. Current planner runs
+use configuration v5; the retained paid v4 results keep their original identities.
 
 ## Prompt, schema and one actual source trace
 
@@ -191,11 +193,12 @@ npm run --silent pipeline -- resume <planner-run-id>
 - Accounting or storage blockage pauses the owning run. Resume reads saved work;
   unknown timeout/disconnection charges remain reserved. Recovery cannot
   redispatch an uncertain request or invent a reply.
-- Missing metadata pauses the planner attempt with its completed answer and known
-  charge retained. `eval:planner recover` verifies only existing trials and cannot
-  dispatch remaining intentional trials. `eval:planner resume` can then continue
-  those remaining trials under the experiment's recorded cap. Production recovery
-  can verify a saved answer but leaves selection to normal resume and current gates.
+- Missing inline evidence ends a future planner trial as `verification_unresolved`
+  with its answer and charge retained. Other eligible evaluation trials continue
+  serially within the cap. `recover` interprets only existing saved work and cannot
+  dispatch remaining trials, query generation metadata or reopen unresolved proof.
+  Historical metadata recovery belongs to the frozen runtime under its original
+  identity and still requires explicit owner authorization.
 - Changed interpretation or dependency artifacts stop incompatible resume.
   Each experiment saves the interpretation identity it actually tested.
   Promotion cannot restamp older evidence under changed rules. Promotion checks
