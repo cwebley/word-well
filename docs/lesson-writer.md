@@ -60,6 +60,39 @@ Creative analogy need not be an established expression. A forced figurative use
 should be replaced by another direct example through the approved prompt rule.
 There is no model judge or repair call.
 
+## Approved synonym inclusion rule
+
+The owner approved the following rule, recorded in
+[#28](https://github.com/cwebley/word-well/issues/28#issuecomment-6083168638):
+
+> Each included synonym must add a distinct, useful reason to choose it. Look
+> for a supported distinction first. If two synonyms still give essentially the
+> same guidance, keep one. Different labels alone do not make a useful contrast.
+
+A shared individual value, such as the same less-of quality, is allowed when
+the rest of the comparison supplies a meaningful distinction. Assess the useful
+guidance of the whole comparison. Unique strings in each cell do not establish
+distinct guidance, and identical broad source definitions alone do not prove
+that two words can never offer different usage guidance.
+
+The owner chose the definitions-only evidence scope in
+[#28](https://github.com/cwebley/word-well/issues/28#issuecomment-6084141555).
+Select one representative when the selected linked meanings' definitions support
+no distinct guidance. This revision does not add contrast usage examples,
+supplemental dictionaries or other meanings.
+
+The [approved implementation](https://github.com/cwebley/word-well/issues/28#issuecomment-6084250455)
+uses planner-owned, prompt-led selection with pinned definitions for eligible
+linked contrast terms. The planner looks for a supported distinction first. If
+terms have essentially the same meaning and give the same guidance, it keeps
+only the more common or educational one. There is no new human-review step in
+the main pipeline or mechanical rejection based on identical definition strings.
+
+Writer input supplies selected OEWN definitions only, and output must include
+exactly the terms selected in the Lesson plan. A redundant selection cannot be
+resolved by silently dropping a writer row. Historical paid answers and frozen
+evaluation sets retain their original contents and identities.
+
 ## One source trace
 
 The retained evanescent evidence supplies one adjective source meaning:

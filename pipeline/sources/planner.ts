@@ -20,7 +20,13 @@ export function plannerEvidence(bundleId: string, bundle: EvidenceBundle): Plann
     if (!posNames[recordedPos]) throw new PrivateError("planner_pos_unmapped");
     return { ref: `s${i + 1}`, sourceId: m.id, entryId: m.entryId, conceptId: m.conceptId, order: m.order, recordedPos, partOfSpeech: posNames[recordedPos],
       definition: z.string().parse(m.data.definition), examples: z.array(z.string()).parse(m.data.examples),
-      contrasts: bundle.relations.filter(r => r.source === "oewn" && r.purpose === "contrast" && r.from === m.id).map(r => ({ word: r.word, type: r.type,
-        support: { source: r.source, from: r.from, to: r.to, type: r.type } })) };
+      contrasts: bundle.relations.filter(r => r.source === "oewn" && r.purpose === "contrast" && r.from === m.id).map(r => {
+        const target = bundle.meanings.find(meaning => meaning.source === "oewn" && meaning.id === r.to);
+        const entry = target && bundle.entries.find(e => e.source === "oewn" && e.id === target.entryId && e.headword === r.word);
+        const definition = target && z.string().min(1).safeParse(target.data.definition);
+        if (!entry || !definition?.success || !definition.data.trim()) throw new PrivateError("planner_contrast_evidence_missing");
+        return { word: r.word, type: r.type, definition: definition.data,
+          support: { source: r.source, from: r.from, to: r.to, type: r.type } };
+      }) };
   }), family: [...family.values()] });
 }

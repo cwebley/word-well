@@ -358,13 +358,15 @@ describe.skipIf(!process.env.DATABASE_URL)("durable writer paths in restricted d
       evidence.entries.push({ source: "oewn", id: "linked-entry", headword: "transient", pos: "a", order: 2, role: "linked", raw: "harmless-linked", rawSha256: "b".repeat(64), locator: {}, data: {} });
       evidence.meanings.push({ source: "oewn", entryId: "linked-entry", id: "linked-meaning", order: 2, conceptId: "linked-concept", relations: [], data: { definition: "Lasting briefly in a controlled fixture.", examples: ["An example that must not enter the writer payload."] } });
       evidence.relations.push({ source: "oewn", from: "meaning-fixture", to: "linked-meaning", word: "transient", type: "similar", purpose: "contrast" });
-      // An unselected target is eligible to the planner but never opened by the writer mapper.
+      // The planner reads every eligible definition; the writer includes only its selection.
+      evidence.entries.push({ source: "oewn", id: "unselected-entry", headword: "other", pos: "a", order: 3, role: "linked", raw: "harmless-other", rawSha256: "c".repeat(64), locator: {}, data: {} });
+      evidence.meanings.push({ source: "oewn", entryId: "unselected-entry", id: "unselected-meaning", order: 3, conceptId: "unselected-concept", relations: [], data: { definition: "Another eligible controlled contrast.", examples: [] } });
       evidence.relations.push({ source: "oewn", from: "meaning-fixture", to: "unselected-meaning", word: "other", type: "similar", purpose: "contrast" });
       const plannerInput = plannerEvidence(h.bundleId, evidence), plan = { ...h.plan, meanings: [{ ...h.plan.meanings[0], synonyms: ["transient"] }] };
       const input = writerEvidence(h.bundleId, evidence, plannerInput, plan);
       expect(input.meanings[0].contrastDefinitions).toEqual([{ synonym: "transient", definitions: [{ sourceId: "linked-meaning", definition: "Lasting briefly in a controlled fixture." }] }]);
       evidence.meanings = evidence.meanings.filter(m => m.id !== "linked-meaning");
-      expect(() => writerEvidence(h.bundleId, evidence, plannerInput, plan)).toThrow("writer_contrast_evidence_missing");
+      expect(() => writerEvidence(h.bundleId, evidence, plannerInput, plan)).toThrow("planner_contrast_evidence_missing");
       expect(h.remote.sent).toHaveLength(0);
     } finally { await h.close(); }
   }, 30000);

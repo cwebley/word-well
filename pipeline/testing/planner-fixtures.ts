@@ -2,7 +2,7 @@ import type { PlannerInput, LessonPlan } from "../stages/planner.js";
 // Invented contract fixtures, never owner-approved evaluation cases.
 export const plannerFixture: PlannerInput = { headword: "fixture", bundleId: "a".repeat(64), meanings: [
   { ref: "s1", sourceId: "private-source-1", entryId: "private-entry", conceptId: "private-concept-1", recordedPos: "n", partOfSpeech: "noun", order: 1,
-    definition: "A thing used in a controlled check.", examples: ["The fixture made the check repeatable."], contrasts: [{ word: "example", type: "hypernym", support: { source: "oewn", from: "private-source-1", to: "linked-1", type: "hypernym" } }] },
+    definition: "A thing used in a controlled check.", examples: ["The fixture made the check repeatable."], contrasts: [{ word: "example", type: "hypernym", definition: "A representative instance.", support: { source: "oewn", from: "private-source-1", to: "linked-1", type: "hypernym" } }] },
   { ref: "s2", sourceId: "private-source-2", entryId: "private-entry", conceptId: "private-concept-2", recordedPos: "n", partOfSpeech: "noun", order: 2,
     definition: "An extension of the controlled check.", examples: [], contrasts: [] }
 ], family: [{ word: "fixtures", supports: [{ source: "kaikki", from: "line:1", to: "fixtures", type: "derived" }] }] };

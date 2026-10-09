@@ -53,9 +53,12 @@ teach. It constrains the lesson writer but does not itself authorize publication
 _Avoid_: Published lesson, editorial approval
 
 **Synonym contrast**:
-What a synonym carries more of, and less of, than the headword in one published
-meaning. Either side may be absent when the evidence supports only one, and both
-sides are absent when the two words are near-equivalent.
+An evidence-backed comparison of what a synonym carries more of, and less of,
+than the headword in one published meaning, giving each included synonym a
+distinct, useful reason to choose it. Either side may be absent when the evidence
+supports only one, and both sides are absent when the two words are near-equivalent;
+shared individual values are allowed when the comparison as a whole adds useful
+guidance.
 _Avoid_: Synonym distinction, synonym comparison
 
 **Usage note**:

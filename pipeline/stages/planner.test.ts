@@ -15,6 +15,26 @@ describe("source-backed planner", () => {
     const stage = createPlannerStage(PLANNER_CONFIGURATION, plannerFixture);
     expect(stage.validate(plannerExchangeBody())).toEqual({ ok: true, result: plannerPlan });
   });
+  it("requires complete linked definitions only when the configuration enables them", () => {
+    const input = structuredClone(plannerFixture);
+    delete input.meanings[0].contrasts[0].definition;
+    expect(() => createPlannerStage(PLANNER_CONFIGURATION, input)).toThrow("planner_contrast_evidence_missing");
+    if (PLANNER_CONFIGURATION.schema !== "wordwell-planner-configuration-v5") throw new Error("current_configuration_required");
+    const { contrastEvidence, ...historicalConfig } = PLANNER_CONFIGURATION;
+    expect(contrastEvidence).toBe("linked-definitions-v1");
+    const expectedPayload = "headword: fixture\n\ns1 [noun] A thing used in a controlled check.\n    examples: The fixture made the check repeatable.\n    broader terms: example\ns2 [noun] An extension of the controlled check.\n\nword family candidates\n  listed by one source: fixtures";
+    expect(createPlannerStage(historicalConfig, input).render(input)).toMatchObject({ messages: [{ role: "system" }, { role: "user", content: expectedPayload }] });
+    expect(createPlannerStage(historicalConfig, plannerFixture).render(plannerFixture)).toMatchObject({ messages: [{ role: "system" }, { role: "user", content: expectedPayload }] });
+  });
+  it("renders all distinct linked definitions once per word without changing relation labels", () => {
+    const input = structuredClone(plannerFixture);
+    input.meanings[0].contrasts.push({ ...input.meanings[0].contrasts[0], support: { ...input.meanings[0].contrasts[0].support, to: "linked-2" }, definition: "A second supported use." });
+    input.meanings[0].contrasts.push(structuredClone(input.meanings[0].contrasts[0]));
+    const payload = JSON.stringify(createPlannerStage(PLANNER_CONFIGURATION, input).render(input));
+    expect(payload).toContain("broader terms: example");
+    expect(payload).toContain("example: A representative instance.; A second supported use.");
+    expect(payload).not.toContain("linked-2");
+  });
   it.each(["missing", "duplicate", "unknown", "wrong_pos", "unsupported_contrast", "duplicate_contrast", "unsupported_family", "too_many", "empty_definition", "unsupported_note"])("rejects %s without repair", kind => {
     const plan = structuredClone(plannerPlan);
     if (kind === "missing") plan.meanings[0].usage_note_sense_ids = [];

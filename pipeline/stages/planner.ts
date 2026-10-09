@@ -4,7 +4,7 @@ import { PrivateError } from "../storage/crypto.js";
 import type { StageDefinition } from "../execution/stage.js";
 import { checkLunaRouting, completionBody, lunaExchangeSchema } from "../execution/luna-response.js";
 
-// The approved newer prototype prompt, followed only by explicit source accounting.
+// Approved prototype instructions with source accounting and definition-backed contrast selection.
 export const PLANNER_PROMPT = `You are planning a vocabulary lesson for an adult learner.
 
 Below is a headword and its dictionary senses from Open English WordNet.
@@ -19,7 +19,7 @@ Put the meaning a learner is most likely to meet in reading first.
 
 Finally, choose up to four word-family forms a learner should see beside the headword — ones that give another useful part of speech. A form both sources list is a stronger candidate than one only Wiktionary lists. Choose none rather than a rare or negated form.
 
-Each sense lists words to contrast the headword against: synonyms, and broader or similar terms where it has no synonym. For each meaning, choose up to four from the senses you grouped into it — ones that each show something different about the headword. Skip one that differs from another you chose only in spelling or formality.
+Each sense lists words to contrast the headword against: synonyms, and broader or similar terms where it has no synonym, with their linked definitions. For each meaning, choose up to four from the senses you grouped into it. Each included term must add a distinct, useful reason to choose it rather than the headword, supported by the supplied definitions. First look for a meaningful distinction. If terms have essentially the same meaning and give the same guidance, include only the more common or educational one. Different labels alone do not make a useful contrast. A shared quality is fine when the rest of the comparison supplies a meaningful distinction. Do not invent a difference or infer planning, a fixed deadline, suddenness, or register from the word alone. Skip one that differs from another you chose only in spelling or formality.
 
 Account for every supplied sense exactly once: in sense_ids, in usage_note_sense_ids, or in omitted_source_meanings with its source_ref and a reason.`;
 
@@ -29,7 +29,9 @@ const support = z.object({ source: z.enum(["oewn", "kaikki"]), from: z.string(),
 export const plannerInputSchema = z.object({ headword: z.string().min(1).max(200), bundleId: z.string().regex(/^[a-f0-9]{64}$/),
   meanings: z.array(z.object({ ref, sourceId: z.string(), entryId: z.string(), conceptId: z.string(), order: z.number().int().positive(),
     recordedPos: z.string(), partOfSpeech: pos, definition: z.string().min(1), examples: z.array(z.string()),
-    contrasts: z.array(z.object({ word: z.string().min(1), type: z.enum(["direct_member", "hypernym", "similar"]), support }).strict()) }).strict()).min(1),
+    contrasts: z.array(z.object({ word: z.string().min(1), type: z.enum(["direct_member", "hypernym", "similar"]), support,
+      // Historical names-only inputs retain their original shape.
+      definition: z.string().min(1).refine(value => Boolean(value.trim())).optional() }).strict()) }).strict()).min(1),
   family: z.array(z.object({ word: z.string().min(1), supports: z.array(support).min(1) }).strict())
 }).strict().superRefine((input, ctx) => {
   const ids = input.meanings.map(m => m.sourceId);
@@ -55,19 +57,22 @@ export const plannerConfigurationSchema = z.union([legacyPlannerConfigurationSch
   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v4"), routingVerification: z.literal("authenticated-generation-resumable-v1"),
      routingLookup: routingLookupSchema, metadataRecovery: z.literal("saved-completion-append-only-rounds-v1") }).strict(),
    legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v5"), routingVerification: z.literal("completion-inline-strict-v1"),
-     responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved") }).strict()]);
+     responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved"),
+     contrastEvidence: z.literal("linked-definitions-v1").optional() }).strict()]);
 export type PlannerConfiguration = z.infer<typeof plannerConfigurationSchema>;
 export const PLANNER_CONFIGURATION: PlannerConfiguration = { schema: "wordwell-planner-configuration-v5", stage: "planner", route: "openrouter-aisdk-v1",
   requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", provider: "openai", maxOutputTokens: 16000, prompt: PLANNER_PROMPT,
-  routingVerification: "completion-inline-strict-v1", responseCache: "disabled", missingEvidence: "terminal-verification-unresolved" };
+  routingVerification: "completion-inline-strict-v1", responseCache: "disabled", missingEvidence: "terminal-verification-unresolved", contrastEvidence: "linked-definitions-v1" };
 
-export function plannerPayload(input: PlannerInput) {
+export function plannerPayload(input: PlannerInput, contrastEvidence?: "linked-definitions-v1") {
   const senses = input.meanings.map(m => `${m.ref} [${m.partOfSpeech}] ${m.definition}` +
     (m.examples.length ? `\n    examples: ${m.examples.join("; ")}` : "") +
     (["direct_member", "hypernym", "similar"] as const).map(type => {
       const words = [...new Set(m.contrasts.filter(c => c.type === type).map(c => c.word))];
       return words.length ? `\n    ${{ direct_member: "synonyms", hypernym: "broader terms", similar: "similar terms" }[type]}: ${words.join(", ")}` : "";
-    }).join("")).join("\n");
+    }).join("") +
+    (contrastEvidence && m.contrasts.length ? `\n    contrast definitions:\n${[...new Set(m.contrasts.map(c => c.word))].map(word =>
+      `      ${word}: ${[...new Set(m.contrasts.filter(c => c.word === word).map(c => c.definition!))].join("; ")}`).join("\n")}` : "")).join("\n");
   let family = "";
   if (input.family.length) {
     family = "\n\nword family candidates";
@@ -105,11 +110,13 @@ export function checkPlan(input: PlannerInput, value: unknown): LessonPlan {
 }
 export function createPlannerStage(configuration: PlannerConfiguration, boundInput: PlannerInput): StageDefinition<PlannerInput, LessonPlan> {
   const config = plannerConfigurationSchema.parse(configuration), input = plannerInputSchema.parse(boundInput);
+  const contrastEvidence = config.schema === "wordwell-planner-configuration-v5" ? config.contrastEvidence : undefined;
+  if (contrastEvidence && input.meanings.some(m => m.contrasts.some(c => c.definition === undefined))) throw new PrivateError("planner_contrast_evidence_missing");
   return { name: "planner", configuration: config, fingerprint: fingerprint({ config, outputSchema: z.toJSONSchema(planSchema) }), inputSchema: plannerInputSchema, resultSchema: planSchema,
     render(value) {
       if (fingerprint(plannerInputSchema.parse(value)) !== fingerprint(input)) throw new PrivateError("stage_input_invalid");
       return { model: config.pinnedModel, max_tokens: config.maxOutputTokens,
-        messages: [{ role: "system", content: [{ type: "text", text: config.prompt }] }, { role: "user", content: plannerPayload(input) }],
+        messages: [{ role: "system", content: [{ type: "text", text: config.prompt }] }, { role: "user", content: plannerPayload(input, contrastEvidence) }],
         response_format: { type: "json_schema", json_schema: { name: "plan", strict: true, schema: z.toJSONSchema(planSchema) } },
         provider: { only: [config.provider], order: [config.provider], allow_fallbacks: false, require_parameters: true, max_price: { prompt: 0.4, completion: 1.8, request: 0 } },
         usage: { include: true } };

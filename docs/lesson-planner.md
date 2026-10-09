@@ -27,8 +27,8 @@ frozen encrypted input + separate owner expectations
 
 | File | Input, output and persistence |
 | --- | --- |
-| `pipeline/sources/planner.ts` | Maps candidate OEWN source meanings in retained order to `s1`, `s2` and later opaque references. Preserves recorded POS, entry/concept identities, examples and typed contrast/family support in private input |
-| `pipeline/stages/planner.ts` | Owns the prototype prompt, strict output schema, renderer and input-bound checks. The model-visible payload has normalized POS names, definitions, source examples and eligible selections. Source IDs, gate judgments and owner criteria are absent |
+| `pipeline/sources/planner.ts` | Maps candidate OEWN source meanings in retained order to `s1`, `s2` and later opaque references. Preserves recorded POS, entry/concept identities, candidate examples and typed contrast/family support. Adds the exact definition of every eligible linked OEWN contrast meaning |
+| `pipeline/stages/planner.ts` | Owns the prompt, strict output schema, renderer and input-bound checks. The model-visible payload has normalized POS names, candidate definitions/examples and eligible contrast terms with their linked definitions. Source IDs, gate judgments and owner criteria are absent |
 | `pipeline/execution/openrouter.ts` | Sends inline-metadata and response-cache-opt-out headers through the locked SDK once per physical request. Checks the recorded wire body, captures completion bytes and selected headers before SDK parsing, and extracts accounting independently. Makes no generation-metadata lookup |
 | `pipeline/execution/luna-response.ts` | Requires returned dated-model/OpenAI evidence, an explicit single successful attempt and absence of response-cache replay. Separates missing proof from contradictions. Decodes historical lookup envelopes for inspection |
 | `pipeline/execution/luna-setup.ts` | Makes a public metadata GET, with no generation, to check the dated OpenAI endpoint, required structured-output settings, input/output limits and price ceilings before dispatch |
@@ -51,9 +51,10 @@ use configuration v5; the retained paid v4 results keep their original identitie
 ## Prompt, schema and one actual source trace
 
 `PLANNER_PROMPT` in `pipeline/stages/planner.ts` preserves the newer prototype's
-compact editorial instructions. It adds only the requirement to account for
-every supplied source meaning in defining support, a same-POS usage note or an
-explicit omission with a reason. The output retains the prototype keys
+compact editorial instructions. It adds source accounting and the approved
+definition-backed synonym selection rule. Every supplied source meaning needs
+defining support, a same-POS usage note or an explicit omission with a reason.
+The output retains the prototype keys
 `sense_ids`, `usage_note_sense_ids`, `synonyms` and `word_family`, with the approved
 `omitted_source_meanings` addition.
 
@@ -64,6 +65,29 @@ duplicate source assignments, missing defining support, mixed-POS groups/notes,
 unsupported selections and duplicates. Contrast and family limits are zero to
 four. No result is silently dropped, repaired or regenerated.
 
+The owner-approved [synonym inclusion rule](lesson-writer.md#approved-synonym-inclusion-rule)
+requires each included term to add distinct, useful, evidence-backed guidance.
+The [approved implementation](https://github.com/cwebley/word-well/issues/28#issuecomment-6084250455)
+puts this decision in the planner prompt. It asks for a useful distinction
+supported by the supplied definitions first. When terms have essentially the
+same meaning and give the same guidance, it selects only the more common or
+educational one. Shared qualities are allowed when the rest of the comparison
+adds a meaningful distinction. Changing labels alone is insufficient.
+
+Current configuration v5 enables `contrastEvidence: linked-definitions-v1`.
+Each eligible contrast retains its target source ID and exact definition in
+private input. Requests group definitions by term and omit source IDs, linked
+usage examples and uncovered meanings. Missing or blank linked definitions stop
+before dispatch, including for a term the planner might omit. Selection remains
+prompt-led, without a definition-string rejection rule or a new human-review
+step in the main pipeline.
+
+Historical inputs may omit contrast definitions. Configurations without the
+evidence mode retain their names-only renderer, even when an input has definition
+fields. Frozen datasets, saved request identities and original paid answers stay
+unchanged. The new mode requires an approved input containing linked definitions;
+it does not enrich an old frozen dataset during loading or inspection.
+
 The evanescent scope provides this actual model-visible input:
 
 ```text
@@ -72,6 +96,9 @@ headword: evanescent
 s1 [adjective] tending to vanish like vapor
     examples: evanescent beauty
     similar terms: impermanent, temporary
+    contrast definitions:
+      impermanent: not permanent; not lasting
+      temporary: not permanent; not lasting
 
 word family candidates
   listed by both sources: evanescence
@@ -81,10 +108,14 @@ word family candidates
 1. `pipeline/sources/planner.ts` reads the selected ready bundle and maps `s1` to
    `oewn-evanescent__5.00.00.impermanent.00`, entry `oewn-evanescent-a`, concept
    `oewn-01761452-s`, recorded POS `a`, normalized POS `adjective`. This full
-   mapping persists with the frozen input and each attempt, not in the prompt.
+   mapping persists with each input and attempt, not in the prompt. The eligible
+   contrast definitions come from `oewn-impermanent__3.00.00..` and
+   `oewn-temporary__3.00.00..`, both in concept `oewn-01760139-a`.
 2. `pipeline/stages/planner.ts` renders the input above and the exact strict
-   schema. Both production dry-run and frozen evaluation dry-run render identical
-   request bodies. Neither sees owner expectations or Wiktionary definitions.
+   schema. Production and isolated evaluation use the same renderer for the same
+   input/configuration. Neither sees owner expectations or Wiktionary definitions.
+   The original frozen evaluation input remains names-only and cannot run under
+   the new evidence mode without a separately approved dataset version.
 3. `pipeline/execution/openrouter.ts` forwards dated model
    `openai/gpt-5.6-luna-20260709`, the approved GPT Luna upstream. Routing admits
    only OpenAI, with fallbacks disabled and required-parameter enforcement.
@@ -107,6 +138,40 @@ The source trace exposed a family candidate that needs editorial judgment:
 eligible source input, not automatic lesson content. The prototype instruction
 prefers useful forms and says to choose none rather than rare or negated forms.
 Semantic review still decides whether any selection teaches the intended family.
+
+The contrast trace exposes a different limit. Both eligible words have the same
+selected definition, so the prompt must either find useful guidance supported
+by those definitions or choose one representative. Rendering both definitions
+does not prove the model will make that decision correctly. Scripted selection
+tests verify the planner-to-writer path, without claiming a live quality result.
+
+## Definition-backed selection checkpoint, 2026-10-09
+
+The prompt-led rule and linked-definition input are implemented. The current
+effective planner configuration fingerprint is
+`53f0c39c2bd65e92e7700c88e0b83ceee911c8007ae2d264187ff2b9b921912c`.
+Read-only rendering of the retained source bundle verifies that removing only
+the new contrast definition fields recreates the original planner input exactly.
+The original names-only frozen input stops with `planner_contrast_evidence_missing`
+under the new mode, while historical inspection retains its original renderer.
+
+Verification passed 428 tests with 12 skipped across 41 files, including the
+restricted disposable-database planner and writer regressions, plus typecheck
+and whitespace checks. New cases cover exact linked definitions, missing support,
+private source-ID and linked-example exclusion, historical names-only rendering,
+multiple definitions per term, scripted one-term selection passed to the writer,
+shared contrast values, and prompt-led rather than string-based selection.
+Standards and spec review found no findings.
+
+Before/after checks preserve all 14,702 retained private rows across 35 tables,
+all 34 inspected frozen-dataset, finalized-summary and receipt files, and the
+exact historical inspection reports. All 13 files in the uncommitted #34 repair
+and its compatibility policy identity remain unchanged. The retained frozen
+runtime archive matches its original checksum. Its extracted temporary copy is
+incomplete; no restoration or recovery ran. No new model call, metadata call,
+dataset freeze, production selection or promotion ran for this revision. This
+verification preceded commit and push. Fresh model quality for the new prompt
+is untested.
 
 ## Locked model and accounting checks
 
