@@ -3,6 +3,7 @@ import { z } from "zod";
 import { fingerprint, pipelineConfigSchema, type PipelineConfig } from "./config.js";
 import { createStageExecutor } from "./execution/executor.js";
 import type { ModelAdapter } from "./execution/model.js";
+import { requireLunaVerificationPolicy } from "./execution/openrouter.js";
 import type { CandidateClaim } from "./storage/postgres.js";
 import { latestResponse } from "./storage/postgres.js";
 import type { WriterStore } from "./storage/writer.js";
@@ -72,6 +73,7 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
       const claim = await store.claimCandidate(report.candidateId, id, true);
       try {
         if (report.material.executionKind !== deps.executionKind || report.material.implementation !== await writerImplementation()) throw new PrivateError("implementation_changed");
+        requireLunaVerificationPolicy(deps.model, report.material.configuration);
         const stage = createWriterStage(report.material.configuration, report.material.input);
         const executor = createStageExecutor({ store, ledger: deps.ledger, model: deps.model, sleep: deps.sleep,
           settings: lunaExecutionSettings(report.material.execution, report.material.configuration.maxOutputTokens) });
@@ -109,6 +111,7 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
        const checked = await current(options.bundleId, options.candidate), config = writerConfigurationSchema.parse(options.configuration);
        if (config.schema !== "wordwell-writer-configuration-v2") throw new PrivateError("writer_configuration_historical_only");
       if (deps.model.route !== config.route) throw new PrivateError("model_adapter_unavailable");
+      requireLunaVerificationPolicy(deps.model, config);
       if (deps.executionKind === "live") await requireWriterPromotion(store, createWriterStage(config, checked.input).fingerprint);
       const id = randomUUID();
       await store.createProductionRun({ id, candidateId: checked.authorization.candidateId, capNanoUsd: options.capNanoUsd,
@@ -123,6 +126,7 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
       const { run, material } = await load(id);
       if (["accepted", "rejected", "failed"].includes(run.status)) return inspect(id);
       if (material.executionKind !== deps.executionKind || material.implementation !== await writerImplementation() || deps.model.route !== material.configuration.route) throw new PrivateError("implementation_changed");
+      requireLunaVerificationPolicy(deps.model, material.configuration);
       const claim = await store.claimCandidate(run.candidateId, id, recover);
       try {
         const permissions = async () => {

@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { createStageExecutor } from "../pipeline/execution/executor.js";
 import type { ModelAdapter } from "../pipeline/execution/model.js";
-import { createPlannerStage, checkPlan, plannerInputSchema, plannerConfigurationSchema, type PlannerConfiguration } from "../pipeline/stages/planner.js";
+import { requireLunaVerificationPolicy } from "../pipeline/execution/openrouter.js";
+import { createPlannerStage, checkPlan, plannerInputSchema, plannerConfigurationSchema, type PlannerConfiguration, type LessonPlan } from "../pipeline/stages/planner.js";
 import { LUNA_EXECUTION, lunaExecutionSchema, lunaExecutionSettings } from "../pipeline/planner-config.js";
 import { plannerImplementation } from "../pipeline/planner-identity.js";
 import { fingerprint } from "../pipeline/config.js";
@@ -16,6 +17,11 @@ import { plannerPromotionRuleIdentity } from "../pipeline/planner-promotion.js";
 
 export const plannerEvaluationMaterial = z.object({ schema: z.literal("wordwell-planner-evaluation-v1"), configuration: plannerConfigurationSchema,
   execution: lunaExecutionSchema, implementation: z.string(), testedRuleIdentity: z.string(), datasetContentIdentity: z.string() }).strict();
+export function plannerCoveragePass(plan: LessonPlan, expectation: z.infer<typeof plannerExpectationSchema>) {
+  return expectation.requiredDefiningGroups.every(group => plan.meanings.some(m => fingerprint([...m.sense_ids].sort()) === fingerprint([...group].sort()))) &&
+    plan.meanings.flatMap(m => m.usage_note_sense_ids).every(ref => expectation.allowedUsageNoteRefs.includes(ref)) &&
+    plan.omitted_source_meanings.every(o => expectation.allowedOmissionRefs.includes(o.source_ref));
+}
 export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: ReceiptLedger; model: ModelAdapter; beforeDispatch?: () => Promise<void>; sleep?: (ms: number) => Promise<void> }) {
   const { store } = deps;
   async function load(id: string) {
@@ -38,9 +44,7 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
           const validation = reply?.kind === "response" ? stage.validate(reply.body) : null;
           if (attempt.experimentId !== id || attempt.stage !== "planner" || fingerprint(attempt.input.request) !== fingerprint(stage.render(input)) || !validation?.ok || fingerprint(validation.result) !== fingerprint(attempt.result)) throw new PrivateError("planner_evidence_mismatch");
           const plan = checkPlan(input, attempt.result); contractPass = true;
-          expectationPass = expectation.requiredDefiningGroups.every(group => plan.meanings.some(m => fingerprint([...m.sense_ids].sort()) === fingerprint([...group].sort()))) &&
-            plan.meanings.flatMap(m => m.usage_note_sense_ids).every(ref => expectation.allowedUsageNoteRefs.includes(ref)) &&
-            plan.omitted_source_meanings.every(o => expectation.allowedOmissionRefs.includes(o.source_ref));
+          expectationPass = plannerCoveragePass(plan, expectation);
         }
         outcomes.push({ caseId: c.caseId, trialIndex: index, split: owner.split, input, expectation, attempt, contractPass, expectationPass });
       }
@@ -57,6 +61,7 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
   async function run(id: string, allowDispatch: boolean) {
     const { material } = await load(id);
     if (material.implementation !== await plannerImplementation()) throw new PrivateError("implementation_changed");
+    requireLunaVerificationPolicy(deps.model, material.configuration);
     const lock = await store.lockExperiment(id);
     try {
       const executor = createStageExecutor({ ...deps, settings: lunaExecutionSettings(material.execution, material.configuration.maxOutputTokens) });
@@ -89,6 +94,7 @@ export function createPlannerEvaluator(deps: { store: PrivateStore; ledger: Rece
       const { digest } = await import("../pipeline/storage/crypto.js");
       if (digest(JSON.stringify(body)) !== contentIdentity || dataset.id !== options.manifest.id || dataset.version !== options.manifest.version) throw new PrivateError("dataset_identity_mismatch");
       if (deps.model.route !== config.route) throw new PrivateError("model_adapter_unavailable");
+      requireLunaVerificationPolicy(deps.model, config);
       const id = randomUUID(), implementation = await plannerImplementation();
       await store.createExperiment({ id, stage: "planner", dataset: { id: dataset.id, version: dataset.version, ciphertextSha256: options.manifest.ciphertextSha256 },
         configurationFingerprint: createPlannerStage(config, dataset.cases[0].input).fingerprint, implementationFingerprint: implementation, capNanoUsd: options.capNanoUsd,

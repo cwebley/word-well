@@ -7,6 +7,7 @@ import { createPrivateCrypto, keyReferenceSchema } from "./crypto.js";
 import { loadKeychainIdentity } from "./keychain.js";
 import { createPrivateStore } from "./postgres.js";
 import { createSourceStore } from "./sources.js";
+import { createPlannerRevalidationStore } from "./planner-revalidations.js";
 
 export const productionLedgerDirectory = resolve(homedir(), "Library/Application Support/WordWell/production/ledger");
 export async function openLocalProductionStores() {
@@ -16,6 +17,9 @@ export async function openLocalProductionStores() {
   const store = await createPrivateStore(options);
   try {
     const sources = await createSourceStore(options);
-    return { store, sources, close: async () => { await Promise.all([store.close(), sources.close()]); } };
+    try {
+      const revalidations = await createPlannerRevalidationStore(options);
+      return { store, sources, revalidations, close: async () => { await Promise.all([store.close(), sources.close(), revalidations.close()]); } };
+    } catch (error) { await sources.close(); throw error; }
   } catch (error) { await store.close(); throw error; }
 }

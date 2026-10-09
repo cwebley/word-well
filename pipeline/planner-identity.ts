@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { fingerprint } from "./config.js";
 import { createPlannerStage, type PlannerConfiguration, type PlannerInput } from "./stages/planner.js";
 export async function plannerImplementation() {
-  const paths = ["./stages/planner.ts", "./sources/planner.ts", "./planner-config.ts", "./planner-run.ts", "./planner-identity.ts", "./planner-promotion.ts",
+  const paths = ["./stages/planner.ts", "./sources/planner.ts", "./planner-config.ts", "./planner-run.ts", "./planner-identity.ts", "./planner-promotion.ts", "./planner-revalidation.ts", "./storage/planner-revalidations.ts", "../db/private-migrations/015_planner_revalidations.sql",
     "./execution/openrouter.ts", "./execution/luna-response.ts", "./execution/luna-setup.ts", "./execution/executor.ts", "./execution/model.ts", "./execution/stage.ts", "./storage/postgres.ts", "./storage/receipts.ts", "./storage/crypto.ts", "../evals/planner.ts", "../evals/datasets/planner.ts", "../db/private-migrations/011_request_verifications.sql", "../db/private-migrations/013_verification_unresolved.sql", "../package-lock.json"];
   return fingerprint(await Promise.all(paths.map(async path => ({ path, bytes: await readFile(new URL(path, import.meta.url), "utf8") }))));
 }

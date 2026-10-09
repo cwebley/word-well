@@ -6,7 +6,7 @@ import { z } from "zod";
 import { isDeepStrictEqual } from "node:util";
 import { PrivateError } from "../storage/crypto.js";
 import type { Accounting, Classification, Exchange, ModelAdapter } from "./model.js";
-import { checkLunaRouting, completionBody, lunaInlineExchangeSchema } from "./luna-response.js";
+import { checkLunaRouting, completionBody, lunaInlineExchangeSchema, LUNA_INLINE_VERIFICATION } from "./luna-response.js";
 
 export const LUNA_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const schema = z.record(z.string(), z.unknown());
@@ -25,8 +25,15 @@ const retryable = new Set([408, 429, 500, 502, 503, 504]);
 function classifyStatus(status: number): Classification {
   return retryable.has(status) ? { kind: "retryable" } : { kind: "rejected", code: status === 401 || status === 403 ? "credentials_rejected" : status === 402 ? "insufficient_credits" : "provider_error" };
 }
-export function createLunaAdapter({ apiKey, fetch = globalThis.fetch }: { apiKey?: string; fetch?: typeof globalThis.fetch }): ModelAdapter {
-  return { route: "openrouter-aisdk-v1",
+type LunaVerificationPolicy = "completion-inline-strict-v1" | typeof LUNA_INLINE_VERIFICATION;
+export function requireLunaVerificationPolicy(model: ModelAdapter, configuration: { route: string; routingVerification?: string }) {
+  if (model.route !== configuration.route || !("routingVerification" in model) || model.routingVerification !== configuration.routingVerification)
+    throw new PrivateError("luna_verification_policy_mismatch");
+}
+export function createLunaAdapter({ apiKey, fetch = globalThis.fetch, routingVerification = LUNA_INLINE_VERIFICATION }: {
+  apiKey?: string; fetch?: typeof globalThis.fetch; routingVerification?: LunaVerificationPolicy
+}): ModelAdapter & { readonly routingVerification: LunaVerificationPolicy } {
+  return { route: "openrouter-aisdk-v1", routingVerification,
     async send(value, { timeoutMs }): Promise<Exchange> {
       const body = lunaRequestSchema.parse(value);
       if (!apiKey) throw new PrivateError("dispatch_forbidden");
@@ -78,7 +85,7 @@ export function createLunaAdapter({ apiKey, fetch = globalThis.fetch }: { apiKey
         if (data.error) return classifyStatus(typeof data.error.code === "number" ? data.error.code : 400);
       } catch { /* The stage retains and rejects malformed replies. */ }
       try {
-        checkLunaRouting(exchange.body, { requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709" });
+        checkLunaRouting(exchange.body, { requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", routingVerification });
       }
       catch (error) { return error instanceof PrivateError && error.code === "luna_verification_unresolved"
         ? { kind: "verification_unresolved", code: error.code } : { kind: "rejected", code: "luna_routing_unverified" }; }

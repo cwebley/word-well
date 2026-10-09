@@ -2,7 +2,7 @@ import { z } from "zod";
 import { fingerprint } from "../config.js";
 import { PrivateError } from "../storage/crypto.js";
 import type { StageDefinition } from "../execution/stage.js";
-import { checkLunaRouting, completionBody, lunaExchangeSchema } from "../execution/luna-response.js";
+import { checkLunaRouting, completionBody, lunaExchangeSchema, LUNA_INLINE_VERIFICATION } from "../execution/luna-response.js";
 
 // Approved prototype instructions with source accounting and definition-backed contrast selection.
 export const PLANNER_PROMPT = `You are planning a vocabulary lesson for an adult learner.
@@ -56,13 +56,13 @@ export const plannerConfigurationSchema = z.union([legacyPlannerConfigurationSch
     routingLookup: routingLookupSchema }).strict(),
   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v4"), routingVerification: z.literal("authenticated-generation-resumable-v1"),
      routingLookup: routingLookupSchema, metadataRecovery: z.literal("saved-completion-append-only-rounds-v1") }).strict(),
-   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v5"), routingVerification: z.literal("completion-inline-strict-v1"),
+   legacyPlannerConfigurationSchema.extend({ schema: z.literal("wordwell-planner-configuration-v5"), routingVerification: z.enum(["completion-inline-strict-v1", LUNA_INLINE_VERIFICATION]),
      responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved"),
      contrastEvidence: z.literal("linked-definitions-v1").optional() }).strict()]);
 export type PlannerConfiguration = z.infer<typeof plannerConfigurationSchema>;
 export const PLANNER_CONFIGURATION: PlannerConfiguration = { schema: "wordwell-planner-configuration-v5", stage: "planner", route: "openrouter-aisdk-v1",
   requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", provider: "openai", maxOutputTokens: 16000, prompt: PLANNER_PROMPT,
-  routingVerification: "completion-inline-strict-v1", responseCache: "disabled", missingEvidence: "terminal-verification-unresolved", contrastEvidence: "linked-definitions-v1" };
+  routingVerification: LUNA_INLINE_VERIFICATION, responseCache: "disabled", missingEvidence: "terminal-verification-unresolved", contrastEvidence: "linked-definitions-v1" };
 
 export function plannerPayload(input: PlannerInput, contrastEvidence?: "linked-definitions-v1") {
   const senses = input.meanings.map(m => `${m.ref} [${m.partOfSpeech}] ${m.definition}` +

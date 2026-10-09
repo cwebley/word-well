@@ -4,9 +4,14 @@ The #27 code path is implemented for private inspection and controlled checks.
 The first owner-approved case was frozen before planner-answer generation. The
 three-trial v4 paid evaluation is complete. Exact owner review and the configuration
 promotion decision are the next acceptance steps.
-The selected dataset version is 2. Its sole case is development-only, with no
+The selected dataset version for that historical v4 evaluation was 2. Its sole case is development-only, with no
 held-out performance claim. Version 1 remains retained; version 2 adds the
 explicit split without changing the approved input or criteria.
+
+The current selected dataset is version 3. Its definition-enriched paid evaluation
+and the later verification amendment are recorded below. The owner approved
+append-only revalidation of its original paid answers under the amended rule.
+Exact content reviews and promotion remain separate decisions.
 
 ```text
 ready source bundle + current factual intake + both promoted gate acceptances
@@ -147,8 +152,8 @@ tests verify the planner-to-writer path, without claiming a live quality result.
 
 ## Definition-backed selection checkpoint, 2026-10-09
 
-The prompt-led rule and linked-definition input are implemented. The current
-effective planner configuration fingerprint is
+The prompt-led rule and linked-definition input are implemented. The effective
+planner configuration fingerprint at this checkpoint was
 `53f0c39c2bd65e92e7700c88e0b83ceee911c8007ae2d264187ff2b9b921912c`.
 Read-only rendering of the retained source bundle verifies that removing only
 the new contrast definition fields recreates the original planner input exactly.
@@ -172,6 +177,115 @@ incomplete; no restoration or recovery ran. No new model call, metadata call,
 dataset freeze, production selection or promotion ran for this revision. This
 verification preceded commit and push. Fresh model quality for the new prompt
 is untested.
+
+## Definition-enriched evaluation and optional history amendment
+
+The owner approved the exact private definition-enriched input and separate
+expectations. Encrypted planner dataset version 3 is frozen and reload-verified,
+with one development case and no held-out claim. Versions 1 and 2 remain intact.
+The new input adds only the eligible linked contrast definitions. Original
+source-coverage expectations and four original semantic criteria are retained;
+the approved semantic additions stay outside the model request.
+
+The separately authorized three-trial evaluation under a $1.23 cap completed as
+experiment `b22c4dd3-a565-45e7-9802-b602bbeaf224`. Its identity was saved before
+dispatch. Three original charged replies persist, with no transport retries or
+generation-metadata lookups. Cost was $0.001854, with no outstanding reservations
+or unresolved charges. All three replies omitted detailed attempt history and
+ended terminal verification-unresolved under the original strict configuration.
+These outcomes and their original identities remain unchanged.
+
+The owner then approved accepting OpenRouter's documented successful attempt
+number without requiring its optional detailed history. Current planner v5 uses
+`routingVerification: completion-inline-attempt-number-v1`, with effective
+configuration fingerprint
+`ea7df84a68c7118b954b445bde3e5683916e114ac0e25d2a70014e8f927c653a`.
+The prompt, rendered request, frozen input, separate expectations and spending
+controls remain unchanged. Saved strict configurations still require history.
+
+Offline replay passes amended routing, planner content and required coverage
+checks for all three original responses. This is a new diagnostic interpretation,
+not a change to the stored trials or an owner semantic review. The owner
+subsequently approved a separate record of this revalidation, with original
+outcomes preserved. Details and preservation checks are in
+[single-response verification](single-response-verification.md#optional-attempt-history-checkpoint-2026-10-09).
+
+## Append-only reuse of paid planner answers
+
+The [owner-approved reuse](https://github.com/cwebley/word-well/issues/28#issuecomment-6088340503)
+applies to the exact retained three-trial experiment above. It does not authorize
+new generation, metadata recovery, changed input or expectations, or promotion.
+
+```text
+original paid responses + frozen input and separate expectations
+    -> check the approved source snapshot and policy-only configuration change
+    -> current routing, content and required coverage checks
+    -> encrypted immutable planner revalidation record
+    -> exact owner reviews bound to this record and its result fingerprints
+    -> separate promotion or non-promotion decision
+```
+
+`pipeline/planner-revalidation.ts` binds the approved experiment, original
+implementation and rule, complete encrypted source-row snapshot, current
+configuration, implementation and review rule, original request and response
+fingerprints, case/trial membership, charges and revalidated plans. Creation
+checks the retained accounting receipts. The current request must reproduce the
+original request exactly. Every original response must have stopped only for
+missing strict routing proof and must pass the amended routing, content and
+shared required-coverage checks. Expectations stay outside model requests.
+
+`pipeline/storage/planner-revalidations.ts` owns persistence and read-only source
+snapshot hashing. Migration 015 adds `private.planner_revalidations`, without
+altering existing tables. PostgreSQL rejects updates and deletes. Identical
+revalidation is idempotent, including concurrent creation, and retains the first
+ciphertext. A changed source snapshot, configuration, implementation or review
+rule invalidates the proof. Inspection and authorization never refresh it.
+
+For this actual source trace, trial 1 remains an original
+`verification_unresolved` attempt. `attempt: 1` and the selected dated OpenAI
+endpoint now permit current validation. The new record retains that trial's
+original attempt/request IDs and charge. It records a separately identified
+result, without modifying the original attempt, response, receipt or dataset.
+The trace exposes a review boundary: a successful technical recheck is not an
+owner finding that the authored definition or selected terms are good.
+
+Revalidation reviews use `wordwell-planner-trial-review-v2` and a `revalidationId`.
+They bind each result fingerprint to owner factuality, grounding, coverage and
+comparative quality findings. Old trial reviews cannot satisfy this requirement.
+Promotion still needs every required trial and all exact owner reviews to pass;
+quality scores have no threshold. A revalidation-backed promotion uses schema
+`wordwell-planner-promotion-v2` and requires the current proof at authorization
+time. Production reads that proof using the storage key, without owner labels.
+Later non-promotion takes precedence. Revalidation itself selects no production
+plan and starts no writer.
+
+```sh
+npm run --silent eval:planner -- revalidate --owner-approval <private-approval-file>
+npm run --silent eval:planner -- inspect-revalidation <revalidation-id>
+npm run --silent eval:planner -- review --owner-review <private-review-file>
+npm run --silent eval:planner -- decision --owner-decision <private-decision-file>
+```
+
+These operations make no provider calls. The approval file names the exact
+approved source experiment and the recorded owner reuse decision. Review and
+decision files must name the same revalidation. Missing or stale proof stops
+without changing the source record or generating a replacement answer.
+
+The approved revalidation is recorded in the retained local store. Repeating
+creation and inspection returns the same proof and preserves its first ciphertext.
+Before/after verification preserves all 14,713 inherited rows across 35 tables,
+all 17 inspected frozen-dataset and ledger files, six historical inspection
+reports, both retained archive checksums and the gate compatibility policy.
+Migration 015 and one immutable revalidation row are the only additions. There
+are now 36 private tables. Original cost remains $0.001854; added cost and provider
+calls are zero. No owner review, promotion or production selection was recorded.
+
+Verification passed 451 tests with 12 skipped across 42 files, plus typecheck and
+whitespace checks. Standards and spec reviews have zero remaining findings.
+Checks cover idempotency, concurrent creation, immutable ciphertext, source and
+interpretation changes, exact owner review bindings, explicit promotion and later
+non-promotion, unfinished evaluation review, private import boundaries and learner
+access rejection. Generated plans and exact owner criteria remain private.
 
 ## Locked model and accounting checks
 

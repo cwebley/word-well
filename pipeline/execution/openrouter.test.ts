@@ -34,7 +34,7 @@ it("verifies the original inline response and retains cache headers without a me
 
 it.each([
   ["absent metadata", undefined],
-  ["attempt number without history", { ...metadata, attempts: undefined }],
+  ["missing attempt number", { ...metadata, attempt: undefined, attempts: undefined }],
   ["empty history", { ...metadata, attempts: [] }],
   ["undated attempt", { ...metadata, attempts: [{ provider: "OpenAI", model: "openai/gpt-5.6-luna", status: 200 }] }],
   ["undated selected endpoint", { ...metadata, endpoints: { available: [{ provider: "OpenAI", model: "openai/gpt-5.6-luna", selected: true }] } }],
@@ -76,6 +76,22 @@ it("accepts additive routing fields and prompt-cache usage without treating them
   const response = await model.send(stage.render(plannerFixture), { timeoutMs: 1000 });
   expect(model.classify(response)).toEqual({ kind: "reply" });
   expect(response.kind === "response" && stage.validate(response.body).ok).toBe(true);
+});
+
+it("accepts absent optional history without another request and retains the strict historical classifier", async () => {
+  const stage = createPlannerStage(PLANNER_CONFIGURATION, plannerFixture);
+  let sends = 0;
+  const model = createLunaAdapter({ apiKey: "synthetic", fetch: async () => {
+    sends++;
+    return new Response(plannerReply(plannerPlan, { openrouter_metadata: { ...metadata, attempts: undefined } }));
+  } });
+  const response = await model.send(stage.render(plannerFixture), { timeoutMs: 1000 });
+  expect(model.classify(response)).toEqual({ kind: "reply" });
+  expect(model.accounting(response).chargeNanoUsd).toBe(420000);
+  const strict = createLunaAdapter({ routingVerification: "completion-inline-strict-v1", fetch: async () => { throw new Error("network_forbidden"); } });
+  expect(strict.classify(response)).toEqual({ kind: "verification_unresolved", code: "luna_verification_unresolved" });
+  expect(sends).toBe(1);
+  expect(model.verify).toBeUndefined();
 });
 
 it.each([

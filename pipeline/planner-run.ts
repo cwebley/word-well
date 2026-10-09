@@ -3,10 +3,12 @@ import { z } from "zod";
 import { fingerprint, pipelineConfigSchema, type PipelineConfig } from "./config.js";
 import { createStageExecutor } from "./execution/executor.js";
 import type { ModelAdapter } from "./execution/model.js";
+import { requireLunaVerificationPolicy } from "./execution/openrouter.js";
 import type { PrivateStore, CandidateClaim } from "./storage/postgres.js";
 import { latestResponse } from "./storage/postgres.js";
 import type { SourceStore } from "./storage/sources.js";
 import type { ReceiptLedger } from "./storage/receipts.js";
+import type { PlannerRevalidationStore } from "./storage/planner-revalidations.js";
 import { PrivateError } from "./storage/crypto.js";
 import { checkPlan, createPlannerStage, planSchema, plannerInputSchema, plannerConfigurationSchema, type PlannerConfiguration } from "./stages/planner.js";
 import { plannerEvidence } from "./sources/planner.js";
@@ -22,7 +24,7 @@ const resultSchema = z.object({ schema: z.literal("wordwell-production-planner-v
   configurationFingerprint: z.string(), attemptId: z.uuid(), originalDependencies: dependenciesSchema, plan: planSchema }).strict();
 export type GateAuthorization = { candidateId: string; headword: string; bundleId: string; assessmentId: string; resultId: string; appropriatenessResultId?: string };
 export function createPlannerCoordinator(deps: { store: PrivateStore; sources: SourceStore; ledger: ReceiptLedger; model: ModelAdapter; executionKind: "live" | "controlled";
-  currentIntake: () => Promise<PipelineConfig>; authorizeGates: (bundleId: string, intake: PipelineConfig) => Promise<GateAuthorization>; beforeDispatch?: () => Promise<void>; sleep?: (ms: number) => Promise<void> }) {
+  currentIntake: () => Promise<PipelineConfig>; authorizeGates: (bundleId: string, intake: PipelineConfig) => Promise<GateAuthorization>; beforeDispatch?: () => Promise<void>; sleep?: (ms: number) => Promise<void>; revalidations?: PlannerRevalidationStore }) {
   const { store } = deps;
   async function load(id: string) {
     const run = await store.readProductionRun(id);
@@ -67,6 +69,7 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
       const claim = await store.claimCandidate(report.candidateId, id, true);
       try {
         if (report.material.implementation !== await plannerImplementation()) throw new PrivateError("implementation_changed");
+        requireLunaVerificationPolicy(deps.model, report.material.configuration);
         const stage = createPlannerStage(report.material.configuration, report.material.input);
         const executor = createStageExecutor({ store, ledger: deps.ledger, model: deps.model, sleep: deps.sleep,
           settings: lunaExecutionSettings(report.material.execution, report.material.configuration.maxOutputTokens) });
@@ -106,7 +109,8 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
       const checked = await current(options.bundleId, options.candidate), config = plannerConfigurationSchema.parse(options.configuration);
       if (config.schema !== "wordwell-planner-configuration-v5") throw new PrivateError("planner_configuration_historical_only");
       if (deps.model.route !== config.route) throw new PrivateError("model_adapter_unavailable");
-      if (deps.executionKind === "live") await requirePlannerPromotion(store, createPlannerStage(config, checked.input).fingerprint);
+      requireLunaVerificationPolicy(deps.model, config);
+      if (deps.executionKind === "live") await requirePlannerPromotion(store, createPlannerStage(config, checked.input).fingerprint, deps.revalidations);
       const id = randomUUID();
       await store.createProductionRun({ id, candidateId: checked.gates.candidateId, capNanoUsd: options.capNanoUsd,
         material: plannerRunSchema.parse({ schema: "wordwell-planner-run-v1", stage: "planner", mode: options.stageOnly ? "stage-only" : "normal", fresh: options.fresh ?? false,
@@ -119,12 +123,13 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
       const { run, material } = await load(id);
       if (["accepted", "rejected", "failed"].includes(run.status)) return inspect(id);
       if (material.executionKind !== deps.executionKind || material.implementation !== await plannerImplementation() || deps.model.route !== material.configuration.route) throw new PrivateError("implementation_changed");
+      requireLunaVerificationPolicy(deps.model, material.configuration);
       const claim = await store.claimCandidate(run.candidateId, id, recover);
       try {
         const permissions = async () => {
           const checked = await current(material.bundleId, material.input.headword);
           if (checked.gates.candidateId !== run.candidateId || fingerprint(checked.input) !== fingerprint(material.input)) throw new PrivateError("planner_input_changed");
-          const promotion = deps.executionKind === "live" ? await requirePlannerPromotion(store, createPlannerStage(material.configuration, material.input).fingerprint) : null;
+          const promotion = deps.executionKind === "live" ? await requirePlannerPromotion(store, createPlannerStage(material.configuration, material.input).fingerprint, deps.revalidations) : null;
           return { ...checked.gates, plannerPromotionId: promotion?.id };
         };
         await permissions();
@@ -168,7 +173,7 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
       } finally { await claim.release(); }
     },
     async authorizeWriter(bundleId: string, config: PlannerConfiguration) {
-      const checked = await current(bundleId), stage = createPlannerStage(config, checked.input), promotion = await requirePlannerPromotion(store, stage.fingerprint);
+      const checked = await current(bundleId), stage = createPlannerStage(config, checked.input), promotion = await requirePlannerPromotion(store, stage.fingerprint, deps.revalidations);
       const selected = await store.selectedProductionResult(checked.gates.candidateId, "planner");
       if (!selected || selected.reuseIdentity !== await plannerReuseIdentity(checked.input, config)) throw new PrivateError("planner_not_current");
       const result = await validated(selected, checked.input, config);

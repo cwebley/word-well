@@ -8,6 +8,7 @@ import { createPrivateCrypto, keyReferenceSchema } from "../pipeline/storage/cry
 import { readBytes } from "../pipeline/storage/files.js";
 import { loadKeychainIdentity } from "../pipeline/storage/keychain.js";
 import { createPrivateStore } from "../pipeline/storage/postgres.js";
+import { createPlannerRevalidationStore } from "../pipeline/storage/planner-revalidations.js";
 import { databaseConnection } from "../db/connections.mjs";
 
 export const checkout = fileURLToPath(new URL("../", import.meta.url));
@@ -24,5 +25,9 @@ export async function openLocalPrivateStore() {
     connectionString: databaseConnection("pipeline"),
     storageKey: keys.storageKey, datasetKey: keys.datasetKey, crypto
   });
-  return { store, crypto, keys: { storageKey: keys.storageKey, datasetKey: keys.datasetKey } };
+  try {
+    const revalidations = await createPlannerRevalidationStore({ connectionString: databaseConnection("pipeline"), storageKey: keys.storageKey, crypto });
+    const close = async () => { await Promise.all([store.close(), revalidations.close()]); };
+    return { store: { ...store, close }, revalidations, crypto, keys: { storageKey: keys.storageKey, datasetKey: keys.datasetKey }, close };
+  } catch (error) { await store.close(); throw error; }
 }

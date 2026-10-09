@@ -9,7 +9,7 @@ import { createSourceStore } from "./storage/sources.js";
 import { createReceiptLedger } from "./storage/receipts.js";
 import { createLunaAdapter } from "./execution/openrouter.js";
 import { createPlannerCoordinator } from "./planner-run.js";
-import { PLANNER_CONFIGURATION, createPlannerStage } from "./stages/planner.js";
+import { PLANNER_CONFIGURATION, createPlannerStage, plannerConfigurationSchema } from "./stages/planner.js";
 import { plannerEvidence } from "./sources/planner.js";
 import { createPlannerEvaluator } from "../evals/planner.js";
 import { freezePlannerDataset, loadPlannerDataset } from "../evals/datasets/planner.js";
@@ -61,6 +61,47 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
   }
   const onePlan = { meanings: [{ definition: "A harmless adjective fixture.", part_of_speech: "adjective", sense_ids: ["s1"], usage_note_sense_ids: [], synonyms: [] }], word_family: [], omitted_source_meanings: [] };
   const reply = () => ({ status: 200, body: plannerReply(onePlan), headers: { "content-type": "application/json" } });
+  it("accepts a first-attempt completion without optional history and retains one answer and charge", async () => {
+    const body = plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }) });
+    const h = await harness([{ ...reply(), body }]);
+    try {
+      const id = await h.create(), report = await h.coordinator.run(id);
+      expect(report).toMatchObject({ status: "accepted", spend: { physicalRequests: 1, knownNanoUsd: 420000, outstandingNanoUsd: 0 } });
+      const request = report.trials[0].attempt!.requests[0];
+      expect(request.response?.kind === "response" && JSON.parse(request.response.body).completion).toBe(body);
+      expect(request.verifications).toHaveLength(0);
+      h.model.send = async () => { throw new Error("replacement_generation_forbidden"); };
+      expect((await h.coordinator.run(id)).selected).toEqual(report.selected);
+      expect(h.remote.sent).toHaveLength(1);
+      expect((await h.ledger.read()).filter(event => event.type === "request_outcome")).toHaveLength(1);
+    } finally { await h.close(); }
+  }, 30000);
+  it("rejects mismatched classifier policies before work and preserves strict unresolved trial classification", async () => {
+    const missingHistory = { ...reply(), body: plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }) }) };
+    const truncated = { ...reply(), body: plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }),
+      choices: [{ finish_reason: "length", message: { role: "assistant", content: "", refusal: null } }] }) };
+    const h = await harness([truncated, missingHistory, missingHistory]);
+    try {
+      const configuration = plannerConfigurationSchema.parse({ ...PLANNER_CONFIGURATION, routingVerification: "completion-inline-strict-v1" });
+      await expect(h.create(false, configuration)).rejects.toThrow("luna_verification_policy_mismatch");
+      const frozen = await freezePlannerDataset({ directory: resolve(h.temp.root, "datasets"), checkout: REPO, version: 1, key: h.keys.datasetKey, crypto: h.keys.crypto,
+        cases: [{ id: randomUUID(), input: h.input, expectation: { requiredDefiningGroups: [["s1"]], allowedUsageNoteRefs: [], allowedOmissionRefs: [], semanticCriteria: ["Controlled coverage."] },
+          approval: { reviewer: "local-owner", approvedAt: new Date().toISOString(), reference: "Controlled expectation.", answersInspected: false } }] });
+      const loaded = await loadPlannerDataset(frozen.directory, h.keys.crypto);
+      const mismatched = createPlannerEvaluator({ store: h.store, ledger: h.ledger, model: h.model });
+      await expect(mismatched.create({ ...loaded, configuration, capNanoUsd: 2e9 })).rejects.toThrow("luna_verification_policy_mismatch");
+      const model = createLunaAdapter({ apiKey: "harmless-key", fetch: h.remote.fetch, routingVerification: "completion-inline-strict-v1" });
+      const strict = createPlannerEvaluator({ store: h.store, ledger: h.ledger, model });
+      const id = await strict.create({ ...loaded, configuration, capNanoUsd: 2e9 });
+      await expect(mismatched.run(id)).rejects.toThrow("luna_verification_policy_mismatch");
+      expect(h.remote.sent).toHaveLength(0);
+      const report = await strict.run(id);
+      expect(report.summary).toMatchObject({ requiredTrials: 3, verificationUnresolvedTrials: 3, invalidContentTrials: 0, rejectedRoutingTrials: 0, unstartedTrials: 0 });
+      expect(report.spend).toMatchObject({ physicalRequests: 3, knownNanoUsd: 1260000, outstandingNanoUsd: 0 });
+      expect((await strict.recover(id)).summary).toEqual(report.summary);
+      expect(h.remote.sent).toHaveLength(3);
+    } finally { await h.close(); }
+  }, 30000);
   it("retains a charged unresolved completion and never reopens or replaces it", async () => {
     const h = await harness([{ ...reply(), body: plannerReply(onePlan, { openrouter_metadata: undefined }) }]);
     try {
@@ -95,7 +136,7 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
     } finally { await h.close(); }
   }, 30000);
   it("finishes other serial evaluation trials after unresolved proof and preserves every outcome on restart", async () => {
-    const h = await harness([{ ...reply(), body: plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }) }) }, reply(), reply()]);
+    const h = await harness([{ ...reply(), body: plannerReply(onePlan, { openrouter_metadata: plannerInlineMetadata({ attempt: undefined, attempts: undefined }) }) }, reply(), reply()]);
     try {
       const frozen = await freezePlannerDataset({ directory: resolve(h.temp.root, "datasets"), checkout: REPO, version: 1, key: h.keys.datasetKey, crypto: h.keys.crypto,
         cases: [{ id: randomUUID(), input: h.input, expectation: { requiredDefiningGroups: [["s1"]], allowedUsageNoteRefs: [], allowedOmissionRefs: [], semanticCriteria: ["Controlled coverage."] },
@@ -117,6 +158,28 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       await expect(recordPlannerDecision(h.store, restarted, { experimentId: id, decision: "promote", reference: "Synthetic check." })).rejects.toThrow("planner_evaluation_not_passing");
       expect(h.remote.sent).toHaveLength(3);
       expect((await evaluator.inspect(id)).outcomes[0].attempt?.id).toBe(attemptId);
+    } finally { await h.close(); }
+  }, 30000);
+  it("can decline unstarted evaluation and review a valid answer while other trials remain unstarted", async () => {
+    const h = await harness([reply()]);
+    try {
+      const frozen = await freezePlannerDataset({ directory: resolve(h.temp.root, "datasets"), checkout: REPO, version: 1, key: h.keys.datasetKey, crypto: h.keys.crypto,
+        cases: [{ id: randomUUID(), input: h.input, expectation: { requiredDefiningGroups: [["s1"]], allowedUsageNoteRefs: [], allowedOmissionRefs: [], semanticCriteria: ["Controlled coverage."] },
+          approval: { reviewer: "local-owner", approvedAt: new Date().toISOString(), reference: "Controlled expectation.", answersInspected: false } }] });
+      let checks = 0;
+      const evaluator = createPlannerEvaluator({ store: h.store, ledger: h.ledger, model: h.model, beforeDispatch: async () => {
+        if (++checks > 2) throw new PrivateError("controlled_stop");
+      } });
+      const id = await evaluator.create({ ...await loadPlannerDataset(frozen.directory, h.keys.crypto), configuration: PLANNER_CONFIGURATION, capNanoUsd: 2e9 });
+      expect(await recordPlannerDecision(h.store, evaluator, { experimentId: id, decision: "do_not_promote", reference: "Controlled unstarted decision." })).toMatchObject({ decision: "do_not_promote" });
+      await expect(evaluator.run(id)).rejects.toThrow("controlled_stop");
+      const report = await evaluator.inspect(id), first = report.outcomes[0].attempt!;
+      expect(report.summary).toMatchObject({ validTrials: 1, pendingTrials: 1, unstartedTrials: 1 });
+      expect(await recordPlannerReview(h.store, evaluator, { schema: "wordwell-planner-trial-review-v1", reviewer: "local-owner", experimentId: id,
+        attemptId: first.id, resultFingerprint: fingerprint(first.result), factualityPassed: true, groundingPassed: true, coveragePassed: true,
+        quality: 3, findings: ["Controlled partial review."], reference: "Controlled review." })).toMatchObject({ modelCalls: 0 });
+      expect(await recordPlannerDecision(h.store, evaluator, { experimentId: id, decision: "do_not_promote", reference: "Controlled partial decision." })).toMatchObject({ decision: "do_not_promote" });
+      expect(h.remote.sent).toHaveLength(1);
     } finally { await h.close(); }
   }, 30000);
   it("waits for durable accounting and retains the completed answer when terminalization writes fail", async () => {

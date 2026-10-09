@@ -6,6 +6,17 @@ provider replies. The first three-trial paid development evaluation is complete.
 Owner semantic review, promotion and the first normal writer selection remain
 acceptance work.
 
+Current writer v2 uses `routingVerification: completion-inline-attempt-number-v1`.
+The owner-approved shared verification amendment accepts returned first-attempt
+success without an optional detailed history list, while retaining exact dated
+OpenAI selection, cache and contradiction checks. Supplied history remains
+validated. The effective configuration fingerprint is
+`23ef47dc15d4f7ecb4b1c4a4b355223237d6c65be58041a8d28b6a9fe65d7c57`.
+This changes local verification only. The writer prompt, request, frozen inputs
+and spending controls are unchanged. Saved strict configurations retain their
+original interpretation. No new writer generation or promotion follows from
+this amendment. See [single-response verification](single-response-verification.md#optional-attempt-history-checkpoint-2026-10-09).
+
 ```text
 Ready source bundle + current gates + promoted selected planner result
     -> pipeline/sources/writer.ts -> fixed writer input

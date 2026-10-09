@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { createStageExecutor } from "../pipeline/execution/executor.js";
 import type { ModelAdapter } from "../pipeline/execution/model.js";
+import { requireLunaVerificationPolicy } from "../pipeline/execution/openrouter.js";
 import { createWriterStage, checkWrittenLesson, writerInputSchema, writerConfigurationSchema, type WriterConfiguration } from "../pipeline/stages/writer.js";
 import { assembleWrittenLesson } from "../pipeline/sources/writer.js";
 import { LUNA_EXECUTION, lunaExecutionSchema, lunaExecutionSettings } from "../pipeline/planner-config.js";
@@ -55,6 +56,7 @@ export function createWriterEvaluator(deps: { store: PrivateStore; ledger: Recei
   async function run(id: string, allowDispatch: boolean) {
     const { material } = await load(id);
     if (material.implementation !== await writerImplementation()) throw new PrivateError("implementation_changed");
+    requireLunaVerificationPolicy(deps.model, material.configuration);
     const lock = await store.lockExperiment(id);
     try {
       const executor = createStageExecutor({ ...deps, settings: lunaExecutionSettings(material.execution, material.configuration.maxOutputTokens) });
@@ -85,6 +87,7 @@ export function createWriterEvaluator(deps: { store: PrivateStore; ledger: Recei
       if (digest(JSON.stringify(body)) !== contentIdentity || dataset.id !== manifest.id || dataset.version !== manifest.version) throw new PrivateError("dataset_identity_mismatch");
       if (new Set(dataset.cases.map(c => c.id)).size !== dataset.cases.length || new Set(dataset.cases.map(c => c.input.headword)).size !== dataset.cases.length) throw new PrivateError("dataset_membership_invalid");
       if (deps.model.route !== config.route) throw new PrivateError("model_adapter_unavailable");
+      requireLunaVerificationPolicy(deps.model, config);
       const id = randomUUID(), implementation = await writerImplementation();
       await store.createExperiment({ id, stage: "writer", dataset: { id: dataset.id, version: dataset.version, ciphertextSha256: manifest.ciphertextSha256 },
         configurationFingerprint: createWriterStage(config, dataset.cases[0].input).fingerprint, implementationFingerprint: implementation, capNanoUsd: options.capNanoUsd,

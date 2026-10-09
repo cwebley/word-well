@@ -2,7 +2,8 @@
 
 Future planner and writer runs decide from the original completion. The approved
 decisions are on [#28](https://github.com/cwebley/word-well/issues/28), especially
-comments 6065877255, 6066133972 and 6066320116.
+comments 6065877255, 6066133972, 6066320116 and
+[the optional-attempt-list amendment](https://github.com/cwebley/word-well/issues/28#issuecomment-6087898686).
 
 ```text
 dated Luna request + inline metadata enabled + response cache disabled
@@ -27,9 +28,13 @@ sleep, scheduled work, background service or replacement answer for missing proo
 - A `gen-` completion ID, a compatible completion model and completion provider
   `OpenAI`. The completion model may be the existing undated Luna alias only when
   the remaining evidence proves the dated upstream.
-- `openrouter_metadata.attempt` equals 1, with an explicit `attempts` array of
-  exactly one successful response. That response must report status 200, provider
-  `OpenAI` and model `openai/gpt-5.6-luna-20260709`.
+- `openrouter_metadata.attempt` equals 1. OpenRouter documents this as the
+  1-indexed attempt number that succeeded. A greater number means earlier
+  attempts failed and fell back.
+- The detailed `attempts` array may be absent. When supplied, it must contain
+  exactly one successful response with status 200, provider `OpenAI` and model
+  `openai/gpt-5.6-luna-20260709`. Null, malformed, empty or incomplete supplied
+  history remains unresolved. Explicit conflicting facts are rejected.
 - Exactly one selected endpoint, with that same dated model and provider. Other
   candidate endpoints do not establish which model served the request.
 - No contradictory response-cache evidence. A returned cache status must be
@@ -37,9 +42,12 @@ sleep, scheduled work, background service or replacement answer for missing proo
   generation-ID header must match the completion ID.
 
 The request's dated slug and metadata `requested` field describe request intent.
-Neither substitutes for returned upstream evidence. `attempt: 1` does not
-substitute for the explicit one-entry history. An undated alias in either the
-selected endpoint or the attempt leaves verification unresolved. Missing or
+Neither substitutes for returned upstream evidence. Current configurations use
+`routingVerification: completion-inline-attempt-number-v1`, which accepts the
+documented successful attempt number without requiring optional history. Saved
+configurations with `completion-inline-strict-v1` retain their original mandatory
+one-entry-history check. An undated alias in either the selected endpoint or a
+supplied attempt leaves verification unresolved. Missing or
 malformed required facts never pass. Explicit wrong models/providers, extra or
 failed attempts, multiple selected endpoints, mismatched generation IDs and cache
 hits are routing rejections, even when other evidence is missing.
@@ -53,10 +61,13 @@ documents header precedence and cache-source/age indicators. Provider prompt
 caching is separate and does not reject a fresh response. Unknown additive
 metadata fields do not invalidate otherwise complete proof.
 
-Synthetic HTTP checks verify this contract and SDK transport support. No real
-inline Luna completion has established that the provider always returns these
-required fields. An optional omitted attempt history can therefore end a usable,
-charged answer as unresolved.
+Synthetic HTTP checks verify this contract and SDK transport support. Three saved
+inline Luna completions returned the dated selected OpenAI endpoint and
+`attempt: 1`, but omitted the optional detailed history. They remain unresolved
+under their original strict interpretation. Offline replay passes the amended
+routing and content checks without adding evidence or making a provider request.
+Missing required facts in any future response still end a charged answer as
+unresolved. This observed case does not establish provider-wide completeness.
 
 ## Persistence and reporting
 
@@ -136,7 +147,7 @@ three answers can be durably paid for while only two are verified. Applying the
 new missing-proof outcome to that historical pending answer would rewrite its
 policy identity. The repair applies to future experiments instead.
 
-Current configurations are planner v5 and writer v2. They fingerprint the strict
+At the original repair checkpoint, planner v5 and writer v2 fingerprinted the strict
 inline policy, response-cache opt-out and terminal missing-evidence outcome.
 Historical configurations remain decodable but cannot create new runs. The new
 implementation and review identities do not authorize older evidence.
@@ -160,3 +171,55 @@ duplication note for planner/writer reporting and continuation predicates. Spec
 review found two gaps, both fixed and regression-tested: malformed evidence could
 discard a valid returned cost, and truncation/refusal classification could bypass
 routing verification. Follow-up spec review found no remaining findings.
+
+## Optional attempt history checkpoint, 2026-10-09
+
+The owner approved accepting the documented successful attempt number without
+requiring the optional detailed list. `pipeline/execution/luna-response.ts` keeps
+the mandatory history check for saved strict configurations and selects the
+amended check only for `completion-inline-attempt-number-v1`. The adapter and
+current planner v5 and writer v2 configurations use this new mode. Their request
+bytes, prompts, output contracts, source inputs and spending controls are
+unchanged. Effective configuration and implementation identities change.
+
+Evaluation and production coordinators require the adapter's verification policy
+to match the saved stage configuration before creating or executing work.
+A mismatch stops with `luna_verification_policy_mismatch`; it cannot misclassify
+missing strict proof as invalid content or a content refusal.
+
+The effective planner configuration fingerprint is
+`ea7df84a68c7118b954b445bde3e5683916e114ac0e25d2a70014e8f927c653a`.
+The effective writer configuration fingerprint is
+`23ef47dc15d4f7ecb4b1c4a4b355223237d6c65be58041a8d28b6a9fe65d7c57`.
+
+Before editing, the evaluated current source and installed dependencies were
+copied into a new private runtime and archived. All 13,085 preserved files and
+symlinks verify against its manifest. The new archive SHA-256 is
+`df941ef5447f6e975ad66ebcad6661db8b371899adda0dbf8987e1164a9d8b04`.
+The earlier archive retains its original checksum. The incomplete earlier
+extracted copy was not repaired or overwritten.
+
+Offline replay of experiment `b22c4dd3-a565-45e7-9802-b602bbeaf224` verifies the
+actual transition. Each saved response reports `attempt: 1` and one selected
+dated OpenAI endpoint, without an `attempts` list. The frozen runtime and current
+code under the saved strict configuration both reproduce unresolved verification.
+The amended configuration passes routing, planner content contracts and the
+unchanged required source-coverage expectations for all three responses.
+This replay writes a private diagnostic report only. It does not turn those
+original terminal trials into accepted results, record an owner semantic review
+or support promotion by itself.
+
+Preservation checks retain all 14,713 private rows across 35 tables, all 17
+inspected frozen-dataset and ledger files, and six exact historical inspection
+reports. Gate compatibility policy identity is unchanged. No model call,
+generation-metadata lookup, historical reconciliation, promotion or production
+selection ran at this checkpoint. The owner subsequently approved append-only
+reuse of these paid answers. The new interpretation is recorded separately, with
+original outcomes and identities preserved. See
+[planner revalidation](lesson-planner.md#append-only-reuse-of-paid-planner-answers).
+
+The final full suite passes 447 tests, with 12 skipped, across 41 files. Typecheck
+and whitespace checks pass. Both standards and spec reviews have zero remaining
+findings. Regression coverage includes policy mismatch before dispatch and strict
+proof classification before truncation or refusal, as well as optional-history
+acceptance, malformed supplied history and unchanged historical stage validation.

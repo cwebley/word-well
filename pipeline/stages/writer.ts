@@ -3,7 +3,7 @@ import { fingerprint } from "../config.js";
 import { PrivateError } from "../storage/crypto.js";
 import type { StageDefinition } from "../execution/stage.js";
 import { checkPlan, planSchema, plannerInputSchema, type LessonPlan, type PlannerInput } from "./planner.js";
-import { checkLunaRouting, completionBody, lunaExchangeSchema } from "../execution/luna-response.js";
+import { checkLunaRouting, completionBody, lunaExchangeSchema, LUNA_INLINE_VERIFICATION } from "../execution/luna-response.js";
 
 // Approved prototype instructions, with the approved example and source-note amendments.
 export const WRITER_PROMPT = `You are writing a vocabulary lesson for an adult learner.
@@ -85,12 +85,12 @@ const historicalWriterConfigurationSchema = z.object({ schema: z.literal("wordwe
 }).strict();
 export const writerConfigurationSchema = z.union([historicalWriterConfigurationSchema,
   historicalWriterConfigurationSchema.omit({ routingLookup: true, metadataRecovery: true }).extend({ schema: z.literal("wordwell-writer-configuration-v2"),
-    routingVerification: z.literal("completion-inline-strict-v1"), responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved") }).strict()]);
+    routingVerification: z.enum(["completion-inline-strict-v1", LUNA_INLINE_VERIFICATION]), responseCache: z.literal("disabled"), missingEvidence: z.literal("terminal-verification-unresolved") }).strict()]);
 export type WriterConfiguration = z.infer<typeof writerConfigurationSchema>;
 export const WRITER_CONFIGURATION: WriterConfiguration = { schema: "wordwell-writer-configuration-v2", stage: "writer", route: "openrouter-aisdk-v1",
   requestedModel: "openai/gpt-5.6-luna", pinnedModel: "openai/gpt-5.6-luna-20260709", provider: "openai", maxOutputTokens: 16000, prompt: WRITER_PROMPT,
   contrastEvidence: "selected-definitions-v1",
-  routingVerification: "completion-inline-strict-v1", responseCache: "disabled", missingEvidence: "terminal-verification-unresolved" };
+  routingVerification: LUNA_INLINE_VERIFICATION, responseCache: "disabled", missingEvidence: "terminal-verification-unresolved" };
 
 export function writerPayload(input: WriterInput, contrastEvidence?: WriterConfiguration["contrastEvidence"]) {
   return `headword: ${input.headword}\n\n` + input.meanings.map(m => `${m.ref} [${m.partOfSpeech}] ${m.definition}\n` +

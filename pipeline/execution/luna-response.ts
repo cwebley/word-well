@@ -16,7 +16,9 @@ export function completionBody(raw: string): string {
   return ["wordwell-luna-exchange-v1", "wordwell-luna-exchange-v2", "wordwell-luna-exchange-v3", "wordwell-luna-exchange-v4"].includes(value?.schema) ? lunaExchangeSchema.parse(value).completion : raw;
 }
 const record = (value: unknown) => z.record(z.string(), z.unknown()).safeParse(value).data ?? {};
-export function checkLunaInlineRouting(raw: string, expected: { requestedModel: string; pinnedModel: string }) {
+export const LUNA_INLINE_VERIFICATION = "completion-inline-attempt-number-v1";
+type RoutingExpectation = { requestedModel: string; pinnedModel: string; routingVerification?: string };
+export function checkLunaInlineRouting(raw: string, expected: RoutingExpectation) {
   const unresolved = () => { throw new PrivateError("luna_verification_unresolved"); };
   const mismatch = () => { throw new PrivateError("luna_routing_evidence_mismatch"); };
   let value: unknown;
@@ -40,10 +42,13 @@ export function checkLunaInlineRouting(raw: string, expected: { requestedModel: 
     attempts.some(e => typeof e.status === "number" && e.status !== 200) ||
     headers.generationId !== null && typeof reply.id === "string" && headers.generationId !== reply.id ||
     reply.response_cache_source_id !== undefined && reply.response_cache_source_id !== null) return mismatch();
+  const history = z.array(z.object({ provider: z.literal("OpenAI"), model: z.literal(expected.pinnedModel), status: z.literal(200) }).passthrough()).length(1);
   const proof = z.object({ id: z.string().regex(/^gen-[0-9A-Za-z-]+$/), model: z.enum([expected.requestedModel, expected.pinnedModel]), provider: z.literal("OpenAI"),
     openrouter_metadata: z.object({ attempt: z.literal(1), endpoints: z.object({ available: z.array(z.object({
-      provider: z.string(), model: z.string(), selected: z.boolean() }).passthrough()) }).passthrough(),
-      attempts: z.array(z.object({ provider: z.literal("OpenAI"), model: z.literal(expected.pinnedModel), status: z.literal(200) }).passthrough()).length(1)
+       provider: z.string(), model: z.string(), selected: z.boolean() }).passthrough()) }).passthrough(),
+      // The documented successful attempt number is sufficient in the new mode.
+      // Supplied history remains checked; older configurations still require it.
+      attempts: expected.routingVerification === LUNA_INLINE_VERIFICATION ? history.optional() : history
     }).passthrough() }).passthrough().safeParse(completion);
   if (!proof.success || selected.length !== 1 || selected[0].provider !== "OpenAI" || selected[0].model !== expected.pinnedModel ||
     headers.cacheStatus !== null && headers.cacheStatus.trim().toUpperCase() !== "MISS") return unresolved();
@@ -51,7 +56,7 @@ export function checkLunaInlineRouting(raw: string, expected: { requestedModel: 
   // current routing record proves no response-cache replay, even without MISS.
   return { reply: proof.data, metadata: proof.data.openrouter_metadata };
 }
-export function checkLunaRouting(raw: string, expected: { requestedModel: string; pinnedModel: string }) {
+export function checkLunaRouting(raw: string, expected: RoutingExpectation) {
   const exchange = lunaExchangeSchema.safeParse(JSON.parse(raw));
   if (!exchange.success) throw new PrivateError("luna_routing_evidence_missing");
   const data = exchange.data;

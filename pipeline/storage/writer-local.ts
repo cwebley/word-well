@@ -7,6 +7,7 @@ import { loadKeychainIdentity } from "./keychain.js";
 import { readBytes } from "./files.js";
 import { createWriterStore } from "./writer.js";
 import { createSourceStore } from "./sources.js";
+import { createPlannerRevalidationStore } from "./planner-revalidations.js";
 
 export async function openLocalWriterStores(evaluation = false) {
   const keys = z.object({ storageKey: keyReferenceSchema, datasetKey: keyReferenceSchema }).passthrough()
@@ -16,6 +17,9 @@ export async function openLocalWriterStores(evaluation = false) {
   const store = await createWriterStore({ ...options, ...(evaluation ? { datasetKey: keys.datasetKey } : {}) });
   try {
     const sources = await createSourceStore(options);
-    return { store, sources, crypto, keys, close: async () => { await Promise.all([store.close(), sources.close()]); } };
+    try {
+      const revalidations = await createPlannerRevalidationStore(options);
+      return { store, sources, revalidations, crypto, keys, close: async () => { await Promise.all([store.close(), sources.close(), revalidations.close()]); } };
+    } catch (error) { await sources.close(); throw error; }
   } catch (error) { await store.close(); throw error; }
 }

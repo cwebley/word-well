@@ -12,7 +12,7 @@ import { WRITER_CONFIGURATION, writerConfigurationSchema, createWriterStage } fr
 import { plannerEvidence } from "./sources/planner.js";
 import { writerEvidence } from "./sources/writer.js";
 import { fingerprint, loadPipelineConfig } from "./config.js";
-import { plannerReply, plannerExchangeBody } from "./testing/planner-fixtures.js";
+import { plannerReply, plannerExchangeBody, plannerInlineMetadata } from "./testing/planner-fixtures.js";
 import { bundleSchema } from "./sources/bundle.js";
 import { PrivateError } from "./storage/crypto.js";
 import { createWriterEvaluator } from "../evals/writer.js";
@@ -162,6 +162,29 @@ describe.skipIf(!process.env.DATABASE_URL)("durable writer paths in restricted d
         approval: { reviewer: "local-owner", approvedAt: new Date().toISOString(), reference: "Controlled expectation and fixed-plan approval.", fixedPlanApproved: true, answersInspected: false } }] });
     return loadWriterDataset(saved.directory, h.keys.crypto);
   }
+  it("requires a matching writer classifier and preserves strict proof failures before content checks", async () => {
+    const missingHistory = { ...reply(), body: plannerReply(written, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }) }) };
+    const refused = { ...reply(), body: plannerReply(written, { openrouter_metadata: plannerInlineMetadata({ attempts: undefined }),
+      choices: [{ finish_reason: "content_filter", message: { role: "assistant", content: "", refusal: "Controlled refusal." } }] }) };
+    const h = await harness([refused, missingHistory, missingHistory]);
+    try {
+      const configuration = writerConfigurationSchema.parse({ ...WRITER_CONFIGURATION, routingVerification: "completion-inline-strict-v1" });
+      await expect(h.create(false, configuration)).rejects.toThrow("luna_verification_policy_mismatch");
+      const dataset = await frozen(h);
+      const mismatched = createWriterEvaluator({ store: h.store, ledger: h.ledger, model: h.model });
+      await expect(mismatched.create({ ...dataset, configuration, capNanoUsd: 2e9 })).rejects.toThrow("luna_verification_policy_mismatch");
+      const model = createLunaAdapter({ apiKey: "harmless-key", fetch: h.remote.fetch, routingVerification: "completion-inline-strict-v1" });
+      const strict = createWriterEvaluator({ store: h.store, ledger: h.ledger, model });
+      const id = await strict.create({ ...dataset, configuration, capNanoUsd: 2e9 });
+      await expect(mismatched.recover(id)).rejects.toThrow("luna_verification_policy_mismatch");
+      expect(h.remote.sent).toHaveLength(0);
+      const report = await strict.run(id);
+      expect(report.summary).toMatchObject({ requiredTrials: 3, verificationUnresolvedTrials: 3, invalidContentTrials: 0, rejectedRoutingTrials: 0, unstartedTrials: 0 });
+      expect(report.spend).toMatchObject({ physicalRequests: 3, knownNanoUsd: 1260000, outstandingNanoUsd: 0 });
+      expect((await strict.recover(id)).summary).toEqual(report.summary);
+      expect(h.remote.sent).toHaveLength(3);
+    } finally { await h.close(); }
+  }, 30000);
   it("freezes a fixed plan, runs three shared writer trials, and binds promotion to exact owner reviews", async () => {
     const h = await harness([reply(), reply(), reply()]);
     try {
