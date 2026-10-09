@@ -11,14 +11,16 @@ import type { PrivateStore, CandidateClaim } from "./storage/postgres.js";
 import type { SourceStore } from "./storage/sources.js";
 import type { ReceiptLedger } from "./storage/receipts.js";
 import { authorizeScopedCandidate } from "./sources/index.js";
-import { appropriatenessReuseIdentity, usefulnessReuseIdentity, productionImplementation } from "./reuse.js";
+import { appropriatenessReuseIdentity, usefulnessReuseIdentity, productionImplementation, historicalAppropriatenessIdentities, historicalUsefulnessIdentities, assertHistoricalGateExecution } from "./reuse.js";
+import { gateCompatibilityPolicyIdentity, parseGateCompatibility } from "./gate-compatibility.js";
 import { executionSettings, runMaterialSchema, type RunMaterial } from "./production-config.js";
 import type { LocalConfig } from "../evals/private-appropriateness.js";
-import { requirePromotion } from "./promotion.js";
+import { requireGatePromotion } from "./gate-promotion-compatibility.js";
 import { requireUsefulnessPromotion } from "./usefulness-promotion.js";
 import { combineTrials, createUsefulnessStage, features, usefulnessConfiguration, usefulnessInputSchema, type Subject, type UsefulnessConfiguration } from "./stages/usefulness.js";
 import { PRODUCTION_COMBINER } from "./stages/usefulness-production.js";
 import type { StageDefinition } from "./execution/stage.js";
+import { createValidationOnlySystemOneAdapter } from "./execution/validation-only.js";
 
 const decisionSchema = z.object({ blockedProbability: z.number().min(0).max(1), slurProbability: z.number().min(0).max(1).nullable(),
   vulgarProbability: z.number().min(0).max(1).nullable(), disposition: z.enum(["accept", "reject"]) }).strict();
@@ -30,6 +32,7 @@ export const productionUsefulnessSchema = z.object({ schema: z.literal("wordwell
   originalAssessmentId: z.string(), originalAppropriatenessResultId: z.uuid(), bundleId: z.string(),
   decision: z.object({ keepScore: z.number().min(0).max(1), verdict: z.enum(["advance", "exclude"]),
     averagedFeatures: z.record(z.string(), z.number()), configId: z.string() }).strict() }).strict();
+type SelectedResult = NonNullable<Awaited<ReturnType<PrivateStore["selectedProductionResult"]>>>;
 
 export function createProductionCoordinator(deps: {
   store: PrivateStore; sources: SourceStore; ledger: ReceiptLedger;
@@ -50,7 +53,7 @@ export function createProductionCoordinator(deps: {
     if (authorization.candidateId !== material.candidateId || authorization.headword !== material.input.headword) throw new PrivateError("candidate_input_changed");
     if (material.usefulness && fingerprint(authorization.usefulnessInput) !== fingerprint(material.usefulness.input)) throw new PrivateError("candidate_input_changed");
     const promotion = material.executionKind !== "live" ? null : stage === "appropriateness"
-      ? await requirePromotion(store, createAppropriatenessStage(material.configuration).fingerprint)
+      ? await requireGatePromotion(store, createAppropriatenessStage(material.configuration).fingerprint)
       : await requireUsefulnessPromotion(store, createUsefulnessStage(material.usefulness!.configuration).fingerprint);
     return { ...authorization, promotionId: promotion?.id };
   }
@@ -78,23 +81,66 @@ export function createProductionCoordinator(deps: {
     const attempt = await store.readAttempt(id), code = `${stage.name}_not_valid`;
     if (attempt?.status !== "valid" || attempt.runId !== runId || attempt.stage !== stage.name || fingerprint(attempt.input.request) !== fingerprint(stage.render(input))) throw new PrivateError(code);
     const parsed = stage.resultSchema.parse(attempt.result), reply = attempt.requests.at(-1)?.response;
-    const validated = reply?.kind === "response" ? stage.validate(reply.body) : null;
+    const provider = createValidationOnlySystemOneAdapter();
+    if (!reply || provider.classify(reply).kind !== "reply" || attempt.requests.some(r => (r.verifications?.length ?? 0) > 0)) throw new PrivateError(code);
+    const validated = reply.kind === "response" ? stage.validate(reply.body) : null;
     if (!validated?.ok || fingerprint(validated.result) !== fingerprint(parsed)) throw new PrivateError(code);
     return { attempt, result: parsed };
   }
-  async function validatePreceding(material: Pick<RunMaterial, "candidateId" | "input" | "configuration" | "reuseIdentity" | "executionKind">) {
-    const selected = await store.selectedProductionResult(material.candidateId);
-    if (!selected || selected.reuseIdentity !== material.reuseIdentity) throw new PrivateError("appropriateness_not_current");
-    const result = productionResultSchema.parse(selected.material);
-    if (result.executionKind !== material.executionKind || result.decision.disposition !== "accept") throw new PrivateError("appropriateness_not_accepted");
-    const stage = createAppropriatenessStage(material.configuration);
-    if (result.configurationFingerprint !== stage.fingerprint || fingerprint(result.input) !== fingerprint(material.input)) throw new PrivateError("appropriateness_not_valid");
+  async function gateEvidence(selected: SelectedResult, kind: "appropriateness" | "usefulness") {
+    const originalRun = await store.readProductionRun(selected.runId);
+    if (!originalRun) throw new PrivateError(`${kind}_not_valid`);
+    const original = runMaterialSchema.parse(originalRun.material);
+    if (kind === "usefulness" && !original.usefulness) throw new PrivateError("usefulness_not_valid");
+    const view = kind === "appropriateness"
+      ? { saved: productionResultSchema.parse(selected.material), input: original.input, originalIdentity: original.reuseIdentity,
+          configurationFingerprint: createAppropriatenessStage(original.configuration).fingerprint,
+          currentIdentity: await appropriatenessReuseIdentity(original.input, original.configuration) }
+      : { saved: productionUsefulnessSchema.parse(selected.material), input: original.usefulness!.input, originalIdentity: original.usefulness!.reuseIdentity,
+          configurationFingerprint: createUsefulnessStage(original.usefulness!.configuration).fingerprint,
+          currentIdentity: await usefulnessReuseIdentity(original.usefulness!.input, original.usefulness!.configuration, original.bundleId) };
+    const { saved } = view;
+    if (selected.reuseIdentity !== view.currentIdentity) await assertHistoricalGateExecution(original.implementation);
+    if (view.originalIdentity !== selected.reuseIdentity || original.executionKind !== saved.executionKind || fingerprint(view.input) !== fingerprint(saved.input) ||
+        view.configurationFingerprint !== saved.configurationFingerprint ||
+        original.bundleId !== saved.bundleId) throw new PrivateError(`${kind}_not_valid`);
+    const trials = (await store.productionTrials(selected.runId)).filter(t => t.stage === kind);
+    if (trials.length !== 3 || trials.some((t, index) => t.trialIndex !== index + 1 || t.attemptId !== saved.trialAttemptIds[index])) throw new PrivateError(`${kind}_not_valid`);
+    const attempts = await Promise.all(saved.trialAttemptIds.map(id => store.readAttempt(id)));
+    // Serialize dates before hashing. This binds timestamps as well as original
+    // reply bytes, accounting and provenance, without changing any saved row.
+    return fingerprint(JSON.parse(JSON.stringify({ selected, originalRun: originalRun.material, trials, attempts })));
+  }
+  async function reuseMatches(selected: SelectedResult, kind: "appropriateness" | "usefulness", currentIdentity: string, historicalIdentities: string[]) {
+    if (selected.reuseIdentity === currentIdentity) return true;
+    if (!historicalIdentities.includes(selected.reuseIdentity)) return false;
+    const value = await store.readGateCompatibility({ kind, subjectId: selected.id, currentIdentity, policyIdentity: gateCompatibilityPolicyIdentity() });
+    if (!value) return false;
+    const proof = parseGateCompatibility(value);
+    return proof.kind === kind && proof.subjectId === selected.id && proof.currentIdentity === currentIdentity && proof.originalIdentity === selected.reuseIdentity && proof.evidenceIdentity === await gateEvidence(selected, kind);
+  }
+  async function appropriateMatches(selected: SelectedResult, input: RunMaterial["input"], configuration: RunMaterial["configuration"], currentIdentity: string) {
+    return reuseMatches(selected, "appropriateness", currentIdentity, selected.reuseIdentity === currentIdentity ? [] : await historicalAppropriatenessIdentities(input, configuration));
+  }
+  async function usefulMatches(selected: SelectedResult, input: Subject, configuration: UsefulnessConfiguration, bundleId: string, currentIdentity: string) {
+    return reuseMatches(selected, "usefulness", currentIdentity, selected.reuseIdentity === currentIdentity ? [] : await historicalUsefulnessIdentities(input, configuration, bundleId));
+  }
+  async function validateAppropriate(selected: SelectedResult, input: RunMaterial["input"], configuration: RunMaterial["configuration"]) {
+    const result = productionResultSchema.parse(selected.material), stage = createAppropriatenessStage(configuration);
+    if (result.configurationFingerprint !== stage.fingerprint || fingerprint(result.input) !== fingerprint(input)) throw new PrivateError("appropriateness_not_valid");
     const signals = [];
     for (const id of result.trialAttemptIds) {
-      const { result: parsed } = await validatedTrial(id, selected.runId, stage, material.input);
+      const { result: parsed } = await validatedTrial(id, selected.runId, stage, input);
       signals.push({ blocked: parsed.blockedProbability, slur: parsed.slurProbability ?? null, vulgar: parsed.vulgarProbability ?? null });
     }
-    if (new Set(result.trialAttemptIds).size !== 3 || fingerprint(averageDecision(signals, thresholdsFor(material.configuration))) !== fingerprint(result.decision)) throw new PrivateError("appropriateness_not_valid");
+    if (new Set(result.trialAttemptIds).size !== 3 || fingerprint(averageDecision(signals, thresholdsFor(configuration))) !== fingerprint(result.decision)) throw new PrivateError("appropriateness_not_valid");
+    return result;
+  }
+  async function validatePreceding(material: Pick<RunMaterial, "candidateId" | "input" | "configuration" | "reuseIdentity" | "executionKind">) {
+    const selected = await store.selectedProductionResult(material.candidateId);
+    if (!selected || !await appropriateMatches(selected, material.input, material.configuration, material.reuseIdentity)) throw new PrivateError("appropriateness_not_current");
+    const result = await validateAppropriate(selected, material.input, material.configuration);
+    if (result.executionKind !== material.executionKind || result.decision.disposition !== "accept") throw new PrivateError("appropriateness_not_accepted");
     return selected;
   }
   async function validateUseful(selected: NonNullable<Awaited<ReturnType<PrivateStore["selectedProductionResult"]>>>, input: Subject, configuration: UsefulnessConfiguration) {
@@ -108,6 +154,20 @@ export function createProductionCoordinator(deps: {
     const combined = combineTrials(answers, configuration.combiner);
     if (new Set(saved.trialAttemptIds).size !== 3 || fingerprint(saved.decision) !== fingerprint({ keepScore: combined.keepScore, verdict: combined.verdict, configId: combined.configId, averagedFeatures: features(answers) })) throw new PrivateError("usefulness_not_valid");
     return saved;
+  }
+  async function authorizeDownstream(options: { bundleId: string; intake: PipelineConfig; stage?: "appropriateness" | "usefulness" }) {
+    const currentIntake = await authorizeScopedCandidate(deps.sources, options.bundleId, options.intake);
+    const promotion = await requireGatePromotion(store, createAppropriatenessStage(APPROPRIATENESS_CONFIGURATION).fingerprint);
+    const selected = await validatePreceding({ candidateId: currentIntake.candidateId, input: currentIntake.appropriatenessInput,
+      configuration: APPROPRIATENESS_CONFIGURATION, executionKind: "live", reuseIdentity: await appropriatenessReuseIdentity(currentIntake.appropriatenessInput, APPROPRIATENESS_CONFIGURATION) });
+    if (options.stage === "appropriateness") return { ...currentIntake, resultId: selected.id, promotionId: promotion.id };
+    const config = usefulnessConfiguration(PRODUCTION_COMBINER), stage = createUsefulnessStage(config);
+    const usefulPromotion = await requireUsefulnessPromotion(store, stage.fingerprint);
+    const useful = await store.selectedProductionResult(currentIntake.candidateId, "usefulness");
+    if (!useful || !await usefulMatches(useful, currentIntake.usefulnessInput, config, options.bundleId, await usefulnessReuseIdentity(currentIntake.usefulnessInput, config, options.bundleId))) throw new PrivateError("usefulness_not_current");
+    const saved = await validateUseful(useful, currentIntake.usefulnessInput, config);
+    if (saved.executionKind !== "live" || saved.decision.verdict !== "advance") throw new PrivateError("usefulness_not_accepted");
+    return { ...currentIntake, resultId: useful.id, promotionId: usefulPromotion.id, appropriatenessResultId: selected.id, appropriatenessPromotionId: promotion.id };
   }
   async function trials<Input, Result>(runId: string, material: RunMaterial, claim: CandidateClaim, stage: StageDefinition<Input, Result>, input: Input, provenance?: unknown) {
     const executor = createStageExecutor({ store, ledger: deps.ledger, model: deps.execution.model, settings: executionSettings(material.execution), sleep: deps.sleep });
@@ -155,7 +215,7 @@ export function createProductionCoordinator(deps: {
       const usefulness = usefulnessConfiguration(PRODUCTION_COMBINER);
       const throughUsefulness = !options.stageOnly || only === "usefulness";
       if (deps.execution.kind === "live") {
-        await requirePromotion(store, stage.fingerprint);
+        await requireGatePromotion(store, stage.fingerprint);
         if (throughUsefulness) await requireUsefulnessPromotion(store, createUsefulnessStage(usefulness).fingerprint);
         if (options.config.pricing.status !== "verified") throw new PrivateError("pricing_unverified");
       }
@@ -187,14 +247,14 @@ export function createProductionCoordinator(deps: {
         // Its immutable authorization is the checkpoint, not a new fresh trial.
         const selected = await store.selectedProductionResult(run.candidateId);
         const checkpoint = (await store.productionAuthorizations(runId)).some(a => a.stage === "appropriateness");
-        const matching = selected?.reuseIdentity === material.reuseIdentity && productionResultSchema.parse(selected.material).executionKind === material.executionKind;
+        const matching = !!selected && await appropriateMatches(selected, material.input, material.configuration, material.reuseIdentity) && productionResultSchema.parse(selected.material).executionKind === material.executionKind;
         if (checkpoint && !matching) throw new PrivateError("appropriateness_not_current");
         const reuseAppropriateness = matching && (!material.fresh || checkpoint);
         if (material.stage === "appropriateness" && reuseAppropriateness) {
-          const saved = productionResultSchema.parse(selected.material);
+          const saved = await validateAppropriate(selected!, material.input, material.configuration);
           if (saved.executionKind === material.executionKind) {
             await store.completeProduction(claim, { status: saved.decision.disposition === "accept" ? "accepted" : "rejected",
-              reusedResultId: selected.id, assessmentId: authorization.assessmentId, promotionId: authorization.promotionId,
+              reusedResultId: selected!.id, assessmentId: authorization.assessmentId, promotionId: authorization.promotionId,
               continuing: !!material.usefulness && saved.decision.disposition === "accept", keepClaim: !!material.usefulness && saved.decision.disposition === "accept" });
             if (!material.usefulness || saved.decision.disposition === "reject") return inspect(runId);
           }
@@ -216,7 +276,7 @@ export function createProductionCoordinator(deps: {
         if (material.usefulness) {
           const previous = await preceding(material), permission = await current(material, "usefulness");
           const selected = !material.fresh ? await store.selectedProductionResult(run.candidateId, "usefulness") : null;
-          if (selected?.reuseIdentity === material.usefulness.reuseIdentity && productionUsefulnessSchema.parse(selected.material).executionKind === material.executionKind) {
+          if (selected && await usefulMatches(selected, material.usefulness.input, material.usefulness.configuration, material.bundleId, material.usefulness.reuseIdentity) && productionUsefulnessSchema.parse(selected.material).executionKind === material.executionKind) {
             const saved = await validateUseful(selected, material.usefulness.input, material.usefulness.configuration);
             await store.completeProduction(claim, { status: saved.decision.verdict === "advance" ? "accepted" : "rejected", stage: "usefulness",
               reusedResultId: selected.id, assessmentId: permission.assessmentId, promotionId: permission.promotionId, appropriatenessResultId: previous.id });
@@ -274,19 +334,45 @@ export function createProductionCoordinator(deps: {
         return inspect(runId);
       } finally { await claim.release(); }
     },
-    async authorizeDownstream(options: { bundleId: string; intake: PipelineConfig; stage?: "appropriateness" | "usefulness" }) {
-      const currentIntake = await authorizeScopedCandidate(deps.sources, options.bundleId, options.intake);
-      const promotion = await requirePromotion(store, createAppropriatenessStage(APPROPRIATENESS_CONFIGURATION).fingerprint);
-      const selected = await validatePreceding({ candidateId: currentIntake.candidateId, input: currentIntake.appropriatenessInput,
-        configuration: APPROPRIATENESS_CONFIGURATION, executionKind: "live", reuseIdentity: await appropriatenessReuseIdentity(currentIntake.appropriatenessInput, APPROPRIATENESS_CONFIGURATION) });
-      if (options.stage === "appropriateness") return { ...currentIntake, resultId: selected.id, promotionId: promotion.id };
-      const config = usefulnessConfiguration(PRODUCTION_COMBINER), stage = createUsefulnessStage(config);
-      const usefulPromotion = await requireUsefulnessPromotion(store, stage.fingerprint);
-      const useful = await store.selectedProductionResult(currentIntake.candidateId, "usefulness");
-      if (!useful || useful.reuseIdentity !== await usefulnessReuseIdentity(currentIntake.usefulnessInput, config, options.bundleId)) throw new PrivateError("usefulness_not_current");
-      const saved = await validateUseful(useful, currentIntake.usefulnessInput, config);
-      if (saved.executionKind !== "live" || saved.decision.verdict !== "advance") throw new PrivateError("usefulness_not_accepted");
-      return { ...currentIntake, resultId: useful.id, promotionId: usefulPromotion.id, appropriatenessResultId: selected.id, appropriatenessPromotionId: promotion.id };
+    authorizeDownstream,
+    async revalidateSavedGates(options: { bundleId: string; intake: PipelineConfig; stage?: "appropriateness" | "usefulness" }) {
+      const permission = await authorizeScopedCandidate(deps.sources, options.bundleId, options.intake);
+      await requireGatePromotion(store, createAppropriatenessStage(APPROPRIATENESS_CONFIGURATION).fingerprint);
+      const config = usefulnessConfiguration(PRODUCTION_COMBINER);
+      const selected = await store.selectedProductionResult(permission.candidateId);
+      if (!selected) throw new PrivateError("appropriateness_not_current");
+      const currentIdentity = await appropriatenessReuseIdentity(permission.appropriatenessInput, APPROPRIATENESS_CONFIGURATION);
+      if (selected.reuseIdentity !== currentIdentity && !(await historicalAppropriatenessIdentities(permission.appropriatenessInput, APPROPRIATENESS_CONFIGURATION)).includes(selected.reuseIdentity)) throw new PrivateError("appropriateness_not_current");
+      const accepted = await validateAppropriate(selected, permission.appropriatenessInput, APPROPRIATENESS_CONFIGURATION);
+      if (accepted.executionKind !== "live" || options.stage === "usefulness" && accepted.decision.disposition !== "accept") throw new PrivateError("appropriateness_not_accepted");
+      async function proof(result: SelectedResult, kind: "appropriateness" | "usefulness", identity: string) {
+        const material = { schema: "wordwell-gate-compatibility-v1", kind, subjectId: result.id, originalIdentity: result.reuseIdentity,
+          currentIdentity: identity, evidenceIdentity: await gateEvidence(result, kind), policyIdentity: gateCompatibilityPolicyIdentity(), modelCalls: 0 };
+        return parseGateCompatibility({ ...material, id: fingerprint(material) });
+      }
+      const appropriateness = await proof(selected, "appropriateness", currentIdentity);
+      const useful = options.stage !== "appropriateness" && accepted.decision.disposition === "accept" ? await store.selectedProductionResult(permission.candidateId, "usefulness") : null;
+      if (options.stage === "usefulness" && !useful) throw new PrivateError("usefulness_not_current");
+      let usefulness = null;
+      if (useful) {
+        await requireUsefulnessPromotion(store, createUsefulnessStage(config).fingerprint);
+        const usefulIdentity = await usefulnessReuseIdentity(permission.usefulnessInput, config, options.bundleId);
+        if (useful.reuseIdentity !== usefulIdentity && !(await historicalUsefulnessIdentities(permission.usefulnessInput, config, options.bundleId)).includes(useful.reuseIdentity)) throw new PrivateError("usefulness_not_current");
+        const saved = await validateUseful(useful, permission.usefulnessInput, config);
+        if (saved.executionKind !== "live" || saved.bundleId !== options.bundleId) throw new PrivateError("usefulness_not_accepted");
+        usefulness = await proof(useful, "usefulness", usefulIdentity);
+      }
+      if ((await store.selectedProductionResult(permission.candidateId))?.id !== selected.id || useful && (await store.selectedProductionResult(permission.candidateId, "usefulness"))?.id !== useful.id) throw new PrivateError("gate_selection_changed");
+      await store.saveGateCompatibility({ ...appropriateness, material: appropriateness });
+      if (usefulness) await store.saveGateCompatibility({ ...usefulness, material: usefulness });
+      await requireGatePromotion(store, createAppropriatenessStage(APPROPRIATENESS_CONFIGURATION).fingerprint);
+      await authorizeScopedCandidate(deps.sources, options.bundleId, options.intake);
+      if (!await appropriateMatches(selected, permission.appropriatenessInput, APPROPRIATENESS_CONFIGURATION, currentIdentity)) throw new PrivateError("appropriateness_not_current");
+      if (useful) {
+        await requireUsefulnessPromotion(store, createUsefulnessStage(config).fingerprint);
+        if (!await usefulMatches(useful, permission.usefulnessInput, config, options.bundleId, usefulness!.currentIdentity)) throw new PrivateError("usefulness_not_current");
+      }
+      return { appropriateness, usefulness, modelCalls: 0 as const };
     }
   };
 }

@@ -1,8 +1,11 @@
 // @vitest-environment node
 import { readFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { assessSavedPromotion, recordOwnerPromotion, requirePromotion } from "./promotion.js";
+import { requireGatePromotion, revalidateSavedGatePromotion } from "./gate-promotion-compatibility.js";
+import { fingerprint } from "./config.js";
 import { createPrivateStore } from "./storage/postgres.js";
 import { createReceiptLedger } from "./storage/receipts.js";
 import { createSystemOneAdapter } from "./execution/system-one.js";
@@ -13,6 +16,80 @@ import { fixturePool, jevReply, scriptedFetch, testDatabase, REPO } from "./test
 
 const config = loadLocalConfig(JSON.parse(await readFile(resolve(REPO, "config/private-appropriateness.json"), "utf8")));
 describe.skipIf(!process.env.DATABASE_URL)("versioned saved-evidence promotion", () => {
+  it("carries only the approved rule transition across exact historical evidence, without replacing the owner's decision", async () => {
+    const database = await testDatabase(), d = await frozenDataset([{ headword: "harmless-clear-standin", finding: "clear", split: "held-out" }]);
+    const options = { connectionString: database.pipelineUrl, storageKey: d.f.storageKey, datasetKey: d.f.datasetKey, crypto: d.f.crypto };
+    const store = await createPrivateStore(options), admin = fixturePool(database.adminUrl);
+    const ledger = await createReceiptLedger({ directory: resolve(d.f.root, "ledger"), checkout: REPO });
+    const remote = scriptedFetch(Array.from({ length: 3 }, () => jevReply("clear", 0.1, {}, 0.1)));
+    const runner = createPrivateAppropriatenessRunner({ store, ledger, models: { "openrouter-systemone-v1": createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: remote.fetch }) },
+      implementation: { ...await implementationIdentity(), fingerprint: "1266db030c7ca52515a000b1d5b9b65ad1b4c8c63dc4286fedd87aa78585d0b2" } });
+    try {
+      const experimentId = await runner.create({ datasetDir: d.datasetDir, manifest: d.manifest, datasetCrypto: d.f.crypto, capNanoUsd: 1_000_000_000,
+        configuration: APPROPRIATENESS_CONFIGURATION, config, split: "held-out" });
+      await runner.run(experimentId);
+      await runner.finalize(experimentId, { summariesDir: resolve(d.f.root, "summaries") });
+      // The original store predates request_verifications. Retain its exact view
+      // for this historical fixture, without changing any attempt or response.
+      const historicalStore = { ...store, readAttempt: async (id: string) => {
+        const attempt = await store.readAttempt(id);
+        return attempt && { ...attempt, requests: attempt.requests.map(({ verifications: _empty, ...request }) => request) };
+      } };
+      const assessed = await assessSavedPromotion({ store: historicalStore, datasetDir: d.datasetDir, manifest: d.manifest, crypto: d.f.crypto, experimentId });
+      const original = { ...assessed, ruleIdentity: "c1c53e7f137fe21bed9d6b4c537303d00f6c2ec7b51508244b8e69a386066b37" };
+      original.id = fingerprint({ ruleIdentity: original.ruleIdentity, evidenceIdentity: original.evidenceIdentity });
+      await store.savePromotionAssessment({ ...original, material: original });
+      const owner = { schema: "wordwell-owner-stage-promotion-v1", reviewer: "local-owner", issue: "https://github.com/cwebley/word-well/issues/17",
+        decisionReference: "https://github.com/cwebley/word-well/issues/17#issuecomment-1", assessmentId: original.id, decision: "promote" as const };
+      const promotionId = "f29675ef-4c9b-43d6-99ea-3eece045a943";
+      await store.recordPromotion({ id: promotionId, assessmentId: original.id, configurationFingerprint: original.configurationFingerprint, decision: "promote", material: owner });
+      const before = await store.readPromotionAssessment(original.id), receipts = await ledger.read();
+      await expect(requireGatePromotion(store, original.configurationFingerprint)).rejects.toThrow("promotion_evidence_invalid");
+      const revalidate = () => revalidateSavedGatePromotion({ store, datasetDir: d.datasetDir, manifest: d.manifest, crypto: d.f.crypto, configurationFingerprint: original.configurationFingerprint });
+      const proof = await revalidate();
+      expect(proof).toMatchObject({ kind: "promotion", subjectId: promotionId, originalAssessmentId: original.id, originalIdentity: original.ruleIdentity, modelCalls: 0 });
+      expect(await revalidate()).toEqual(proof);
+      const restarted = await createPrivateStore(options);
+      try { expect((await requireGatePromotion(restarted, original.configurationFingerprint)).id).toBe(promotionId); }
+      finally { await restarted.close(); }
+      expect(await store.readPromotionAssessment(original.id)).toEqual(before);
+      expect(await store.currentPromotion(original.configurationFingerprint)).toMatchObject({ id: promotionId, material: owner });
+      expect(await ledger.read()).toEqual(receipts);
+      expect(remote.sent).toHaveLength(3);
+      await expect(admin.query("UPDATE private.gate_compatibilities SET current_identity=$1 WHERE id=$2", ["0".repeat(64), proof.id])).rejects.toMatchObject({ code: "55000" });
+      const learner = fixturePool(database.learnerUrl);
+      try { await expect(learner.query("SELECT * FROM private.gate_compatibilities")).rejects.toMatchObject({ code: "42501" }); }
+      finally { await learner.end(); }
+      // Same scores do not authorize an unknown rule or a different evidence
+      // identity. Both must fail before a compatibility proof can be appended.
+      for (const change of [{ ruleIdentity: "0".repeat(64) }, { evidenceIdentity: "1".repeat(64) }, { originalSummarySha256: "2".repeat(64) }]) {
+        const altered = { ...original, ...change };
+        if ("originalSummarySha256" in change) altered.evidenceIdentity = "3".repeat(64);
+        altered.id = fingerprint({ ruleIdentity: altered.ruleIdentity, evidenceIdentity: altered.evidenceIdentity });
+        await store.savePromotionAssessment({ ...altered, material: altered });
+        await store.recordPromotion({ id: randomUUID(), assessmentId: altered.id, configurationFingerprint: original.configurationFingerprint,
+          decision: "promote", material: { ...owner, assessmentId: altered.id } });
+        await expect(requireGatePromotion(store, original.configurationFingerprint)).rejects.toThrow("promotion_evidence_invalid");
+        await expect(revalidate()).rejects.toThrow("promotion_evidence_invalid");
+      }
+      await store.recordPromotion({ id: randomUUID(), assessmentId: original.id, configurationFingerprint: original.configurationFingerprint, decision: "promote", material: owner });
+      await revalidate();
+      expect((await requireGatePromotion(store, original.configurationFingerprint)).decision).toBe("promote");
+      // A new reservation can be appended through the public storage interface
+      // even after finalization. A prior snapshot must not authorize changed
+      // evidence, and checking its integrity must not need the dataset key.
+      const trial = (await store.listTrials(experimentId))[0];
+      await store.reserveRequest({ requestId: randomUUID(), experimentId, attemptId: trial.attemptId, sequence: 2, reservedNanoUsd: 1, at: new Date() });
+      const productionStore = await createPrivateStore({ ...options, datasetKey: undefined });
+      try { await expect(requireGatePromotion(productionStore, original.configurationFingerprint)).rejects.toThrow("promotion_evidence_invalid"); }
+      finally { await productionStore.close(); }
+      expect(remote.sent).toHaveLength(3);
+      await store.recordPromotion({ id: "494f8d72-c5db-4878-8c1e-d95f7c097c28", assessmentId: original.id, configurationFingerprint: original.configurationFingerprint,
+        decision: "do_not_promote", material: { ...owner, decision: "do_not_promote" } });
+      await expect(requireGatePromotion(store, original.configurationFingerprint)).rejects.toThrow("configuration_not_promoted");
+      await expect(revalidate()).rejects.toThrow("configuration_not_promoted");
+    } finally { await Promise.all([store.close(), admin.end()]); await database.drop(); await d.f.cleanup(); }
+  }, 30_000);
   it("counts averaged accuracy, reports both error directions and development misses, and preserves finalized evidence", async () => {
     const database = await testDatabase();
     const d = await frozenDataset([

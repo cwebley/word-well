@@ -6,8 +6,9 @@ import pg from "pg";
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
-import { PrivateError, type KeyReference, type PrivateCrypto } from "./crypto.js";
+import { digest, PrivateError, type KeyReference, type PrivateCrypto } from "./crypto.js";
 import type { Exchange } from "../execution/model.js";
+import type { GateCompatibilityKey } from "../gate-compatibility.js";
 
 export type AttemptStatus = "pending" | "valid" | "invalid" | "failed" | "uncertain" | "response_lost" | "verification_unresolved";
 export type RequestRecord = {
@@ -543,6 +544,28 @@ export async function createPrivateStore(options: {
       return row ? { id, configurationFingerprint: row.configuration_fingerprint as string, qualifies: row.qualifies as boolean,
         material: await open(`promotion_assessments:${id}:payload`, row.key_id, row.payload, anyJson) } : null;
     },
+    // Production checks this encrypted-row binding without the dataset key.
+    // One read-only snapshot includes mutable accounting, membership and labels.
+    async gatePromotionEvidenceIdentity(experimentIds: string[]) {
+      return read("gate_promotion_evidence_identity", async () => {
+        const client = await pool.connect();
+        try {
+          await client.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+          const ids = [...new Set(experimentIds)].sort();
+          const data = [];
+          for (const table of ["experiments", "cases", "trials", "case_scores", "attempts", "requests", "request_verifications"]) {
+            const from = table === "requests" ? "private.requests t JOIN private.attempts a ON a.id=t.attempt_id"
+              : table === "request_verifications" ? "private.request_verifications t JOIN private.requests r ON r.id=t.request_id JOIN private.attempts a ON a.id=r.attempt_id" : `private.${table} t`;
+            const owner = table === "experiments" ? "t.id" : ["requests", "request_verifications"].includes(table) ? "a.experiment_id" : "t.experiment_id";
+            const { rows } = await client.query(`SELECT row_to_json(t)::text AS value FROM ${from} WHERE ${owner}=ANY($1::uuid[]) ORDER BY row_to_json(t)::text`, [ids]);
+            data.push({ table, rows: rows.map(row => row.value) });
+          }
+          await client.query("COMMIT");
+          return digest(JSON.stringify({ experimentIds: ids, data }));
+        } catch (error) { await client.query("ROLLBACK").catch(() => {}); throw error; }
+        finally { client.release(); }
+      });
+    },
     async recordPromotion(record: { id: string; assessmentId?: string; stage?: "appropriateness" | "usefulness"; configurationFingerprint: string; decision: "promote" | "do_not_promote"; material: unknown }) {
       const payload = await seal(`stage_promotions:${record.id}:payload`, record.material);
       await guard("record_promotion", async () => {
@@ -559,6 +582,21 @@ export async function createPrivateStore(options: {
         "SELECT * FROM private.stage_promotions WHERE configuration_fingerprint=$1 ORDER BY created_at DESC,id DESC LIMIT 1", [configurationFingerprint]));
       return row ? { id: row.id as string, decision: row.decision as "promote" | "do_not_promote", assessmentId: row.assessment_id as string,
         material: await open(`stage_promotions:${row.id}:payload`, row.key_id, row.payload, anyJson) } : null;
+    },
+    async saveGateCompatibility(record: GateCompatibilityKey & { id: string; material: unknown }) {
+      const payload = await seal(`gate_compatibilities:${record.id}:payload`, record.material);
+      await guard("save_gate_compatibility", async () => {
+        await pool.query(`INSERT INTO private.gate_compatibilities(id,kind,subject_id,promotion_id,result_id,current_identity,policy_identity,key_id,payload)
+          VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT DO NOTHING`,
+          [record.id, record.kind, record.subjectId, record.kind === "promotion" ? record.subjectId : null,
+            record.kind === "promotion" ? null : record.subjectId, record.currentIdentity, record.policyIdentity, key.id, payload]);
+        const { rows: [row] } = await pool.query("SELECT * FROM private.gate_compatibilities WHERE kind=$1 AND subject_id=$2 AND current_identity=$3 AND policy_identity=$4", [record.kind, record.subjectId, record.currentIdentity, record.policyIdentity]);
+        if (!row || row.id !== record.id || !isDeepStrictEqual(await open(`gate_compatibilities:${row.id}:payload`, row.key_id, row.payload, anyJson), record.material)) throw new PrivateError("gate_compatibility_conflict");
+      });
+    },
+    async readGateCompatibility(record: GateCompatibilityKey) {
+      const { rows: [row] } = await read("read_gate_compatibility", () => pool.query("SELECT * FROM private.gate_compatibilities WHERE kind=$1 AND subject_id=$2 AND current_identity=$3 AND policy_identity=$4", [record.kind, record.subjectId, record.currentIdentity, record.policyIdentity]));
+      return row ? await open(`gate_compatibilities:${row.id}:payload`, row.key_id, row.payload, anyJson) : null;
     },
     async productionHistory(candidateId: string) {
       const { rows } = await read("production_history", () => pool.query("SELECT id,result_id,run_id,created_at FROM private.selection_history WHERE candidate_id=$1 ORDER BY created_at,id", [candidateId]));

@@ -22,6 +22,9 @@ if (group === "sources" && ["fetch", "setup", "extract", "verify", "status", "re
     } else if (["run", "resume", "recover", "inspect"].includes(group)) {
       const { executeProductionCommand } = await import("./production-commands.js");
       console.log(JSON.stringify(await executeProductionCommand(process.argv.slice(2))));
+    } else if (group === "compatibility") {
+      const { executeGateCompatibilityCommand } = await import("./gate-compatibility-commands.js");
+      console.log(JSON.stringify(await executeGateCompatibilityCommand(process.argv.slice(2))));
     } else if (group === "promotion") {
       const { executePromotionCommand } = await import("./promotion-commands.js");
       console.log(JSON.stringify(await executePromotionCommand(process.argv.slice(2))));

@@ -2,8 +2,10 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { beforeAll, describe, expect, it } from "vitest";
-import { createProductionCoordinator } from "./run.js";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import { createProductionCoordinator, productionResultSchema, productionUsefulnessSchema } from "./run.js";
+import { createStageExecutor } from "./execution/executor.js";
+import { averageDecision, thresholdsFor } from "./stages/appropriateness.js";
 import { createPrivateStore } from "./storage/postgres.js";
 import { createSourceStore } from "./storage/sources.js";
 import { createReceiptLedger } from "./storage/receipts.js";
@@ -11,10 +13,11 @@ import { createSystemOneAdapter } from "./execution/system-one.js";
 import { createAppropriatenessStage, APPROPRIATENESS_CONFIGURATION } from "./stages/appropriateness.js";
 import { buildScopedCandidate, authorizeScopedCandidate } from "./sources/index.js";
 import { loadPipelineConfig, fingerprint } from "./config.js";
-import { executionSettings } from "./production-config.js";
+import { executionSettings, runMaterialSchema } from "./production-config.js";
 import { createPrivateAppropriatenessRunner, implementationIdentity, loadLocalConfig } from "../evals/private-appropriateness.js";
 import { frozenDataset } from "../evals/private-fixtures.js";
 import { assessSavedPromotion, recordOwnerPromotion } from "./promotion.js";
+import { revalidateSavedGatePromotion } from "./gate-promotion-compatibility.js";
 import { fixturePool, harmlessKeys, jevReply, scriptedFetch, privateTempDir, testDatabase, REPO, type ScriptedReply } from "./testing/private-fixtures.js";
 import { PrivateError } from "./storage/crypto.js";
 import { bundleSchema, type EvidenceBundle } from "./sources/bundle.js";
@@ -24,6 +27,19 @@ import { combineTrials, createUsefulnessStage, features, usefulnessConfiguration
 import { PRODUCTION_COMBINER } from "./stages/usefulness-production.js";
 import { recordApprovedUsefulnessPromotion } from "./usefulness-promotion.js";
 import { createDurableUsefulnessEvaluator } from "../evals/durable-usefulness.js";
+
+// Simulate the bytes of a subsequent checkout without editing source files or
+// mocking authorization. The coordinator and encrypted store remain real.
+const sourceChange = vi.hoisted(() => ({ path: "", suffix: "", before: "", after: "" }));
+vi.mock("node:fs/promises", async importOriginal => {
+  const fs = await importOriginal<typeof import("node:fs/promises")>();
+  return { ...fs, readFile: async (...args: Parameters<typeof fs.readFile>) => {
+    const bytes = await fs.readFile(...args);
+    if (!sourceChange.path || !String(args[0]).endsWith(sourceChange.path) || typeof bytes !== "string") return bytes;
+    if (sourceChange.before && !bytes.includes(sourceChange.before)) throw new Error("source_change_fixture_mismatch");
+    return (sourceChange.before ? bytes.replace(sourceChange.before, sourceChange.after) : bytes) + sourceChange.suffix;
+  } };
+});
 
 const config = loadLocalConfig(JSON.parse(await readFile(resolve(REPO, "config/private-appropriateness.json"), "utf8")));
 const intake = await loadPipelineConfig(resolve(REPO, "config/pipeline.yaml"));
@@ -443,6 +459,157 @@ describe.skipIf(!process.env.DATABASE_URL)("production appropriateness coordinat
     } finally { releaseReply(); await h.close(); }
   });
   const normal = (h: Awaited<ReturnType<typeof harness>>, fresh = false) => h.coordinator.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, fresh });
+  it("revalidates historical live gate selections, tolerates unrelated Luna types, and rejects changed provider behavior without calls", async () => {
+    const h = await harness([...Array.from({ length: 3 }, clear), ...Array.from({ length: 3 }, () => usefulnessReply()),
+      ...Array.from({ length: 3 }, () => usefulnessReply(1.9)), ...Array.from({ length: 3 }, () => jevReply("blocked", 0.8, {}, 0.1))]);
+    const d = await frozenDataset([{ headword: "harmless-heldout", finding: "clear", split: "held-out" }]);
+    const crypto = { verify: (key: typeof h.keys.storageKey) => (key.id.startsWith("ww-storage-") ? h.keys.crypto : d.f.crypto).verify(key),
+      encrypt: (key: typeof h.keys.storageKey, id: string, value: unknown) => (key.id.startsWith("ww-storage-") ? h.keys.crypto : d.f.crypto).encrypt(key, id, value),
+      decrypt: <T>(key: typeof h.keys.storageKey, id: string, bytes: Uint8Array, schema: import("zod").z.ZodType<T>) => (key.id.startsWith("ww-storage-") ? h.keys.crypto : d.f.crypto).decrypt(key, id, bytes, schema) };
+    const evalStore = await createPrivateStore({ ...h.options, datasetKey: d.f.datasetKey, crypto });
+    const evalRemote = scriptedFetch(Array.from({ length: 3 }, clear));
+    const evalLedger = await createReceiptLedger({ directory: resolve(d.f.root, "ledger"), checkout: REPO });
+    const evaluator = createPrivateAppropriatenessRunner({ store: evalStore, ledger: evalLedger,
+      models: { "openrouter-systemone-v1": createSystemOneAdapter({ apiKey: "harmless-test-key", fetch: evalRemote.fetch }) },
+      implementation: { ...await implementationIdentity(), fingerprint: "1266db030c7ca52515a000b1d5b9b65ad1b4c8c63dc4286fedd87aa78585d0b2" } });
+    try {
+      const experimentId = await evaluator.create({ datasetDir: d.datasetDir, manifest: d.manifest, datasetCrypto: d.f.crypto,
+        capNanoUsd: 100_000_000, configuration: APPROPRIATENESS_CONFIGURATION, config, split: "held-out" });
+      await evaluator.run(experimentId); await evaluator.finalize(experimentId, { summariesDir: resolve(d.f.root, "summaries") });
+      const historicalStore = { ...evalStore, readAttempt: async (id: string) => {
+        const attempt = await evalStore.readAttempt(id);
+        return attempt && { ...attempt, requests: attempt.requests.map(({ verifications: _empty, ...request }) => request) };
+      } };
+      const assessment = await assessSavedPromotion({ store: historicalStore, datasetDir: d.datasetDir, manifest: d.manifest, crypto: d.f.crypto, experimentId });
+      assessment.ruleIdentity = "c1c53e7f137fe21bed9d6b4c537303d00f6c2ec7b51508244b8e69a386066b37";
+      assessment.id = fingerprint({ ruleIdentity: assessment.ruleIdentity, evidenceIdentity: assessment.evidenceIdentity });
+      await h.store.savePromotionAssessment({ ...assessment, material: assessment });
+      await h.store.recordPromotion({ id: randomUUID(), assessmentId: assessment.id, configurationFingerprint: assessment.configurationFingerprint, decision: "promote",
+        material: { schema: "wordwell-owner-stage-promotion-v1", reviewer: "local-owner", issue: "https://github.com/cwebley/word-well/issues/17",
+          decisionReference: "https://github.com/cwebley/word-well/issues/17#issuecomment-1", assessmentId: assessment.id, decision: "promote" } });
+      await revalidateSavedGatePromotion({ store: evalStore, datasetDir: d.datasetDir, manifest: d.manifest, crypto: d.f.crypto, configurationFingerprint: assessment.configurationFingerprint });
+      await recordApprovedUsefulnessPromotion(h.store);
+      const live = createProductionCoordinator({ store: h.store, sources: h.sources, ledger: h.ledger, currentIntake: h.currentIntake, execution: { kind: "live", model: h.model } });
+      const templateId = await live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
+      const material = runMaterialSchema.parse((await h.store.readProductionRun(templateId))!.material);
+      material.implementation = "2871109493cddcfdf1f462b14e4b707b884c6019a2af730b67747033c2f164fb";
+      const usefulStage = createUsefulnessStage(material.usefulness!.configuration);
+      // Reproduce the historical identity calculation as fixture data. These
+      // bytes are the independently pinned pre-Luna interface, never runtime code.
+      const modelBytes = await readFile(resolve(REPO, "pipeline/compatibility/model-before-luna.txt"), "utf8");
+      const lock = JSON.parse(await readFile(resolve(REPO, "package-lock.json"), "utf8"));
+      const oldImplementation = (paths: string[]) => Promise.all(paths.map(async path => ({ path,
+        bytes: path === "execution/model.ts" ? modelBytes : await readFile(resolve(REPO, "pipeline", path), "utf8") })));
+      material.reuseIdentity = fingerprint({ input: material.input, request: stage.render(material.input), configuration: stage.configuration,
+        contractDependency: lock.packages["node_modules/zod"], implementation: await oldImplementation(["stages/appropriateness.ts", "execution/stage.ts", "execution/model.ts", "execution/system-one.ts"]) });
+      material.usefulness!.reuseIdentity = fingerprint({ input: material.usefulness!.input, bundleId: h.bundleId, request: usefulStage.render(material.usefulness!.input), configuration: usefulStage.configuration,
+        contractDependency: lock.packages["node_modules/zod"], implementation: await oldImplementation(["stages/usefulness.ts", "execution/jev.ts", "execution/stage.ts", "execution/model.ts", "execution/system-one.ts"]) });
+      const runId = randomUUID();
+      await h.store.createProductionRun({ id: runId, candidateId: material.candidateId, capNanoUsd: 100_000_000, material });
+      const claim = await h.store.claimCandidate(material.candidateId, runId);
+      const executor = createStageExecutor({ store: h.store, ledger: h.ledger, model: h.model, settings: executionSettings(config) });
+      const ids: string[] = [], signals = [];
+      const appropriatenessResultId = randomUUID();
+      try {
+        for (let index = 1; index <= 3; index++) {
+          const attemptId = await h.store.productionTrial(runId, index); ids.push(attemptId);
+          const outcome = await executor.execute({ runId, attemptId, stage, input: material.input, ownership: claim, assertOwnership: claim.assert });
+          if (outcome.state !== "valid") throw new Error("historical_fixture_not_valid");
+          signals.push({ blocked: outcome.result.blockedProbability, slur: outcome.result.slurProbability ?? null, vulgar: outcome.result.vulgarProbability ?? null });
+        }
+        await h.store.completeProduction(claim, { status: "accepted", continuing: true, keepClaim: true, result: { id: appropriatenessResultId, reuseIdentity: material.reuseIdentity,
+          material: productionResultSchema.parse({ schema: "wordwell-production-appropriateness-v1", executionKind: "live", trialAttemptIds: ids,
+            input: material.input, configurationFingerprint: stage.fingerprint, originalAssessmentId: material.assessmentId, bundleId: h.bundleId, decision: averageDecision(signals, thresholdsFor(material.configuration)) }) } });
+        const stageOnly = await live.revalidateSavedGates({ bundleId: h.bundleId, intake });
+        expect(stageOnly).toMatchObject({ appropriateness: { subjectId: appropriatenessResultId }, usefulness: null, modelCalls: 0 });
+        const usefulIds: string[] = [], answers = [];
+        for (let index = 1; index <= 3; index++) {
+          const attemptId = await h.store.productionTrial(runId, index, "usefulness"); usefulIds.push(attemptId);
+          const outcome = await executor.execute({ runId, attemptId, stage: usefulStage, input: material.usefulness!.input,
+            provenance: { appropriatenessResultId, assessmentId: material.assessmentId, bundleId: h.bundleId }, ownership: claim, assertOwnership: claim.assert });
+          if (outcome.state !== "valid") throw new Error("historical_fixture_not_valid");
+          answers.push(outcome.result.answers);
+        }
+        const combined = combineTrials(answers, material.usefulness!.configuration.combiner);
+        await h.store.completeProduction(claim, { status: "accepted", stage: "usefulness", result: { id: randomUUID(), reuseIdentity: material.usefulness!.reuseIdentity,
+          material: productionUsefulnessSchema.parse({ schema: "wordwell-production-usefulness-v1", executionKind: "live", trialAttemptIds: usefulIds,
+            input: material.usefulness!.input, configurationFingerprint: usefulStage.fingerprint, originalAssessmentId: material.assessmentId, originalAppropriatenessResultId: appropriatenessResultId,
+            bundleId: h.bundleId, decision: { keepScore: combined.keepScore, verdict: combined.verdict, configId: combined.configId, averagedFeatures: features(answers) } }) } });
+      } finally { await claim.release(); }
+      const original = await live.inspect(runId), receipts = await h.ledger.read();
+      await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("usefulness_not_current");
+      const proofs = await live.revalidateSavedGates({ bundleId: h.bundleId, intake });
+      expect(proofs).toMatchObject({ modelCalls: 0, appropriateness: { subjectId: appropriatenessResultId }, usefulness: { subjectId: original.selectedUsefulness!.id } });
+      expect(await live.revalidateSavedGates({ bundleId: h.bundleId, intake })).toEqual(proofs);
+      sourceChange.path = "execution/model.ts"; sourceChange.suffix = '\nexport type UnrelatedLunaMetadata = { extra: string };\n';
+      const restartedStore = await createPrivateStore(h.options);
+      try {
+        const restarted = createProductionCoordinator({ store: restartedStore, sources: h.sources, ledger: h.ledger, currentIntake: h.currentIntake, execution: { kind: "live", model: h.model } });
+        expect(await restarted.authorizeDownstream({ bundleId: h.bundleId, intake })).toMatchObject({ appropriatenessResultId, resultId: original.selectedUsefulness!.id });
+        const reused = await restarted.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
+        expect((await restarted.run(reused)).spend.physicalRequests).toBe(0);
+      } finally { await restartedStore.close(); }
+      expect((await live.inspect(runId)).selected).toEqual(original.selected);
+      expect((await live.inspect(runId)).selectedUsefulness).toEqual(original.selectedUsefulness);
+      expect(await h.ledger.read()).toEqual(receipts);
+      sourceChange.path = ""; sourceChange.suffix = "";
+      // Negative saved judgments are reusable content too. They gain no
+      // downstream permission and must not spend another three calls.
+      const excludedRun = randomUUID();
+      await h.store.createProductionRun({ id: excludedRun, candidateId: material.candidateId, capNanoUsd: 100_000_000,
+        material: { ...material, stage: "usefulness", mode: "stage-only" } });
+      const usefulClaim = await h.store.claimCandidate(material.candidateId, excludedRun);
+      try {
+        const ids: string[] = [], answers = [];
+        for (let index = 1; index <= 3; index++) {
+          const attemptId = await h.store.productionTrial(excludedRun, index, "usefulness"); ids.push(attemptId);
+          const outcome = await executor.execute({ runId: excludedRun, attemptId, stage: usefulStage, input: material.usefulness!.input,
+            provenance: { appropriatenessResultId, assessmentId: material.assessmentId, bundleId: h.bundleId }, ownership: usefulClaim, assertOwnership: usefulClaim.assert });
+          if (outcome.state !== "valid") throw new Error("historical_fixture_not_valid");
+          answers.push(outcome.result.answers);
+        }
+        const combined = combineTrials(answers, material.usefulness!.configuration.combiner);
+        expect(combined.verdict).toBe("exclude");
+        await h.store.completeProduction(usefulClaim, { status: "rejected", stage: "usefulness", result: { id: randomUUID(), reuseIdentity: material.usefulness!.reuseIdentity,
+          material: productionUsefulnessSchema.parse({ schema: "wordwell-production-usefulness-v1", executionKind: "live", trialAttemptIds: ids,
+            input: material.usefulness!.input, configurationFingerprint: usefulStage.fingerprint, originalAssessmentId: material.assessmentId, originalAppropriatenessResultId: appropriatenessResultId,
+            bundleId: h.bundleId, decision: { keepScore: combined.keepScore, verdict: combined.verdict, configId: combined.configId, averagedFeatures: features(answers) } }) } });
+      } finally { await usefulClaim.release(); }
+      expect((await live.revalidateSavedGates({ bundleId: h.bundleId, intake })).usefulness).not.toBeNull();
+      await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("usefulness_not_accepted");
+      const excludedReuse = await live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000 });
+      expect(await live.run(excludedReuse)).toMatchObject({ status: "rejected", spend: { physicalRequests: 0 } });
+      const rejectedRun = randomUUID();
+      await h.store.createProductionRun({ id: rejectedRun, candidateId: material.candidateId, capNanoUsd: 100_000_000, material: { ...material, mode: "stage-only" } });
+      const negativeClaim = await h.store.claimCandidate(material.candidateId, rejectedRun);
+      try {
+        const ids: string[] = [], signals = [];
+        for (let index = 1; index <= 3; index++) {
+          const attemptId = await h.store.productionTrial(rejectedRun, index); ids.push(attemptId);
+          const outcome = await executor.execute({ runId: rejectedRun, attemptId, stage, input: material.input, ownership: negativeClaim, assertOwnership: negativeClaim.assert });
+          if (outcome.state !== "valid") throw new Error("historical_fixture_not_valid");
+          signals.push({ blocked: outcome.result.blockedProbability, slur: outcome.result.slurProbability ?? null, vulgar: outcome.result.vulgarProbability ?? null });
+        }
+        await h.store.completeProduction(negativeClaim, { status: "rejected", result: { id: randomUUID(), reuseIdentity: material.reuseIdentity,
+          material: productionResultSchema.parse({ schema: "wordwell-production-appropriateness-v1", executionKind: "live", trialAttemptIds: ids, input: material.input,
+            configurationFingerprint: stage.fingerprint, originalAssessmentId: material.assessmentId, bundleId: h.bundleId, decision: averageDecision(signals, thresholdsFor(material.configuration)) }) } });
+      } finally { await negativeClaim.release(); }
+      expect((await live.revalidateSavedGates({ bundleId: h.bundleId, intake })).usefulness).toBeNull();
+      await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("appropriateness_not_accepted");
+      const rejectedReuse = await live.create({ bundleId: h.bundleId, candidate: "emulate", intake, config, capNanoUsd: 100_000_000, stageOnly: true });
+      expect(await live.run(rejectedReuse)).toMatchObject({ status: "rejected", spend: { physicalRequests: 0 } });
+      sourceChange.path = "execution/system-one.ts"; sourceChange.suffix = "";
+      sourceChange.before = '"X-OpenRouter-Cache": "false"'; sourceChange.after = '"X-OpenRouter-Cache": "true"';
+      await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("gate_execution_changed");
+      await expect(live.revalidateSavedGates({ bundleId: h.bundleId, intake })).rejects.toThrow("gate_execution_changed");
+      sourceChange.path = "execution/executor.ts";
+      sourceChange.before = "const exchange = await model.send(body, { timeoutMs: settings.requestTimeoutMs });";
+      sourceChange.after = "const exchange = await model.send({ changedInput: body }, { timeoutMs: settings.requestTimeoutMs });";
+      await expect(live.authorizeDownstream({ bundleId: h.bundleId, intake })).rejects.toThrow("gate_execution_changed");
+      await expect(live.revalidateSavedGates({ bundleId: h.bundleId, intake })).rejects.toThrow("gate_execution_changed");
+      expect(h.remote.sent).toHaveLength(12); expect(evalRemote.sent).toHaveLength(3);
+    } finally { sourceChange.path = ""; sourceChange.suffix = ""; sourceChange.before = ""; sourceChange.after = ""; await evalStore.close(); await d.f.cleanup(); await h.close(); }
+  }, 30_000);
   it("runs both gates, persists original dependencies and authorizes zero-call reuse after fresh acceptance", async () => {
     const h = await harness([...Array.from({ length: 3 }, clear), usefulnessReply(1.75), usefulnessReply(1.8), usefulnessReply(1.85), ...Array.from({ length: 3 }, clear)]);
     try {
