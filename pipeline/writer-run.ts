@@ -1,28 +1,22 @@
 import { randomUUID } from "node:crypto";
-import { z } from "zod";
-import { fingerprint, pipelineConfigSchema, type PipelineConfig } from "./config.js";
+import { fingerprint, type PipelineConfig } from "./config.js";
 import { createStageExecutor } from "./execution/executor.js";
 import type { ModelAdapter } from "./execution/model.js";
 import { requireLunaVerificationPolicy } from "./execution/openrouter.js";
 import type { CandidateClaim } from "./storage/postgres.js";
-import { latestResponse } from "./storage/postgres.js";
 import type { WriterStore } from "./storage/writer.js";
 import type { SourceStore } from "./storage/sources.js";
 import type { ReceiptLedger } from "./storage/receipts.js";
 import { PrivateError } from "./storage/crypto.js";
-import { checkWrittenLesson, createWriterStage, writerResultSchema, writerInputSchema, writerConfigurationSchema, type WriterConfiguration, type WriterInput } from "./stages/writer.js";
+import { checkWrittenLesson, createWriterStage, writerConfigurationSchema, type WriterConfiguration, type WriterInput } from "./stages/writer.js";
 import type { LessonPlan, PlannerInput } from "./stages/planner.js";
 import { writerEvidence, assembleWrittenLesson } from "./sources/writer.js";
-import { LUNA_EXECUTION, lunaExecutionSchema, lunaExecutionSettings } from "./planner-config.js";
+import { LUNA_EXECUTION, lunaExecutionSettings } from "./planner-config.js";
 import { writerImplementation, writerReuseIdentity } from "./writer-identity.js";
 import { requireWriterPromotion } from "./writer-promotion.js";
 
-const dependenciesSchema = z.object({ assessmentId: z.string(), appropriatenessResultId: z.uuid(), usefulnessResultId: z.uuid(), plannerResultId: z.uuid() }).strict();
-export const writerRunSchema = z.object({ schema: z.literal("wordwell-writer-run-v1"), stage: z.literal("writer"), mode: z.enum(["normal", "stage-only"]), fresh: z.boolean(),
-  executionKind: z.enum(["live", "controlled"]), candidateId: z.uuid(), bundleId: z.string(), input: writerInputSchema, configuration: writerConfigurationSchema,
-  intake: pipelineConfigSchema, execution: lunaExecutionSchema, implementation: z.string(), reuseIdentity: z.string(), originalDependencies: dependenciesSchema }).strict();
-const resultSchema = z.object({ schema: z.literal("wordwell-production-writer-v1"), executionKind: z.enum(["live", "controlled"]), input: writerInputSchema,
-  configurationFingerprint: z.string(), attemptId: z.uuid(), originalDependencies: dependenciesSchema, written: writerResultSchema, assembled: z.unknown() }).strict();
+import { writerRunSchema, writerSavedResultSchema as resultSchema, validateSavedWriterResult } from "./saved-results.js";
+export { writerRunSchema } from "./saved-results.js";
 export type PlanAuthorization = { candidateId: string; headword: string; bundleId: string; assessmentId: string; usefulnessResultId: string; appropriatenessResultId?: string;
   plannerResultId: string; plannerPromotionId?: string; input: PlannerInput; plan: LessonPlan };
 export function createWriterCoordinator(deps: { store: WriterStore; sources: SourceStore; ledger: ReceiptLedger; model: ModelAdapter; executionKind: "live" | "controlled";
@@ -39,15 +33,11 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
     const input = writerEvidence(bundleId, await deps.sources.readyBundle(bundleId), authorization.input, authorization.plan);
     return { intake, authorization, input };
   }
-  async function validated(selected: NonNullable<Awaited<ReturnType<WriterStore["selectedProductionResult"]>>>, input: WriterInput, config: WriterConfiguration) {
-    const result = resultSchema.parse(selected.material), stage = createWriterStage(config, input), attempt = await store.readAttempt(result.attemptId), last = attempt?.requests.at(-1), reply = last ? latestResponse(last) : null;
-    const raw = reply?.kind === "response" ? stage.validate(reply.body) : null;
-    if (result.executionKind !== deps.executionKind || fingerprint(result.input) !== fingerprint(input) || result.configurationFingerprint !== stage.fingerprint ||
-      attempt?.status !== "valid" || attempt.runId !== selected.runId || attempt.stage !== "writer" || fingerprint(attempt.input.input) !== fingerprint(input) ||
-      fingerprint(attempt.input.request) !== fingerprint(stage.render(input)) || fingerprint(attempt.input.provenance) !== fingerprint(result.originalDependencies) ||
-      !raw?.ok || fingerprint(raw.result) !== fingerprint(result.written) || fingerprint(attempt.result) !== fingerprint(result.written) ||
-      fingerprint(result.assembled) !== fingerprint(assembleWrittenLesson(input, result.written))) throw new PrivateError("writer_result_not_valid");
-    return result;
+  async function validated(selected: NonNullable<Awaited<ReturnType<WriterStore["selectedProductionResult"]>>>, input: WriterInput, config: WriterConfiguration, candidateId: string) {
+    const result = resultSchema.safeParse(selected.material);
+    if (!result.success) throw new PrivateError("writer_result_not_valid");
+    const [run, attempt] = await Promise.all([store.readProductionRun(selected.runId), store.readAttempt(result.data.attemptId)]);
+    return validateSavedWriterResult({ selected, run, attempt, expectedInput: input, configuration: config, candidateId, executionKind: deps.executionKind });
   }
   async function inspect(id: string) {
     const { run, material } = await load(id), trials = await store.productionTrials(id);
@@ -139,7 +129,7 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
         await permissions();
         let selected = await store.selectedProductionResult(run.candidateId, "writer"), reused = false;
         if (!material.fresh && selected?.reuseIdentity === material.reuseIdentity) {
-          await validated(selected, material.input, material.configuration); reused = true;
+          await validated(selected, material.input, material.configuration, run.candidateId); reused = true;
         } else {
           const stage = createWriterStage(material.configuration, material.input), attemptId = await store.productionTrial(id, 1, "writer");
           const executor = createStageExecutor({ store, ledger: deps.ledger, model: deps.model, sleep: deps.sleep,
@@ -170,7 +160,7 @@ export function createWriterCoordinator(deps: { store: WriterStore; sources: Sou
       const checked = await current(bundleId), stage = createWriterStage(config, checked.input), promotion = await requireWriterPromotion(store, stage.fingerprint);
       const selected = await store.selectedProductionResult(checked.authorization.candidateId, "writer");
       if (!selected || selected.reuseIdentity !== await writerReuseIdentity(checked.input, config)) throw new PrivateError("writer_not_current");
-      const result = await validated(selected, checked.input, config);
+      const result = await validated(selected, checked.input, config, checked.authorization.candidateId);
       if (result.executionKind !== "live") throw new PrivateError("writer_not_publishable");
       return { ...checked.authorization, writerResultId: selected.id, writerPromotionId: promotion.id, writerInput: result.input, written: result.written, assembled: result.assembled };
     }

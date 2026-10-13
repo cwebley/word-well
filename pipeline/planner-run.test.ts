@@ -288,6 +288,10 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
     try {
       const first = await h.coordinator.run(await h.create());
       expect(first).toMatchObject({ status: "rejected", outcomeCode: "no_publishable_meanings" });
+      const reused = await h.coordinator.run(await h.create());
+      expect(reused).toMatchObject({ status: "rejected", outcomeCode: "no_publishable_meanings", spend: { physicalRequests: 0 } });
+      expect(reused.selected).toEqual(first.selected);
+      expect(h.remote.sent).toHaveLength(1);
       const id = await h.create(true), failed = await h.coordinator.run(id);
       expect(failed).toMatchObject({ status: "failed", outcomeCode: "uncertain", spend: { physicalRequests: 1, unresolvedRequests: 1 } });
       const before = h.remote.sent.length;

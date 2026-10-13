@@ -1,27 +1,22 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { fingerprint, pipelineConfigSchema, type PipelineConfig } from "./config.js";
+import { fingerprint, type PipelineConfig } from "./config.js";
 import { createStageExecutor } from "./execution/executor.js";
 import type { ModelAdapter } from "./execution/model.js";
 import { requireLunaVerificationPolicy } from "./execution/openrouter.js";
 import type { PrivateStore, CandidateClaim } from "./storage/postgres.js";
-import { latestResponse } from "./storage/postgres.js";
 import type { SourceStore } from "./storage/sources.js";
 import type { ReceiptLedger } from "./storage/receipts.js";
 import type { PlannerRevalidationStore } from "./storage/planner-revalidations.js";
 import { PrivateError } from "./storage/crypto.js";
-import { checkPlan, createPlannerStage, planSchema, plannerInputSchema, plannerConfigurationSchema, type PlannerConfiguration } from "./stages/planner.js";
+import { checkPlan, createPlannerStage, plannerInputSchema, plannerConfigurationSchema, type PlannerConfiguration } from "./stages/planner.js";
 import { plannerEvidence } from "./sources/planner.js";
-import { LUNA_EXECUTION, lunaExecutionSchema, lunaExecutionSettings } from "./planner-config.js";
+import { LUNA_EXECUTION, lunaExecutionSettings } from "./planner-config.js";
 import { plannerImplementation, plannerReuseIdentity } from "./planner-identity.js";
 import { requirePlannerPromotion } from "./planner-promotion.js";
 
-const dependenciesSchema = z.object({ assessmentId: z.string(), appropriatenessResultId: z.uuid(), usefulnessResultId: z.uuid() }).strict();
-export const plannerRunSchema = z.object({ schema: z.literal("wordwell-planner-run-v1"), stage: z.literal("planner"), mode: z.enum(["normal", "stage-only"]), fresh: z.boolean(),
-  executionKind: z.enum(["live", "controlled"]), candidateId: z.uuid(), bundleId: z.string(), input: plannerInputSchema, configuration: plannerConfigurationSchema,
-  intake: pipelineConfigSchema, execution: lunaExecutionSchema, implementation: z.string(), reuseIdentity: z.string(), originalDependencies: dependenciesSchema }).strict();
-const resultSchema = z.object({ schema: z.literal("wordwell-production-planner-v1"), executionKind: z.enum(["live", "controlled"]), input: plannerInputSchema,
-  configurationFingerprint: z.string(), attemptId: z.uuid(), originalDependencies: dependenciesSchema, plan: planSchema }).strict();
+import { plannerRunSchema, plannerSavedResultSchema as resultSchema, validateSavedPlannerResult } from "./saved-results.js";
+export { plannerRunSchema } from "./saved-results.js";
 export type GateAuthorization = { candidateId: string; headword: string; bundleId: string; assessmentId: string; resultId: string; appropriatenessResultId?: string };
 export function createPlannerCoordinator(deps: { store: PrivateStore; sources: SourceStore; ledger: ReceiptLedger; model: ModelAdapter; executionKind: "live" | "controlled";
   currentIntake: () => Promise<PipelineConfig>; authorizeGates: (bundleId: string, intake: PipelineConfig) => Promise<GateAuthorization>; beforeDispatch?: () => Promise<void>; sleep?: (ms: number) => Promise<void>; revalidations?: PlannerRevalidationStore }) {
@@ -36,13 +31,11 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
     if (!gates.appropriatenessResultId || candidate && candidate !== gates.headword) throw new PrivateError("planner_gate_authorization_invalid");
     return { intake, gates, input: plannerEvidence(bundleId, await deps.sources.readyBundle(bundleId)) };
   }
-  async function validated(selected: NonNullable<Awaited<ReturnType<PrivateStore["selectedProductionResult"]>>>, expectedInput: z.infer<typeof plannerInputSchema>, config: PlannerConfiguration) {
-    const result = resultSchema.parse(selected.material), stage = createPlannerStage(config, expectedInput), attempt = await store.readAttempt(result.attemptId), last = attempt?.requests.at(-1), reply = last ? latestResponse(last) : null;
-    const raw = reply?.kind === "response" ? stage.validate(reply.body) : null;
-    if (result.executionKind !== deps.executionKind || fingerprint(result.input) !== fingerprint(expectedInput) || result.configurationFingerprint !== stage.fingerprint ||
-      attempt?.status !== "valid" || attempt.runId !== selected.runId || attempt.stage !== "planner" || fingerprint(attempt.input.request) !== fingerprint(stage.render(expectedInput)) ||
-      fingerprint(attempt.input.provenance) !== fingerprint(result.originalDependencies) || !raw?.ok || fingerprint(raw.result) !== fingerprint(result.plan) || fingerprint(attempt.result) !== fingerprint(result.plan)) throw new PrivateError("planner_result_not_valid");
-    return { ...result, plan: checkPlan(expectedInput, result.plan) };
+  async function validated(selected: NonNullable<Awaited<ReturnType<PrivateStore["selectedProductionResult"]>>>, input: z.infer<typeof plannerInputSchema>, config: PlannerConfiguration, candidateId: string) {
+    const result = resultSchema.safeParse(selected.material);
+    if (!result.success) throw new PrivateError("planner_result_not_valid");
+    const [run, attempt] = await Promise.all([store.readProductionRun(selected.runId), store.readAttempt(result.data.attemptId)]);
+    return validateSavedPlannerResult({ selected, run, attempt, expectedInput: input, configuration: config, candidateId, executionKind: deps.executionKind });
   }
   async function inspect(id: string) {
     const { run, material } = await load(id);
@@ -136,7 +129,7 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
         let selected = await store.selectedProductionResult(run.candidateId, "planner"), plan;
         let reused = false;
         if (!material.fresh && selected?.reuseIdentity === material.reuseIdentity) {
-          plan = (await validated(selected, material.input, material.configuration)).plan; reused = true;
+          plan = (await validated(selected, material.input, material.configuration, run.candidateId)).plan; reused = true;
         } else {
           const stage = createPlannerStage(material.configuration, material.input), attemptId = await store.productionTrial(id, 1, "planner");
           const executor = createStageExecutor({ store, ledger: deps.ledger, model: deps.model, sleep: deps.sleep,
@@ -176,7 +169,7 @@ export function createPlannerCoordinator(deps: { store: PrivateStore; sources: S
       const checked = await current(bundleId), stage = createPlannerStage(config, checked.input), promotion = await requirePlannerPromotion(store, stage.fingerprint, deps.revalidations);
       const selected = await store.selectedProductionResult(checked.gates.candidateId, "planner");
       if (!selected || selected.reuseIdentity !== await plannerReuseIdentity(checked.input, config)) throw new PrivateError("planner_not_current");
-      const result = await validated(selected, checked.input, config);
+      const result = await validated(selected, checked.input, config, checked.gates.candidateId);
       if (result.executionKind !== "live" || !result.plan.meanings.length) throw new PrivateError("planner_not_publishable");
       return { ...checked.gates, plannerResultId: selected.id, plannerPromotionId: promotion.id, input: result.input, plan: result.plan };
     }

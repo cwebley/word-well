@@ -108,6 +108,37 @@ and Practice trigger to verify complete rollback. They also publish a merge,
 then a split and a reorder, inspect encrypted predecessor records, and verify
 Practice retirement after a POS change.
 
+## Saved generation validation
+
+`pipeline/saved-results.ts` owns the planner/writer run and result schemas and
+shared saved-evidence checks. Both coordinators call these checks for reuse and
+publication-stage authorization. The functions accept records, not a store or
+model adapter. A production publisher can therefore supply records read through
+its own transaction client without opening a second connection.
+
+The checks bind the selected result to its original completed run, candidate,
+input, bundle, configuration, execution kind, reuse identity and generation
+dependencies. A planner run must be accepted for a nonempty plan or rejected for
+an empty plan. Valid empty plans remain reusable without new generation, but
+cannot authorize writing or publication. Writer runs must be accepted. They also bind the attempt ID/run/stage, input, rendered request,
+original provenance, latest saved raw response and interpreted output. Writer
+assembly is reconstructed and compared. Original dependencies are checked against
+original generation records, never replaced with fresh gate authorization.
+
+For example, the harmless `fixture` input in
+`pipeline/testing/planner-fixtures.ts` carries prompt reference `s1`, source
+`private-source-1` and the plan definition `A thing used in a check.`. The
+saved-evidence unit test builds an accepted run, its selected result and its raw
+attempt in memory. Validation reinterprets the raw response and returns the plan.
+Changing the attempt's saved input to headword `other` rejects it with
+`planner_result_not_valid`, even if its request and interpreted plan are unchanged.
+This closes an input-binding gap in the previous planner check. Nothing persists
+at this validation boundary; the caller still owns reads and writes.
+
+This extraction is a production-adapter prerequisite. It does not read pinned
+source records, current intake/gates or promotions. It does not make the existing
+coordinator reads transaction-bound or remove the live-publication block.
+
 ## Remaining #29 work
 
 - Load saved live selections and pinned source fields through a production
