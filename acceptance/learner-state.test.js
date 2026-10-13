@@ -147,6 +147,54 @@ suite("learner-state browser acceptance", () => {
     await context.close();
   }, 30_000);
 
+  it("queues a new change behind an unfinished sync and preserves Retry after that change fails", async () => {
+    const context = await newLearnerContext();
+    let releaseFirst;
+    let firstArrived;
+    const firstGate = new Promise(resolve => { releaseFirst = resolve; });
+    const firstResponse = new Promise(resolve => { firstArrived = resolve; });
+    try {
+      const page = await openLearner(context);
+      await page.getByRole("button", { name: "Completely new to me" }).click();
+      await waitForAcceptedOperations(1);
+      await visible(page.getByRole("button", { name: "Useful to me", exact: true }));
+      // Count fetch calls synchronously in the page, independent of when
+      // Playwright receives the corresponding network events.
+      await page.evaluate(() => {
+        const originalFetch = window.fetch;
+        window.syncFetchCalls = 0;
+        window.fetch = function(input, ...args) {
+          if (String(input).endsWith("/learning-state/sync")) window.syncFetchCalls++;
+          return originalFetch.call(this, input, ...args);
+        };
+      });
+      let requests = 0;
+      await page.route(`${apiUrl}/learning-state/sync`, async route => {
+        if (++requests === 1) {
+          const response = await route.fetch();
+          firstArrived();
+          await firstGate;
+          await route.fulfill({ response });
+        } else await route.abort();
+      });
+      await page.getByRole("button", { name: "Useful to me", exact: true }).click();
+      await firstResponse;
+      await page.getByRole("button", { name: "Not useful to me", exact: true }).click();
+      expect(await page.evaluate(() => window.syncFetchCalls)).toBe(1);
+      releaseFirst();
+      await visible(page.getByRole("button", { name: "Retry", exact: true }));
+      expect(await page.evaluate(() => window.syncFetchCalls)).toBe(2);
+      expect(await acceptedOperationCount()).toBe(2);
+      await page.unroute(`${apiUrl}/learning-state/sync`);
+      await page.getByRole("button", { name: "Retry", exact: true }).click();
+      await waitForAcceptedOperations(3);
+      await page.getByText("Your changes will sync when you reconnect.").waitFor({ state: "hidden" });
+    } finally {
+      releaseFirst();
+      await context.close();
+    }
+  }, 30_000);
+
   it("opens an earlier delivery at current content, then removes withdrawn details and Practice offline", async () => {
     const context = await newLearnerContext();
     const page = await openLearner(context);

@@ -25,6 +25,7 @@ let revising = false;
 let practiceResult;
 let syncStatus;
 let syncBusy = false;
+let reconciliation = Promise.resolve();
 let deletionConfirmation = false;
 let recoveryVerification;
 let recoveryStart;
@@ -367,7 +368,17 @@ async function reconcileLearning({ source = "auto" } = {}) {
   }
 }
 
-async function runReconcile({ keepBusy = false } = {}) {
+function runReconcile(options = {}) {
+  // Reconnection, foreground restoration and learning changes can overlap.
+  // Apply their responses in order so an old success cannot hide a newer
+  // failure or replace newer cached learner state. Read the outbox only when
+  // this turn starts, including changes recorded while the prior turn ran.
+  const next = reconciliation.then(() => performReconcile(options));
+  reconciliation = next.catch(() => {});
+  return next;
+}
+
+async function performReconcile({ keepBusy = false } = {}) {
   const start = Date.now();
   try {
     const result = await learning.synchronize();
