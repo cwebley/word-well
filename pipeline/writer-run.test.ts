@@ -185,7 +185,7 @@ describe.skipIf(!process.env.DATABASE_URL)("durable writer paths in restricted d
       expect(h.remote.sent).toHaveLength(3);
     } finally { await h.close(); }
   }, 30000);
-  it("freezes a fixed plan, runs three shared writer trials, and binds promotion to exact owner reviews", async () => {
+  it.each(["rated", "unrated"])("freezes a fixed plan, runs three shared writer trials, and binds promotion to exact %s owner reviews", async rating => {
     const h = await harness([reply(), reply(), reply()]);
     try {
       const evaluator = createWriterEvaluator({ store: h.store, ledger: h.ledger, model: h.model, sleep: async () => {} });
@@ -196,9 +196,16 @@ describe.skipIf(!process.env.DATABASE_URL)("durable writer paths in restricted d
       expect(h.remote.sent.some(r => r.body.includes("Private owner criteria marker"))).toBe(false);
       expect(await h.store.selectedProductionResult(h.candidateId, "writer")).toBeNull();
       await expect(recordWriterDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).rejects.toThrow("writer_review_not_passing");
-      for (const outcome of report.outcomes) await recordWriterReview(h.store, evaluator, { schema: "wordwell-writer-trial-review-v1", reviewer: "local-owner", experimentId: id,
-        attemptId: outcome.attempt!.id, resultFingerprint: fingerprint(outcome.attempt!.result), factualityPassed: true, groundingPassed: true, coveragePassed: true,
-        examplesAndCoachingReviewed: true, contrastsReviewed: true, notesReviewed: true, patternsReviewed: true, quality: 1, findings: ["Controlled style score has no numeric threshold."], reference: "Controlled review." });
+      const review = (outcome: typeof report.outcomes[number], groundingPassed = true) => ({ schema: rating === "rated" ? "wordwell-writer-trial-review-v1" : "wordwell-writer-trial-review-v2", reviewer: "local-owner", experimentId: id,
+        attemptId: outcome.attempt!.id, resultFingerprint: fingerprint(outcome.attempt!.result), factualityPassed: true, groundingPassed, coveragePassed: true,
+        examplesAndCoachingReviewed: true, contrastsReviewed: true, notesReviewed: true, patternsReviewed: true, ...(rating === "rated" ? { quality: 1 } : {}), findings: [], reference: "Controlled review." });
+      await expect(recordWriterReview(h.store, evaluator, { ...review(report.outcomes[0]), resultFingerprint: "a".repeat(64) })).rejects.toThrow("writer_review_evidence_invalid");
+      for (const outcome of report.outcomes.slice(0, 2)) await recordWriterReview(h.store, evaluator, review(outcome));
+      await expect(recordWriterDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).rejects.toThrow("writer_review_not_passing");
+      await recordWriterReview(h.store, evaluator, review(report.outcomes[2], false));
+      await expect(recordWriterDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).rejects.toThrow("writer_review_not_passing");
+      await recordWriterReview(h.store, evaluator, review(report.outcomes[2]));
+      if (rating === "unrated") for (const saved of await h.store.writerReviews(id)) expect(saved.material).not.toHaveProperty("quality");
       expect(await recordWriterDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).toMatchObject({ decision: "promote", modelCalls: 0 });
       expect((await requireWriterPromotion(h.store, report.configurationFingerprint)).decision).toBe("promote");
       await recordWriterDecision(h.store, evaluator, { experimentId: id, decision: "do_not_promote", reference: "Controlled later decision." });

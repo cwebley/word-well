@@ -164,8 +164,8 @@ _Avoid_: Test suite, benchmark, golden data (when meaning the whole set)
 
 **Content evaluation**:
 An assessment of planner or writer output: deterministic contract checks on every
-trial, plus the owner's reading and comparative score for grounding, factuality,
-meaning coverage, naturalness, and practical usefulness.
+trial, plus the owner's reading for grounding, factuality, meaning coverage,
+naturalness, and practical usefulness. Comparative quality ratings are optional.
 
 **Quarantined record**:
 A generated vocabulary record withheld from learner publication because a

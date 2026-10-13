@@ -180,12 +180,70 @@ execution. Three fresh trials run for each frozen input, with no planner calls.
 Failures and missing trials remain in the denominator. Evaluation never writes
 production selections.
 
-`pipeline/writer-promotion.ts` binds owner findings and 1-to-5 comparison scores to
+`pipeline/writer-promotion.ts` binds owner findings and optional 1-to-5 comparison scores to
 exact saved results. The owner confirms review of examples/coaching, contrasts,
 notes and patterns. Factuality, grounding and meaning coverage must pass for every
 required trial. Quality has no numeric threshold. Changed validation/review rules
 cannot restamp older evidence. Promotion and non-promotion are explicit records.
 Review and reporting make zero generation calls.
+
+The [approved review amendment](https://github.com/cwebley/word-well/issues/28#issuecomment-6089076095)
+adds `wordwell-writer-trial-review-v2`, where omission of `quality` means not rated.
+A supplied score must remain an integer from 1 to 5, with no default or inferred
+score. Historical v1 reviews retain their required-score contract. Every teaching
+field still needs owner review, and all required technical trials and exact
+factuality, grounding and coverage reviews must pass before an explicit promotion.
+The review-rule change does not restamp historical writer evidence. The approved
+next fixed plan uses a new immutable development dataset and requires its own
+spending approval before fresh writer trials.
+
+The owner-approved fixed-plan input and separately held expectations are frozen
+and reload-verified as writer dataset version 3. The case retains `evanescent`
+as the only shared planner/writer word, development membership and no held-out
+claim. A current retained planner revalidation identifies its exact source answer.
+The rendered request matches the approved proposal. Existing writer configuration,
+licensed source example, scoped origin and quotation exclusions remain intact;
+the new fixed plan and explicit criteria have separate identities. Versions 1 and
+2 retain their original ciphertext checksums. No writer trial or experiment,
+promotion, production selection or publication was created by the freeze. A fresh
+three-trial evaluation requires a separately approved cap.
+
+## Completed fixed-plan version 3 evaluation
+
+The owner approved a separate $1.23 total cap for three fresh trials, including
+transport retries, in [#28](https://github.com/cwebley/word-well/issues/28#issuecomment-6090830722).
+Experiment `7f47b88b-4b1e-4b66-acaf-1c95ccdb5589` uses frozen writer dataset
+version 3. Its exact input, separate expectations, request, configuration,
+implementation and review identities matched the approved freeze. The dated
+OpenAI endpoint and pricing bounds were checked before dispatch. The experiment
+ID was saved privately before the first request.
+
+All three saved results pass routing and deterministic writer contracts. Three
+generation requests ran, with no transport retries or generation-metadata lookups.
+Total cost was $0.0024264 under the $1.23 cap. All charges match six retained
+dispatch/outcome receipt events, with no outstanding reservations or unresolved
+charges. No planner call or repair generation ran.
+
+Network-forbidden inspection reproduces the exact saved results and original
+evaluation identities. Preservation checks retain all 14,718 inherited private
+rows, 18 unchanged frozen-dataset/ledger artifacts, all 24 earlier writer receipt
+events, six historical inspection reports, both runtime archives and the gate
+compatibility policy. The current planner proof and exact private reviews remain
+intact. The only database additions are this experiment, case, trials, attempts
+and requests, adding 11 rows across the existing 36 tables.
+
+This remains one development case with no held-out claim. Owner semantic review
+is pending. No writer review, promotion, production selection or publication was
+created. Generated answers and exact private criteria remain outside Git.
+
+The owner subsequently delegated adjudication and requested moving beyond the
+repeated single-word evaluation. Three encrypted exact-result reviews and an
+explicit configuration decision are recorded, with the delegation stated in their
+references. Original results, charges, receipts and evaluation identities remain
+unchanged. The required promotion bar remains enforced. This decision made zero
+model or metadata calls and stops this iteration. Exact delegated findings remain
+private. The implementation sequence continues with #24 consumer-contract work;
+real authorized publication remains #29 acceptance.
 
 ## Commands
 

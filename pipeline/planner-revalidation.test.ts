@@ -87,20 +87,21 @@ describe.skipIf(!process.env.DATABASE_URL)("append-only planner revalidation in 
     } finally { await h.close(); }
   }, 30000);
 
-  it("requires exact owner reviews before promotion and keeps the original experiment unaccepted", async () => {
+  it.each(["rated", "unrated"])("requires exact %s owner reviews before promotion and keeps the original experiment unaccepted", async rating => {
     const h = await harness();
     try {
       const proof = await h.revalidate();
       const decision = { experimentId: h.experimentId, revalidationId: proof.id, decision: "promote" as const, reference: "Controlled decision." };
       await expect(recordPlannerDecision(h.store, h.evaluator, decision, h.proofs)).rejects.toThrow("planner_review_not_passing");
-      const review = (index: number) => ({ schema: "wordwell-planner-trial-review-v2", reviewer: "local-owner", experimentId: h.experimentId,
+      const review = (index: number) => ({ schema: rating === "rated" ? "wordwell-planner-trial-review-v2" : "wordwell-planner-trial-review-v3", reviewer: "local-owner", experimentId: h.experimentId,
         revalidationId: proof.id, attemptId: proof.trials[index].attemptId, resultFingerprint: proof.trials[index].resultFingerprint,
-        factualityPassed: true, groundingPassed: true, coveragePassed: true, quality: 1, findings: ["Controlled quality score has no threshold."], reference: "Controlled review." });
+        factualityPassed: true, groundingPassed: true, coveragePassed: true, ...(rating === "rated" ? { quality: 1 } : {}), findings: [], reference: "Controlled review." });
       const { revalidationId, ...first } = review(0);
       expect(revalidationId).toBe(proof.id);
-      await expect(recordPlannerReview(h.store, h.evaluator, { ...first, schema: "wordwell-planner-trial-review-v1" })).rejects.toThrow("planner_review_evidence_invalid");
+      await expect(recordPlannerReview(h.store, h.evaluator, { ...first, schema: rating === "rated" ? "wordwell-planner-trial-review-v1" : "wordwell-planner-trial-review-v3" })).rejects.toThrow("planner_review_evidence_invalid");
       await expect(recordPlannerReview(h.store, h.evaluator, { ...review(0), resultFingerprint: "a".repeat(64) }, h.proofs)).rejects.toThrow("planner_review_evidence_invalid");
       for (let index = 0; index < 2; index++) await recordPlannerReview(h.store, h.evaluator, review(index), h.proofs);
+      if (rating === "unrated") for (const saved of await h.store.plannerReviews(h.experimentId)) expect(saved.material).not.toHaveProperty("quality");
       await expect(recordPlannerDecision(h.store, h.evaluator, decision, h.proofs)).rejects.toThrow("planner_review_not_passing");
       await recordPlannerReview(h.store, h.evaluator, { ...review(2), groundingPassed: false }, h.proofs);
       await expect(recordPlannerDecision(h.store, h.evaluator, decision, h.proofs)).rejects.toThrow("planner_review_not_passing");

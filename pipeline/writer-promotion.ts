@@ -9,14 +9,16 @@ import type { createWriterEvaluator } from "../evals/writer.js";
 export async function writerPromotionRuleIdentity() {
   const paths = ["./writer-promotion.ts", "./stages/writer.ts", "./sources/writer.ts", "./execution/openrouter.ts", "./execution/luna-response.ts", "./storage/writer.ts", "./storage/postgres.ts", "../evals/writer.ts", "../evals/datasets/writer.ts"];
   const lock = JSON.parse(await readFile(new URL("../package-lock.json", import.meta.url), "utf8"));
-  return fingerprint({ rule: "three-valid-trials-owner-factual-grounding-coverage-review-all-teaching-fields-no-numeric-threshold-v1",
+  return fingerprint({ rule: "three-valid-trials-owner-factual-grounding-coverage-review-all-teaching-fields-optional-quality-no-numeric-threshold-v2",
     dependencies: ["zod", "ai", "@openrouter/ai-sdk-provider"].map(name => lock.packages[`node_modules/${name}`]),
     implementation: await Promise.all(paths.map(async path => ({ path, bytes: await readFile(new URL(path, import.meta.url), "utf8") }))) });
 }
-export const writerReviewSchema = z.object({ schema: z.literal("wordwell-writer-trial-review-v1"), reviewer: z.literal("local-owner"), experimentId: z.uuid(), attemptId: z.uuid(),
+const originalReviewSchema = z.object({ schema: z.literal("wordwell-writer-trial-review-v1"), reviewer: z.literal("local-owner"), experimentId: z.uuid(), attemptId: z.uuid(),
   resultFingerprint: z.string().regex(/^[a-f0-9]{64}$/), factualityPassed: z.boolean(), groundingPassed: z.boolean(), coveragePassed: z.boolean(),
   examplesAndCoachingReviewed: z.literal(true), contrastsReviewed: z.literal(true), notesReviewed: z.literal(true), patternsReviewed: z.literal(true),
   quality: z.number().int().min(1).max(5), findings: z.array(z.string()), reference: z.string().min(1) }).strict();
+export const writerReviewSchema = z.union([originalReviewSchema,
+  originalReviewSchema.extend({ schema: z.literal("wordwell-writer-trial-review-v2"), quality: originalReviewSchema.shape.quality.optional() }).strict()]);
 type Inspector = Pick<ReturnType<typeof createWriterEvaluator>, "inspect">;
 export async function recordWriterReview(store: WriterStore, evaluator: Inspector, value: unknown) {
   const review = writerReviewSchema.parse(value), report = await evaluator.inspect(review.experimentId);

@@ -315,7 +315,7 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       expect(h.remote.sent).toHaveLength(2);
     } finally { await h.close(); }
   }, 30000);
-  it("freezes encrypted criteria, runs three shared trials and requires exact manual reviews for promotion", async () => {
+  it.each(["rated", "unrated"])("freezes encrypted criteria, runs three shared trials and requires exact %s manual reviews for promotion", async rating => {
     const h = await harness(Array.from({ length: 3 }, () => ({ status: 200, body: plannerReply(), headers: { "content-type": "application/json" } })));
     try {
       const frozen = await freezePlannerDataset({ directory: resolve(h.temp.root, "datasets"), checkout: REPO, version: 1, key: h.keys.datasetKey, crypto: h.keys.crypto,
@@ -331,8 +331,8 @@ describe.skipIf(!process.env.DATABASE_URL)("durable planner paths in restricted 
       expect((await evaluator.run(id)).summary.validTrials).toBe(3);
       expect(h.remote.sent).toHaveLength(3);
       await expect(recordPlannerDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).rejects.toThrow("planner_review_not_passing");
-      for (const outcome of report.outcomes) await recordPlannerReview(h.store, evaluator, { schema: "wordwell-planner-trial-review-v1", reviewer: "local-owner", experimentId: id,
-        attemptId: outcome.attempt!.id, resultFingerprint: fingerprint(outcome.attempt!.result), factualityPassed: true, groundingPassed: true, coveragePassed: true, quality: 1,
+      for (const outcome of report.outcomes) await recordPlannerReview(h.store, evaluator, { schema: rating === "rated" ? "wordwell-planner-trial-review-v1" : "wordwell-planner-trial-review-v3", reviewer: "local-owner", experimentId: id,
+        attemptId: outcome.attempt!.id, resultFingerprint: fingerprint(outcome.attempt!.result), factualityPassed: true, groundingPassed: true, coveragePassed: true, ...(rating === "rated" ? { quality: 1 } : {}),
         findings: ["Controlled poor-style score is comparative, not a numeric veto."], reference: "Controlled review." });
       expect(await recordPlannerDecision(h.store, evaluator, { experimentId: id, decision: "promote", reference: "Controlled decision." })).toMatchObject({ decision: "promote" });
       expect(await requirePlannerPromotion(h.store, createPlannerStage(PLANNER_CONFIGURATION, plannerFixture).fingerprint)).toMatchObject({ decision: "promote" });

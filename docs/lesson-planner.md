@@ -24,7 +24,7 @@ ready source bundle + current factual intake + both promoted gate acceptances
 frozen encrypted input + separate owner expectations
     -> evals/planner.ts -> same stage/executor/adapter, three fresh trials
     -> contract checks + expected coverage checks
-    -> owner reads each trial and scores quality 1 to 5
+    -> owner reads each trial, optionally rates quality 1 to 5
     -> explicit promotion or non-promotion
 ```
 
@@ -134,7 +134,7 @@ word family candidates
    result dependencies. Reuse appends current authorization while preserving those
    original dependencies. Evaluation retains separate experiments and trial IDs.
 6. The owner reads all three evaluation answers and records exact-result factual,
-   grounding and coverage findings plus a quality score. A separate explicit
+   grounding and coverage findings, with an optional quality score. A separate explicit
    decision promotes or declines the configuration. A promoted plan still does
    not authorize lesson publication without the later writer and exact review.
 
@@ -249,9 +249,11 @@ result, without modifying the original attempt, response, receipt or dataset.
 The trace exposes a review boundary: a successful technical recheck is not an
 owner finding that the authored definition or selected terms are good.
 
-Revalidation reviews use `wordwell-planner-trial-review-v2` and a `revalidationId`.
-They bind each result fingerprint to owner factuality, grounding, coverage and
-comparative quality findings. Old trial reviews cannot satisfy this requirement.
+Revalidation reviews name a `revalidationId`. Historical
+`wordwell-planner-trial-review-v2` requires a comparison score; current
+`wordwell-planner-trial-review-v3` makes that score optional. Both bind each result
+fingerprint to owner factuality, grounding and coverage findings. Reviews without
+the exact revalidation reference cannot satisfy this requirement.
 Promotion still needs every required trial and all exact owner reviews to pass;
 quality scores have no threshold. A revalidation-backed promotion uses schema
 `wordwell-planner-promotion-v2` and requires the current proof at authorization
@@ -286,6 +288,39 @@ Checks cover idempotency, concurrent creation, immutable ciphertext, source and
 interpretation changes, exact owner review bindings, explicit promotion and later
 non-promotion, unfinished evaluation review, private import boundaries and learner
 access rejection. Generated plans and exact owner criteria remain private.
+
+## Optional comparative ratings
+
+The [approved review amendment](https://github.com/cwebley/word-well/issues/28#issuecomment-6089076095)
+makes comparative quality optional through `wordwell-planner-trial-review-v3`.
+It supports ordinary trial reviews and reviews naming an exact revalidation.
+A supplied `quality` must remain an integer from 1 to 5. Omission means not rated;
+there is no default or inferred score. Historical v1 and v2 review formats still
+require their original scores.
+
+Every required technical trial and exact owner factuality, grounding and coverage
+review must still pass. Promotion and non-promotion remain separate explicit
+decisions. The changed rule identity makes earlier revalidation stale for current
+authorization. The approved transition appends a fresh zero-call revalidation
+before recording carried-forward owner findings; it preserves the earlier proof,
+paid outcomes and all original identities. This transition does not itself promote
+the planner or select a production plan.
+
+The approved transition is recorded. One fresh immutable revalidation and three
+encrypted exact-result owner reviews were appended under the amended rule.
+The earlier proof remains historical evidence; the original three paid outcomes
+still report verification-unresolved under their original strict configuration.
+Repeating current revalidation preserves its first ciphertext. No planner promotion
+or production selection was created.
+
+Preservation checks retain all 14,714 inherited private rows across 36 tables,
+17 frozen-dataset and ledger artifacts, six historical inspection reports, both
+runtime archive checksums and the gate compatibility policy identity. The only
+database additions are the new revalidation and three reviews. The separate writer
+freeze adds two encrypted-dataset files. Added cost, model calls and metadata calls
+are zero. Verification passes 462 tests with 12 skipped across 43 files, plus
+typecheck and whitespace checks. Standards and spec review have no remaining
+findings. Exact owner outcomes and private artifacts remain outside Git.
 
 ## Locked model and accounting checks
 

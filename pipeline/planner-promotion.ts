@@ -11,7 +11,7 @@ import type { PlannerRevalidationStore } from "./storage/planner-revalidations.j
 export async function plannerPromotionRuleIdentity() {
   const paths = ["./planner-promotion.ts", "./planner-revalidation.ts", "./storage/planner-revalidations.ts", "../db/private-migrations/015_planner_revalidations.sql", "./stages/planner.ts", "./sources/planner.ts", "./execution/openrouter.ts", "./execution/luna-response.ts", "./storage/postgres.ts", "../evals/planner.ts", "../evals/datasets/planner.ts"];
   const lock = JSON.parse(await readFile(new URL("../package-lock.json", import.meta.url), "utf8"));
-  return fingerprint({ rule: "three-valid-trials-and-owner-factual-grounding-coverage-review-no-numeric-quality-threshold-v1",
+  return fingerprint({ rule: "three-valid-trials-and-owner-factual-grounding-coverage-review-optional-quality-no-numeric-threshold-v2",
     dependencies: ["zod", "ai", "@openrouter/ai-sdk-provider"].map(name => lock.packages[`node_modules/${name}`]),
     implementation: await Promise.all(paths.map(async path => ({ path, bytes: await readFile(new URL(path, import.meta.url), "utf8") }))) });
 }
@@ -21,7 +21,10 @@ const originalReviewSchema = z.object({ schema: z.literal("wordwell-planner-tria
   factualityPassed: z.boolean(), groundingPassed: z.boolean(), coveragePassed: z.boolean(), quality: z.number().int().min(1).max(5), findings: z.array(z.string()), reference: z.string().min(1)
 }).strict();
 export const plannerReviewSchema = z.union([originalReviewSchema, originalReviewSchema.extend({ schema: z.literal("wordwell-planner-trial-review-v2"),
-  revalidationId: z.string().regex(/^[a-f0-9]{64}$/) }).strict()]);
+  revalidationId: z.string().regex(/^[a-f0-9]{64}$/) }).strict(),
+  originalReviewSchema.extend({ schema: z.literal("wordwell-planner-trial-review-v3"), quality: originalReviewSchema.shape.quality.optional(),
+    revalidationId: z.string().regex(/^[a-f0-9]{64}$/).optional() }).strict()]);
+const reviewRevalidationId = (review: z.infer<typeof plannerReviewSchema>) => "revalidationId" in review ? review.revalidationId : undefined;
 type Inspector = Pick<ReturnType<typeof createPlannerEvaluator>, "inspect">;
 async function evaluationEvidence(store: PrivateStore, evaluator: Inspector, experimentId: string, revalidationId?: string, revalidations?: PlannerRevalidationStore) {
   if (revalidationId) {
@@ -40,7 +43,7 @@ async function evaluationEvidence(store: PrivateStore, evaluator: Inspector, exp
 }
 export async function recordPlannerReview(store: PrivateStore, evaluator: Inspector, value: unknown, revalidations?: PlannerRevalidationStore) {
   const review = plannerReviewSchema.parse(value);
-  const evidence = await evaluationEvidence(store, evaluator, review.experimentId, review.schema === "wordwell-planner-trial-review-v2" ? review.revalidationId : undefined, revalidations);
+  const evidence = await evaluationEvidence(store, evaluator, review.experimentId, reviewRevalidationId(review), revalidations);
   const outcome = evidence.trials.find(trial => trial.attemptId === review.attemptId);
   if (!outcome?.contractPass || outcome.resultFingerprint !== review.resultFingerprint) throw new PrivateError("planner_review_evidence_invalid");
   const id = randomUUID();
@@ -58,8 +61,7 @@ export async function recordPlannerDecision(store: PrivateStore, evaluator: Insp
       const saved = reviews.find(r => {
         const parsed = plannerReviewSchema.safeParse(r.material);
         return parsed.success && r.attemptId === outcome.attemptId && r.configurationFingerprint === evidence.configurationFingerprint &&
-          (decision.revalidationId ? parsed.data.schema === "wordwell-planner-trial-review-v2" && parsed.data.revalidationId === decision.revalidationId :
-            parsed.data.schema === "wordwell-planner-trial-review-v1");
+          reviewRevalidationId(parsed.data) === decision.revalidationId;
       });
       const review = saved ? plannerReviewSchema.parse(saved.material) : null;
       if (!review || review.resultFingerprint !== outcome.resultFingerprint ||
