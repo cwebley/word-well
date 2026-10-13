@@ -1,28 +1,40 @@
 import { describe, expect, it } from "vitest";
 import { DailyLessons } from "./daily-lessons.js";
+import { syntheticLesson } from "./fixtures/versioned-word-lesson.js";
+import { versionedPractice } from "./fixtures/versioned-practice.js";
 
 function lesson(id, headword, startingBand) {
   return {
     id,
     startingBand,
-    record: {
-      headword,
-      normalizedHeadword: headword.toLowerCase(),
-      version: "1",
-      pronunciation: `/${headword}/`,
-      meanings: [{
-        practice: {
-          prompt: `Which sentence uses ${headword} naturally?`,
-          correctSentence: `The ${headword} answer fits.`,
-          incorrectSentence: `The ${headword} calculator fits.`,
-          explanation: "The answer fits the word's meaning; the calculator does not."
-        }
-      }]
-    }
+    record: syntheticLesson(id, headword)
   };
 }
 
 describe("daily lessons", () => {
+  it("records the exact served revision after the independent bank is replaced", () => {
+    const item = { ...versionedPractice, lessonId: "candid" };
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")], [item]);
+    const now = new Date("2026-08-26T12:00:00Z");
+    const delivery = lessons.deliver("profile", "UTC", now);
+    lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", now);
+    expect(lessons.practice("profile", now).practice.publicationVersion).toBe(1);
+    lessons.setPracticeItems([{ ...item, publicationVersion: 2, explanation: "Revised explanation." }]);
+    expect(lessons.answerPractice("profile", delivery.id, "correct", now)).toMatchObject({ practiceItemId: item.itemId, practiceVersion: 1 });
+    expect(() => lessons.setPracticeItems([{ ...item, explanation: "Overwritten revision." }])).toThrow("immutable");
+  });
+  it("keeps an empty bank from creating an attempt or completing recall", () => {
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const now = new Date("2026-08-26T12:00:00Z");
+    const delivery = lessons.deliver("profile", "UTC", now);
+    lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", now);
+    expect(lessons.practice("profile", now)).toBeUndefined();
+    expect(() => lessons.answerPractice("profile", delivery.id, "correct", now)).toThrow("No Practice item");
+    expect(lessons.history("profile")[0].delivery.recall.stage).toBe("new");
+    const replacement = lesson("other-id", "candid", "Stretch my vocabulary");
+    lessons.setPublishedLessons([replacement]);
+    expect(lessons.history("profile")[0].status).toBe("unavailable");
+  });
   it("assigns at most one daily delivery for a profile's local calendar date", () => {
     const lessons = new DailyLessons([
       lesson("candid", "candid", "Stretch my vocabulary"),
@@ -56,7 +68,7 @@ describe("daily lessons", () => {
   });
 
   it("requires familiarity before reading and preserves it in history", () => {
-    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")], [{ ...versionedPractice, lessonId: "candid" }]);
     const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
 
     expect(() => lessons.readLesson("profile", delivery.id)).toThrow("Record familiarity");
@@ -78,7 +90,7 @@ describe("daily lessons", () => {
   });
 
   it("presents delivered words for due recall, advances explicit stages, and makes incorrect answers due sooner", () => {
-    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")], [{ ...versionedPractice, lessonId: "candid" }]);
     const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
     const started = new Date("2026-08-26T12:00:00Z");
     lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", started);
@@ -88,15 +100,17 @@ describe("daily lessons", () => {
 
     expect(correct).toMatchObject({ correct: true, delivery: { recall: { stage: "1 day", dueAt: "2026-08-27T12:00:00.000Z", mastery: 1 } } });
     expect(lessons.dueRecall("profile", new Date("2026-08-26T12:00:01Z"))).toEqual([]);
+    lessons.practice("profile", new Date("2026-08-27T12:00:00Z"));
     const incorrect = lessons.answerPractice("profile", delivery.id, "incorrect", new Date("2026-08-27T12:00:00Z"));
 
     expect(incorrect.delivery.recall).toMatchObject({ stage: "new", dueAt: "2026-08-28T12:00:00.000Z", mastery: 0 });
   });
 
   it("keeps utility and content quality as editorial evidence while active use modestly strengthens recall", () => {
-    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")], [{ ...versionedPractice, lessonId: "candid" }]);
     const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
     lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", new Date("2026-08-26T12:00:00Z"));
+    lessons.practice("profile", new Date("2026-08-26T12:00:00Z"));
     lessons.answerPractice("profile", delivery.id, "correct", new Date("2026-08-26T12:00:00Z"));
 
     const utility = lessons.recordUtility("profile", delivery.id, "not_useful", new Date("2026-08-26T13:00:00Z"));
@@ -109,9 +123,10 @@ describe("daily lessons", () => {
   });
 
   it("rebuilds derived recall from retained familiarity, practice, and active-use evidence", () => {
-    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")]);
+    const lessons = new DailyLessons([lesson("candid", "candid", "Stretch my vocabulary")], [{ ...versionedPractice, lessonId: "candid" }]);
     const delivery = lessons.deliver("profile", "UTC", new Date("2026-08-26T12:00:00Z"));
     lessons.recordFamiliarity("profile", delivery.id, "Completely new to me", new Date("2026-08-26T12:00:00Z"));
+    lessons.practice("profile", new Date("2026-08-26T12:00:00Z"));
     lessons.answerPractice("profile", delivery.id, "correct", new Date("2026-08-26T12:00:00Z"));
     lessons.recordActiveUse("profile", delivery.id, "using", new Date("2026-08-26T14:00:00Z"));
     const beforeReset = lessons.history("profile")[0].delivery.recall;

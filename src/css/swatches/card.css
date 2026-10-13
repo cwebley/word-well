@@ -52,7 +52,7 @@
   display: grid;
   gap: var(--space-2xl-4xl);
 }
-.word-lesson-definition > p:last-child {
+.word-lesson-definition {
   font-family: var(--font-reading);
   font-size: var(--step-5);
   font-weight: 460;

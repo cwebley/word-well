@@ -1,3 +1,7 @@
+import type { PublishedLesson } from "../src/lesson-contract.js";
+import type { PublishedPractice } from "../src/practice-contract.js";
+export type { SyncOperation } from "../src/learner-state-contract.js";
+
 export const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 export const maxSyncOperations = 100;
 export const recentAuthenticationLifetimeMs = 5 * 60 * 1000;
@@ -14,19 +18,9 @@ export const permittedKinds = [
 
 export type OperationKind = (typeof permittedKinds)[number];
 
-export type SyncOperation = {
-  readonly id: string;
-  readonly kind: OperationKind;
-  readonly deliveryId: string;
-  readonly createdAt: string;
-  readonly familiarity?: string;
-  readonly correct?: boolean;
-  readonly activeUse?: string;
-  readonly utility?: string;
-};
-
 export type LearnerState = {
-  readonly lessons: readonly Record<string, unknown>[];
+  readonly lessons: readonly { id: string; record: PublishedLesson }[];
+  readonly practiceItems: readonly PublishedPractice[];
   readonly history: readonly Record<string, unknown>[];
   readonly evidence: readonly Record<string, unknown>[];
   readonly mutable: readonly Record<string, unknown>[];

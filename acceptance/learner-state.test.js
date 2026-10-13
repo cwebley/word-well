@@ -12,6 +12,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { LearnerDatabase } from "../api/database.js";
 import { createApi } from "../api/http.js";
 import { databaseConnection, inDatabase } from "../db/connections.mjs";
+import { versionedWordLesson, syntheticLesson } from "../src/fixtures/versioned-word-lesson.js";
+import { versionedPractice } from "../src/fixtures/versioned-practice.js";
 
 const exec = promisify(execFile);
 const databaseUrl = process.env.DATABASE_URL;
@@ -28,6 +30,7 @@ let apiUrl;
 let siteUrl;
 let browser;
 let acceptanceDatabase;
+let serverTime = testTime;
 
 suite("learner-state browser acceptance", () => {
   beforeAll(async () => {
@@ -42,7 +45,7 @@ suite("learner-state browser acceptance", () => {
 
     pool = new pg.Pool({ connectionString: isolatedUrl });
     const learnerPool = new pg.Pool({ connectionString: inDatabase(databaseConnection("learner"), acceptanceDatabase) });
-    database = new LearnerDatabase({ pool: learnerPool, now: () => new Date(testTime) });
+    database = new LearnerDatabase({ pool: learnerPool, now: () => new Date(serverTime) });
     apiServer = createServer(createApi(database));
     await listen(apiServer);
     apiUrl = `http://localhost:${apiServer.address().port}`;
@@ -57,7 +60,8 @@ suite("learner-state browser acceptance", () => {
   });
 
   beforeEach(async () => {
-    await pool.query("TRUNCATE profile_handoffs, recovery_tokens, passkey_challenges, passkeys, profile_access_events, reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_lessons");
+    serverTime = testTime;
+    await pool.query("TRUNCATE profile_handoffs, recovery_tokens, passkey_challenges, passkeys, profile_access_events, reserved_upcoming_words, skipped_upcoming_words, learner_evidence, learner_choices, accepted_operations, deliveries, sessions, profiles, published_practice_items, published_lessons");
     await seedPublishedLesson();
   });
 
@@ -71,29 +75,38 @@ suite("learner-state browser acceptance", () => {
     await adminPool?.end();
   });
 
-  it("renders cached lesson, history, and practice after a cold offline reload", async () => {
+  it("renders the complete lesson and empty Practice bank after a cold offline reload", async () => {
     const context = await newLearnerContext();
     const page = await openLearner(context);
 
     await page.getByRole("button", { name: "Completely new to me" }).click();
     await visible(page.getByRole("heading", { name: "candid" }));
     await waitForAcceptedOperations(1);
+    await visible(page.getByRole("heading", { name: "Sources and license" }));
+    await visible(page.getByText(versionedWordLesson.meanings[0].usageNotes[0].text, { exact: false }));
+    await visible(page.getByRole("heading", { name: "Synonym contrasts" }));
+    await visible(page.getByRole("heading", { name: "Word family" }));
     await page.getByRole("link", { name: "Practice" }).click();
-    await visible(page.getByRole("heading", { name: "Which sentence uses candid naturally?" }));
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    expect(await page.locator('[data-action="practice-answer"]').count()).toBe(0);
 
     await context.setOffline(true);
     await page.reload();
     await visible(page.getByRole("heading", { name: "candid" }));
-    await page.getByRole("link", { name: "History" }).click();
+    await page.getByRole("link", { name: "History", exact: true }).click();
     await visible(page.getByText("Words you've met"));
-    await visible(page.getByText("candid").last());
+    await page.getByRole("button", { name: "candid", exact: true }).click();
+    await visible(page.getByRole("heading", { name: "Sources and license" }));
     await page.getByRole("link", { name: "Practice" }).click();
-    await visible(page.getByRole("heading", { name: "Which sentence uses candid naturally?" }));
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    expect(await page.locator('[data-action="practice-answer"]').count()).toBe(0);
+    expect(await acceptedOperationCount()).toBe(1);
 
     await context.close();
   }, 30_000);
 
   it("reconciles queued learning through online, manual retry, and foreground restoration", async () => {
+    await seedPractice();
     const context = await newLearnerContext();
     const page = await openLearner(context);
 
@@ -131,6 +144,84 @@ suite("learner-state browser acceptance", () => {
     await page.locator("#app-main").getByRole("button", { name: "Retry" }).click();
     await visible(page.getByRole("heading", { name: "candid" }));
 
+    await context.close();
+  }, 30_000);
+
+  it("opens an earlier delivery at current content, then removes withdrawn details and Practice offline", async () => {
+    const context = await newLearnerContext();
+    const page = await openLearner(context);
+    await page.getByRole("button", { name: "Completely new to me" }).click();
+    await waitForAcceptedOperations(1);
+    serverTime = new Date("2026-08-29T12:00:00Z");
+    await context.addInitScript(value => { globalThis.wordwellTestTime = value; }, serverTime.toISOString());
+    await page.evaluate(value => { globalThis.wordwellTestTime = value; }, serverTime.toISOString());
+    const replacement = syntheticLesson("lesson-candid", "candid", 2);
+    replacement.meanings[0].examples[0] = "The candid replacement appears in earlier history.";
+    await pool.query("UPDATE published_lessons SET record = $1 WHERE id = 'lesson-candid'", [replacement]);
+    await pool.query("INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
+      ["lesson-lucid", "lucid", syntheticLesson("lesson-lucid", "lucid")]);
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await visible(page.getByRole("heading", { name: "lucid" }));
+    await page.getByRole("link", { name: "History", exact: true }).click();
+    await page.getByRole("button", { name: "candid", exact: true }).click();
+    await visible(page.getByText("The candid replacement appears in earlier history."));
+    expect(await page.locator("[data-publication-version]").getAttribute("data-publication-version")).toBe("2");
+    await visible(page.getByRole("heading", { name: "Sources and license" }));
+    await context.setOffline(true);
+    await page.reload();
+    await page.getByRole("link", { name: "History", exact: true }).click();
+    await page.getByRole("button", { name: "candid", exact: true }).click();
+    await visible(page.getByText("The candid replacement appears in earlier history."));
+    expect(await page.locator("[data-publication-version]").getAttribute("data-publication-version")).toBe("2");
+    await visible(page.getByRole("heading", { name: "Sources and license" }));
+    await visible(page.getByRole("link", { name: "Source revision", exact: true }));
+    await context.setOffline(false);
+    if (process.env.WORDWELL_ACCEPTANCE_ARTIFACT_DIR)
+      await captureRecord(page, "wordwell-current-history-lesson.png", { expandReadingColumn: true });
+    await page.getByRole("link", { name: "Practice" }).click();
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    if (process.env.WORDWELL_ACCEPTANCE_ARTIFACT_DIR)
+      await captureRecord(page, "wordwell-empty-practice.png");
+    await pool.query("UPDATE published_lessons SET available = false WHERE id = 'lesson-candid'");
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await expect.poll(async () => {
+      const response = await fetch(`${apiUrl}/learning-state`, { headers: { authorization: `Bearer ${await extractGrant(page)}` } });
+      return (await response.json()).state.history.find(item => item.lessonId === "lesson-candid").status;
+    }).toBe("unavailable");
+    await page.getByRole("link", { name: "History", exact: true }).click();
+    await visible(page.getByText("candid", { exact: true }));
+    await visible(page.getByText(/Unavailable/));
+    expect(await page.getByRole("button", { name: "candid", exact: true }).count()).toBe(0);
+    await context.setOffline(true);
+    await page.reload();
+    await page.getByRole("link", { name: "History", exact: true }).click();
+    await visible(page.getByText(/Unavailable/));
+    expect(await page.getByRole("button", { name: "candid", exact: true }).count()).toBe(0);
+    await page.getByRole("link", { name: "Practice" }).click();
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    expect(await acceptedOperationCount()).toBe(1);
+    await context.close();
+  }, 30_000);
+
+  it("removes an already-rendered Practice item on withdrawal and keeps the bank empty after offline reload", async () => {
+    await seedPractice();
+    const context = await newLearnerContext();
+    const page = await openLearner(context);
+    await page.getByRole("button", { name: "Completely new to me" }).click();
+    await waitForAcceptedOperations(1);
+    await page.getByRole("link", { name: "Practice", exact: true }).click();
+    await visible(page.getByRole("heading", { name: versionedPractice.prompt }));
+    expect(await page.locator('[data-action="practice-answer"]').count()).toBe(2);
+    await pool.query("UPDATE published_practice_items SET available = false");
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    expect(await page.locator('[data-action="practice-answer"]').count()).toBe(0);
+    await context.setOffline(true);
+    await page.reload();
+    await page.getByRole("link", { name: "Practice", exact: true }).click();
+    await visible(page.getByText("No Practice items are available for recall right now. You can still read your lessons."));
+    expect(await page.locator('[data-action="practice-answer"]').count()).toBe(0);
+    expect(await acceptedOperationCount()).toBe(1);
     await context.close();
   }, 30_000);
 
@@ -173,7 +264,7 @@ suite("learner-state browser acceptance", () => {
 
     const stillCached = await page.evaluate(async () => {
       return new Promise((resolve) => {
-        const request = indexedDB.open("wordwell", 1);
+        const request = indexedDB.open("wordwell", 2);
         request.onsuccess = () => {
           const transaction = request.result.transaction("learner-state", "readonly");
           const operation = transaction.objectStore("learner-state").getAll();
@@ -276,11 +367,11 @@ async function newLearnerContext() {
     const RealDate = Date;
     class FixedDate extends RealDate {
       constructor(...arguments_) {
-        super(...(arguments_.length ? arguments_ : [fixedTime]));
+        super(...(arguments_.length ? arguments_ : [globalThis.wordwellTestTime ?? fixedTime]));
       }
 
       static now() {
-        return new RealDate(fixedTime).getTime();
+        return new RealDate(globalThis.wordwellTestTime ?? fixedTime).getTime();
       }
     }
     globalThis.Date = FixedDate;
@@ -313,27 +404,24 @@ async function clearIndexedDb(context, page) {
 async function seedPublishedLesson() {
   await pool.query(
     "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
-    ["lesson-candid", "candid", {
-      headword: "candid",
-      normalizedHeadword: "candid",
-      startingBand: "Stretch my vocabulary",
-      pronunciation: "KAN-did",
-      meanings: [{
-        definition: "honest and direct",
-        examples: ["Her candid answer clarified the problem."],
-        useItWhen: "you are being direct",
-        doNotUseItFor: "being cruel",
-        synonyms: ["frank"],
-        partOfSpeech: "adjective",
-        practice: {
-          prompt: "Which sentence uses candid naturally?",
-          correctSentence: "Her candid answer clarified the problem.",
-          incorrectSentence: "The candid chair held four people.",
-          explanation: "Candid describes direct honesty.",
-        },
-      }],
-    }],
+    ["lesson-candid", "candid", versionedWordLesson],
   );
+}
+
+async function seedPractice() {
+  await pool.query("INSERT INTO published_practice_items (item_id, publication_version, lesson_id, record) VALUES ($1, $2, $3, $4)",
+    [versionedPractice.itemId, 1, versionedPractice.lessonId, versionedPractice]);
+}
+
+async function captureRecord(page, filename, { expandReadingColumn = false } = {}) {
+  await page.waitForFunction(() => !document.getAnimations().some(animation => animation.playState === "running"));
+  // The app scrolls its reading column rather than the document. Expand that
+  // column only for the full-record artifact, then restore the viewport layout.
+  const style = expandReadingColumn ? await page.addStyleTag({ content:
+    "body.app-page { block-size: auto; overflow: visible; } .app-shell { block-size: auto; } .app-main { overflow-y: visible; }"
+  }) : undefined;
+  await page.screenshot({ path: path.join(process.env.WORDWELL_ACCEPTANCE_ARTIFACT_DIR, filename), fullPage: true, animations: "disabled" });
+  await style?.evaluate(element => element.remove());
 }
 
 function databaseUrlFor(database) {

@@ -1,9 +1,11 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { projectPublishedLesson } from "../src/lesson-contract.js";
+import { projectPublishedPractice, practiceMatchesLesson } from "../src/practice-contract.js";
+import { learnerOperationSchema, syncOperationSchema } from "../src/learner-state-contract.js";
 import type { Pool, PoolClient, QueryResult } from "pg";
 import {
   challengeLifetimeMs,
   maxSyncOperations,
-  permittedKinds,
   recoveryTokenLifetimeMs,
   recentAuthenticationLifetimeMs,
   sessionLifetimeMs,
@@ -944,6 +946,15 @@ async function acceptOperation(client: Queryable, profileId: string, clientConte
   const delivery = await client.query("SELECT id FROM deliveries WHERE profile_id = $1 AND id = $2", [profileId, operation.deliveryId]);
   if (!delivery.rowCount) throw new ApiError(400, "The operation references no delivery for this profile.");
 
+  if (operation.kind === "practice") {
+    const item = await client.query(
+      `SELECT p.item_id FROM published_practice_items p JOIN deliveries d ON d.lesson_id = p.lesson_id
+       WHERE d.profile_id = $1 AND d.id = $2 AND p.item_id = $3 AND p.publication_version = $4`,
+      [profileId, operation.deliveryId, operation.practiceItemId, operation.practiceVersion]
+    );
+    if (!item.rowCount) throw new ApiError(400, "Practice must reference a published item version for this delivery.");
+  }
+
   const details = detailsFor(operation);
   const accepted = await client.query<{ accepted_order: string }>(
     `INSERT INTO accepted_operations
@@ -1027,7 +1038,9 @@ async function discardIneligibleUpcoming(client: Queryable, profileId: string): 
           NOT l.available
           OR jsonb_typeof(l.record->'meanings') <> 'array'
           OR jsonb_array_length(l.record->'meanings') = 0
-          OR COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) <> p.starting_band
+          OR l.record->>'schemaVersion' IS DISTINCT FROM 'wordwell-lesson-v1'
+          OR l.record->>'lessonId' IS DISTINCT FROM l.id
+          OR l.starting_band <> p.starting_band
           OR EXISTS (SELECT 1 FROM deliveries d WHERE d.profile_id = $1 AND d.normalized_headword = r.normalized_headword)
           OR EXISTS (SELECT 1 FROM skipped_upcoming_words s WHERE s.profile_id = $1 AND s.normalized_headword = r.normalized_headword)
         )`,
@@ -1041,10 +1054,12 @@ async function nextLesson(client: Queryable, profileId: string): Promise<QueryRe
     `SELECT NULL::uuid AS id, l.id AS lesson_id, l.normalized_headword
        FROM published_lessons l
        JOIN profiles p ON p.id = $1
-        WHERE l.available
+         WHERE l.available
+         AND l.record->>'schemaVersion' = 'wordwell-lesson-v1'
+         AND l.record->>'lessonId' = l.id
         AND jsonb_typeof(l.record->'meanings') = 'array'
         AND jsonb_array_length(l.record->'meanings') > 0
-        AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
+         AND l.starting_band = p.starting_band
         AND NOT EXISTS (
           SELECT 1 FROM deliveries d
            WHERE d.profile_id = $1 AND d.normalized_headword = l.normalized_headword
@@ -1067,10 +1082,12 @@ async function fillUpcoming(client: Queryable, profileId: string, now: Date): Pr
       `SELECT l.id, l.normalized_headword
          FROM published_lessons l
          JOIN profiles p ON p.id = $1
-        WHERE l.available
+         WHERE l.available
+           AND l.record->>'schemaVersion' = 'wordwell-lesson-v1'
+           AND l.record->>'lessonId' = l.id
           AND jsonb_typeof(l.record->'meanings') = 'array'
           AND jsonb_array_length(l.record->'meanings') > 0
-          AND COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) = p.starting_band
+           AND l.starting_band = p.starting_band
           AND NOT EXISTS (
             SELECT 1 FROM deliveries d
              WHERE d.profile_id = $1 AND d.normalized_headword = l.normalized_headword
@@ -1165,7 +1182,22 @@ async function learnerState(client: Queryable, profileId: string, localDate?: st
     [profileId]
   );
 
-  const safeLessons = lessons.rows.map((row) => ({ id: row.id, record: learnerSafe(row.record) }));
+  const safeLessons = lessons.rows.map((row) => {
+    const record = projectPublishedLesson(row.record);
+    if (record.lessonId !== row.id) throw new Error("Stored lesson identity does not match its public record.");
+    return { id: row.id, record };
+  });
+  const practiceRows = await client.query<{ item_id: string; publication_version: number; lesson_id: string; record: unknown }>(
+    `SELECT item_id, publication_version, lesson_id, record FROM published_practice_items
+     WHERE available AND lesson_id = ANY($1::text[]) ORDER BY item_id, publication_version`,
+    [safeLessons.map(lesson => lesson.id)]
+  );
+  const practiceItems = practiceRows.rows.map(row => {
+    const item = projectPublishedPractice(row.record);
+    if (item.itemId !== row.item_id || item.publicationVersion !== row.publication_version || item.lessonId !== row.lesson_id)
+      throw new Error("Stored Practice identity does not match its public record.");
+    return item;
+  }).filter(item => safeLessons.some(lesson => practiceMatchesLesson(item, lesson.record)));
   const evidenceRows = evidence.rows.map(flattenStoredOperation);
   const mutableRows = mutable.rows.map(flattenStoredOperation);
   const history = deliveries.rows.map((delivery) => {
@@ -1183,13 +1215,13 @@ async function learnerState(client: Queryable, profileId: string, localDate?: st
     };
   });
 
-  const state: LearnerState = { lessons: safeLessons, history, evidence: evidenceRows, mutable: mutableRows };
+  const state: LearnerState = { lessons: safeLessons, practiceItems, history, evidence: evidenceRows, mutable: mutableRows };
   const activeDelivery = localDate ? history.find((delivery) => delivery.localDate === localDate) : undefined;
 
   const upcoming = await client.query<Record<string, unknown>>(
     `SELECT r.id, r.lesson_id AS "lessonId", r.normalized_headword AS "normalizedHeadword",
             l.record->>'headword' AS headword,
-            COALESCE(NULLIF(l.record->>'startingBand', ''), l.starting_band) AS "startingBand"
+            l.starting_band AS "startingBand"
        FROM reserved_upcoming_words r
        JOIN published_lessons l ON l.id = r.lesson_id
       WHERE r.profile_id = $1
@@ -1199,7 +1231,7 @@ async function learnerState(client: Queryable, profileId: string, localDate?: st
   return {
     ...state,
     ...(activeDelivery ? { delivery: activeDelivery } : {}),
-    ...(upcoming.rows.length ? { upcoming: upcoming.rows.map(learnerSafe) } : {})
+    ...(upcoming.rows.length ? { upcoming: upcoming.rows } : {})
   };
 }
 
@@ -1235,7 +1267,7 @@ function addDays(iso: string, days: number): string {
 function flattenStoredOperation(value: Record<string, unknown>): Record<string, unknown> {
   const details = value.details && typeof value.details === "object" ? value.details as Record<string, unknown> : {};
   const { details: _details, ...operation } = value;
-  return learnerSafe({ ...details, ...operation });
+  return learnerOperationSchema.parse({ ...details, ...operation });
 }
 
 function detailsFor(operation: SyncOperation): Record<string, unknown> {
@@ -1243,7 +1275,7 @@ function detailsFor(operation: SyncOperation): Record<string, unknown> {
     case "familiarity":
       return { familiarity: operation.familiarity };
     case "practice":
-      return { correct: operation.correct };
+      return { correct: operation.correct, practiceItemId: operation.practiceItemId, practiceVersion: operation.practiceVersion };
     case "active-use":
       return { activeUse: operation.activeUse };
     case "utility":
@@ -1251,14 +1283,6 @@ function detailsFor(operation: SyncOperation): Record<string, unknown> {
     case "content-quality":
       return {};
   }
-}
-
-function learnerSafe(value: unknown): any {
-  if (Array.isArray(value)) return value.map(learnerSafe);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(Object.entries(value)
-    .filter(([key]) => !/session|passkey|credential|recovery|analytics|pipeline|provenance/i.test(key))
-    .map(([key, item]) => [key, learnerSafe(item)]));
 }
 
 function stableJson(value: unknown): string {
@@ -1300,15 +1324,8 @@ async function insertSession(client: Queryable, profileId: string, session: { id
 export function validateOperations(value: unknown): SyncOperation[] {
   if (!Array.isArray(value) || value.length > maxSyncOperations) throw new ApiError(400, "Sync operations must be a bounded array.");
   return value.map((candidate) => {
-    if (!candidate || typeof candidate !== "object") throw new ApiError(400, "Each sync operation must be an object.");
-    const operation = candidate as Record<string, unknown>;
-    if (typeof operation.id !== "string" || !operation.id || typeof operation.kind !== "string" || !permittedKinds.includes(operation.kind as never) || typeof operation.deliveryId !== "string" || !operation.deliveryId || typeof operation.createdAt !== "string" || Number.isNaN(Date.parse(operation.createdAt))) {
-      throw new ApiError(400, "Each sync operation needs a valid id, kind, deliveryId, and createdAt.");
-    }
-    if (operation.kind === "familiarity" && !["Completely new to me", "I think I've heard of it", "Familiar, but I don't use it", "I use it all the time"].includes(String(operation.familiarity))) throw new ApiError(400, "Familiarity was not recognized.");
-    if (operation.kind === "practice" && typeof operation.correct !== "boolean") throw new ApiError(400, "Practice correctness must be boolean.");
-    if (operation.kind === "active-use" && !["using", "not_using"].includes(String(operation.activeUse))) throw new ApiError(400, "Active-use state was not recognized.");
-    if (operation.kind === "utility" && !["useful", "not_useful"].includes(String(operation.utility))) throw new ApiError(400, "Utility state was not recognized.");
-    return operation as unknown as SyncOperation;
+    const result = syncOperationSchema.safeParse(candidate);
+    if (!result.success) throw new ApiError(400, "Each sync operation needs its valid kind-specific fields, delivery ID, operation ID and creation time.");
+    return result.data;
   });
 }

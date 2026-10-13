@@ -1,4 +1,4 @@
-import { renderLessonCard } from "../components/card.js";
+import { renderPublishedLesson } from "../components/published-lesson.js";
 import { renderFamiliarityGate } from "../components/familiarity.js";
 import { renderPractice } from "../components/practice.js";
 import { renderStatus } from "../components/status.js";
@@ -6,7 +6,7 @@ import { bindNavigation } from "../components/navigation.js";
 import { renderProfile, renderRecoveryCompletion } from "../components/profile.js";
 import { escapeHtml, renderButton } from "../components/button.js";
 import { BrowserWebAuthn } from "../webauthn.js";
-import { HttpLearningStateAdapter, LearningStateClient } from "../learning-sync.js";
+import { HttpLearningStateAdapter, LearningStateClient, practiceForDelivery } from "../learning-sync.js";
 import { HttpProfileAdapter } from "../profile-api.js";
 import { ProfileClient } from "../profile-client.js";
 import { createInstallation } from "../install.js";
@@ -20,7 +20,7 @@ const retryMinBusyMs = 600;
 const main = document.querySelector("#app-main");
 const syncStatusOutlet = document.querySelector("#learning-sync-status");
 let route = "today";
-let familiarity;
+let historyDeliveryId;
 let revising = false;
 let practiceResult;
 let syncStatus;
@@ -83,53 +83,49 @@ function render() {
     });
     return;
   }
-  if (route === "history") {
+  if (route === "history" && !historyDeliveryId) {
     main.innerHTML = renderHistory();
     return;
   }
+  if (route === "practice") {
+    const cached = learning.cache();
+    practiceVisit = practiceResult === undefined ? cached.history.map(delivery =>
+      delivery.familiarity && practiceForDelivery(delivery, currentLesson(delivery, cached), cached.practiceItems, cached.evidence)
+    ).find(Boolean) : practiceVisit;
+    main.innerHTML = practiceVisit
+      ? renderPractice({ practice: practiceVisit.practice, result: practiceResult })
+      : renderStatus({ label: "Practice", detail: "No Practice items are available for recall right now. You can still read your lessons." });
+    return;
+  }
   const cachedDelivery = currentDelivery();
-  const delivery = route === "practice" ? cachedDelivery : todayDelivery();
+  const delivery = route === "history" ? cachedDelivery : todayDelivery();
   const lesson = currentLesson(delivery);
-  if (!delivery || !lesson || !Array.isArray(lesson.meanings) || !lesson.meanings.length || (route !== "practice" && !isToday(delivery))) {
+  if (!delivery || !lesson) {
+    if (route === "history") {
+      main.innerHTML = renderStatus({ label: "History", detail: "This lesson is unavailable." }) + renderHistory();
+      return;
+    }
     main.innerHTML = learningStatus();
     return;
   }
-  if (route === "practice") {
-    practiceVisit =
-      practiceResult === undefined && familiarity
-        ? practiceFor(delivery, lesson)
-        : practiceVisit;
-    main.innerHTML = familiarity
-      ? practiceResult !== undefined
-        ? renderPractice({
-            practice: practiceVisit.practice,
-            result: practiceResult,
-          })
-        : practiceVisit
-          ? renderPractice({ practice: practiceVisit.practice })
-          : renderStatus({
-              label: "Practice",
-              detail: "Nothing is due for recall right now.",
-            })
-      : renderStatus({
-          label: "Practice",
-          detail: "Record your familiarity before beginning practice.",
-        });
-  } else if (!familiarity || revising) {
+  const known = deliveryFamiliarity(delivery);
+  if (!known || revising) {
     main.innerHTML = renderFamiliarityGate({
       headword: lesson.headword,
-      pronunciation: lesson.pronunciation,
+      pronunciation: lesson.pronunciation.text,
       partOfSpeech: lesson.meanings[0].partOfSpeech,
       revision: revising,
     }) + renderUpcoming();
   } else {
-    main.innerHTML = renderLessonCard({ lesson }) + renderUpcoming();
+    main.innerHTML = renderPublishedLesson({ lesson }) + (route === "today" ? renderUpcoming() : "");
   }
 }
 
 bindNavigation(document.querySelector(".navigation"), {
   onNavigate(nextRoute) {
     route = nextRoute;
+    historyDeliveryId = undefined;
+    revising = false;
     if (route === "history") void profileClient.recordHistoryAccess();
     if (route === "profile") void profileClient.load();
     practiceResult = undefined;
@@ -143,17 +139,22 @@ document.addEventListener("click", async (event) => {
   const target = event.target.closest("[data-action]");
   if (!target) return;
   event.preventDefault();
-  if (target.dataset.action === "familiarity") {
-    familiarity = target.dataset.value;
-    recordLearning("familiarity", { deliveryId: currentDelivery().id, familiarity });
+  if (target.dataset.action === "open-history-lesson") {
+    historyDeliveryId = target.dataset.value;
+    revising = false;
+  } else if (target.dataset.action === "familiarity") {
+    recordLearning("familiarity", { deliveryId: currentDelivery().id, familiarity: target.dataset.value });
     revising = false;
   } else if (target.dataset.action === "revise-familiarity") {
     revising = true;
   } else if (target.dataset.action === "practice-answer") {
+    if (!practiceVisit || practiceResult !== undefined) return;
     practiceResult = target.dataset.value === "correct";
     recordLearning("practice", {
       deliveryId: practiceVisit.delivery.id,
       correct: practiceResult,
+      practiceItemId: practiceVisit.practice.itemId,
+      practiceVersion: practiceVisit.practice.publicationVersion,
     });
   } else if (target.dataset.action === "active-use") {
     recordLearning("active-use", {
@@ -334,8 +335,6 @@ async function startLearning() {
     return;
   }
   await profileClient.load().catch((error) => console.error("profile load failed", error));
-  const cached = learning.cache();
-  familiarity = currentDelivery(cached)?.familiarity;
   if (!navigator.onLine) syncStatus = "offline";
   render();
   await reconcileLearning();
@@ -375,8 +374,10 @@ async function runReconcile({ keepBusy = false } = {}) {
     syncStatus = result.status;
     if (result.status === "deleted") deleted = true;
     if (result.status === "active") {
-      familiarity = currentDelivery()?.familiarity;
-      practiceVisit = undefined;
+      if (practiceVisit && !learning.cache().practiceItems.some(item => item.itemId === practiceVisit.practice.itemId && item.publicationVersion === practiceVisit.practice.publicationVersion)) {
+        practiceVisit = undefined;
+        practiceResult = undefined;
+      }
     }
   } catch (error) {
     syncStatus = "offline";
@@ -398,7 +399,12 @@ async function skipUpcoming(upcomingId) {
 }
 
 function currentDelivery(cached = learning.cache()) {
+  if (route === "history" && historyDeliveryId) return cached.history.find(item => item.id === historyDeliveryId);
   return cached.delivery ?? cached.history.find(({ status }) => status === "current");
+}
+
+function deliveryFamiliarity(delivery) {
+  return learning.outbox().findLast(operation => operation.kind === "familiarity" && operation.deliveryId === delivery.id)?.familiarity ?? delivery.familiarity;
 }
 
 function todayDelivery(cached = learning.cache()) {
@@ -418,13 +424,7 @@ function isToday(delivery) {
 }
 
 function currentLesson(delivery, cached = learning.cache()) {
-  return delivery && cached.lessons.find(({ id }) => id === delivery.lessonId)?.record;
-}
-
-function practiceFor(delivery, lesson) {
-  if (!delivery.recall?.dueAt || delivery.recall.dueAt > new Date().toISOString()) return undefined;
-  const attempts = learning.cache().evidence.filter(({ deliveryId, kind }) => deliveryId === delivery.id && kind === "practice");
-  return { delivery, practice: lesson.meanings[attempts.length % lesson.meanings.length].practice };
+  return delivery?.status === "current" && cached.lessons.find(({ id }) => id === delivery.lessonId)?.record;
 }
 
 function learningStatus() {
@@ -450,7 +450,8 @@ function renderHistory() {
     const lesson = currentLesson(delivery);
     const label = lesson?.headword ?? delivery.normalizedHeadword;
     const familiarityLabel = delivery.status === "current" ? delivery.familiarity ?? "Not started" : "Unavailable";
-    return html`<li><strong>${escapeHtml(label)}</strong> · ${escapeHtml(delivery.localDate)} · ${escapeHtml(familiarityLabel)}</li>`;
+    const heading = lesson ? renderButton({ label, action: "open-history-lesson", value: delivery.id, variant: "outline", size: "small" }) : `<strong>${escapeHtml(label)}</strong>`;
+    return html`<li>${heading} · ${escapeHtml(delivery.localDate)} · ${escapeHtml(familiarityLabel)}</li>`;
   }).join("");
   return html`<section class="card flow">
     <p class="lesson-label">History</p>

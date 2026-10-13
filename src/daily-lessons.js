@@ -1,13 +1,33 @@
+import { projectPublishedLesson } from "./lesson-contract.js";
+import { retainPracticeRevisions, practiceMatchesLesson } from "./practice-contract.js";
+import { practiceForDelivery } from "./learning-sync.js";
+
 export class DailyLessons {
   #profiles = new Map();
   #lessons = new Map();
+  #practiceItems = [];
+  #practiceRevisions = new Map();
+  #servedPractice = new Map();
 
-  constructor(lessons) {
+  constructor(lessons, practiceItems = []) {
     this.setPublishedLessons(lessons);
+    this.setPracticeItems(practiceItems);
   }
 
   setPublishedLessons(lessons) {
-    this.#lessons = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+    this.#lessons = new Map(lessons.map(lesson => {
+      const record = projectPublishedLesson(lesson.record);
+      if (lesson.id !== record.lessonId) throw new Error("Stored lesson identity must match its public record.");
+      return [lesson.id, { ...lesson, record }];
+    }));
+    this.#practiceItems = this.#practiceItems.filter(item => {
+      const lesson = this.#lessons.get(item.lessonId);
+      return lesson && practiceMatchesLesson(item, lesson.record);
+    });
+  }
+
+  setPracticeItems(items) {
+    this.#practiceItems = retainPracticeRevisions(this.#practiceRevisions, items);
   }
 
   setStartingBand(profileId, startingBand) {
@@ -89,25 +109,25 @@ export class DailyLessons {
   }
 
   practice(profileId, now = new Date()) {
-    const due = this.dueRecall(profileId, now)[0];
-    if (!due) return undefined;
-
-    const lesson = this.#currentLesson(due);
-    const attempts = this.#evidence(profileId, due.id).filter(({ kind }) => kind === "practice");
-    const meaning = lesson.record.meanings[attempts.length % lesson.record.meanings.length];
-    return { delivery: due, practice: meaning.practice };
+    const served = this.dueRecall(profileId, now).map(due => practiceForDelivery(due, this.#currentLesson(due)?.record,
+      this.#practiceItems, this.#evidence(profileId, due.id), now)).find(Boolean);
+    if (served) this.#servedPractice.set(`${profileId}:${served.delivery.id}`, structuredClone(served.practice));
+    return served && structuredClone(served);
   }
 
   answerPractice(profileId, deliveryId, answer, now = new Date()) {
     const delivery = this.#delivery(profileId, deliveryId);
     const due = this.dueRecall(profileId, now).some(({ id }) => id === deliveryId);
     if (!due) throw new Error("This word is not due for recall.");
+    const served = this.#servedPractice.get(`${profileId}:${deliveryId}`);
+    if (!served) throw new Error("No Practice item was served for this delivery.");
 
     if (!["correct", "incorrect"].includes(answer)) throw new Error("Practice answer was not recognized.");
     const correct = answer === "correct";
-    this.#recordEvidence(profileId, { kind: "practice", deliveryId, correct }, now);
+    this.#recordEvidence(profileId, { kind: "practice", deliveryId, correct, practiceItemId: served.itemId, practiceVersion: served.publicationVersion }, now);
+    this.#servedPractice.delete(`${profileId}:${deliveryId}`);
     const updated = this.#rebuildDelivery(profileId, deliveryId);
-    return { correct, delivery: updated };
+    return { correct, delivery: updated, practiceItemId: served.itemId, practiceVersion: served.publicationVersion };
   }
 
   dueRecall(profileId, now = new Date()) {
@@ -172,9 +192,7 @@ export class DailyLessons {
   }
 
   #currentLesson(delivery) {
-    return [...this.#lessons.values()].find(
-      (lesson) => lesson.record.normalizedHeadword === delivery.normalizedHeadword
-    );
+    return this.#lessons.get(delivery.lessonId);
   }
 
   #recordEvidence(profileId, evidence, now = new Date()) {

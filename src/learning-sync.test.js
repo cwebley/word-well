@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { HttpLearningStateAdapter, indexedDbStorage, LearningStateClient, LearningStateServer } from "./learning-sync.js";
+import { HttpLearningStateAdapter, indexedDbStorage, LearningStateClient, LearningStateServer, practiceForDelivery } from "./learning-sync.js";
+import { syntheticLesson } from "./fixtures/versioned-word-lesson.js";
+import { versionedPractice } from "./fixtures/versioned-practice.js";
 
 const day = 24 * 60 * 60 * 1000;
 
-function lesson(id, headword, version = "1") {
-  return { id, record: { headword, normalizedHeadword: headword, version } };
+function lesson(id, headword, version = 1) {
+  return { id, record: syntheticLesson(id, headword, version) };
 }
 
 function setup() {
@@ -12,6 +14,7 @@ function setup() {
   let clientContext = 1;
   const server = new LearningStateServer({
     lessons: [lesson("candid", "candid"), lesson("lucid", "lucid")],
+    practiceItems: [{ ...versionedPractice, lessonId: "candid" }],
     now: () => time
   });
   const profile = server.createProfile();
@@ -35,6 +38,59 @@ function storage() {
 }
 
 describe("learner synchronization seam", () => {
+  it("rejects changes to a retained Practice revision even after withdrawal", () => {
+    const { server } = setup();
+    server.setPracticeItems([]);
+    expect(() => server.setPracticeItems([{ ...versionedPractice, lessonId: "candid", explanation: "Overwritten." }])).toThrow("immutable");
+  });
+  it("restores current public attribution offline and discards it after withdrawal", async () => {
+    const { server, profile } = setup();
+    server.setPracticeItems([]);
+    server.recordDelivery(profile, { id: "delivery-1", lessonId: "candid", localDate: "2026-08-27" });
+    const persisted = storage();
+    const first = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser" });
+    await first.synchronize();
+    const replacement = lesson("candid", "candid", 2);
+    replacement.record.meanings[0].examples[0] = "Replacement wording.";
+    replacement.record.privateReply = "must not cache";
+    server.setLessons([replacement]);
+    await first.synchronize();
+    const offline = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser" });
+    expect(offline.cache().lessons[0].record.publicationVersion).toBe(2);
+    expect(offline.cache().lessons[0].record.sources).toEqual(replacement.record.sources);
+    expect(offline.cache().lessons[0].record).not.toHaveProperty("privateReply");
+    expect(offline.cache().practiceItems).toEqual([]);
+    server.setLessons([]);
+    await offline.synchronize();
+    const reloaded = new LearningStateClient({ server, profile, storage: persisted, clientId: "browser" });
+    expect(reloaded.cache().lessons).toEqual([]);
+    expect(reloaded.cache().history[0].status).toBe("unavailable");
+  });
+
+  it("drops the prototype cache and outbox without converting them", () => {
+    const persisted = storage();
+    persisted.save("profile", "browser", { cache: { lessons: ["prototype"] }, outbox: [{ kind: "practice" }] });
+    const client = new LearningStateClient({ server: {}, profile: "profile", storage: persisted, clientId: "browser" });
+    expect(client.cache().lessons).toEqual([]);
+    expect(client.outbox()).toEqual([]);
+  });
+
+  it("selects Practice by stable meaning and definition/POS, never by meaning position", () => {
+    const lesson = syntheticLesson("lesson-candid", "candid");
+    lesson.meanings.unshift({ ...lesson.meanings[0], id: "other-meaning" });
+    const delivery = { id: "delivery", status: "current", recall: { dueAt: "2026-08-27T00:00:00Z" } };
+    const now = new Date("2026-08-28T00:00:00Z");
+    expect(practiceForDelivery(delivery, lesson, [], [], now)).toBeUndefined();
+    expect(practiceForDelivery(delivery, lesson, [versionedPractice], [], now).practice.meaningId).toBe("meaning-candid-direct");
+    lesson.meanings[1].definition = "Different definition";
+    expect(practiceForDelivery(delivery, lesson, [versionedPractice], [], now)).toBeUndefined();
+    lesson.meanings[1].definition = versionedPractice.definition;
+    lesson.meanings[1].partOfSpeech = "noun";
+    expect(practiceForDelivery(delivery, lesson, [versionedPractice], [], now)).toBeUndefined();
+    lesson.meanings[1].partOfSpeech = "adjective";
+    lesson.meanings[1].id = "split-meaning";
+    expect(practiceForDelivery(delivery, lesson, [versionedPractice], [], now)).toBeUndefined();
+  });
   it("constructs an HTTP adapter with its default browser client context", () => {
     expect(() => new HttpLearningStateAdapter({ fetch: () => {} })).not.toThrow();
   });
@@ -66,7 +122,7 @@ describe("learner synchronization seam", () => {
 
     await offline.synchronize();
 
-    expect(offline.cache()).toMatchObject({ appShell: true, history: expect.any(Array), practice: expect.any(Array) });
+    expect(offline.cache()).toMatchObject({ appShell: true, history: expect.any(Array), practiceItems: expect.any(Array) });
     expect(offline.cache().history).toHaveLength(50);
     expect(offline.cache().lessons).toHaveLength(50);
     expect(JSON.stringify(offline.cache())).not.toMatch(/session|passkey|recovery|analytics/i);
@@ -77,7 +133,7 @@ describe("learner synchronization seam", () => {
     const offline = client();
 
     offline.record("familiarity", { deliveryId: "delivery-1", familiarity: "Completely new to me" });
-    offline.record("practice", { deliveryId: "delivery-1", correct: true });
+    offline.record("practice", { deliveryId: "delivery-1", correct: true, practiceItemId: versionedPractice.itemId, practiceVersion: 1 });
     expect(() => offline.record("delivery", { lessonId: "candid" })).toThrow("cannot be queued");
     expect(offline.outbox()).toHaveLength(2);
 
@@ -95,7 +151,7 @@ describe("learner synchronization seam", () => {
     await second.synchronize();
 
     const familiarity = first.record("familiarity", { deliveryId: "delivery-1", familiarity: "Completely new to me" });
-    const practice = first.record("practice", { deliveryId: "delivery-1", correct: true });
+    const practice = first.record("practice", { deliveryId: "delivery-1", correct: true, practiceItemId: versionedPractice.itemId, practiceVersion: 1 });
     await first.synchronize();
     first.retry(familiarity.id);
     first.retry(practice.id);
@@ -121,7 +177,7 @@ describe("learner synchronization seam", () => {
     server.deleteProfile(profile);
     offline.record("utility", { deliveryId: "delivery-1", utility: "useful" });
     expect(offline.synchronize()).toEqual({ status: "deleted" });
-    expect(offline.cache()).toEqual({ appShell: true, lessons: [], history: [], practice: [] });
+    expect(offline.cache()).toEqual({ appShell: true, lessons: [], history: [], practiceItems: [], evidence: [], mutable: [] });
   });
 
   it("reports session expiry without accepting queued changes", async () => {
@@ -150,6 +206,7 @@ describe("learner synchronization seam", () => {
   it("hydrates the server-issued delivery before offline rendering and queues changes for that delivery", async () => {
     const persisted = storage();
     const canonical = {
+      practiceItems: [],
       lessons: [lesson("candid", "candid")],
       history: [{ id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" }],
       delivery: { id: "delivery-server-1", lessonId: "candid", localDate: "2026-08-27", status: "current" },
@@ -157,7 +214,8 @@ describe("learner synchronization seam", () => {
       mutable: [],
     };
     await persisted.save("server-profile", "browser-tab", {
-      cache: { appShell: true, lessons: canonical.lessons, history: canonical.history, delivery: canonical.delivery, practice: [], evidence: [], mutable: [] },
+      cacheVersion: "wordwell-cache-v2",
+      cache: { appShell: true, lessons: canonical.lessons, history: canonical.history, delivery: canonical.delivery, practiceItems: [], evidence: [], mutable: [] },
       outbox: [],
       clientId: "browser-tab",
       nextOperation: 1,
@@ -180,7 +238,8 @@ describe("learner synchronization seam", () => {
   it("persists learner cache and outbox records in IndexedDB without using local storage", async () => {
     const storage = indexedDbStorage({ indexedDB: fakeIndexedDb() });
     const value = {
-      cache: { appShell: true, lessons: [], history: [], practice: [] },
+      cacheVersion: "wordwell-cache-v2",
+      cache: { appShell: true, lessons: [], history: [], practiceItems: [], evidence: [], mutable: [] },
       outbox: [{ id: "browser:operation-1" }],
       clientId: "browser",
       nextOperation: 2
@@ -189,7 +248,7 @@ describe("learner synchronization seam", () => {
     await storage.save("client:browser", "browser", value);
     expect(await storage.load("client:browser", "browser")).toEqual(value);
     const reloaded = new LearningStateClient({
-      server: { synchronize: () => ({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }) },
+      server: { synchronize: () => ({ status: "active", state: { lessons: [], practiceItems: [], history: [], evidence: [], mutable: [] } }) },
       profile: "client:browser",
       clientId: "browser",
       storage
@@ -206,7 +265,7 @@ describe("learner synchronization seam", () => {
     const calls = [];
     const responses = [
       response(201, { profile: { state: "anonymous" }, session: { grant: "first-grant" } }),
-      response(200, { status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }),
+      response(200, { status: "active", state: { lessons: [], practiceItems: [], history: [], evidence: [], mutable: [] } }),
       response(401, { status: "session-expired" }),
       response(200, { status: "active", session: { grant: "renewed-grant" } }),
       response(410, { status: "deleted" })
@@ -243,7 +302,7 @@ describe("learner synchronization seam", () => {
     expect(calls[2].options.headers.authorization).toBe("Bearer first-grant");
     expect(calls[4].options.headers.authorization).toBe("Bearer renewed-grant");
     expect(client.outbox()).toEqual([]);
-    expect(client.cache()).toEqual({ appShell: true, lessons: [], history: [], practice: [] });
+    expect(client.cache()).toEqual({ appShell: true, lessons: [], history: [], practiceItems: [], evidence: [], mutable: [] });
     expect(sessions.get("browser-tab")).toBeUndefined();
   });
 });
@@ -255,6 +314,7 @@ function response(status, body) {
 function fakeIndexedDb() {
   const records = new Map();
   const database = {
+    objectStoreNames: { contains: () => false },
     createObjectStore() {},
     transaction() {
       return {

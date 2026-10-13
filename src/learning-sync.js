@@ -1,4 +1,9 @@
+import { projectLearnerState, learnerOperationSchema, syncOperationSchema } from "./learner-state-contract.js";
+import { practiceMatchesLesson, retainPracticeRevisions } from "./practice-contract.js";
+
+const cacheVersion = "wordwell-cache-v2";
 const maxCachedLessons = 50;
+const maxCachedPracticeItems = 500;
 const maxOutboxOperations = 100;
 const outboxLifetime = 30 * 24 * 60 * 60 * 1000;
 const permittedKinds = new Set([
@@ -14,13 +19,16 @@ const recallStages = ["new", "1 day", "3 days", "7 days", "14 days", "30 days"];
 export class LearningStateServer {
   #profiles = new Map();
   #lessons = new Map();
+  #practiceItems = [];
+  #practiceRevisions = new Map();
   #now;
   #nextProfile = 1;
   #nextOrder = 1;
 
-  constructor({ lessons = [], now = () => new Date() } = {}) {
+  constructor({ lessons = [], practiceItems = [], now = () => new Date() } = {}) {
     this.#now = now;
     this.setLessons(lessons);
+    this.setPracticeItems(practiceItems);
   }
 
   createProfile() {
@@ -38,6 +46,14 @@ export class LearningStateServer {
 
   setLessons(lessons) {
     this.#lessons = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+    this.#practiceItems = this.#practiceItems.filter(item => {
+      const lesson = this.#lessons.get(item.lessonId);
+      return lesson && practiceMatchesLesson(item, lesson.record);
+    });
+  }
+
+  setPracticeItems(items) {
+    this.#practiceItems = retainPracticeRevisions(this.#practiceRevisions, items);
   }
 
   recordDelivery(profileId, delivery) {
@@ -95,7 +111,7 @@ export class LearningStateServer {
         };
       })
       .sort((left, right) => right.localDate.localeCompare(left.localDate));
-    return { evidence, mutable, history, lessons: [...this.#lessons.values()] };
+    return projectLearnerState({ evidence, mutable, history, lessons: [...this.#lessons.values()], practiceItems: this.#practiceItems });
   }
 
   #accept(profile, operation) {
@@ -104,8 +120,13 @@ export class LearningStateServer {
       profile.received.has(operation.id)
     )
       return;
+    if (operation.kind === "practice") {
+      const item = this.#practiceRevisions.get(`${operation.practiceItemId}:${operation.practiceVersion}`);
+      if (!item || !profile.deliveries.some(delivery => delivery.id === operation.deliveryId && delivery.lessonId === item.lessonId))
+        throw new Error("Practice must reference a published item version for this delivery.");
+    }
     const accepted = {
-      ...operation,
+      ...learnerOperationSchema.parse(operation),
       acceptedAt: this.#now().toISOString(),
       order: this.#nextOrder++,
     };
@@ -134,7 +155,7 @@ export class LearningStateClient {
   #sent = new Map();
   #nextOperation = 1;
   #clientId;
-  #cache = { appShell: true, lessons: [], history: [], practice: [] };
+  #cache = emptyCache();
   #ready;
 
   constructor({
@@ -161,12 +182,12 @@ export class LearningStateClient {
   record(kind, details) {
     if (!permittedKinds.has(kind))
       throw new Error(`${kind} cannot be queued while offline.`);
-    const operation = {
+    const operation = syncOperationSchema.parse({
       id: `${this.#clientId}:operation-${this.#nextOperation++}`,
       kind,
       ...details,
       createdAt: this.#now().toISOString(),
-    };
+    });
     this.#queue(operation);
     this.#save();
     return operation;
@@ -237,7 +258,7 @@ export class LearningStateClient {
     if (response.status === "deleted") {
       this.#outbox = [];
       this.#sent.clear();
-      this.#cache = { appShell: true, lessons: [], history: [], practice: [] };
+      this.#cache = emptyCache();
       const cleared = this.#storage.clearProfile(this.#profile);
       if (cleared instanceof Promise) void cleared.catch(() => {});
       return { status: "deleted" };
@@ -267,7 +288,7 @@ export class LearningStateClient {
     await this.ready();
     this.#outbox = [];
     this.#sent.clear();
-    this.#cache = { appShell: true, lessons: [], history: [], practice: [] };
+    this.#cache = emptyCache();
     const cleared = this.#storage.clearProfile(this.#profile);
     if (cleared instanceof Promise) await cleared;
   }
@@ -279,6 +300,7 @@ export class LearningStateClient {
 
   #save() {
     const saved = this.#storage.save(this.#profile, this.#clientId, {
+      cacheVersion,
       cache: this.#cache,
       outbox: this.#outbox,
       clientId: this.#clientId,
@@ -288,9 +310,9 @@ export class LearningStateClient {
   }
 
   #restore(saved, clientId) {
-    if (saved) {
+    if (saved?.cacheVersion === cacheVersion) {
       this.#outbox = saved.outbox;
-      this.#cache = saved.cache;
+      this.#cache = cache(saved.cache);
       this.#clientId = saved.clientId;
       this.#nextOperation = saved.nextOperation;
     } else {
@@ -381,7 +403,12 @@ export class HttpLearningStateAdapter {
   }
 }
 
-function cache(state) {
+function emptyCache() {
+  return { appShell: true, lessons: [], history: [], practiceItems: [], evidence: [], mutable: [] };
+}
+
+function cache(value) {
+  const state = projectLearnerState(value);
   const history = state.history.slice(0, maxCachedLessons);
   const lessonIds = new Set(
     history
@@ -391,14 +418,13 @@ function cache(state) {
   return {
     appShell: true,
     lessons: state.lessons
-      .filter(({ id }) => lessonIds.has(id))
-      .map(learnerSafe),
-    history: history.map(learnerSafe),
-    practice: history.filter(({ recall }) => recall).map(learnerSafe),
-    evidence: state.evidence.map(learnerSafe),
-    mutable: state.mutable.map(learnerSafe),
-    ...(state.delivery ? { delivery: learnerSafe(state.delivery) } : {}),
-    ...(state.upcoming ? { upcoming: state.upcoming.map(learnerSafe) } : {}),
+      .filter(({ id }) => lessonIds.has(id)),
+    history,
+    practiceItems: state.practiceItems.filter(item => lessonIds.has(item.lessonId)).slice(0, maxCachedPracticeItems),
+    evidence: state.evidence,
+    mutable: state.mutable,
+    ...(state.delivery ? { delivery: state.delivery } : {}),
+    ...(state.upcoming ? { upcoming: state.upcoming } : {}),
   };
 }
 
@@ -444,21 +470,6 @@ function byOrder(left, right) {
   return left.order - right.order;
 }
 
-function learnerSafe(value) {
-  if (Array.isArray(value)) return value.map(learnerSafe);
-  if (!value || typeof value !== "object") return value;
-  return Object.fromEntries(
-    Object.entries(value)
-      .filter(
-        ([key]) =>
-          !/session|passkey|credential|recovery|analytics|pipeline|provenance/i.test(
-            key,
-          ),
-      )
-      .map(([key, item]) => [key, learnerSafe(item)]),
-  );
-}
-
 export function indexedDbStorage({ indexedDB = globalThis.indexedDB } = {}) {
   if (!indexedDB) return memoryStorage();
   const database = openDatabase(indexedDB);
@@ -496,12 +507,22 @@ export function indexedDbStorage({ indexedDB = globalThis.indexedDB } = {}) {
 
 function openDatabase(indexedDB) {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("wordwell", 1);
-    request.onupgradeneeded = () =>
+    const request = indexedDB.open("wordwell", 2);
+    request.onupgradeneeded = () => {
+      if (request.result.objectStoreNames.contains("learner-state")) request.result.deleteObjectStore("learner-state");
       request.result.createObjectStore("learner-state", { keyPath: "id" });
+    };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+export function practiceForDelivery(delivery, lesson, items, evidence = [], now = new Date()) {
+  if (!delivery || delivery.status === "unavailable" || !lesson || !delivery.recall?.dueAt || delivery.recall.dueAt > now.toISOString()) return undefined;
+  const bank = items.filter(item => practiceMatchesLesson(item, lesson));
+  if (!bank.length) return undefined;
+  const attempts = evidence.filter(event => event.deliveryId === delivery.id && event.kind === "practice").length;
+  return { delivery, practice: bank[attempts % bank.length] };
 }
 
 function memoryStorage() {

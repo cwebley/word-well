@@ -8,8 +8,8 @@ let baseUrl;
 beforeAll(async () => {
   const database = {
     createAnonymousProfile: async () => ({ profile: { state: "anonymous" }, session: { grant: "grant", expiresAt: "2026-09-26T12:00:00.000Z" } }),
-    readState: async () => ({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } }),
-    synchronize: async (_grant, operations) => ({ status: "active", state: { lessons: [], history: [], evidence: operations, mutable: [] } }),
+    readState: async () => ({ status: "active", state: { lessons: [], practiceItems: [], history: [], evidence: [], mutable: [] } }),
+    synchronize: async (_grant, operations) => ({ status: "active", state: { lessons: [], practiceItems: [], history: [], evidence: operations, mutable: [] } }),
     renewSession: async () => ({ status: "session-expired" }),
     recordProductSignal: async (signal) => recorded.push(signal)
   };

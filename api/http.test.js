@@ -6,6 +6,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { LearnerDatabase } from "./database.js";
 import { createApi } from "./http.js";
 import { databaseConnection, inDatabase } from "../db/connections.mjs";
+import { syntheticLesson } from "../src/fixtures/versioned-word-lesson.js";
+import { versionedPractice } from "../src/fixtures/versioned-practice.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 const suite = describe.skipIf(!databaseUrl);
@@ -61,7 +63,7 @@ suite("learner HTTP seam", () => {
 
     const state = await request("GET", "/learning-state", created.body.session.grant);
     expect(state.response.status).toBe(200);
-    expect(state.body).toEqual({ status: "active", state: { lessons: [], history: [], evidence: [], mutable: [] } });
+    expect(state.body).toEqual({ status: "active", state: { lessons: [], practiceItems: [], history: [], evidence: [], mutable: [] } });
   });
 
   it("delivers one lesson per local date, promotes the reserved queue, and does not catch up missed dates", async () => {
@@ -149,6 +151,8 @@ suite("learner HTTP seam", () => {
       kind: "practice",
       deliveryId: "delivery-1",
       correct: true,
+      practiceItemId: versionedPractice.itemId,
+      practiceVersion: versionedPractice.publicationVersion,
       createdAt: now.toISOString()
     };
 
@@ -192,6 +196,64 @@ suite("learner HTTP seam", () => {
     const deleted = await request("GET", "/learning-state", created.body.session.grant);
     expect(deleted.response.status).toBe(410);
     expect(deleted.body).toEqual({ status: "deleted" });
+  });
+
+  it("projects every public lesson field and rejects a fabricated empty-bank attempt", async () => {
+    await seedPublishedLessons();
+    const record = syntheticLesson("lesson-candid", "candid");
+    record.rawReply = "private root";
+    record.meanings[0].internalMapping = "private meaning";
+    record.sources[0].rejectionDetails = "private source";
+    await pool.query("UPDATE published_lessons SET record = $1 WHERE id = 'lesson-candid'", [record]);
+    const created = await request("POST", "/profiles/anonymous");
+    const state = await request("GET", "/learning-state", created.body.session.grant);
+    expect(state.body.state.lessons[0].record).toEqual(syntheticLesson("lesson-candid", "candid"));
+    expect(state.body.state.practiceItems).toEqual([]);
+    const result = await request("POST", "/learning-state/sync", created.body.session.grant, { operations: [{
+      id: "fabricated", kind: "practice", deliveryId: state.body.state.delivery.id,
+      correct: true, practiceItemId: "no-item", practiceVersion: 1, createdAt: now.toISOString()
+    }] });
+    expect(result.response.status).toBe(400);
+    expect((await pool.query("SELECT * FROM learner_evidence")).rows).toEqual([]);
+  });
+
+  it("keeps independent Practice through example edits and hides mismatched or withdrawn items", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    await seedLessonAndDelivery(await profileForGrant(created.body.session.grant));
+    const grant = created.body.session.grant;
+    expect((await request("GET", "/learning-state", grant)).body.state.practiceItems).toEqual([versionedPractice]);
+    const replacement = syntheticLesson("lesson-candid", "candid", 2);
+    replacement.meanings[0].examples[0] = "A replacement candid example.";
+    await pool.query("UPDATE published_lessons SET record = $1 WHERE id = 'lesson-candid'", [replacement]);
+    expect((await request("GET", "/learning-state", grant)).body.state.practiceItems).toEqual([versionedPractice]);
+    replacement.meanings[0].definition = "A changed defining meaning.";
+    await pool.query("UPDATE published_lessons SET record = $1 WHERE id = 'lesson-candid'", [replacement]);
+    expect((await request("GET", "/learning-state", grant)).body.state.practiceItems).toEqual([]);
+    await pool.query("UPDATE published_lessons SET record = $1 WHERE id = 'lesson-candid'", [syntheticLesson("lesson-candid", "candid", 3)]);
+    expect((await request("GET", "/learning-state", grant)).body.state.practiceItems).toEqual([]);
+    expect((await pool.query("SELECT available FROM published_practice_items")).rows).toEqual([{ available: false }]);
+    await pool.query("UPDATE published_lessons SET available = false WHERE id = 'lesson-candid'");
+    const withdrawn = (await request("GET", "/learning-state", grant)).body.state;
+    expect(withdrawn.lessons).toEqual([]);
+    expect(withdrawn.practiceItems).toEqual([]);
+    expect(withdrawn.history[0].status).toBe("unavailable");
+  });
+
+  it("preserves the item version for an offline attempt after withdrawal and denies learner content writes", async () => {
+    const created = await request("POST", "/profiles/anonymous");
+    await seedLessonAndDelivery(await profileForGrant(created.body.session.grant));
+    await expect(pool.query("INSERT INTO published_practice_items (item_id, publication_version, lesson_id, record) VALUES ('incomplete',1,'lesson-candid','{}')")).rejects.toThrow(/practice_identity_required/);
+    await expect(learnerPool.query("UPDATE published_practice_items SET available = false")).rejects.toThrow(/permission denied/);
+    await expect(pool.query("UPDATE published_practice_items SET record = jsonb_set(record, '{explanation}', '\"changed\"')")).rejects.toThrow(/immutable/);
+    await pool.query("UPDATE published_practice_items SET available = false");
+    const operation = { id: "offline-item-attempt", kind: "practice", deliveryId: "delivery-1", correct: true,
+      practiceItemId: versionedPractice.itemId, practiceVersion: 1, createdAt: now.toISOString() };
+    const result = await request("POST", "/learning-state/sync", created.body.session.grant, { operations: [operation] });
+    expect(result.response.status).toBe(200);
+    expect(result.body.state.practiceItems).toEqual([]);
+    expect(result.body.state.evidence[0]).toMatchObject({ practiceItemId: versionedPractice.itemId, practiceVersion: 1 });
+    const retry = await request("POST", "/learning-state/sync", created.body.session.grant, { operations: [operation] });
+    expect(retry.body.state.evidence).toHaveLength(1);
   });
 
   it.skip("refuses protection when the profile has no eligibility, then accepts it after meaningful history", async () => {
@@ -433,8 +495,10 @@ suite("learner HTTP seam", () => {
   async function seedLessonAndDelivery(profileId) {
     await pool.query(
       "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
-      ["lesson-candid", "candid", { headword: "candid", normalizedHeadword: "candid", provenance: { source: "private" } }]
+      ["lesson-candid", "candid", { ...syntheticLesson("lesson-candid", "candid"), provenance: { source: "private" }, rawReply: "private" }]
     );
+    await pool.query("INSERT INTO published_practice_items (item_id, publication_version, lesson_id, record) VALUES ($1, $2, $3, $4)",
+      [versionedPractice.itemId, 1, "lesson-candid", versionedPractice]);
     await pool.query(
       "INSERT INTO deliveries (id, profile_id, local_date, lesson_id, normalized_headword) VALUES ($1, $2, $3, $4, $5)",
       ["delivery-1", profileId, "2026-08-27", "lesson-candid", "candid"]
@@ -445,7 +509,7 @@ suite("learner HTTP seam", () => {
     for (const date of dates) {
       await pool.query(
         "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
-        [`lesson-${date}`, `headword-${date}`, { headword: `headword-${date}`, normalizedHeadword: `headword-${date}`, meanings: [{ definition: "test", examples: ["example"] }] }]
+        [`lesson-${date}`, `headword-${date}`, syntheticLesson(`lesson-${date}`, `headword-${date}`)]
       );
       await pool.query(
         "INSERT INTO deliveries (id, profile_id, local_date, lesson_id, normalized_headword) VALUES ($1, $2, $3, $4, $5)",
@@ -458,25 +522,7 @@ suite("learner HTTP seam", () => {
     for (const [id, headword] of [["lesson-candid", "candid"], ["lesson-lucid", "lucid"], ["lesson-plain", "plain"]]) {
       await pool.query(
         "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
-        [id, headword, {
-          headword,
-          normalizedHeadword: headword,
-          startingBand: "Stretch my vocabulary",
-          meanings: [{
-            definition: "A test meaning.",
-            examples: ["A first example.", "A second example.", "A third example."],
-            useItWhen: "testing delivery",
-            doNotUseItFor: "anything else",
-            synonyms: ["test"],
-            partOfSpeech: "noun",
-            practice: {
-              prompt: "Which example is correct?",
-              correctSentence: "A first example.",
-              incorrectSentence: "A second example.",
-              explanation: "This is test content."
-            }
-          }]
-        }]
+        [id, headword, syntheticLesson(id, headword)]
       );
     }
   }

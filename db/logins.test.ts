@@ -7,6 +7,7 @@ import { z } from "zod";
 import { applyMigrations } from "./apply-migrations.mjs";
 import { databaseConnection, inDatabase } from "./connections.mjs";
 import { testDatabase } from "../pipeline/testing/private-fixtures.js";
+import { versionedWordLesson } from "../src/fixtures/versioned-word-lesson.js";
 
 const configured = process.env.WORDWELL_ADMIN_DATABASE_URL && process.env.WORDWELL_LEARNER_DATABASE_URL && process.env.WORDWELL_PIPELINE_DATABASE_URL;
 describe.skipIf(!configured)("actual PostgreSQL job logins", () => {
@@ -22,8 +23,8 @@ describe.skipIf(!configured)("actual PostgreSQL job logins", () => {
     admin = new pg.Pool({ connectionString: fixture.adminUrl });
     learner = new pg.Pool({ connectionString: fixture.learnerUrl });
     pipeline = new pg.Pool({ connectionString: fixture.pipelineUrl });
-    await admin.query(`INSERT INTO published_lessons (id, normalized_headword, record)
-      VALUES ('lesson-candid', 'candid', '{"headword":"candid","normalizedHeadword":"candid","meanings":[{"definition":"A harmless test meaning."}]}')`);
+    await admin.query("INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1, $2, $3)",
+      [versionedWordLesson.lessonId, versionedWordLesson.normalizedHeadword, versionedWordLesson]);
   });
   afterAll(async () => {
     await Promise.all([admin?.end(), learner?.end(), pipeline?.end()]);
@@ -58,6 +59,10 @@ describe.skipIf(!configured)("actual PostgreSQL job logins", () => {
     await denied(learner, "DELETE FROM published_lessons");
     await denied(learner, "TRUNCATE published_lessons CASCADE");
     await denied(learner, "ALTER TABLE published_lessons ADD COLUMN bad int");
+    expect((await learner.query("SELECT * FROM published_practice_items")).rows).toEqual([]);
+    await denied(learner, "INSERT INTO published_practice_items (item_id, publication_version, lesson_id, record) VALUES ('bad',1,'lesson-candid','{}')");
+    await denied(learner, "UPDATE published_practice_items SET available = false");
+    await denied(learner, "DELETE FROM published_practice_items");
     await denied(learner, "CREATE TABLE private.runtime_table (id int)");
     const { rows } = await admin.query("SELECT tablename FROM pg_tables WHERE schemaname = 'private'");
     for (const row of rows) {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderButton } from "./button.js";
-import { renderLessonCard } from "./card.js";
+import { renderPublishedLesson } from "./published-lesson.js";
 import { renderFamiliarityGate } from "./familiarity.js";
 import { renderPractice } from "./practice.js";
 import { renderStatus } from "./status.js";
@@ -8,9 +8,10 @@ import { renderLearningSyncStatus } from "./learning-sync-status.js";
 import { bindNavigation, renderNavigation } from "./navigation.js";
 import { renderProfile } from "./profile.js";
 import {
-  multiMeaningVocabularyRecord,
-  seededVocabularyRecord,
-} from "../fixtures/published-word-lesson.js";
+  multiMeaningWordLesson,
+  versionedWordLesson,
+} from "../fixtures/versioned-word-lesson.js";
+import { versionedPractice } from "../fixtures/versioned-practice.js";
 
 describe("SwatchKit shared WordWell components", () => {
   it("escapes and delegates button actions", () => {
@@ -21,7 +22,7 @@ describe("SwatchKit shared WordWell components", () => {
   });
 
   it("renders the learner components shared by the application and library", () => {
-    const lesson = renderLessonCard({ lesson: seededVocabularyRecord });
+    const lesson = renderPublishedLesson({ lesson: versionedWordLesson });
     expect(lesson).toContain("candid");
     expect(lesson).toContain('class="region word-lesson"');
     expect(lesson).toContain('class="region wrapper word-hero"');
@@ -48,14 +49,14 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain("Useful to me");
     expect(lesson).toContain("I&#39;m using this");
     expect(lesson).toContain("This seems wrong");
-    const practice = renderPractice({ practice: seededVocabularyRecord.meanings[0].practice });
+    const practice = renderPractice({ practice: versionedPractice });
     expect(practice).toContain("Which sentence uses candid naturally?");
     expect(practice).toContain('class="button choice large"');
     expect(practice).toContain('class="practice region region-space:space-l"');
     expect(practice).toContain('class="wrapper"');
     expect(practice).not.toContain('class="card practice');
     expect(practice).not.toContain("lesson-label");
-    expect(renderPractice({ practice: seededVocabularyRecord.meanings[0].practice, result: false })).not.toContain("Practice again");
+    expect(renderPractice({ practice: versionedPractice, result: false })).not.toContain("Practice again");
     expect(renderStatus({ label: "You're offline", detail: "Downloaded lessons remain available." })).toContain("You&#39;re offline");
     expect(renderLearningSyncStatus("offline")).toContain('data-action="retry-learning"');
     expect(renderLearningSyncStatus("session-expired")).toContain("Session expired");
@@ -63,7 +64,7 @@ describe("SwatchKit shared WordWell components", () => {
   });
 
   it("renders every meaning in a multi-meaning lesson", () => {
-    const lesson = renderLessonCard({ lesson: multiMeaningVocabularyRecord });
+    const lesson = renderPublishedLesson({ lesson: multiMeaningWordLesson });
 
     expect(lesson).toContain("honest and direct, even when the truth may be uncomfortable");
     expect(lesson).toContain("shown plainly in a photograph without posing or concealment");
@@ -72,7 +73,7 @@ describe("SwatchKit shared WordWell components", () => {
     expect(lesson).toContain('id="lesson-meaning-1"');
     expect(lesson).toContain('id="lesson-examples-0"');
     expect(lesson).toContain('id="lesson-examples-1"');
-    expect(lesson).toContain("Also: frank, open, unposed, informal");
+    expect(lesson).toContain("Synonym contrasts");
   });
 
   it("renders navigation with an active page", () => {
