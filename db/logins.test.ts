@@ -72,7 +72,19 @@ describe.skipIf(!configured)("actual PostgreSQL job logins", () => {
     await denied(pipeline, "ALTER TABLE private.experiments ADD COLUMN bad int");
     await denied(pipeline, "DELETE FROM private.experiments");
     await denied(pipeline, "SELECT * FROM profiles");
-    await denied(pipeline, "INSERT INTO published_lessons (id, normalized_headword, record) VALUES ('bad','bad','{}')");
+    await denied(pipeline, "DELETE FROM published_lessons");
+    await denied(pipeline, "UPDATE published_lessons SET id='changed'");
+    await denied(pipeline, "UPDATE published_lessons SET normalized_headword='changed'");
+  });
+
+  it("grants the pipeline explicit lesson INSERT and content/availability UPDATE without identity mutation", async () => {
+    await pipeline.query("BEGIN");
+    try {
+      await pipeline.query("INSERT INTO published_lessons (id, normalized_headword, record) VALUES ($1,$2,$3)",
+        ["publication-permission-fixture", "fixture", { ...versionedWordLesson, lessonId: "publication-permission-fixture" }]);
+      await pipeline.query("UPDATE published_lessons SET record=record,available=false,withdrawal_reason='fixture' WHERE id='publication-permission-fixture'");
+      expect((await pipeline.query("SELECT available FROM published_lessons WHERE id='publication-permission-fixture'")).rows[0].available).toBe(false);
+    } finally { await pipeline.query("ROLLBACK"); }
   });
 
   it("keeps new public records denied and grants new private tables through migration-owner defaults", async () => {
